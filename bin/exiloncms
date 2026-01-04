@@ -175,6 +175,73 @@ function extractZip(string $zipPath, string $destination): bool
     return true;
 }
 
+function ask_simple_choice(string $question, array $options, $default = null): string
+{
+    $keys = array_keys($options);
+    $defaultIndex = array_search($default ?? $keys[0], $keys, true);
+    if ($defaultIndex === false) {
+        $defaultIndex = 0;
+    }
+
+    $selectedIndex = $defaultIndex;
+
+    // Save terminal settings
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        system('stty -echo -icanon min 0 time 0');
+    }
+
+    echo colorize($question, 'cyan') . "\n\n";
+
+    // Display menu
+    while (true) {
+        // Clear screen and redraw menu
+        echo "\033[" . (count($options) + 2) . "A"; // Move cursor up
+        echo "\033[J"; // Clear from cursor to end of screen
+
+        foreach ($options as $i => $label) {
+            $key = $keys[$i];
+            if ($i === $selectedIndex) {
+                echo colorize(" > {$label}", 'green') . "\n";
+            } else {
+                echo "   {$label}\n";
+            }
+        }
+
+        echo "\n" . colorize("Use arrow keys to navigate, Enter to select:", 'cyan');
+
+        // Read key
+        $key = fread(STDIN, 4);
+
+        // Handle arrow keys (ANSI escape sequences)
+        if (isset($key[0]) && $key[0] === "\033") {
+            if (isset($key[1]) && $key[1] === '[') {
+                if (isset($key[2])) {
+                    switch ($key[2]) {
+                        case 'A': // Up arrow
+                            $selectedIndex = ($selectedIndex - 1 + count($options)) % count($options);
+                            break;
+                        case 'B': // Down arrow
+                            $selectedIndex = ($selectedIndex + 1) % count($options);
+                            break;
+                    }
+                }
+            }
+        }
+        // Enter key
+        elseif ($key === "\n" || $key === "\r") {
+            echo "\n";
+            break;
+        }
+    }
+
+    // Restore terminal settings
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        system('stty echo icanon');
+    }
+
+    return $keys[$selectedIndex];
+}
+
 function ask_choice(string $question, array $options, $default = null): string
 {
     $keys = array_keys($options);
@@ -272,7 +339,7 @@ function getMarketplaceData(): array
         }
     }
 
-    print_warn("No themes or plugins available in marketplace");
+    // Return empty arrays - no fake defaults!
     return ['themes' => [], 'plugins' => []];
 }
 
@@ -320,42 +387,33 @@ function command_new(array $argv): int
         echo "\n";
         $themeOptions = [];
         foreach ($marketplaceData['themes'] as $i => $theme) {
-            $themeOptions[$i + 1] = "{$theme['name']} - {$theme['description']}";
+            $themeOptions[$i] = $theme['name'];
         }
         $themeOptions['none'] = 'Skip (use default)';
 
-        echo colorize("Theme Selection", 'yellow') . "\n\n";
+        echo colorize("Theme Selection", 'yellow') . "\n";
 
-        foreach ($marketplaceData['themes'] as $i => $theme) {
-            echo "  " . ($i + 1) . ". " . colorize($theme['name'], 'cyan') . " - {$theme['description']}\n";
+        $themeChoice = ask_simple_choice('Select a theme', $themeOptions, 'none');
+        if ($themeChoice !== 'none' && isset($marketplaceData['themes'][$themeChoice])) {
+            $selectedTheme = $marketplaceData['themes'][$themeChoice]['id'];
         }
-
-        echo "\n";
-        $themeChoice = ask_choice('Select a theme', $themeOptions, 'none');
-        $selectedTheme = $themeChoice !== 'none' ? $marketplaceData['themes'][$themeChoice - 1]['id'] : null;
     }
 
     // Ask about plugins if available
     if ($hasPlugins) {
         echo "\n";
-        echo colorize("Plugin Selection", 'yellow') . "\n";
-        print_info("Select the plugins you want to install (comma-separated numbers, or enter to skip):\n");
-
+        $pluginOptions = [];
         foreach ($marketplaceData['plugins'] as $i => $plugin) {
-            echo "  " . ($i + 1) . ". " . colorize($plugin['name'], 'cyan') . " - {$plugin['description']}\n";
+            $pluginOptions[$i] = $plugin['name'];
         }
+        $pluginOptions['none'] = 'Skip';
 
-        echo "\n";
-        $pluginsChoice = ask('Select plugins', 'none');
+        echo colorize("Plugin Selection", 'yellow') . "\n";
 
-        if ($pluginsChoice !== 'none') {
-            $selectedArray = array_map('trim', explode(',', $pluginsChoice));
-            foreach ($selectedArray as $selection) {
-                $index = (int) $selection - 1;
-                if (isset($marketplaceData['plugins'][$index])) {
-                    $selectedPlugins[] = $marketplaceData['plugins'][$index]['id'];
-                }
-            }
+        $pluginChoice = ask_simple_choice('Select plugins (enter for none)', $pluginOptions, 'none');
+
+        if ($pluginChoice !== 'none' && isset($marketplaceData['plugins'][$pluginChoice])) {
+            $selectedPlugins[] = $marketplaceData['plugins'][$pluginChoice]['id'];
         }
     }
 
