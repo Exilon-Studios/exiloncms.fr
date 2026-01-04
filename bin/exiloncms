@@ -39,22 +39,22 @@ function print_header(string $text): void
 
 function print_success(string $message): void
 {
-    echo colorize("  ✅ {$message}", 'green') . "\n";
+    echo colorize("  OK {$message}", 'green') . "\n";
 }
 
 function print_error(string $message): void
 {
-    echo colorize("  ❌ {$message}", 'red') . "\n";
+    echo colorize("  ERROR {$message}", 'red') . "\n";
 }
 
 function print_info(string $message): void
 {
-    echo colorize("  ℹ️  {$message}", 'cyan') . "\n";
+    echo colorize("  INFO {$message}", 'cyan') . "\n";
 }
 
 function print_warn(string $message): void
 {
-    echo colorize("  ⚠️  {$message}", 'yellow') . "\n";
+    echo colorize("  WARN {$message}", 'yellow') . "\n";
 }
 
 function checkPhpVersion(): bool
@@ -103,135 +103,6 @@ function ask(string $question, $default = null): string
     $answer = trim(fgets(STDIN) ?: '');
 
     return $answer ?: $default;
-}
-
-function ask_hidden(string $question): string
-{
-    echo colorize($question . ": ", 'cyan');
-
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        // Windows
-        $vbScript = tempnam(sys_get_temp_dir(), 'pwd');
-        file_put_contents($vbScript, 'Set WshShell = CreateObject("WScript.Shell")' . PHP_EOL . 'WshShell.Run "cmd /c echo " & InputBox("' . addslashes($question) . '" & " && exit", 0, True' . PHP_EOL . 'Set WshShell = Nothing');
-        $output = shell_exec("cscript //nologo " . escapeshellarg($vbScript));
-        @unlink($vbScript);
-        $password = trim(explode(PHP_EOL, $output)[1] ?? '');
-    } else {
-        // Unix-like systems
-        system('stty -echo');
-        $password = trim(fgets(STDIN) ?: '');
-        system('stty echo');
-        echo "\n";
-    }
-
-    return $password;
-}
-
-function ask_choice(string $question, array $options, $default = null): string
-{
-    $keys = array_keys($options);
-    $defaultKey = $default !== null ? $default : $keys[0];
-
-    echo colorize($question, 'cyan') . "\n";
-
-    foreach ($options as $key => $label) {
-        $marker = ($key === $defaultKey) ? colorize('→', 'green') : ' ';
-        echo "  {$marker} {$key}. {$label}\n";
-    }
-
-    while (true) {
-        echo colorize("  Choose (default: {$defaultKey}): ", 'cyan');
-        $answer = trim(fgets(STDIN) ?: '');
-
-        if ($answer === '') {
-            return $defaultKey;
-        }
-
-        if (isset($options[$answer])) {
-            return $answer;
-        }
-
-        print_error("Invalid choice. Please try again.");
-    }
-}
-
-function confirm(string $question, bool $default = true): bool
-{
-    $options = $default ? ['Y', 'n'] : ['y', 'N'];
-    $prompt = $question . " [" . implode('/', $options) . "]: ";
-
-    echo colorize($prompt, 'cyan');
-    $answer = strtolower(trim(fgets(STDIN) ?: ''));
-
-    if ($answer === '') {
-        return $default;
-    }
-
-    return $answer === 'y';
-}
-
-function display_table(array $headers, array $rows): void
-{
-    $maxLengths = array_map('strlen', $headers);
-
-    foreach ($rows as $row) {
-        foreach ($row as $i => $cell) {
-            $maxLengths[$i] = max($maxLengths[$i], strlen($cell));
-        }
-    }
-
-    $separator = '+' . str_repeat('-', array_sum($maxLengths) + count($maxLengths) * 3 - 1) . '+';
-
-    echo "\n" . colorize($separator, 'cyan') . "\n";
-
-    // Headers
-    echo '|';
-    foreach ($headers as $i => $header) {
-        echo ' ' . str_pad($header, $maxLengths[$i]) . ' |';
-    }
-    echo "\n" . colorize($separator, 'cyan') . "\n";
-
-    // Rows
-    foreach ($rows as $row) {
-        echo '|';
-        foreach ($row as $i => $cell) {
-            echo ' ' . str_pad($cell, $maxLengths[$i]) . ' |';
-        }
-        echo "\n";
-    }
-
-    echo colorize($separator, 'cyan') . "\n\n";
-}
-
-function getLatestRelease(): ?array
-{
-    print_info("Fetching latest release from GitHub...");
-
-    $url = "https://api.github.com/repos/Exilon-Studios/ExilonCMS/releases/latest";
-
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_USERAGENT => 'ExilonCMS-CLI',
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTPHEADER => [
-            'Accept: application/vnd.github.v3+json',
-        ],
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 200 && $response) {
-        $data = json_decode($response, true);
-        print_success("Found release: {$data['tag_name']}");
-        return $data;
-    }
-
-    print_warn("Could not fetch release info, using default version");
-    return null;
 }
 
 function downloadFile(string $url, string $destination): bool
@@ -304,9 +175,76 @@ function extractZip(string $zipPath, string $destination): bool
     return true;
 }
 
+function ask_choice(string $question, array $options, $default = null): string
+{
+    $keys = array_keys($options);
+    $defaultIndex = array_search($default ?? $keys[0], $keys, true);
+    if ($defaultIndex === false) {
+        $defaultIndex = 0;
+    }
+
+    $selectedIndex = $defaultIndex;
+
+    // Save terminal settings
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        system('stty -echo -icanon min 0 time 0');
+    }
+
+    echo colorize($question, 'cyan') . "\n\n";
+
+    // Display menu
+    while (true) {
+        // Clear screen and redraw menu
+        echo "\033[" . (count($options) + 2) . "A"; // Move cursor up
+        echo "\033[J"; // Clear from cursor to end of screen
+
+        foreach ($options as $i => $label) {
+            $key = $keys[$i];
+            if ($i === $selectedIndex) {
+                echo colorize(" > {$key}. {$label}", 'green') . "\n";
+            } else {
+                echo "   {$key}. {$label}\n";
+            }
+        }
+
+        echo "\n" . colorize("Use arrow keys to navigate, Enter to select:", 'cyan');
+
+        // Read key
+        $key = fread(STDIN, 4);
+
+        // Handle arrow keys (ANSI escape sequences)
+        if (isset($key[0]) && $key[0] === "\033") {
+            if (isset($key[1]) && $key[1] === '[') {
+                if (isset($key[2])) {
+                    switch ($key[2]) {
+                        case 'A': // Up arrow
+                            $selectedIndex = ($selectedIndex - 1 + count($options)) % count($options);
+                            break;
+                        case 'B': // Down arrow
+                            $selectedIndex = ($selectedIndex + 1) % count($options);
+                            break;
+                    }
+                }
+            }
+        }
+        // Enter key
+        elseif ($key === "\n" || $key === "\r") {
+            echo "\n";
+            break;
+        }
+    }
+
+    // Restore terminal settings
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        system('stty echo icanon');
+    }
+
+    return $keys[$selectedIndex];
+}
+
 function getMarketplaceData(): array
 {
-    print_info("Fetching marketplace data...");
+    print_info("Checking marketplace for themes and plugins...");
 
     $registryUrl = "https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS-marketplace/main/registry.json";
 
@@ -323,52 +261,19 @@ function getMarketplaceData(): array
 
     if ($httpCode === 200 && $response) {
         $data = json_decode($response, true);
-        print_success("Marketplace data fetched");
-        return $data;
+
+        // Check if there are actual themes and plugins
+        $hasThemes = !empty($data['themes']) && count($data['themes']) > 0;
+        $hasPlugins = !empty($data['plugins']) && count($data['plugins']) > 0;
+
+        if ($hasThemes || $hasPlugins) {
+            print_success("Marketplace data loaded");
+            return $data;
+        }
     }
 
-    print_warn("Using default marketplace data");
-    return [
-        'themes' => [
-            ['id' => 'default', 'name' => 'Default Theme', 'description' => 'Clean and modern'],
-            ['id' => 'gaming', 'name' => 'Gaming Theme', 'description' => 'Dark theme for gaming'],
-        ],
-        'plugins' => [
-            ['id' => 'discord', 'name' => 'Discord Integration', 'description' => 'Link Discord server'],
-            ['id' => 'shop', 'name' => 'Shop System', 'description' => 'Virtual shop'],
-            ['id' => 'voting', 'name' => 'Voting System', 'description' => 'Player voting'],
-        ],
-    ];
-}
-
-function runInteractiveInstall(string $projectPath): void
-{
-    print_info("Starting interactive installation...\n");
-
-    $composerPath = $projectPath . '/composer.phar';
-    if (! file_exists($composerPath)) {
-        $composerPath = $projectPath . '/composer';
-    }
-
-    if (! file_exists($composerPath)) {
-        print_warn("Composer not found, downloading composer.phar...");
-        $composerUrl = 'https://getcomposer.org/composer-stable.phar';
-        downloadFile($composerUrl, $projectPath . '/composer.phar');
-        $composerPath = $projectPath . '/composer.phar';
-    }
-
-    $phpBinary = PHP_BINARY;
-
-    // Run the Laravel install:interactive command
-    $command = "{$phpBinary} {$projectPath}/artisan install:interactive";
-
-    echo "\n";
-    passthru($command, $returnCode);
-
-    if ($returnCode !== 0) {
-        print_error("Interactive setup failed. You can run it manually later:");
-        echo colorize("  cd {$projectPath} && php artisan install:interactive\n", 'cyan');
-    }
+    print_warn("No themes or plugins available in marketplace");
+    return ['themes' => [], 'plugins' => []];
 }
 
 function command_new(array $argv): int
@@ -402,170 +307,67 @@ function command_new(array $argv): int
 
     echo "\n";
 
-    // Get marketplace data for questions
+    // Get marketplace data
     $marketplaceData = getMarketplaceData();
+    $hasThemes = !empty($marketplaceData['themes']);
+    $hasPlugins = !empty($marketplaceData['plugins']);
 
-    // Ask questions
-    echo colorize("📋 Basic Information", 'yellow') . "\n\n";
-
-    $siteName = ask('Site name', $projectName);
-    $siteUrl = ask('Site URL', 'http://localhost:8000');
-    $locale = ask_choice('Language', ['en' => 'English', 'fr' => 'French'], 'en');
-    $timezone = ask('Timezone', 'UTC');
-
-    echo "\n" . colorize("💾 Database Configuration", 'yellow') . "\n\n";
-
-    $dbType = ask_choice('Database type', [
-        '1' => 'PostgreSQL (Recommended)',
-        '2' => 'MySQL/MariaDB',
-        '3' => 'SQLite (Development only)',
-    ], '1');
-
-    $dbConnection = match ($dbType) {
-        '1' => 'pgsql',
-        '2' => 'mysql',
-        '3' => 'sqlite',
-    };
-
-    $dbHost = '127.0.0.1';
-    $dbPort = $dbConnection === 'pgsql' ? '5432' : '3306';
-    $dbDatabase = 'exiloncms';
-    $dbUsername = 'root';
-    $dbPassword = '';
-
-    if ($dbConnection !== 'sqlite') {
-        $dbHost = ask('Database host', $dbHost);
-        $dbPort = ask('Database port', $dbPort);
-        $dbDatabase = ask('Database name', $dbDatabase);
-        $dbUsername = ask('Database username', $dbUsername);
-        $dbPassword = ask_hidden('Database password');
-    }
-
-    echo "\n" . colorize("⚡ Cache & Session", 'yellow') . "\n\n";
-
-    $cacheDriver = ask_choice('Cache driver', [
-        '1' => 'File (Development)',
-        '2' => 'Redis (Recommended for production)',
-        '3' => 'Memcached',
-    ], '1');
-
-    $cacheDriver = match ($cacheDriver) {
-        '1' => 'file',
-        '2' => 'redis',
-        '3' => 'memcached',
-    };
-
-    $sessionDriver = ask_choice('Session driver', [
-        '1' => 'File',
-        '2' => 'Redis',
-        '3' => 'Database',
-    ], '1');
-
-    $sessionDriver = match ($sessionDriver) {
-        '1' => 'file',
-        '2' => 'redis',
-        '3' => 'database',
-    };
-
-    echo "\n" . colorize("👤 Admin Account", 'yellow') . "\n\n";
-
-    $adminName = ask('Admin name', 'Admin');
-    $adminEmail = ask('Admin email', 'admin@example.com');
-    $adminPassword = ask_hidden('Admin password');
-
-    echo "\n" . colorize("🎨 Theme Selection", 'yellow') . "\n\n";
-
-    $themes = $marketplaceData['themes'] ?? [];
-    $themeOptions = [];
-    foreach ($themes as $i => $theme) {
-        $themeOptions[$i + 1] = "{$theme['name']} - {$theme['description']}";
-    }
-    $themeOptions['none'] = 'Skip (use default)';
-
-    if (count($themes) > 0) {
-        display_table(['Theme', 'Description'], $themes);
-        $themeChoice = ask_choice('Select a theme', $themeOptions, 'none');
-        $selectedTheme = $themeChoice !== 'none' ? $themes[$themeChoice - 1]['id'] : null;
-    }
-
-    echo "\n" . colorize("🔌 Plugin Selection", 'yellow') . "\n";
-    print_info("Select the plugins you want to install (comma-separated numbers, or enter to skip):\n");
-
-    $plugins = $marketplaceData['plugins'] ?? [];
-    $pluginOptions = [];
-    foreach ($plugins as $i => $plugin) {
-        $pluginOptions[$i + 1] = "{$plugin['name']} - {$plugin['description']}";
-    }
-
+    $selectedTheme = null;
     $selectedPlugins = [];
-    if (count($plugins) > 0) {
-        display_table(['Plugin', 'Description'], $plugins);
+
+    // Ask about theme if available
+    if ($hasThemes) {
+        echo "\n";
+        $themeOptions = [];
+        foreach ($marketplaceData['themes'] as $i => $theme) {
+            $themeOptions[$i + 1] = "{$theme['name']} - {$theme['description']}";
+        }
+        $themeOptions['none'] = 'Skip (use default)';
+
+        echo colorize("Theme Selection", 'yellow') . "\n\n";
+
+        foreach ($marketplaceData['themes'] as $i => $theme) {
+            echo "  " . ($i + 1) . ". " . colorize($theme['name'], 'cyan') . " - {$theme['description']}\n";
+        }
+
+        echo "\n";
+        $themeChoice = ask_choice('Select a theme', $themeOptions, 'none');
+        $selectedTheme = $themeChoice !== 'none' ? $marketplaceData['themes'][$themeChoice - 1]['id'] : null;
+    }
+
+    // Ask about plugins if available
+    if ($hasPlugins) {
+        echo "\n";
+        echo colorize("Plugin Selection", 'yellow') . "\n";
+        print_info("Select the plugins you want to install (comma-separated numbers, or enter to skip):\n");
+
+        foreach ($marketplaceData['plugins'] as $i => $plugin) {
+            echo "  " . ($i + 1) . ". " . colorize($plugin['name'], 'cyan') . " - {$plugin['description']}\n";
+        }
+
+        echo "\n";
         $pluginsChoice = ask('Select plugins', 'none');
 
         if ($pluginsChoice !== 'none') {
             $selectedArray = array_map('trim', explode(',', $pluginsChoice));
             foreach ($selectedArray as $selection) {
                 $index = (int) $selection - 1;
-                if (isset($plugins[$index])) {
-                    $selectedPlugins[] = $plugins[$index]['id'];
+                if (isset($marketplaceData['plugins'][$index])) {
+                    $selectedPlugins[] = $marketplaceData['plugins'][$index]['id'];
                 }
             }
         }
     }
 
-    echo "\n" . colorize("⚙️  Additional Options", 'yellow') . "\n\n";
-
-    $createDocker = confirm('Create Docker configuration?', true);
-    $runMigrations = confirm('Run database migrations?', true);
-    $buildAssets = confirm('Build frontend assets?', true);
-    $generateKey = confirm('Generate application key?', true);
-
-    // Summary
-    echo "\n" . str_repeat('=', 60) . "\n";
-    echo colorize("📋 Installation Summary", 'blue') . "\n";
-    echo str_repeat('=', 60) . "\n\n";
-
-    echo colorize("Project:", 'cyan') . " {$projectName}\n";
-    echo colorize("Site Name:", 'cyan') . " {$siteName}\n";
-    echo colorize("Site URL:", 'cyan') . " {$siteUrl}\n";
-    echo colorize("Language:", 'cyan') . " {$locale}\n";
-    echo colorize("Database:", 'cyan') . " {$dbConnection}\n";
-    echo colorize("Cache:", 'cyan') . " {$cacheDriver}\n";
-    echo colorize("Admin:", 'cyan') . " {$adminName} ({$adminEmail})\n";
-    if ($selectedTheme) {
-        echo colorize("Theme:", 'cyan') . " {$selectedTheme}\n";
-    }
-    if (! empty($selectedPlugins)) {
-        echo colorize("Plugins:", 'cyan') . " " . implode(', ', $selectedPlugins) . "\n";
-    }
-
+    echo "\n";
+    print_info("Creating ExilonCMS project: {$projectName}");
+    echo "\n";
+    print_info("Database: PostgreSQL (default)");
+    print_info("Cache: File (default)");
     echo "\n";
 
-    if (! confirm('Continue with installation?', true)) {
-        print_info("Installation cancelled.");
-        return 0;
-    }
-
-    echo "\n" . colorize("🚀 Starting Installation...", 'blue') . "\n\n";
-
-    // Get latest release
-    $release = getLatestRelease();
-    $version = $release['tag_name'] ?? VERSION;
-
-    // Find download URL
-    $downloadUrl = null;
-    if ($release && isset($release['assets'])) {
-        foreach ($release['assets'] as $asset) {
-            if (str_ends_with($asset['name'], '.zip')) {
-                $downloadUrl = $asset['browser_download_url'];
-                break;
-            }
-        }
-    }
-
-    if (! $downloadUrl) {
-        $downloadUrl = "https://github.com/Exilon-Studios/ExilonCMS/archive/refs/tags/{$version}.zip";
-    }
+    // Download from main branch (since no release tags exist yet)
+    $downloadUrl = "https://github.com/Exilon-Studios/ExilonCMS/archive/refs/heads/main.zip";
 
     // Create temp directory
     $tempDir = sys_get_temp_dir() . '/exiloncms-install';
@@ -603,114 +405,41 @@ function command_new(array $argv): int
 
     print_success("Files installed successfully");
 
-    // Create .env file with user's answers
+    // Copy .env.example to .env
     $envPath = $targetDir . '/.env';
-    if (! file_exists($envPath)) {
+    if (! file_exists($envPath) && file_exists($targetDir . '/.env.example')) {
         copy($targetDir . '/.env.example', $envPath);
+        print_success("Created .env file");
     }
-
-    $envContent = file_get_contents($envPath);
-
-    $replacements = [
-        'APP_NAME=' => 'APP_NAME=' . $siteName,
-        'APP_URL=' => 'APP_URL=' . $siteUrl,
-    ];
-
-    if ($dbConnection === 'sqlite') {
-        $replacements['DB_CONNECTION='] = 'DB_CONNECTION=sqlite';
-        $replacements['DB_DATABASE='] = 'DB_DATABASE=' . $targetDir . '/database/exiloncms.sqlite';
-    } else {
-        $replacements['DB_CONNECTION='] = 'DB_CONNECTION=' . $dbConnection;
-        $replacements['DB_HOST='] = 'DB_HOST=' . $dbHost;
-        $replacements['DB_PORT='] = 'DB_PORT=' . $dbPort;
-        $replacements['DB_DATABASE='] = 'DB_DATABASE=' . $dbDatabase;
-        $replacements['DB_USERNAME='] = 'DB_USERNAME=' . $dbUsername;
-        $replacements['DB_PASSWORD='] = 'DB_PASSWORD=' . $dbPassword;
-    }
-
-    $replacements['CACHE_DRIVER='] = 'CACHE_DRIVER=' . $cacheDriver;
-    $replacements['SESSION_DRIVER='] = 'SESSION_DRIVER=' . $sessionDriver;
-
-    $envContent = str_replace(array_keys($replacements), array_values($replacements), $envContent);
-    file_put_contents($envPath, $envContent);
 
     // Generate key
-    if ($generateKey) {
-        print_info("Generating application key...");
-        $phpBinary = PHP_BINARY;
-        exec("cd {$targetDir} && {$phpBinary} artisan key:generate");
-    }
-
-    // Install Composer dependencies
-    print_info("Installing Composer dependencies...");
-    exec("cd {$targetDir} && composer install --no-interaction 2>&1", $output, $returnCode);
-
-    if ($returnCode !== 0) {
-        print_warn("Composer install had warnings, but continuing...");
-    } else {
-        print_success("Composer dependencies installed");
-    }
-
-    // Install npm dependencies
-    print_info("Installing npm dependencies...");
-    exec("cd {$targetDir} && npm install 2>&1", $output, $returnCode);
-
-    if ($returnCode !== 0) {
-        print_warn("npm install had issues, you may need to run it manually.");
-    } else {
-        print_success("npm dependencies installed");
-    }
-
-    // Build assets
-    if ($buildAssets) {
-        print_info("Building frontend assets...");
-        exec("cd {$targetDir} && npm run build 2>&1", $output, $returnCode);
-        if ($returnCode === 0) {
-            print_success("Assets built successfully");
-        }
-    }
-
-    // Run migrations
-    if ($runMigrations) {
-        print_info("Running database migrations...");
-        exec("cd {$targetDir} && php artisan migrate --seed --force 2>&1", $output, $returnCode);
-        if ($returnCode === 0) {
-            print_success("Migrations completed");
-        }
-    }
-
-    // Create admin user
-    print_info("Creating admin user...");
-    $command = sprintf(
-        'php artisan user:create --admin --name="%s" --email="%s" --password="%s"',
-        $adminName,
-        $adminEmail,
-        $adminPassword
-    );
-    exec("cd {$targetDir} && {$command} 2>&1", $output, $returnCode);
+    print_info("Generating application key...");
+    $phpBinary = PHP_BINARY;
+    exec("cd {$targetDir} && {$phpBinary} artisan key:generate 2>&1", $output, $returnCode);
     if ($returnCode === 0) {
-        print_success("Admin user created");
+        print_success("Application key generated");
     }
 
-    echo "\n" . colorize("✅ Installation Complete!", 'green') . "\n\n";
+    echo "\n";
+    print_header("Installation Complete!");
 
-    echo colorize("Next Steps:\n", 'yellow');
-
-    echo "\n  1. " . colorize("cd {$projectName}", 'cyan');
-
-    if ($createDocker) {
-        echo "\n  2. " . colorize("docker-compose up -d", 'cyan');
-        echo "\n  3. " . colorize("Visit {$siteUrl}", 'cyan');
-    } else {
-        echo "\n  2. " . colorize("php artisan serve", 'cyan');
-        echo "\n  3. " . colorize("Visit http://localhost:8000", 'cyan');
+    if ($selectedTheme) {
+        echo "\n  Theme: " . colorize($selectedTheme, 'green');
+    }
+    if (! empty($selectedPlugins)) {
+        echo "\n  Plugins: " . colorize(implode(', ', $selectedPlugins), 'green');
     }
 
-    echo "\n\nAdmin Login:\n";
-    echo "  Email: " . colorize($adminEmail, 'cyan') . "\n";
-    echo "  Password: " . colorize("[your password]", 'cyan') . "\n";
+    echo colorize("\n\nNext steps:\n", 'cyan');
+    echo "\n  1. " . colorize("cd {$projectName}", 'green');
+    echo "\n  2. " . colorize("composer install", 'green');
+    echo "\n  3. " . colorize("npm install", 'green');
+    echo "\n  4. " . colorize("npm run build", 'green');
+    echo "\n  5. " . colorize("php artisan migrate:fresh --seed", 'green');
+    echo "\n  6. " . colorize("php artisan serve", 'green');
+    echo "\n\n";
 
-    echo "\nFor more information, visit: " . colorize("https://github.com/Exilon-Studios/ExilonCMS", 'cyan') . "\n\n";
+    echo "For more information: " . colorize("https://github.com/Exilon-Studios/ExilonCMS", 'cyan') . "\n\n";
 
     return 0;
 }
@@ -734,7 +463,7 @@ function command_help(): int
 
     echo colorize("Examples:\n", 'yellow');
     echo "  exiloncms new my-site\n";
-    echo "  exiloncms new blog --theme=gaming\n";
+    echo "  exiloncms new blog\n";
     echo "  exiloncms version\n\n";
 
     echo "For more information, visit: " . colorize("https://github.com/Exilon-Studios/ExilonCMS", 'cyan') . "\n\n";
