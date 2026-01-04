@@ -159,7 +159,7 @@ try {
 Write-Info "Starting installation..."
 Write-Host ""
 
-& php $outputFile new $ProjectName
+& php -f $outputFile -- new $ProjectName
 $exitCode = $LASTEXITCODE
 
 # Cleanup
