@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 

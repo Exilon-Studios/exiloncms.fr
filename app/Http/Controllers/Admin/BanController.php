@@ -1,11 +1,11 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\BanRequest;
-use MCCMS\Models\Ban;
-use MCCMS\Models\User;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\BanRequest;
+use ExilonCMS\Models\Ban;
+use ExilonCMS\Models\User;
 use Inertia\Inertia;
 
 class BanController extends Controller

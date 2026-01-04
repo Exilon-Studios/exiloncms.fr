@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\Translation;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\Translation;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

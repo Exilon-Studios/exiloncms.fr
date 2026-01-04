@@ -62,7 +62,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => MCCMS\Models\User::class,
+            'model' => ExilonCMS\Models\User::class,
         ],
 
         // 'users' => [

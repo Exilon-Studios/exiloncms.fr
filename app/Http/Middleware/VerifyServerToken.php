@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Http\Middleware;
+namespace ExilonCMS\Http\Middleware;
 
-use MCCMS\Models\Server;
+use ExilonCMS\Models\Server;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;

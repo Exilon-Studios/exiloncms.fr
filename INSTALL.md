@@ -6,9 +6,10 @@ Complete installation guide for ExilonCMS.
 
 - [Requirements](#requirements)
 - [Installation Methods](#installation-methods)
-  - [Method 1: Composer (Recommended)](#method-1-composer-recommended)
-  - [Method 2: Manual Installation](#method-2-manual-installation)
-  - [Method 3: Docker](#method-3-docker)
+  - [Method 1: ExilonCMS CLI (Recommended)](#method-1-exiloncms-cli-recommended)
+  - [Method 2: Composer](#method-2-composer)
+  - [Method 3: Manual Installation](#method-3-manual-installation)
+  - [Method 4: Docker](#method-4-docker)
 - [Post-Installation](#post-installation)
 - [Web Server Configuration](#web-server-configuration)
 - [Troubleshooting](#troubleshooting)
@@ -57,9 +58,82 @@ One of:
 
 ## Installation Methods
 
-### Method 1: Composer (Recommended)
+### Method 1: ExilonCMS CLI (Recommended)
 
-This is the fastest way to get started.
+The easiest way to get started with ExilonCMS is using our interactive CLI tool.
+
+#### Installation
+
+```bash
+# Install the CLI globally
+npm install -g exiloncms
+```
+
+For development/testing from source:
+
+```bash
+cd /path/to/ExilonCMS
+npm link
+```
+
+Or use PHP directly (no npm required):
+
+```bash
+# The CLI is included in the repository
+php bin/exiloncms new my-site
+```
+
+#### Creating a New Project
+
+```bash
+# Interactive wizard - guides you through all options
+exiloncms new my-site
+
+# Or specify the project name directly
+exiloncms new blog --theme=default
+```
+
+The interactive CLI will guide you through:
+
+1. **Basic Information**
+   - Site name, URL, language, timezone
+
+2. **Database Configuration**
+   - Database type (PostgreSQL, MySQL, SQLite)
+   - Connection details
+
+3. **Cache & Session**
+   - Cache driver (File, Redis, Memcached)
+   - Session driver
+
+4. **Admin Account**
+   - Name, email, password
+
+5. **Theme Selection**
+   - Browse and select from marketplace themes
+
+6. **Plugin Selection**
+   - Choose multiple plugins from marketplace
+
+7. **Additional Options**
+   - Docker configuration
+   - Run migrations
+   - Build assets
+
+The CLI automatically:
+- ✅ Downloads the latest ExilonCMS release
+- ✅ Configures your `.env` file
+- ✅ Installs all dependencies
+- ✅ Builds frontend assets
+- ✅ Runs database migrations
+- ✅ Creates your admin account
+- ✅ Installs selected themes and plugins
+
+---
+
+### Method 2: Composer
+
+This is the traditional way to create a new project.
 
 ```bash
 # 1. Create a new project
@@ -68,32 +142,27 @@ composer create-project exilon-studios/exiloncms your-site-name
 # 2. Navigate to the project directory
 cd your-site-name
 
-# 3. Install frontend dependencies
+# 3. Run the interactive installer
+php artisan install:interactive
+
+# Or manually:
 npm install
-
-# 4. Build frontend assets for production
 npm run build
-
-# 5. Copy environment file
 cp .env.example .env
-
-# 6. Generate application key
 php artisan key:generate
 
-# 7. Configure your database in .env
-# Edit .env and set:
+# Configure your database in .env
 # DB_DATABASE=your_database_name
 # DB_USERNAME=your_database_username
 # DB_PASSWORD=your_database_password
-# DB_HOST=127.0.0.1
 
-# 8. Run migrations and seeders
+# 4. Run migrations and seeders
 php artisan migrate --seed
 
-# 9. Create admin user
+# 5. Create admin user
 php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="your_secure_password"
 
-# 10. Start the development server
+# 6. Start the development server
 php artisan serve
 ```
 
@@ -101,7 +170,7 @@ Visit `http://localhost:8000` to access your site!
 
 ---
 
-### Method 2: Manual Installation
+### Method 3: Manual Installation
 
 #### Step 1: Clone the Repository
 
@@ -186,7 +255,7 @@ php artisan serve
 
 ---
 
-### Method 3: Docker
+### Method 4: Docker
 
 ```bash
 # 1. Copy environment file

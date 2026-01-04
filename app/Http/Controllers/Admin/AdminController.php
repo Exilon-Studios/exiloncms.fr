@@ -1,14 +1,14 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Extensions\UpdateManager;
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\Image;
-use MCCMS\Models\Page;
-use MCCMS\Models\Post;
-use MCCMS\Models\User;
-use MCCMS\Support\Charts;
+use ExilonCMS\Extensions\UpdateManager;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\Image;
+use ExilonCMS\Models\Page;
+use ExilonCMS\Models\Post;
+use ExilonCMS\Models\User;
+use ExilonCMS\Support\Charts;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
 

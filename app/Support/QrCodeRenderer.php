@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support;
+namespace ExilonCMS\Support;
 
 use BaconQrCode\Common\ErrorCorrectionLevel;
 use BaconQrCode\Encoder\Encoder;

@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Exceptions;
+namespace ExilonCMS\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Support\ViewErrorBag;

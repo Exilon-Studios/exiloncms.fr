@@ -1,13 +1,13 @@
 <?php
 
-namespace MCCMS\Games\Minecraft;
+namespace ExilonCMS\Games\Minecraft;
 
-use MCCMS\Games\Game;
-use MCCMS\Games\Minecraft\Servers\AzLink;
-use MCCMS\Games\Minecraft\Servers\BedrockPing;
-use MCCMS\Games\Minecraft\Servers\BedrockRcon;
-use MCCMS\Games\UserAttribute;
-use MCCMS\Models\User;
+use ExilonCMS\Games\Game;
+use ExilonCMS\Games\Minecraft\Servers\AzLink;
+use ExilonCMS\Games\Minecraft\Servers\BedrockPing;
+use ExilonCMS\Games\Minecraft\Servers\BedrockRcon;
+use ExilonCMS\Games\UserAttribute;
+use ExilonCMS\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;

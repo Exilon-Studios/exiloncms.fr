@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\View;
+namespace ExilonCMS\View;
 
 use Illuminate\View\FileViewFinder;
 use InvalidArgumentException;

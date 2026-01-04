@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models\Traits;
+namespace ExilonCMS\Models\Traits;
 
 /**
  * Add a prefix to the table name.

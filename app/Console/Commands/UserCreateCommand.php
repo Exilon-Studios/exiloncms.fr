@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
-use MCCMS\Models\Role;
-use MCCMS\Models\User;
+use ExilonCMS\Models\Role;
+use ExilonCMS\Models\User;
 use Illuminate\Console\Command;
 
 class UserCreateCommand extends Command

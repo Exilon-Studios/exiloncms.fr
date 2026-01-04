@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Http\Resources;
+namespace ExilonCMS\Http\Resources;
 
-use MCCMS\Models\Server;
+use ExilonCMS\Models\Server;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 

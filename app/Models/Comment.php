@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\HasMarkdown;
-use MCCMS\Models\Traits\HasUser;
+use ExilonCMS\Models\Traits\HasMarkdown;
+use ExilonCMS\Models\Traits\HasUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
@@ -15,8 +15,8 @@ use Illuminate\Support\HtmlString;
  * @property string $content
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \MCCMS\Models\Post $post
- * @property \MCCMS\Models\User $author
+ * @property \ExilonCMS\Models\Post $post
+ * @property \ExilonCMS\Models\User $author
  */
 class Comment extends Model
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Policies;
+namespace ExilonCMS\Policies;
 
-use MCCMS\Models\Role;
-use MCCMS\Models\User;
+use ExilonCMS\Models\Role;
+use ExilonCMS\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RolePolicy

@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Games\Steam\Servers;
+namespace ExilonCMS\Games\Steam\Servers;
 
-use MCCMS\Games\ServerBridge;
+use ExilonCMS\Games\ServerBridge;
 use Exception;
 use Illuminate\Support\Facades\Http;
 

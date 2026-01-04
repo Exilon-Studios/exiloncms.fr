@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Models\Post;
+use ExilonCMS\Models\Post;
 use Illuminate\Http\Request;
 
 class PostLikeController extends Controller

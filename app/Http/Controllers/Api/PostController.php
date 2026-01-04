@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Api;
+namespace ExilonCMS\Http\Controllers\Api;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Resources\PostResource;
-use MCCMS\Models\Post;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Resources\PostResource;
+use ExilonCMS\Models\Post;
 
 class PostController extends Controller
 {

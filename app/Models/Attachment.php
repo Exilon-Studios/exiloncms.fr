@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\HasImage;
+use ExilonCMS\Models\Traits\HasImage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * @property \Illuminate\Database\Eloquent\Model|\MCCMS\Models\Traits\Attachable $attachable
+ * @property \Illuminate\Database\Eloquent\Model|\ExilonCMS\Models\Traits\Attachable $attachable
  */
 class Attachment extends Model
 {

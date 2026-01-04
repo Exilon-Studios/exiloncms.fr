@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support;
+namespace ExilonCMS\Support;
 
 use Carbon\Carbon;
 use Illuminate\Contracts\Database\Query\Expression;

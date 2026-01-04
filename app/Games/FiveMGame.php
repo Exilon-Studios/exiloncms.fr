@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Games;
+namespace ExilonCMS\Games;
 
-use MCCMS\Games\Steam\Servers\AzLink;
-use MCCMS\Games\Steam\Servers\FiveMRcon;
-use MCCMS\Games\Steam\Servers\FiveMStatus;
-use MCCMS\Models\Setting;
-use MCCMS\Models\User;
+use ExilonCMS\Games\Steam\Servers\AzLink;
+use ExilonCMS\Games\Steam\Servers\FiveMRcon;
+use ExilonCMS\Games\Steam\Servers\FiveMStatus;
+use ExilonCMS\Models\Setting;
+use ExilonCMS\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;

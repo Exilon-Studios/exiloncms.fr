@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Http\Requests;
+namespace ExilonCMS\Http\Requests;
 
-use MCCMS\Http\Requests\Traits\ConvertCheckbox;
+use ExilonCMS\Http\Requests\Traits\ConvertCheckbox;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RoleRequest extends FormRequest

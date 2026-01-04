@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 

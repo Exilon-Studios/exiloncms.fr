@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Support;
+namespace ExilonCMS\Support;
 
-use MCCMS\Support\CommonMark\BasicOnly\RemoveImageProcessor;
-use MCCMS\Support\CommonMark\ExternalImage\ExternalImageExtension;
+use ExilonCMS\Support\CommonMark\BasicOnly\RemoveImageProcessor;
+use ExilonCMS\Support\CommonMark\ExternalImage\ExternalImageExtension;
 use Illuminate\Support\Str;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Event\DocumentParsedEvent;

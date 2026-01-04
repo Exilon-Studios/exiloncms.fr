@@ -1,20 +1,20 @@
 <?php
 
-namespace MCCMS\Providers;
+namespace ExilonCMS\Providers;
 
-use MCCMS\Games\FallbackGame;
-use MCCMS\Games\FiveMGame;
-use MCCMS\Games\Minecraft\MinecraftBedrockGame;
-use MCCMS\Games\Minecraft\MinecraftOfflineGame;
-use MCCMS\Games\Minecraft\MinecraftOnlineGame;
-use MCCMS\Games\Steam\FiveMGame as FiveMGameLegacy;
-use MCCMS\Games\Steam\RustGame;
-use MCCMS\Games\Steam\SteamGame;
-use MCCMS\Socialite\CfxProvider;
-use MCCMS\Socialite\DiscordProvider;
-use MCCMS\Socialite\EpicOnlineServiceProvider;
-use MCCMS\Socialite\Minecraft\AzuriomMinecraftProvider;
-use MCCMS\Socialite\Xbox\AzuriomXboxProvider;
+use ExilonCMS\Games\FallbackGame;
+use ExilonCMS\Games\FiveMGame;
+use ExilonCMS\Games\Minecraft\MinecraftBedrockGame;
+use ExilonCMS\Games\Minecraft\MinecraftOfflineGame;
+use ExilonCMS\Games\Minecraft\MinecraftOnlineGame;
+use ExilonCMS\Games\Steam\FiveMGame as FiveMGameLegacy;
+use ExilonCMS\Games\Steam\RustGame;
+use ExilonCMS\Games\Steam\SteamGame;
+use ExilonCMS\Socialite\CfxProvider;
+use ExilonCMS\Socialite\DiscordProvider;
+use ExilonCMS\Socialite\EpicOnlineServiceProvider;
+use ExilonCMS\Socialite\Minecraft\AzuriomMinecraftProvider;
+use ExilonCMS\Socialite\Xbox\AzuriomXboxProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\Contracts\Factory;

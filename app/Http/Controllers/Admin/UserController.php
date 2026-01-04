@@ -1,15 +1,15 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\UserRequest;
-use MCCMS\Models\ActionLog;
-use MCCMS\Models\Notification;
-use MCCMS\Models\Role;
-use MCCMS\Models\User;
-use MCCMS\Notifications\AlertNotification;
-use MCCMS\Support\Discord\LinkedRoles;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\UserRequest;
+use ExilonCMS\Models\ActionLog;
+use ExilonCMS\Models\Notification;
+use ExilonCMS\Models\Role;
+use ExilonCMS\Models\User;
+use ExilonCMS\Notifications\AlertNotification;
+use ExilonCMS\Support\Discord\LinkedRoles;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;

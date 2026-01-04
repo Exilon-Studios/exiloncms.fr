@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Models\Notification;
+use ExilonCMS\Models\Notification;
 use Illuminate\Http\Request;
 
 class NotificationController extends Controller

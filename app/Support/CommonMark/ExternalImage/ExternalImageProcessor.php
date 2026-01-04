@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support\CommonMark\ExternalImage;
+namespace ExilonCMS\Support\CommonMark\ExternalImage;
 
 use Illuminate\Support\Str;
 use League\CommonMark\Environment\EnvironmentInterface;

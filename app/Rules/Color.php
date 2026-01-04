@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Rules;
+namespace ExilonCMS\Rules;
 
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;

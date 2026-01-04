@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Games;
+namespace ExilonCMS\Games;
 
 enum UserAttribute: string
 {

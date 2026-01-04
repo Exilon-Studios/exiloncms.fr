@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Api;
+namespace ExilonCMS\Http\Controllers\Api;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\Post;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\Post;
 use Illuminate\Database\Eloquent\Collection;
 
 class FeedController extends Controller

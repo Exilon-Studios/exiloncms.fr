@@ -1,26 +1,26 @@
 <?php
 
-use MCCMS\Http\Controllers\Admin\ActionLogController;
-use MCCMS\Http\Controllers\Admin\AdminController;
-use MCCMS\Http\Controllers\Admin\BanController;
-use MCCMS\Http\Controllers\Admin\ImageController;
-use MCCMS\Http\Controllers\Admin\LanguageController;
-use MCCMS\Http\Controllers\Admin\NavbarController;
-use MCCMS\Http\Controllers\Admin\PageAttachmentController;
-use MCCMS\Http\Controllers\Admin\PageController;
-use MCCMS\Http\Controllers\Admin\PluginController;
-use MCCMS\Http\Controllers\Admin\PostAttachmentController;
-use MCCMS\Http\Controllers\Admin\PostController;
-use MCCMS\Http\Controllers\Admin\RedirectController;
-use MCCMS\Http\Controllers\Admin\RoleController;
-use MCCMS\Http\Controllers\Admin\ServerController;
-use MCCMS\Http\Controllers\Admin\SettingsController;
-use MCCMS\Http\Controllers\Admin\SocialLinkController;
-use MCCMS\Http\Controllers\Admin\ThemeController;
-use MCCMS\Http\Controllers\Admin\ThemeSettingsController;
-use MCCMS\Http\Controllers\Admin\TranslationController;
-use MCCMS\Http\Controllers\Admin\UpdateController;
-use MCCMS\Http\Controllers\Admin\UserController;
+use ExilonCMS\Http\Controllers\Admin\ActionLogController;
+use ExilonCMS\Http\Controllers\Admin\AdminController;
+use ExilonCMS\Http\Controllers\Admin\BanController;
+use ExilonCMS\Http\Controllers\Admin\ImageController;
+use ExilonCMS\Http\Controllers\Admin\LanguageController;
+use ExilonCMS\Http\Controllers\Admin\NavbarController;
+use ExilonCMS\Http\Controllers\Admin\PageAttachmentController;
+use ExilonCMS\Http\Controllers\Admin\PageController;
+use ExilonCMS\Http\Controllers\Admin\PluginController;
+use ExilonCMS\Http\Controllers\Admin\PostAttachmentController;
+use ExilonCMS\Http\Controllers\Admin\PostController;
+use ExilonCMS\Http\Controllers\Admin\RedirectController;
+use ExilonCMS\Http\Controllers\Admin\RoleController;
+use ExilonCMS\Http\Controllers\Admin\ServerController;
+use ExilonCMS\Http\Controllers\Admin\SettingsController;
+use ExilonCMS\Http\Controllers\Admin\SocialLinkController;
+use ExilonCMS\Http\Controllers\Admin\ThemeController;
+use ExilonCMS\Http\Controllers\Admin\ThemeSettingsController;
+use ExilonCMS\Http\Controllers\Admin\TranslationController;
+use ExilonCMS\Http\Controllers\Admin\UpdateController;
+use ExilonCMS\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AdminController::class, 'index'])->name('dashboard');

@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Policies;
+namespace ExilonCMS\Policies;
 
-use MCCMS\Models\Page;
-use MCCMS\Models\User;
+use ExilonCMS\Models\Page;
+use ExilonCMS\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PagePolicy

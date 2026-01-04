@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
-use MCCMS\Models\Server;
-use MCCMS\Models\Setting;
+use ExilonCMS\Models\Server;
+use ExilonCMS\Models\Setting;
 use Illuminate\Console\Command;
 
 class GamePingCommand extends Command

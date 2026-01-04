@@ -1,11 +1,11 @@
 <?php
 
-use MCCMS\Extensions\Plugin\PluginManager;
-use MCCMS\Extensions\Theme\ThemeManager;
-use MCCMS\Games\Game;
-use MCCMS\Http\Controllers\InstallController;
-use MCCMS\Models\SocialLink;
-use MCCMS\Support\SettingsRepository;
+use ExilonCMS\Extensions\Plugin\PluginManager;
+use ExilonCMS\Extensions\Theme\ThemeManager;
+use ExilonCMS\Games\Game;
+use ExilonCMS\Http\Controllers\InstallController;
+use ExilonCMS\Models\SocialLink;
+use ExilonCMS\Support\SettingsRepository;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -104,7 +104,7 @@ if (! function_exists('setting')) {
      */
     function setting(?string $name = null, mixed $default = null): mixed
     {
-        /** @var \MCCMS\Support\SettingsRepository $settings */
+        /** @var \ExilonCMS\Support\SettingsRepository $settings */
         $settings = app(SettingsRepository::class);
 
         if ($name === null) {

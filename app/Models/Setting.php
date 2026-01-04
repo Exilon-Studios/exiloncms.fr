@@ -1,13 +1,13 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use JsonException;
-use MCCMS\Support\SettingsRepository;
+use ExilonCMS\Support\SettingsRepository;
 
 /**
  * @property int $id

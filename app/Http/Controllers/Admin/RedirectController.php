@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\RedirectRequest;
-use MCCMS\Models\Redirect;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\RedirectRequest;
+use ExilonCMS\Models\Redirect;
 use Inertia\Inertia;
 
 class RedirectController extends Controller

@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Socialite\Minecraft;
+namespace ExilonCMS\Socialite\Minecraft;
 
-use MCCMS\Socialite\Xbox\XboxProvider;
+use ExilonCMS\Socialite\Xbox\XboxProvider;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;
 use Laravel\Socialite\Two\InvalidStateException;

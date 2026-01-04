@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\Attachable;
-use MCCMS\Models\Traits\Loggable;
+use ExilonCMS\Models\Traits\Attachable;
+use ExilonCMS\Models\Traits\Loggable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $is_enabled
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Role[] $roles
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Role[] $roles
  *
  * @method static \Illuminate\Database\Eloquent\Builder enabled()
  */

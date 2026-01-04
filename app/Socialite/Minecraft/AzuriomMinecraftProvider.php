@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Socialite\Minecraft;
+namespace ExilonCMS\Socialite\Minecraft;
 
 use Illuminate\Support\Str;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support\Discord\Embeds;
+namespace ExilonCMS\Support\Discord\Embeds;
 
 use Illuminate\Contracts\Support\Arrayable;
 

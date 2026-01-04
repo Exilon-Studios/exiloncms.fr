@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\Auth;
  * @property array $data
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \MCCMS\Models\User $user
+ * @property \ExilonCMS\Models\User $user
  * @property \Illuminate\Database\Eloquent\Model|null $target
- * @property \MCCMS\Models\ActionLogEntry[] $entries
+ * @property \ExilonCMS\Models\ActionLogEntry[] $entries
  *
  * @method static \Illuminate\Database\Eloquent\Builder onlyGlobal()
  */

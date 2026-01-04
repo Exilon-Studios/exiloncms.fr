@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Http\Requests;
+namespace ExilonCMS\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 

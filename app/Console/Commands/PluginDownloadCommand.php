@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
-use MCCMS\Extensions\Plugin\PluginManager;
+use ExilonCMS\Extensions\Plugin\PluginManager;
 use Illuminate\Console\Command;
 
 class PluginDownloadCommand extends Command

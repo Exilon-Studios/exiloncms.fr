@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Policies;
+namespace ExilonCMS\Policies;
 
-use MCCMS\Models\Comment;
-use MCCMS\Models\User;
+use ExilonCMS\Models\Comment;
+use ExilonCMS\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommentPolicy

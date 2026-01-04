@@ -1,16 +1,16 @@
 <?php
 
-namespace MCCMS\Models\Traits;
+namespace ExilonCMS\Models\Traits;
 
-use MCCMS\Models\Attachment;
-use MCCMS\Models\PendingAttachment;
+use ExilonCMS\Models\Attachment;
+use ExilonCMS\Models\PendingAttachment;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 /**
  * Associate multiple attachments to a model.
  *
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Attachment[] $attachments
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Attachment[] $attachments
  */
 trait Attachable
 {
@@ -85,7 +85,7 @@ trait Attachable
 
     public function storeAttachment(UploadedFile $file): string
     {
-        /** @var \MCCMS\Models\Attachment $attachment */
+        /** @var \ExilonCMS\Models\Attachment $attachment */
         $attachment = $this->attachments()->make();
 
         return $attachment->storeImage($file, true);

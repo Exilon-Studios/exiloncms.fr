@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Providers;
+namespace ExilonCMS\Providers;
 
-use MCCMS\Listeners\UpdatePasswordChangedDate;
+use ExilonCMS\Listeners\UpdatePasswordChangedDate;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;

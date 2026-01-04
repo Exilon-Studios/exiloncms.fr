@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Extensions\Plugin;
+namespace ExilonCMS\Extensions\Plugin;
 
-use MCCMS\MCCMS;
-use MCCMS\Extensions\ExtensionManager;
-use MCCMS\Extensions\UpdateManager;
-use MCCMS\Support\Files;
-use MCCMS\Support\Optimizer;
+use ExilonCMS\MCCMS;
+use ExilonCMS\Extensions\ExtensionManager;
+use ExilonCMS\Extensions\UpdateManager;
+use ExilonCMS\Support\Files;
+use ExilonCMS\Support\Optimizer;
 use Closure;
 use Composer\Autoload\ClassLoader;
 use Composer\Semver\Semver;

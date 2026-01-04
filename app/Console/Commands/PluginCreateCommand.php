@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -50,7 +50,7 @@ class PluginCreateCommand extends Command
         $id = $this->argument('id') ?? Str::slug($name);
         $studlyName = Str::studly($name);
         $path = plugin_path($id);
-        $namespace = 'MCCMS\Plugin\\'.$studlyName;
+        $namespace = 'ExilonCMS\Plugin\\'.$studlyName;
 
         if ($this->files->exists($path)) {
             $this->error("The plugin '{$path}' already exists!");

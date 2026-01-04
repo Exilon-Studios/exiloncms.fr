@@ -40,7 +40,38 @@ A powerful, modern content management system designed specifically for game serv
 
 ## 🚀 Quick Installation
 
-### Via Composer (Recommended)
+### Option 1: Using the ExilonCMS CLI (Recommended)
+
+The easiest way to create a new ExilonCMS project is using our CLI tool:
+
+```bash
+# Install globally via npm
+npm install -g exiloncms
+
+# Create a new project (interactive wizard)
+exiloncms new my-site
+
+# The CLI will guide you through:
+# ✅ Site configuration (name, URL, language, timezone)
+# ✅ Database setup (PostgreSQL, MySQL, SQLite)
+# ✅ Admin account creation
+# ✅ Theme & plugin selection from marketplace
+# ✅ Docker configuration (optional)
+```
+
+**Development mode** (from source):
+```bash
+cd /path/to/ExilonCMS
+npm link
+exiloncms new my-site
+```
+
+**Direct PHP** (no npm needed):
+```bash
+php bin/exiloncms new my-site
+```
+
+### Option 2: Via Composer
 
 ```bash
 # Create a new project
@@ -48,24 +79,11 @@ composer create-project exilon-studios/exiloncms your-site-name
 
 cd your-site-name
 
-# Install dependencies
-npm install
-
-# Build assets
-npm run build
-
-# Configure environment
-cp .env.example .env
-php artisan key:generate
-
-# Configure database in .env
-
-# Run installation
-php artisan migrate --seed
-php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="password"
+# Run interactive installer
+php artisan install:interactive
 ```
 
-### Manual Installation
+### Option 3: Manual Installation
 
 ```bash
 # Clone the repository

@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
-use MCCMS\Models\ActionLog;
+use ExilonCMS\Models\ActionLog;
 use Illuminate\Console\Command;
 
 class LogsPurgeCommand extends Command

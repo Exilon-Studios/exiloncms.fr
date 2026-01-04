@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Http\Requests\CommentRequest;
-use MCCMS\Models\Comment;
-use MCCMS\Models\Post;
+use ExilonCMS\Http\Requests\CommentRequest;
+use ExilonCMS\Models\Comment;
+use ExilonCMS\Models\Post;
 
 class PostCommentController extends Controller
 {

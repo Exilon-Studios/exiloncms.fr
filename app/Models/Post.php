@@ -1,14 +1,14 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\Attachable;
-use MCCMS\Models\Traits\HasImage;
-use MCCMS\Models\Traits\HasUser;
-use MCCMS\Models\Traits\Loggable;
-use MCCMS\Models\Traits\Searchable;
-use MCCMS\Support\Discord\DiscordWebhook;
-use MCCMS\Support\Discord\Embed;
+use ExilonCMS\Models\Traits\Attachable;
+use ExilonCMS\Models\Traits\HasImage;
+use ExilonCMS\Models\Traits\HasUser;
+use ExilonCMS\Models\Traits\Loggable;
+use ExilonCMS\Models\Traits\Searchable;
+use ExilonCMS\Support\Discord\DiscordWebhook;
+use ExilonCMS\Support\Discord\Embed;
 use Exception;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,9 +28,9 @@ use Illuminate\Support\Facades\Auth;
  * @property \Carbon\Carbon $published_at
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \MCCMS\Models\User $author
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Comment[] $comments
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Like[] $likes
+ * @property \ExilonCMS\Models\User $author
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Comment[] $comments
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Like[] $likes
  *
  * @method static \Illuminate\Database\Eloquent\Builder published()
  */

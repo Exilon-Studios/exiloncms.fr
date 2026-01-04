@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property array|null $data
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \MCCMS\Models\Server $server
+ * @property \ExilonCMS\Models\Server $server
  */
 class ServerStat extends Model
 {

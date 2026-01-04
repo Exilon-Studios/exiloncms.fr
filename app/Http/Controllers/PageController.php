@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Models\Page;
+use ExilonCMS\Models\Page;
 use Inertia\Inertia;
 
 class PageController extends Controller

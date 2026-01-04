@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support\CommonMark\BasicOnly;
+namespace ExilonCMS\Support\CommonMark\BasicOnly;
 
 use League\CommonMark\Event\DocumentParsedEvent;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Image;

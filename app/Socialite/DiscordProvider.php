@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Socialite;
+namespace ExilonCMS\Socialite;
 
 use Illuminate\Support\Str;
 use Laravel\Socialite\Two\AbstractProvider;

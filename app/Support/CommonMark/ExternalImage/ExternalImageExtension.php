@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support\CommonMark\ExternalImage;
+namespace ExilonCMS\Support\CommonMark\ExternalImage;
 
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Event\DocumentParsedEvent;

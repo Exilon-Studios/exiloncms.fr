@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Providers;
+namespace ExilonCMS\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;

@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Models\Page;
-use MCCMS\Models\Redirect;
+use ExilonCMS\Models\Page;
+use ExilonCMS\Models\Redirect;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Inertia\Inertia;
 
@@ -16,7 +16,7 @@ class FallbackController extends Controller
      */
     public function get(string $path)
     {
-        /** @var \MCCMS\Models\Redirect|null $redirect */
+        /** @var \ExilonCMS\Models\Redirect|null $redirect */
         $redirect = Redirect::enabled()->firstWhere('source', $path);
 
         if ($redirect !== null) {

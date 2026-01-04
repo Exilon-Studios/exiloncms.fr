@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support;
+namespace ExilonCMS\Support;
 
 use Illuminate\Support\Facades\File;
 use Symfony\Component\Filesystem\Filesystem;

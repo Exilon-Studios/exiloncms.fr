@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Auth;
+namespace ExilonCMS\Http\Controllers\Auth;
 
-use MCCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;

@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Support\Discord;
+namespace ExilonCMS\Support\Discord;
 
-use MCCMS\Models\DiscordAccount;
-use MCCMS\Models\Role;
+use ExilonCMS\Models\DiscordAccount;
+use ExilonCMS\Models\Role;
 use Illuminate\Support\Facades\Http;
 
 class LinkedRoles

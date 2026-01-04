@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Extensions;
+namespace ExilonCMS\Extensions;
 
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;

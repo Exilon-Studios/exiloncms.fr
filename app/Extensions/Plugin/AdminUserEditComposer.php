@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Extensions\Plugin;
+namespace ExilonCMS\Extensions\Plugin;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\View\View;
 

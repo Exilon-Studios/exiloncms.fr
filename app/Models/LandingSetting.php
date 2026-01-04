@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

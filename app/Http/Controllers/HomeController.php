@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Models\Post;
-use MCCMS\Models\Server;
-use MCCMS\Models\LandingSetting;
+use ExilonCMS\Models\Post;
+use ExilonCMS\Models\Server;
+use ExilonCMS\Models\LandingSetting;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 

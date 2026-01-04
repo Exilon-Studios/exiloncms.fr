@@ -1,14 +1,14 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Models\ActionLog;
-use MCCMS\Models\User;
-use MCCMS\Notifications\AlertNotification;
-use MCCMS\Notifications\UserDelete;
-use MCCMS\Rules\Username;
-use MCCMS\Support\Discord\LinkedRoles;
-use MCCMS\Support\QrCodeRenderer;
+use ExilonCMS\Models\ActionLog;
+use ExilonCMS\Models\User;
+use ExilonCMS\Notifications\AlertNotification;
+use ExilonCMS\Notifications\UserDelete;
+use ExilonCMS\Rules\Username;
+use ExilonCMS\Support\Discord\LinkedRoles;
+use ExilonCMS\Support\QrCodeRenderer;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

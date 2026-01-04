@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Extensions;
+namespace ExilonCMS\Extensions;
 
 use Illuminate\Translation\FileLoader;
 

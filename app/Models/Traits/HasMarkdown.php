@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Models\Traits;
+namespace ExilonCMS\Models\Traits;
 
-use MCCMS\Support\Markdown;
+use ExilonCMS\Support\Markdown;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\HtmlString;

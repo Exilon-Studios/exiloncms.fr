@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Socialite;
+namespace ExilonCMS\Socialite;
 
 use Laravel\Socialite\Two\User;
 use TheCoati\CfxSocialite\CfxProvider as BaseCfxProvider;

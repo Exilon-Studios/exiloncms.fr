@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Http\Middleware;
+namespace ExilonCMS\Http\Middleware;
 
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Extensions\Plugin;
+namespace ExilonCMS\Extensions\Plugin;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Foundation\Application;

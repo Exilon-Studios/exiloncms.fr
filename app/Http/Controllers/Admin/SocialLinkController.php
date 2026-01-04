@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\SocialLinkRequest;
-use MCCMS\Models\SocialLink;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\SocialLinkRequest;
+use ExilonCMS\Models\SocialLink;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

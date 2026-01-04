@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Http\Requests;
+namespace ExilonCMS\Http\Requests;
 
-use MCCMS\Http\Requests\Traits\ConvertCheckbox;
-use MCCMS\Rules\Slug;
+use ExilonCMS\Http\Requests\Traits\ConvertCheckbox;
+use ExilonCMS\Rules\Slug;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

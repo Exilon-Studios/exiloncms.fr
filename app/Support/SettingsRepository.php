@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support;
+namespace ExilonCMS\Support;
 
 use Illuminate\Config\Repository as Config;
 use Illuminate\Support\Collection;

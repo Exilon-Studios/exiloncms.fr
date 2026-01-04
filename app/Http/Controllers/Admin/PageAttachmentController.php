@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\AttachmentRequest;
-use MCCMS\Models\Page;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\AttachmentRequest;
+use ExilonCMS\Models\Page;
 
 class PageAttachmentController extends Controller
 {

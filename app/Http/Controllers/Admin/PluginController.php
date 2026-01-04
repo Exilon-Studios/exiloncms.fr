@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\MCCMS;
-use MCCMS\Extensions\Plugin\PluginManager;
-use MCCMS\Extensions\UpdateManager;
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\ActionLog;
+use ExilonCMS\MCCMS;
+use ExilonCMS\Extensions\Plugin\PluginManager;
+use ExilonCMS\Extensions\UpdateManager;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\ActionLog;
 use Exception;
 use Inertia\Inertia;
 use Throwable;

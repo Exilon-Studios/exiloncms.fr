@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Games\Minecraft\Servers;
+namespace ExilonCMS\Games\Minecraft\Servers;
 
-use MCCMS\Games\Minecraft\Servers\Protocol\MinecraftPing;
-use MCCMS\Games\ServerBridge;
+use ExilonCMS\Games\Minecraft\Servers\Protocol\MinecraftPing;
+use ExilonCMS\Games\ServerBridge;
 use Exception;
 use Illuminate\Support\Arr;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Games\FallbackServerBridge;
-use MCCMS\Games\ServerBridge;
-use MCCMS\Models\Traits\Loggable;
+use ExilonCMS\Games\FallbackServerBridge;
+use ExilonCMS\Games\ServerBridge;
+use ExilonCMS\Models\Traits\Loggable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -23,9 +23,9 @@ use Illuminate\Support\Facades\Cache;
  * @property bool $home_display
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \MCCMS\Models\ServerStat $stat
- * @property \Illuminate\Support\Collection|\MCCMS\Models\ServerStat[] $stats
- * @property \Illuminate\Support\Collection|\MCCMS\Models\ServerCommand[] $commands
+ * @property \ExilonCMS\Models\ServerStat $stat
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\ServerStat[] $stats
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\ServerCommand[] $commands
  *
  * @method static \Illuminate\Database\Eloquent\Builder executable()
  * @method static \Illuminate\Database\Eloquent\Builder pingable()

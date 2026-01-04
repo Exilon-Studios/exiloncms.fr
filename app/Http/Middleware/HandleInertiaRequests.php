@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Http\Middleware;
+namespace ExilonCMS\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
-use MCCMS\Models\NavbarElement;
-use MCCMS\Models\SocialLink;
+use ExilonCMS\Models\NavbarElement;
+use ExilonCMS\Models\SocialLink;
 
 class HandleInertiaRequests extends Middleware
 {

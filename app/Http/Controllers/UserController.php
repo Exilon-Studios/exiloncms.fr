@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Http\Resources\UserResource;
-use MCCMS\Models\User;
+use ExilonCMS\Http\Resources\UserResource;
+use ExilonCMS\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller

@@ -1,11 +1,11 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\ServerRequest;
-use MCCMS\Models\Server;
-use MCCMS\Models\Setting;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\ServerRequest;
+use ExilonCMS\Models\Server;
+use ExilonCMS\Models\Setting;
 use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;

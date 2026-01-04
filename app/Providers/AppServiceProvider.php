@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Providers;
+namespace ExilonCMS\Providers;
 
-use MCCMS\Extensions\ExtensionFileLoader;
-use MCCMS\Models\Page;
-use MCCMS\Models\Post;
-use MCCMS\Models\User;
-use MCCMS\Notifications\AlertNotificationChannel;
+use ExilonCMS\Extensions\ExtensionFileLoader;
+use ExilonCMS\Models\Page;
+use ExilonCMS\Models\Post;
+use ExilonCMS\Models\User;
+use ExilonCMS\Notifications\AlertNotificationChannel;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\Paginator;
@@ -29,6 +29,16 @@ class AppServiceProvider extends ServiceProvider
         $translator->setFallback($this->app['config']['app.fallback_locale']);
 
         $this->app->instance('translator', $translator);
+
+        // Enforce MorphMap aliases
+        Relation::enforceMorphMap([
+            'user' => User::class,
+            'page' => Page::class,
+            'post' => Post::class,
+        ]);
+
+        // Only accept JSON for API resources
+        JsonResource::withoutWrapping();
     }
 
     /**
@@ -36,30 +46,37 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Paginator::useBootstrapFive();
-
-        JsonResource::withoutWrapping();
-
-        Notification::extend('alert', fn () => new AlertNotificationChannel());
-
-        // TODO : change default string length only on incompatible
-        //  database versions (MySQL < 5.7.7 & MariaDB < 10.2)?
+        // Default string length for MySQL
         Schema::defaultStringLength(191);
 
-        Relation::enforceMorphMap([
-            'posts' => Post::class,
-            'pages' => Page::class,
-            'users' => User::class,
-        ]);
+        // Pagination
+        Paginator::useBootstrap();
 
-        Gate::before(function (User $user, string $ability, array $arguments) {
-            if ($user->isAdmin()) {
-                return true;
-            }
+        // Gate::after(function ($user, $ability) {
+        //     return $user->hasRole(Role::ADMIN_ROLE);
+        // });
 
-            if (empty($arguments)) {
-                return $user->role->hasRawPermission($ability);
-            }
+        // Gates
+        Gate::define('admin.dashboard', fn (User $user) => true);
+        Gate::define('admin.settings', [User::class, 'canAdminSettings']);
+        Gate::define('admin.translations', [User::class, 'canAdminTranslations']);
+        Gate::define('admin.languages', [User::class, 'canAdminLanguages']);
+        Gate::define('admin.users', [User::class, 'canAdminUsers']);
+        Gate::define('admin.roles', [User::class, 'canAdminRoles']);
+        Gate::define('admin.pages', [User::class, 'canAdminPages']);
+        Gate::define('admin.posts', [User::class, 'canAdminPosts']);
+        Gate::define('admin.servers', [User::class, 'canAdminServers']);
+        Gate::define('admin.bans', [User::class, 'canAdminBans']);
+        Gate::define('admin.plugins', [User::class, 'canAdminPlugins']);
+        Gate::define('admin.themes', [User::class, 'canAdminThemes']);
+        Gate::define('admin.navbar', [User::class, 'canAdminNavbar']);
+        Gate::define('admin.socials', [User::class, 'canAdminSocials']);
+        Gate::define('admin.images', [User::class, 'canAdminImages']);
+        Gate::define('admin.logs', [User::class, 'canAdminLogs']);
+
+        // Notifications
+        Notification::extend('alert', function ($app) {
+            return new AlertNotificationChannel();
         });
     }
 }

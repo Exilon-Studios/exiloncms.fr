@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Providers;
+namespace ExilonCMS\Providers;
 
-use MCCMS\Http\View\Composers\AdminLayoutComposer;
-use MCCMS\Http\View\Composers\NavbarComposer;
-use MCCMS\Http\View\Composers\NotificationComposer;
-use MCCMS\Http\View\Composers\ServerComposer;
-use MCCMS\View\ThemeViewFinder;
+use ExilonCMS\Http\View\Composers\AdminLayoutComposer;
+use ExilonCMS\Http\View\Composers\NavbarComposer;
+use ExilonCMS\Http\View\Composers\NotificationComposer;
+use ExilonCMS\Http\View\Composers\ServerComposer;
+use ExilonCMS\View\ThemeViewFinder;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;

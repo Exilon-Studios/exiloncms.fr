@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models\Traits;
+namespace ExilonCMS\Models\Traits;
 
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model;

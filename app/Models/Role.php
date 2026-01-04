@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Casts\Color;
-use MCCMS\Models\Traits\Loggable;
-use MCCMS\Models\Traits\Searchable;
+use ExilonCMS\Casts\Color;
+use ExilonCMS\Models\Traits\Loggable;
+use ExilonCMS\Models\Traits\Searchable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,8 +20,8 @@ use Illuminate\Support\Collection;
  * @property bool $is_admin
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \Illuminate\Support\Collection|\MCCMS\Models\User[] $users
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Permission[] $permissions
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\User[] $users
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Permission[] $permissions
  *
  * @method static \Illuminate\Database\Eloquent\Builder admin()
  */

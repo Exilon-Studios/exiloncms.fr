@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Games\Minecraft\Servers;
+namespace ExilonCMS\Games\Minecraft\Servers;
 
-use MCCMS\Games\ServerBridge;
-use MCCMS\Models\User;
+use ExilonCMS\Games\ServerBridge;
+use ExilonCMS\Models\User;
 use Exception;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;

@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Games\Minecraft;
+namespace ExilonCMS\Games\Minecraft;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 use Closure;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Generator\NameGeneratorInterface;

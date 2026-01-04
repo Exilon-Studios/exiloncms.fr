@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Games\Steam\Servers;
+namespace ExilonCMS\Games\Steam\Servers;
 
-use MCCMS\Games\Steam\Servers\Protocol\FiveMRcon as RconClient;
-use MCCMS\Models\User;
+use ExilonCMS\Games\Steam\Servers\Protocol\FiveMRcon as RconClient;
+use ExilonCMS\Models\User;
 
 class FiveMRcon extends FiveMStatus
 {

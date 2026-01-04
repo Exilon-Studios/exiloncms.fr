@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Extensions;
+namespace ExilonCMS\Extensions;
 
-use MCCMS\MCCMS;
-use MCCMS\Models\User;
-use MCCMS\Support\Optimizer;
+use ExilonCMS\MCCMS;
+use ExilonCMS\Models\User;
+use ExilonCMS\Support\Optimizer;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;

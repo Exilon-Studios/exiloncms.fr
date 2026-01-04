@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Http\Requests\Traits;
+namespace ExilonCMS\Http\Requests\Traits;
 
 trait ConvertCheckbox
 {

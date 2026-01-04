@@ -1,21 +1,21 @@
 <?php
 
-use MCCMS\Http\Controllers\Auth\LoginController;
-use MCCMS\Http\Controllers\FallbackController;
-use MCCMS\Http\Controllers\HomeController;
-use MCCMS\Http\Controllers\NotificationController;
-use MCCMS\Http\Controllers\PostCommentController;
-use MCCMS\Http\Controllers\PostController;
-use MCCMS\Http\Controllers\PostLikeController;
-use MCCMS\Http\Controllers\ProfileController;
-use MCCMS\Http\Controllers\UserController;
+use ExilonCMS\Http\Controllers\Auth\LoginController;
+use ExilonCMS\Http\Controllers\FallbackController;
+use ExilonCMS\Http\Controllers\HomeController;
+use ExilonCMS\Http\Controllers\NotificationController;
+use ExilonCMS\Http\Controllers\PostCommentController;
+use ExilonCMS\Http\Controllers\PostController;
+use ExilonCMS\Http\Controllers\PostLikeController;
+use ExilonCMS\Http\Controllers\ProfileController;
+use ExilonCMS\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Authentication Routes (Inertia)
-use MCCMS\Http\Controllers\Auth\RegisterController;
+use ExilonCMS\Http\Controllers\Auth\RegisterController;
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

@@ -1,15 +1,15 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\HasImage;
-use MCCMS\Models\Traits\InteractsWithMoney;
-use MCCMS\Models\Traits\Loggable;
-use MCCMS\Models\Traits\Searchable;
-use MCCMS\Models\Traits\TwoFactorAuthenticatable;
-use MCCMS\Notifications\ResetPassword as ResetPasswordNotification;
-use MCCMS\Notifications\VerifyEmail as VerifyEmailNotification;
-use MCCMS\Support\Discord\LinkedRoles;
+use ExilonCMS\Models\Traits\HasImage;
+use ExilonCMS\Models\Traits\InteractsWithMoney;
+use ExilonCMS\Models\Traits\Loggable;
+use ExilonCMS\Models\Traits\Searchable;
+use ExilonCMS\Models\Traits\TwoFactorAuthenticatable;
+use ExilonCMS\Notifications\ResetPassword as ResetPasswordNotification;
+use ExilonCMS\Notifications\VerifyEmail as VerifyEmailNotification;
+use ExilonCMS\Support\Discord\LinkedRoles;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -37,16 +37,16 @@ use Illuminate\Support\Str;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $deleted_at
- * @property \MCCMS\Models\DiscordAccount|null $discordAccount
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Post[] $posts
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Comment[] $comments
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Like[] $likes
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Ban[] $bans
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Notification[] $notifications
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Notification[] $readNotifications
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Notification[] $unreadNotifications
- * @property \MCCMS\Models\Role $role
- * @property \MCCMS\Models\Ban|null $ban
+ * @property \ExilonCMS\Models\DiscordAccount|null $discordAccount
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Post[] $posts
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Comment[] $comments
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Like[] $likes
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Ban[] $bans
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Notification[] $notifications
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Notification[] $readNotifications
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Notification[] $unreadNotifications
+ * @property \ExilonCMS\Models\Role $role
+ * @property \ExilonCMS\Models\Ban|null $ban
  */
 class User extends Authenticatable implements MustVerifyEmail
 {

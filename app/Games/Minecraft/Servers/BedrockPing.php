@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Games\Minecraft\Servers;
+namespace ExilonCMS\Games\Minecraft\Servers;
 
-use MCCMS\Games\Minecraft\Servers\Protocol\MinecraftBedrockPing;
-use MCCMS\Games\ServerBridge;
-use MCCMS\Models\User;
+use ExilonCMS\Games\Minecraft\Servers\Protocol\MinecraftBedrockPing;
+use ExilonCMS\Games\ServerBridge;
+use ExilonCMS\Models\User;
 use Exception;
 use Illuminate\Support\Arr;
 use RuntimeException;

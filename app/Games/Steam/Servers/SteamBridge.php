@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Games\Steam\Servers;
+namespace ExilonCMS\Games\Steam\Servers;
 
-use MCCMS\Games\Steam\SteamID;
-use MCCMS\Models\User;
+use ExilonCMS\Games\Steam\SteamID;
+use ExilonCMS\Models\User;
 
 trait SteamBridge
 {

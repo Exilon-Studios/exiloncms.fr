@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Games\Steam;
+namespace ExilonCMS\Games\Steam;
 
-use MCCMS\Games\Steam\Servers\AzLink;
-use MCCMS\Games\Steam\Servers\FiveMRcon;
-use MCCMS\Games\Steam\Servers\FiveMStatus;
+use ExilonCMS\Games\Steam\Servers\AzLink;
+use ExilonCMS\Games\Steam\Servers\FiveMRcon;
+use ExilonCMS\Games\Steam\Servers\FiveMStatus;
 
 class FiveMGame extends SteamGame
 {

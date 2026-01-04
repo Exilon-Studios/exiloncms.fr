@@ -1,11 +1,11 @@
 <?php
 
-namespace MCCMS\Providers;
+namespace ExilonCMS\Providers;
 
-use MCCMS\Extensions\Plugin\PluginManager as Plugins;
-use MCCMS\Extensions\Theme\ThemeManager as Themes;
-use MCCMS\Models\Setting;
-use MCCMS\Support\SettingsRepository;
+use ExilonCMS\Extensions\Plugin\PluginManager as Plugins;
+use ExilonCMS\Extensions\Theme\ThemeManager as Themes;
+use ExilonCMS\Models\Setting;
+use ExilonCMS\Support\SettingsRepository;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;

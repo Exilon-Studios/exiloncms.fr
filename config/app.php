@@ -141,14 +141,14 @@ return [
 
     'providers' => ServiceProvider::defaultProviders()->merge([
         // App Service Providers
-        MCCMS\Providers\AppServiceProvider::class,
-        MCCMS\Providers\ViewServiceProvider::class,
-        MCCMS\Providers\EventServiceProvider::class,
-        MCCMS\Providers\ExtensionServiceProvider::class,
-        MCCMS\Providers\RouteServiceProvider::class,
+        ExilonCMS\Providers\AppServiceProvider::class,
+        ExilonCMS\Providers\ViewServiceProvider::class,
+        ExilonCMS\Providers\EventServiceProvider::class,
+        ExilonCMS\Providers\ExtensionServiceProvider::class,
+        ExilonCMS\Providers\RouteServiceProvider::class,
         // Laravel Socialite (must be loaded before GameServiceProvider)
         Laravel\Socialite\SocialiteServiceProvider::class,
-        MCCMS\Providers\GameServiceProvider::class,
+        ExilonCMS\Providers\GameServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -163,7 +163,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        'MCCMS' => MCCMS\MCCMS::class,
+        'MCCMS' => ExilonCMS\MCCMS::class,
     ])->toArray(),
 
 ];

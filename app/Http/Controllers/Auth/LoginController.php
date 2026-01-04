@@ -1,11 +1,11 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Auth;
+namespace ExilonCMS\Http\Controllers\Auth;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\ActionLog;
-use MCCMS\Models\User;
-use MCCMS\Providers\RouteServiceProvider;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\ActionLog;
+use ExilonCMS\Models\User;
+use ExilonCMS\Providers\RouteServiceProvider;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Events\Registered;
@@ -84,7 +84,7 @@ class LoginController extends Controller
             return $this->sendFailedLoginResponse($request);
         }
 
-        /** @var \MCCMS\Models\User $user */
+        /** @var \ExilonCMS\Models\User $user */
         $user = Auth::guard()->user();
 
         if ($user === null || $user->isDeleted()) {
@@ -245,7 +245,7 @@ class LoginController extends Controller
             throw new AuthenticationException('Unauthenticated.', [Auth::guard()], route('login'));
         }
 
-        /** @var \MCCMS\Models\User $user */
+        /** @var \ExilonCMS\Models\User $user */
         $user = User::findOrFail($request->session()->get('login.2fa.id'));
         $code = $request->input('code');
 
@@ -273,7 +273,7 @@ class LoginController extends Controller
 
         $this->clearLoginAttempts($request);
 
-        /** @var \MCCMS\Models\User $user */
+        /** @var \ExilonCMS\Models\User $user */
         $user = Auth::user();
 
         $this->authenticated($request, $user);

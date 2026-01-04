@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\HasUser;
+use ExilonCMS\Models\Traits\HasUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $post_id
  * @property int $author_id
  * @property \Carbon\Carbon $created_at
- * @property \MCCMS\Models\Post $post
- * @property \MCCMS\Models\User $author
+ * @property \ExilonCMS\Models\Post $post
+ * @property \ExilonCMS\Models\User $author
  */
 class Like extends Model
 {

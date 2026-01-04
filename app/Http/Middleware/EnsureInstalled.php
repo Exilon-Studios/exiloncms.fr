@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Http\Middleware;
+namespace ExilonCMS\Http\Middleware;
 
-use MCCMS\Http\Controllers\InstallController;
+use ExilonCMS\Http\Controllers\InstallController;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;

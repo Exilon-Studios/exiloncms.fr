@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support;
+namespace ExilonCMS\Support;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;

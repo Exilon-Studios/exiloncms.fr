@@ -1,9 +1,9 @@
 <?php
 
-use MCCMS\Http\Controllers\Api\AuthController;
-use MCCMS\Http\Controllers\Api\FeedController;
-use MCCMS\Http\Controllers\Api\PostController;
-use MCCMS\Http\Controllers\Api\ServerController;
+use ExilonCMS\Http\Controllers\Api\AuthController;
+use ExilonCMS\Http\Controllers\Api\FeedController;
+use ExilonCMS\Http\Controllers\Api\PostController;
+use ExilonCMS\Http\Controllers\Api\ServerController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('api.')->group(function () {

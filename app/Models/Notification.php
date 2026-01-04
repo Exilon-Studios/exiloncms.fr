@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\HasUuidKey;
+use ExilonCMS\Models\Traits\HasUuidKey;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -18,8 +18,8 @@ use Illuminate\Notifications\DatabaseNotificationCollection;
  * @property \Carbon\Carbon|null $read_at
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \MCCMS\Models\User $user
- * @property \MCCMS\Models\User|null $author
+ * @property \ExilonCMS\Models\User $user
+ * @property \ExilonCMS\Models\User|null $author
  */
 class Notification extends Model
 {

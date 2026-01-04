@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Games\Steam\Servers;
+namespace ExilonCMS\Games\Steam\Servers;
 
-use MCCMS\Games\ServerBridge;
-use MCCMS\Models\User;
+use ExilonCMS\Games\ServerBridge;
+use ExilonCMS\Models\User;
 
 class AzLink extends ServerBridge
 {

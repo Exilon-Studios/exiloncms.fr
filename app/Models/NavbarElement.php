@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -21,9 +21,9 @@ use Illuminate\Support\Str;
  * @property bool $new_tab
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \MCCMS\Models\NavbarElement|null $parent
- * @property \Illuminate\Support\Collection|\MCCMS\Models\NavbarElement[] $elements
- * @property \Illuminate\Support\Collection|\MCCMS\Models\Role[] $roles
+ * @property \ExilonCMS\Models\NavbarElement|null $parent
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\NavbarElement[] $elements
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Role[] $roles
  */
 class NavbarElement extends Model
 {
@@ -196,7 +196,7 @@ class NavbarElement extends Model
             return false;
         }
 
-        /** @var \MCCMS\Models\User $user */
+        /** @var \ExilonCMS\Models\User $user */
         $user = Auth::user();
 
         return $user->isAdmin() || $this->roles->contains($user->role);

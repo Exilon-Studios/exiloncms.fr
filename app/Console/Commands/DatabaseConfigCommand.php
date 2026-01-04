@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
-use MCCMS\Support\EnvEditor;
+use ExilonCMS\Support\EnvEditor;
 use Illuminate\Console\Command;
 use Illuminate\Console\ConfirmableTrait;
 

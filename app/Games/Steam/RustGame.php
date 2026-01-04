@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Games\Steam;
+namespace ExilonCMS\Games\Steam;
 
-use MCCMS\Games\Steam\Servers\AzLink;
-use MCCMS\Games\Steam\Servers\Query;
-use MCCMS\Games\Steam\Servers\RustRcon;
+use ExilonCMS\Games\Steam\Servers\AzLink;
+use ExilonCMS\Games\Steam\Servers\Query;
+use ExilonCMS\Games\Steam\Servers\RustRcon;
 
 class RustGame extends SteamGame
 {

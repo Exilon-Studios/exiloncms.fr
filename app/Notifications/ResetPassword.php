@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Notifications;
+namespace ExilonCMS\Notifications;
 
 use Illuminate\Auth\Notifications\ResetPassword as Notification;
 use Illuminate\Notifications\Messages\MailMessage;

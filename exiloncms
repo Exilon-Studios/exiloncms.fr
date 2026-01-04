@@ -1,0 +1,88 @@
+#!/bin/bash
+
+# ExilonCMS Installer
+# This script downloads and runs the ExilonCMS installer
+# Usage: curl -sSL https://install.exiloncms.com | bash
+#        or
+#        curl -sSL https://install.exiloncms.com | bash -s -- project-name
+
+set -e
+
+INSTALLER_VERSION="0.0.1-beta"
+INSTALLER_URL="https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/exiloncms-installer.php"
+TEMP_DIR="/tmp/exiloncms-installer"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
+
+# Functions
+print_header() {
+    echo -e "${CYAN}${BOLD}"
+    echo "======================================"
+    echo "   ExilonCMS Installer"
+    echo "   Version: ${INSTALLER_VERSION}"
+    echo "======================================"
+    echo -e "${RESET}"
+}
+
+print_success() {
+    echo -e "${GREEN}✅ $1${RESET}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${RESET}"
+}
+
+print_info() {
+    echo -e "${CYAN}ℹ️  $1${RESET}"
+}
+
+print_header
+
+# Get project name from argument or use default
+PROJECT_NAME=${1:-exiloncms}
+
+# Validate project name
+if [[ ! "$PROJECT_NAME" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+    print_error "Invalid project name. Use only letters, numbers, hyphens, and underscores."
+    exit 1
+fi
+
+print_info "Project name: $PROJECT_NAME"
+
+# Check PHP
+if ! command -v php &> /dev/null; then
+    print_error "PHP is not installed. Please install PHP 8.2 or higher."
+    exit 1
+fi
+
+PHP_VERSION=$(php -r 'echo PHP_VERSION;' | cut -d'.' -f1,2)
+print_success "PHP version: $PHP_VERSION"
+
+# Create temp directory
+print_info "Downloading installer..."
+mkdir -p "$TEMP_DIR"
+
+# Download installer
+if command -v curl &> /dev/null; then
+    curl -sSL "$INSTALLER_URL" -o "$TEMP_DIR/installer.php"
+elif command -v wget &> /dev/null; then
+    wget -q "$INSTALLER_URL" -O "$TEMP_DIR/installer.php"
+else
+    print_error "Neither curl nor wget is installed."
+    exit 1
+fi
+
+# Run installer
+print_info "Running installer..."
+php "$TEMP_DIR/installer.php" "$PROJECT_NAME"
+
+# Cleanup
+rm -rf "$TEMP_DIR"
+
+exit $?

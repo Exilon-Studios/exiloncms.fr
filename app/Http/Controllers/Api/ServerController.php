@@ -1,13 +1,13 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Api;
+namespace ExilonCMS\Http\Controllers\Api;
 
-use MCCMS\Games\Steam\SteamID;
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Resources\ServerCollection;
-use MCCMS\Models\Role;
-use MCCMS\Models\Server;
-use MCCMS\Models\User;
+use ExilonCMS\Games\Steam\SteamID;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Resources\ServerCollection;
+use ExilonCMS\Models\Role;
+use ExilonCMS\Models\Server;
+use ExilonCMS\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Database\Eloquent\Builder;
@@ -55,7 +55,7 @@ class ServerController extends Controller
 
     public function fetch(Request $request)
     {
-        /** @var \MCCMS\Models\Server $server */
+        /** @var \ExilonCMS\Models\Server $server */
         $server = Server::find($request->input('server-id'));
         $uidKey = $request->json('platform.key') === 'uid'
             || in_array($request->json('platform.type'), self::UID_KEYS, true);

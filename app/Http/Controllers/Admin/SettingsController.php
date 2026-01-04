@@ -1,14 +1,14 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\ActionLog;
-use MCCMS\Models\Image;
-use MCCMS\Models\Setting;
-use MCCMS\Notifications\TestMail;
-use MCCMS\Support\Files;
-use MCCMS\Support\Optimizer;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\ActionLog;
+use ExilonCMS\Models\Image;
+use ExilonCMS\Models\Setting;
+use ExilonCMS\Notifications\TestMail;
+use ExilonCMS\Support\Files;
+use ExilonCMS\Support\Optimizer;
 use DateTimeZone;
 use Exception;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -651,7 +651,7 @@ class SettingsController extends Controller
         ]);
 
         // Verify what was saved
-        $saved = \MCCMS\Models\Setting::where('name', 'maintenance.enabled')->first();
+        $saved = \ExilonCMS\Models\Setting::where('name', 'maintenance.enabled')->first();
         dump('Saved in DB:', $saved?->value, 'Type:', gettype($saved?->value));
         dump('=== END DEBUG ===');
 

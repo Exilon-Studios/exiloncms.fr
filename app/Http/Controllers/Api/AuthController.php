@@ -1,11 +1,11 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Api;
+namespace ExilonCMS\Http\Controllers\Api;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Resources\AuthenticatedUser as AuthenticatedUserResource;
-use MCCMS\Models\ActionLog;
-use MCCMS\Models\User;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Resources\AuthenticatedUser as AuthenticatedUserResource;
+use ExilonCMS\Models\ActionLog;
+use ExilonCMS\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
@@ -50,7 +50,7 @@ class AuthController extends Controller
             ], 422);
         }
 
-        /** @var \MCCMS\Models\User $user */
+        /** @var \ExilonCMS\Models\User $user */
         $user = Auth::getLastAttempted();
 
         if ($user->isBanned()) {

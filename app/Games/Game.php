@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Games;
+namespace ExilonCMS\Games;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 
 abstract class Game
 {
@@ -80,7 +80,7 @@ abstract class Game
     /**
      * Get the supported server bridge types.
      *
-     * @return \MCCMS\Games\ServerBridge[]
+     * @return \ExilonCMS\Games\ServerBridge[]
      */
     abstract public function getSupportedServers();
 

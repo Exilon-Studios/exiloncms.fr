@@ -1,11 +1,11 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\PageRequest;
-use MCCMS\Models\Page;
-use MCCMS\Models\Role;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\PageRequest;
+use ExilonCMS\Models\Page;
+use ExilonCMS\Models\Role;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Inertia\Inertia;

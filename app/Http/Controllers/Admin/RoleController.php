@@ -1,13 +1,13 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\RoleRequest;
-use MCCMS\Models\Permission;
-use MCCMS\Models\Role;
-use MCCMS\Models\Setting;
-use MCCMS\Support\Discord\LinkedRoles;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\RoleRequest;
+use ExilonCMS\Models\Permission;
+use ExilonCMS\Models\Role;
+use ExilonCMS\Models\Setting;
+use ExilonCMS\Support\Discord\LinkedRoles;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;

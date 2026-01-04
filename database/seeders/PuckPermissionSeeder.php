@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use MCCMS\Models\Permission;
-use MCCMS\Models\Role;
+use ExilonCMS\Models\Permission;
+use ExilonCMS\Models\Role;
 use Illuminate\Database\Seeder;
 
 class PuckPermissionSeeder extends Seeder

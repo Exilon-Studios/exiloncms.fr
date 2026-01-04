@@ -1,11 +1,11 @@
 <?php
 
-namespace MCCMS\Http\Requests;
+namespace ExilonCMS\Http\Requests;
 
-use MCCMS\Http\Requests\Traits\ConvertCheckbox;
-use MCCMS\Models\NavbarElement;
-use MCCMS\Models\Page;
-use MCCMS\Models\Post;
+use ExilonCMS\Http\Requests\Traits\ConvertCheckbox;
+use ExilonCMS\Models\NavbarElement;
+use ExilonCMS\Models\Page;
+use ExilonCMS\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
-use MCCMS\Support\EnvEditor;
+use ExilonCMS\Support\EnvEditor;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Str;
 
@@ -46,7 +46,7 @@ class GameCreateCommand extends PluginCreateCommand
         $id = $this->argument('id') ?? Str::slug($name);
         $studlyName = Str::studly($name);
         $path = plugin_path($id);
-        $namespace = 'MCCMS\Plugin\\'.$studlyName;
+        $namespace = 'ExilonCMS\Plugin\\'.$studlyName;
 
         $code = $this->call('plugin:create', [
             'name' => $name,

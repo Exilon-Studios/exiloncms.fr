@@ -1,13 +1,13 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\MCCMS;
-use MCCMS\Extensions\Theme\ThemeManager;
-use MCCMS\Extensions\UpdateManager;
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\ActionLog;
-use MCCMS\Models\Image;
+use ExilonCMS\MCCMS;
+use ExilonCMS\Extensions\Theme\ThemeManager;
+use ExilonCMS\Extensions\UpdateManager;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\ActionLog;
+use ExilonCMS\Models\Image;
 use Exception;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;

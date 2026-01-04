@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\Loggable;
+use ExilonCMS\Models\Traits\Loggable;
 use Illuminate\Database\Eloquent\Model;
 
 /**

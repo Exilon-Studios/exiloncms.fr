@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Listeners;
+namespace ExilonCMS\Listeners;
 
 use Illuminate\Auth\Events\PasswordReset;
 

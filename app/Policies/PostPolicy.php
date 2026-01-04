@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Policies;
+namespace ExilonCMS\Policies;
 
-use MCCMS\Models\Post;
-use MCCMS\Models\User;
+use ExilonCMS\Models\Post;
+use ExilonCMS\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PostPolicy

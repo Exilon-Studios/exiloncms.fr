@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Support\Discord;
+namespace ExilonCMS\Support\Discord;
 
 enum RoleMetadataType: int
 {

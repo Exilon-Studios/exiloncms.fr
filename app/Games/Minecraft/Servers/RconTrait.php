@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Games\Minecraft\Servers;
+namespace ExilonCMS\Games\Minecraft\Servers;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 use RuntimeException;
 use Thedudeguy\Rcon as MinecraftRcon;
 

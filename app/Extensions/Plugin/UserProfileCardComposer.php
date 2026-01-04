@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Extensions\Plugin;
+namespace ExilonCMS\Extensions\Plugin;
 
 abstract class UserProfileCardComposer extends AdminDashboardCardComposer
 {

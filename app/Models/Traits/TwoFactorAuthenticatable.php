@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models\Traits;
+namespace ExilonCMS\Models\Traits;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

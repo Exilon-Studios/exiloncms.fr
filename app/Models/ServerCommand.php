@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property int|null $user_id
  * @property bool $need_online
  * @property string $command
- * @property \MCCMS\Models\Server $server
- * @property \MCCMS\Models\User|null $user
+ * @property \ExilonCMS\Models\Server $server
+ * @property \ExilonCMS\Models\User|null $user
  */
 class ServerCommand extends Model
 {

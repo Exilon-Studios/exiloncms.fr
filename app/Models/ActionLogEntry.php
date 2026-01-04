@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $attribute
  * @property string|null $old_value
  * @property string|null $new_value
- * @property \MCCMS\Models\ActionLog $log
+ * @property \ExilonCMS\Models\ActionLog $log
  */
 class ActionLogEntry extends Model
 {

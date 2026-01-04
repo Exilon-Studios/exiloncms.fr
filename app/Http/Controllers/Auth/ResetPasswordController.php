@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Auth;
+namespace ExilonCMS\Http\Controllers\Auth;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\User;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;

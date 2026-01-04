@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Support\Discord;
+namespace ExilonCMS\Support\Discord;
 
-use MCCMS\Support\Discord\Embeds\EmbedAuthor;
-use MCCMS\Support\Discord\Embeds\EmbedField;
-use MCCMS\Support\Discord\Embeds\EmbedFooter;
-use MCCMS\Support\Discord\Embeds\EmbedImage;
-use MCCMS\Support\Discord\Embeds\EmbedThumbnail;
+use ExilonCMS\Support\Discord\Embeds\EmbedAuthor;
+use ExilonCMS\Support\Discord\Embeds\EmbedField;
+use ExilonCMS\Support\Discord\Embeds\EmbedFooter;
+use ExilonCMS\Support\Discord\Embeds\EmbedImage;
+use ExilonCMS\Support\Discord\Embeds\EmbedThumbnail;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;

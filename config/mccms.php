@@ -22,20 +22,21 @@ return [
     |
     */
 
-    'version' => \MCCMS\MCCMS::version(),
+    'version' => \ExilonCMS\ExilonCMS::version(),
 
     /*
     |--------------------------------------------------------------------------
     | Marketplace Configuration
     |--------------------------------------------------------------------------
     |
-    | Configuration for the MC-CMS marketplace system
+    | Configuration for the ExilonCMS marketplace system
     |
     */
 
     'marketplace' => [
-        'enabled' => env('MCCMS_MARKETPLACE_ENABLED', true),
-        'url' => env('MCCMS_MARKETPLACE_URL', 'https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS-marketplace/main'),
+        'enabled' => env('EXILONCMS_MARKETPLACE_ENABLED', true),
+        'url' => env('EXILONCMS_MARKETPLACE_URL', 'https://marketplace.exiloncms.com'),
+        'registry_url' => env('EXILONCMS_MARKETPLACE_REGISTRY_URL', 'https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS-marketplace/main'),
         'api_version' => 'v1',
         'registry' => 'registry.json',
         'cache_duration' => 3600, // 1 hour

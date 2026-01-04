@@ -1,11 +1,11 @@
 <?php
 
-namespace MCCMS\Http\Resources;
+namespace ExilonCMS\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \MCCMS\Models\User */
+/** @mixin \ExilonCMS\Models\User */
 class AuthenticatedUser extends JsonResource
 {
     /**

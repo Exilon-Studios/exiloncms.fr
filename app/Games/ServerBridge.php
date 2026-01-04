@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Games;
+namespace ExilonCMS\Games;
 
-use MCCMS\Models\Server;
-use MCCMS\Models\User;
+use ExilonCMS\Models\Server;
+use ExilonCMS\Models\User;
 use RuntimeException;
 
 abstract class ServerBridge

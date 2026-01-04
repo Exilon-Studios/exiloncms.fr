@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Games\Minecraft\Servers\Protocol;
+namespace ExilonCMS\Games\Minecraft\Servers\Protocol;
 
 use RuntimeException;
 

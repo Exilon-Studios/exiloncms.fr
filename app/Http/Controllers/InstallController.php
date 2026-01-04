@@ -1,17 +1,17 @@
 <?php
 
-namespace MCCMS\Http\Controllers;
+namespace ExilonCMS\Http\Controllers;
 
-use MCCMS\Extensions\Plugin\PluginManager;
-use MCCMS\Extensions\UpdateManager;
-use MCCMS\Games\FiveMGame;
-use MCCMS\Games\Minecraft\MinecraftBedrockGame;
-use MCCMS\Games\Minecraft\MinecraftOnlineGame;
-use MCCMS\Games\Steam\SteamGame;
-use MCCMS\Models\Role;
-use MCCMS\Models\Setting;
-use MCCMS\Models\User;
-use MCCMS\Support\EnvEditor;
+use ExilonCMS\Extensions\Plugin\PluginManager;
+use ExilonCMS\Extensions\UpdateManager;
+use ExilonCMS\Games\FiveMGame;
+use ExilonCMS\Games\Minecraft\MinecraftBedrockGame;
+use ExilonCMS\Games\Minecraft\MinecraftOnlineGame;
+use ExilonCMS\Games\Steam\SteamGame;
+use ExilonCMS\Models\Role;
+use ExilonCMS\Models\Setting;
+use ExilonCMS\Models\User;
+use ExilonCMS\Support\EnvEditor;
 use Exception;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Client\HttpClientException;

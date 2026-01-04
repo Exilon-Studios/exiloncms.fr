@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Socialite\Xbox;
+namespace ExilonCMS\Socialite\Xbox;
 
 use Illuminate\Support\Str;
 

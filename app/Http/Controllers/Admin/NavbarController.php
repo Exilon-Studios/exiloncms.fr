@@ -1,13 +1,13 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\NavbarElementRequest;
-use MCCMS\Models\NavbarElement;
-use MCCMS\Models\Page;
-use MCCMS\Models\Post;
-use MCCMS\Models\Role;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\NavbarElementRequest;
+use ExilonCMS\Models\NavbarElement;
+use ExilonCMS\Models\Page;
+use ExilonCMS\Models\Post;
+use ExilonCMS\Models\Role;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

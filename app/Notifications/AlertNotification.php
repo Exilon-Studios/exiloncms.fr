@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Notifications;
+namespace ExilonCMS\Notifications;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 use Illuminate\Contracts\Support\Arrayable;
 
 class AlertNotification implements Arrayable

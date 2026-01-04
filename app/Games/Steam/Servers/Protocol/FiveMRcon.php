@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Games\Steam\Servers\Protocol;
+namespace ExilonCMS\Games\Steam\Servers\Protocol;
 
 use RuntimeException;
 

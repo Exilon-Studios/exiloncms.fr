@@ -1,10 +1,10 @@
 <?php
 
-use MCCMS\Http\Controllers\InstallController;
+use ExilonCMS\Http\Controllers\InstallController;
 use Illuminate\Support\Facades\Route;
 
 $middleware = [
-    \MCCMS\Http\Middleware\EncryptCookies::class,
+    \ExilonCMS\Http\Middleware\EncryptCookies::class,
     \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
     \Illuminate\Session\Middleware\StartSession::class,
     \Illuminate\View\Middleware\ShareErrorsFromSession::class,

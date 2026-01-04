@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Games;
+namespace ExilonCMS\Games;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 
 /**
  * Fallback auth implementation unrelated to a game.

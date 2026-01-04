@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Socialite\Xbox;
+namespace ExilonCMS\Socialite\Xbox;
 
 use Closure;
 use Illuminate\Support\Arr;

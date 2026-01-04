@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Models\Traits;
+namespace ExilonCMS\Models\Traits;
 
-use MCCMS\Models\ActionLog;
+use ExilonCMS\Models\ActionLog;
 use Illuminate\Database\Eloquent\Model;
 
 /**

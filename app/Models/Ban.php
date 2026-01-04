@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\HasUser;
-use MCCMS\Models\Traits\Loggable;
+use ExilonCMS\Models\Traits\HasUser;
+use ExilonCMS\Models\Traits\Loggable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
@@ -17,9 +17,9 @@ use Illuminate\Support\Facades\Auth;
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $removed_at
- * @property \MCCMS\Models\User $user
- * @property \MCCMS\Models\User $author
- * @property \MCCMS\Models\User|null $remover
+ * @property \ExilonCMS\Models\User $user
+ * @property \ExilonCMS\Models\User $author
+ * @property \ExilonCMS\Models\User|null $remover
  */
 class Ban extends Model
 {

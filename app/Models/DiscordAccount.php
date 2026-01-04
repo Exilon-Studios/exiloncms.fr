@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
-use MCCMS\Models\Traits\Searchable;
-use MCCMS\Support\Discord\LinkedRoles;
+use ExilonCMS\Models\Traits\Searchable;
+use ExilonCMS\Support\Discord\LinkedRoles;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Carbon\Carbon $expires_at
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property \MCCMS\Models\User $user
+ * @property \ExilonCMS\Models\User $user
  */
 class DiscordAccount extends Model
 {

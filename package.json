@@ -2,6 +2,30 @@
     "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",
+    "name": "exiloncms",
+    "version": "0.2.2",
+    "description": "ExilonCMS - Modern CMS for game servers with CLI project creator",
+    "bin": {
+        "exiloncms": "./bin/exiloncms-wrapper.js"
+    },
+    "files": [
+        "bin/",
+        "exiloncms-installer.php"
+    ],
+    "keywords": [
+        "cms",
+        "laravel",
+        "minecraft",
+        "gaming",
+        "cli",
+        "scaffolding"
+    ],
+    "author": "Exilon Studios",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Exilon-Studios/ExilonCMS.git"
+    },
     "scripts": {
         "build": "vite build",
         "dev": "vite"

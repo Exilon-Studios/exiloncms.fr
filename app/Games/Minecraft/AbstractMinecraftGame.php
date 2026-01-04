@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Games\Minecraft;
+namespace ExilonCMS\Games\Minecraft;
 
-use MCCMS\Games\Game;
-use MCCMS\Games\Minecraft\Servers\AzLink;
-use MCCMS\Games\Minecraft\Servers\Ping;
-use MCCMS\Games\Minecraft\Servers\Rcon;
-use MCCMS\Socialite\Xbox\XboxProvider;
+use ExilonCMS\Games\Game;
+use ExilonCMS\Games\Minecraft\Servers\AzLink;
+use ExilonCMS\Games\Minecraft\Servers\Ping;
+use ExilonCMS\Games\Minecraft\Servers\Rcon;
+use ExilonCMS\Socialite\Xbox\XboxProvider;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 abstract class AbstractMinecraftGame extends Game

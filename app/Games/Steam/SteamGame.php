@@ -1,13 +1,13 @@
 <?php
 
-namespace MCCMS\Games\Steam;
+namespace ExilonCMS\Games\Steam;
 
-use MCCMS\Games\Game;
-use MCCMS\Games\Steam\Servers\AzLink;
-use MCCMS\Games\Steam\Servers\Query;
-use MCCMS\Games\Steam\Servers\Rcon;
-use MCCMS\Games\UserAttribute;
-use MCCMS\Models\User;
+use ExilonCMS\Games\Game;
+use ExilonCMS\Games\Steam\Servers\AzLink;
+use ExilonCMS\Games\Steam\Servers\Query;
+use ExilonCMS\Games\Steam\Servers\Rcon;
+use ExilonCMS\Games\UserAttribute;
+use ExilonCMS\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;

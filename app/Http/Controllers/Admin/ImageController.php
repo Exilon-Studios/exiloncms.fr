@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Http\Requests\ImageRequest;
-use MCCMS\Models\Image;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Requests\ImageRequest;
+use ExilonCMS\Models\Image;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;

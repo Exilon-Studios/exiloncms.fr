@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Models;
+namespace ExilonCMS\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $permission
  * @property int $role_id
- * @property \MCCMS\Models\Role $role
+ * @property \ExilonCMS\Models\Role $role
  */
 class Permission extends Model
 {

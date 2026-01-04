@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Console\Commands;
+namespace ExilonCMS\Console\Commands;
 
-use MCCMS\Models\Attachment;
-use MCCMS\Models\PendingAttachment;
+use ExilonCMS\Models\Attachment;
+use ExilonCMS\Models\PendingAttachment;
 use Illuminate\Console\Command;
 
 class AttachmentsPurgeCommand extends Command

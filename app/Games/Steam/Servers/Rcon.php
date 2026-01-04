@@ -1,8 +1,8 @@
 <?php
 
-namespace MCCMS\Games\Steam\Servers;
+namespace ExilonCMS\Games\Steam\Servers;
 
-use MCCMS\Models\User;
+use ExilonCMS\Models\User;
 
 class Rcon extends Query
 {

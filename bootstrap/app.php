@@ -19,18 +19,18 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \MCCMS\Http\Middleware\CheckForMaintenanceSettings::class,
-            \MCCMS\Http\Middleware\SetLocale::class,
-            \MCCMS\Http\Middleware\HandleInertiaRequests::class,
+            \ExilonCMS\Http\Middleware\CheckForMaintenanceSettings::class,
+            \ExilonCMS\Http\Middleware\SetLocale::class,
+            \ExilonCMS\Http\Middleware\HandleInertiaRequests::class,
         ]);
 
         // Register middleware aliases
         $middleware->alias([
-            'login.socialite' => \MCCMS\Http\Middleware\SocialiteLogin::class,
-            'captcha' => \MCCMS\Http\Middleware\VerifyCaptcha::class,
-            'admin' => \MCCMS\Http\Middleware\AdminAuthenticate::class,
-            'registration' => \MCCMS\Http\Middleware\CheckRegistrationStatus::class,
-            'puck.edit' => \MCCMS\Http\Middleware\CanEditWithPuck::class,
+            'login.socialite' => \ExilonCMS\Http\Middleware\SocialiteLogin::class,
+            'captcha' => \ExilonCMS\Http\Middleware\VerifyCaptcha::class,
+            'admin' => \ExilonCMS\Http\Middleware\AdminAuthenticate::class,
+            'registration' => \ExilonCMS\Http\Middleware\CheckRegistrationStatus::class,
+            'puck.edit' => \ExilonCMS\Http\Middleware\CanEditWithPuck::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

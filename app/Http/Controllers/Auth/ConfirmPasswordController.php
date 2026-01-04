@@ -1,9 +1,9 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Auth;
+namespace ExilonCMS\Http\Controllers\Auth;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Providers\RouteServiceProvider;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;

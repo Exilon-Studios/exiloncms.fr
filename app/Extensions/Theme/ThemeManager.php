@@ -1,12 +1,12 @@
 <?php
 
-namespace MCCMS\Extensions\Theme;
+namespace ExilonCMS\Extensions\Theme;
 
-use MCCMS\Extensions\ExtensionManager;
-use MCCMS\Extensions\UpdateManager;
-use MCCMS\Models\Setting;
-use MCCMS\Support\Files;
-use MCCMS\Support\Optimizer;
+use ExilonCMS\Extensions\ExtensionManager;
+use ExilonCMS\Extensions\UpdateManager;
+use ExilonCMS\Models\Setting;
+use ExilonCMS\Support\Files;
+use ExilonCMS\Support\Optimizer;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;

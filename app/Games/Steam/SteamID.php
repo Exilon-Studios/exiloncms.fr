@@ -1,6 +1,6 @@
 <?php
 
-namespace MCCMS\Games\Steam;
+namespace ExilonCMS\Games\Steam;
 
 class SteamID
 {

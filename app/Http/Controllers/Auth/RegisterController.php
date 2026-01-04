@@ -1,14 +1,14 @@
 <?php
 
-namespace MCCMS\Http\Controllers\Auth;
+namespace ExilonCMS\Http\Controllers\Auth;
 
-use MCCMS\Http\Controllers\Controller;
-use MCCMS\Models\Role;
-use MCCMS\Models\User;
-use MCCMS\Providers\RouteServiceProvider;
-use MCCMS\Rules\GameAuth;
-use MCCMS\Rules\Username;
-use MCCMS\Support\Markdown;
+use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\Role;
+use ExilonCMS\Models\User;
+use ExilonCMS\Providers\RouteServiceProvider;
+use ExilonCMS\Rules\GameAuth;
+use ExilonCMS\Rules\Username;
+use ExilonCMS\Support\Markdown;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
