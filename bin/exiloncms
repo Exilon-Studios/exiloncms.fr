@@ -109,6 +109,27 @@ function downloadFile(string $url, string $destination): bool
 {
     print_info("Downloading from: {$url}");
 
+    // Try file_get_contents first (works better on Windows)
+    $ctx = stream_context_create([
+        'http' => [
+            'timeout' => 300,
+            'follow_location' => true,
+        ],
+        'ssl' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+        ],
+    ]);
+
+    $content = @file_get_contents($url, false, $ctx);
+
+    if ($content !== false) {
+        file_put_contents($destination, $content);
+        print_success("Download complete");
+        return true;
+    }
+
+    // Fallback to curl
     $fp = fopen($destination, 'w+');
     if (! $fp) {
         print_error("Could not open file for writing: {$destination}");
@@ -121,6 +142,8 @@ function downloadFile(string $url, string $destination): bool
         CURLOPT_FILE => $fp,
         CURLOPT_FOLLOWLOCATION => true,
         CURLOPT_TIMEOUT => 300,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_SSL_VERIFYHOST => false,
         CURLOPT_NOPROGRESS => false,
         CURLOPT_PROGRESSFUNCTION => function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) {
             static $lastPercent = 0;
