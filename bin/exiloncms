@@ -472,11 +472,41 @@ function command_new(array $argv): int
     $extractedDirs = glob($tempDir . '/extracted/*', GLOB_ONLYDIR);
     $sourceDir = $extractedDirs[0] ?? $tempDir . '/extracted';
 
-    // Move to target directory
+    // Move to target directory (copy+delete on Windows for better compatibility)
     print_info("Installing to: {$targetDir}");
-    if (! rename($sourceDir, $targetDir)) {
-        print_error("Failed to move files to target directory");
-        return 1;
+
+    // Try rename first (faster)
+    if (! @rename($sourceDir, $targetDir)) {
+        // Fallback to recursive copy
+        print_info("Copying files...");
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sourceDir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $item) {
+            $dest = $targetDir . '/' . $iterator->getSubPathName();
+            if ($item->isDir()) {
+                mkdir($dest, 0755, true);
+            } else {
+                copy($item, $dest);
+            }
+        }
+
+        // Cleanup source
+        $cleanupIterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($sourceDir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($cleanupIterator as $item) {
+            if ($item->isDir()) {
+                rmdir($item);
+            } else {
+                unlink($item);
+            }
+        }
+        rmdir($sourceDir);
     }
 
     // Cleanup
