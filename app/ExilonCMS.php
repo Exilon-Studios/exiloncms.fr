@@ -1,10 +1,10 @@
 <?php
 
-namespace MCCMS;
+namespace ExilonCMS;
 
 use Illuminate\Support\Str;
 
-class MCCMS
+class ExilonCMS
 {
     /**
      * The ExilonCMS version.

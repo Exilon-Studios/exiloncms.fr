@@ -52,7 +52,12 @@
       "Bash(git remote add:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(git push:*)",
+      "Bash(gh release create:*)",
+      "Bash(git archive:*)",
+      "Bash(git tag:*)",
+      "Bash(gh release upload:*)"
     ],
     "deny": [],
     "ask": []

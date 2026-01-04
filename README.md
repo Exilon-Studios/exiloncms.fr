@@ -1,59 +1,236 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# 🎮 ExilonCMS
 
-## About Laravel
+**A modern CMS for game servers**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+[![Latest Release](https://img.shields.io/github/v/release/Exilon-Studios/ExilonCMS)](https://github.com/Exilon-Studios/ExilonCMS/releases)
+[![License](https://img.shields.io/github/license/Exilon-Studios/ExilonCMS)](LICENSE)
+[![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)](https://php.net)
+[![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+A powerful, modern content management system designed specifically for game servers. Built with Laravel 12, React 19, and Inertia.js.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+</div>
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## ✨ Features
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- 🎮 **Multi-game Support** - Minecraft (Java/Bedrock), FiveM, Rust, and more
+- 🚀 **Modern Tech Stack** - Laravel 12, React 19, Inertia.js v2, TypeScript, Tailwind CSS v4
+- 🎨 **Visual Page Builder** - Drag-and-drop editor with Puck
+- 🔐 **Role-based Access** - Complete permission system
+- 🌍 **Multi-language** - Built-in translation system (FR/EN)
+- 🔌 **Plugin System** - Extensible architecture
+- 🎭 **Theme System** - Fully customizable
+- 🔄 **Auto-updates** - GitHub-based updates with automatic backups
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 📋 Requirements
 
-### Premium Partners
+- **PHP**: 8.2 or higher
+- **Composer**: 2.x
+- **Node.js**: 20.x or higher
+- **Database**: PostgreSQL 10+ or MySQL 8+
+- **Web Server**: Apache, Nginx, or Laravel Valet
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🚀 Quick Installation
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Via Composer (Recommended)
 
-## Code of Conduct
+```bash
+# Create a new project
+composer create-project exilon-studios/exiloncms your-site-name
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+cd your-site-name
 
-## Security Vulnerabilities
+# Install dependencies
+npm install
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Build assets
+npm run build
 
-## License
+# Configure environment
+cp .env.example .env
+php artisan key:generate
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Configure database in .env
+
+# Run installation
+php artisan migrate --seed
+php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="password"
+```
+
+### Manual Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/Exilon-Studios/ExilonCMS.git your-site-name
+cd your-site-name
+
+# Install PHP dependencies
+composer install
+
+# Install frontend dependencies
+npm install
+
+# Build frontend
+npm run build
+
+# Configure environment
+cp .env.example .env
+php artisan key:generate
+
+# Edit .env and set database credentials
+# DB_DATABASE=exiloncms
+# DB_USERNAME=your_username
+# DB_PASSWORD=your_password
+
+# Run migrations
+php artisan migrate --seed
+
+# Create admin user
+php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="password"
+
+# Start development server
+php artisan serve
+# In another terminal:
+npm run dev
+```
+
+Visit `http://localhost:8000` to access your site.
+
+---
+
+## 🎯 Development
+
+```bash
+# Start Laravel server
+php artisan serve
+
+# Start Vite dev server (in another terminal)
+npm run dev
+
+# Run tests
+composer test
+
+# Code formatting
+./vendor/bin/pint
+
+# Clear cache
+php artisan optimize:clear
+```
+
+---
+
+## 📦 Creating Plugins
+
+```bash
+# Create a new plugin
+php artisan plugin:create MyPlugin
+
+# Enable a plugin
+php artisan plugin:enable MyPlugin
+
+# Disable a plugin
+php artisan plugin:disable MyPlugin
+```
+
+---
+
+## 🎨 Creating Themes
+
+```bash
+# Create a new theme
+php artisan theme:create MyTheme
+```
+
+---
+
+## 🔄 Updating
+
+ExilonCMS supports automatic updates via GitHub:
+
+1. Go to `/admin/updates` in your admin panel
+2. Check for updates
+3. Download the update (automatic backup created)
+4. Install the update
+
+Or manually:
+
+```bash
+git pull origin main
+composer install
+npm install
+npm run build
+php artisan migrate --force
+php artisan optimize:clear
+```
+
+---
+
+## 📚 Documentation
+
+Full documentation is available at: [https://github.com/Exilon-Studios/ExilonCMS/wiki](https://github.com/Exilon-Studios/ExilonCMS/wiki)
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+- **Framework**: Laravel 12
+- **Language**: PHP 8.2+
+- **Database**: PostgreSQL / MySQL
+- **Queue**: Redis (optional)
+
+### Frontend
+- **Framework**: React 19
+- **Language**: TypeScript
+- **Routing**: Inertia.js v2
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui
+- **Editor**: Puck (Visual page builder)
+- **Rich Text**: Tiptap
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+ExilonCMS is open-sourced software licensed under the [MIT license](LICENSE).
+
+---
+
+## 🙏 Acknowledgments
+
+- [Laravel](https://laravel.com) - The PHP Framework For Web Artisans
+- [React](https://react.dev) - The library for web and native user interfaces
+- [Inertia.js](https://inertiajs.com) - Build single-page apps without building an API
+- [Puck](https://measured.co/puck) - The visual drag-and-drop page builder for React
+- [shadcn/ui](https://ui.shadcn.com) - Beautifully designed components
+- [Tailwind CSS](https://tailwindcss.com) - A utility-first CSS framework
+
+---
+
+<div align="center">
+
+**Built with ❤️ by Exilon Studios**
+
+[Website](https://exilonstudios.com) • [Documentation](https://github.com/Exilon-Studios/ExilonCMS/wiki) • [Support](https://github.com/Exilon-Studios/ExilonCMS/issues)
+
+</div>

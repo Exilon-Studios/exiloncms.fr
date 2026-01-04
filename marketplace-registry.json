@@ -1,0 +1,36 @@
+{
+  "version": "1.0",
+  "last_updated": "2026-01-04",
+  "plugins": [],
+  "themes": [],
+  "games": [
+    {
+      "id": "minecraft-java",
+      "name": "Minecraft Java",
+      "description": "Minecraft Java Edition support",
+      "version": "1.0.0",
+      "icon": "minecraft"
+    },
+    {
+      "id": "minecraft-bedrock",
+      "name": "Minecraft Bedrock",
+      "description": "Minecraft Bedrock Edition support",
+      "version": "1.0.0",
+      "icon": "minecraft"
+    },
+    {
+      "id": "fivem",
+      "name": "FiveM",
+      "description": "FiveM GTA V multiplayer framework",
+      "version": "1.0.0",
+      "icon": "car"
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "description": "Rust survival game",
+      "version": "1.0.0",
+      "icon": "wrench"
+    }
+  ]
+}
