@@ -80,26 +80,62 @@ try {
 }
 
 # Check Composer
-$composerCmd = Get-Command composer -ErrorAction SilentlyContinue
-if ($composerCmd) {
-    $composerVersion = & composer --version 2>$null
-    Write-Success "Composer found"
-} else {
+$ErrorActionPreference = "Continue"
+$composerFound = $false
+try {
+    $null = composer --version 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        $composerFound = $true
+        Write-Success "Composer found"
+    }
+} catch {
+    # Command failed, try next method
+}
+
+if (-not $composerFound) {
+    # Try Get-Command as fallback
+    $composerCmd = Get-Command composer -ErrorAction SilentlyContinue
+    if ($composerCmd) {
+        $composerFound = $true
+        Write-Success "Composer found"
+    }
+}
+
+if (-not $composerFound) {
     Write-Error "Composer is not installed. Please install Composer first."
     Write-Host "https://getcomposer.org/download/"
     exit 1
 }
 
 # Check Node.js
-$nodeCmd = Get-Command node -ErrorAction SilentlyContinue
-if ($nodeCmd) {
-    $nodeVersion = & node -v 2>$null
-    Write-Success "Node.js $nodeVersion found"
-} else {
+$nodeFound = $false
+try {
+    $nodeVersion = node -v 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        $nodeFound = $true
+        Write-Success "Node.js $nodeVersion found"
+    }
+} catch {
+    # Command failed, try next method
+}
+
+if (-not $nodeFound) {
+    # Try Get-Command as fallback
+    $nodeCmd = Get-Command node -ErrorAction SilentlyContinue
+    if ($nodeCmd) {
+        $nodeFound = $true
+        $nodeVersion = & node -v 2>$null
+        Write-Success "Node.js $nodeVersion found"
+    }
+}
+
+if (-not $nodeFound) {
     Write-Error "Node.js is not installed. Please install Node.js 18 or higher."
     Write-Host "https://nodejs.org/"
     exit 1
 }
+
+$ErrorActionPreference = "Stop"
 
 # Download CLI
 Write-Info "Downloading ExilonCMS CLI..."
