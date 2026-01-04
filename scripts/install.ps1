@@ -19,17 +19,17 @@ function Write-Header {
 
 function Write-Success {
     param([string]$Message)
-    Write-Host "✅ $Message" -ForegroundColor Green
+    Write-Host "[OK] $Message" -ForegroundColor Green
 }
 
-function Write-Error {
+function Write-Error-Func {
     param([string]$Message)
-    Write-Host "❌ $Message" -ForegroundColor Red
+    Write-Host "[ERROR] $Message" -ForegroundColor Red
 }
 
 function Write-Info {
     param([string]$Message)
-    Write-Host "ℹ️  $Message" -ForegroundColor Cyan
+    Write-Host "[INFO] $Message" -ForegroundColor Cyan
 }
 
 Write-Header
@@ -47,7 +47,7 @@ Write-Info "Project name: $ProjectName"
 
 # Check if directory exists
 if (Test-Path $ProjectName) {
-    Write-Error "Directory '$ProjectName' already exists!"
+    Write-Error-Func "Directory '$ProjectName' already exists!"
     exit 1
 }
 
@@ -63,7 +63,7 @@ try {
         $currentVersion = "$major.$minor"
 
         if ([version]$currentVersion -lt [version]$minVersion) {
-            Write-Error "PHP $minVersion or higher is required (you have $currentVersion)"
+            Write-Error-Func "PHP $minVersion or higher is required (you have $currentVersion)"
             Write-Host ""
             Write-Host "Download PHP: https://windows.php.net/download/"
             exit 1
@@ -72,7 +72,7 @@ try {
         throw "PHP not found"
     }
 } catch {
-    Write-Error "PHP is not installed. Please install PHP 8.2 or higher."
+    Write-Error-Func "PHP is not installed. Please install PHP 8.2 or higher."
     Write-Host ""
     Write-Host "Download: https://windows.php.net/download/"
     Write-Host "Make sure to add PHP to your system PATH"
@@ -102,7 +102,7 @@ if (-not $composerFound) {
 }
 
 if (-not $composerFound) {
-    Write-Error "Composer is not installed. Please install Composer first."
+    Write-Error-Func "Composer is not installed. Please install Composer first."
     Write-Host "https://getcomposer.org/download/"
     exit 1
 }
@@ -130,7 +130,7 @@ if (-not $nodeFound) {
 }
 
 if (-not $nodeFound) {
-    Write-Error "Node.js is not installed. Please install Node.js 18 or higher."
+    Write-Error-Func "Node.js is not installed. Please install Node.js 18 or higher."
     Write-Host "https://nodejs.org/"
     exit 1
 }
@@ -144,10 +144,14 @@ $cliUrl = "https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/bin/e
 $outputFile = "exiloncms"
 
 try {
-    Invoke-WebRequest -Uri $cliUrl -OutFile $outputFile -UseBasicParsing
+    $cliContent = Invoke-WebRequest -Uri $cliUrl -UseBasicParsing | Select-Object -ExpandProperty Content
+    # Ensure UTF-8 without BOM
+    $utf8NoBom = New-Object System.Text.UTF8Encoding $false
+    $outputPath = Join-Path (Get-Location) $outputFile
+    [System.IO.File]::WriteAllText($outputPath, $cliContent, $utf8NoBom)
     Write-Success "CLI downloaded"
 } catch {
-    Write-Error "Failed to download CLI."
+    Write-Error-Func "Failed to download CLI."
     exit 1
 }
 
@@ -155,7 +159,7 @@ try {
 Write-Info "Starting installation..."
 Write-Host ""
 
-& php $outputFile $ProjectName
+& php $outputFile new $ProjectName
 $exitCode = $LASTEXITCODE
 
 # Cleanup
@@ -173,5 +177,5 @@ if ($exitCode -eq 0) {
     Write-Host "  npm run build"
     Write-Host "  php artisan serve"
 } else {
-    Write-Error "Installation failed with exit code $exitCode"
+    Write-Error-Func "Installation failed with exit code $exitCode"
 }
