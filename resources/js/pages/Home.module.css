@@ -1,0 +1,39 @@
+/* Disable Puck editor styles on public page */
+/* Remove hover effects that look like editor overlays */
+
+.root {
+  /* Disable Puck editor pointer events override */
+}
+
+.root :global([class*="puck-"]) {
+  pointer-events: auto !important;
+}
+
+/* Remove editor-like borders and outlines on hover */
+.root :global(a:hover),
+.root :global(button:hover) {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Ensure normal hover behavior */
+.root :global([class*="puck-"] a),
+.root :global([class*="puck-"] button) {
+  pointer-events: auto !important;
+}
+
+/* Disable any drag handles or edit indicators */
+.root :global([data-puck-component]) {
+  pointer-events: auto !important;
+}
+
+/* Remove editor overlay styles */
+.root :global([data-puck-component]:hover) {
+  outline: none !important;
+  outline-offset: 0 !important;
+}
+
+/* Remove all Puck-related editing styles */
+.root :global([data-puck-edit-overlay]) {
+  display: none !important;
+}

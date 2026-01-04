@@ -1,0 +1,1230 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Language Lines
+    |--------------------------------------------------------------------------
+    |
+    | The following language lines are used on the admin dashboard
+    |
+    */
+
+    'nav' => [
+        'dashboard' => 'Dashboard',
+        'settings' => [
+            'heading' => 'Settings',
+            'settings' => 'Settings',
+            'general' => 'General',
+            'general_page' => 'Home',
+            'security' => 'Security',
+            'mail' => 'Mail',
+            'maintenance' => 'Maintenance',
+            'languages' => 'Languages',
+            'global' => 'Global',
+            'performances' => 'Performance',
+            'home' => 'Home',
+            'auth' => 'Authentication',
+            'social' => 'Social links',
+            'navbar' => 'Navbar',
+            'servers' => 'Servers',
+        ],
+
+        'users' => [
+            'heading' => 'Users',
+            'users' => 'Users',
+            'roles' => 'Roles',
+            'bans' => 'Bans',
+        ],
+
+        'content' => [
+            'heading' => 'Content',
+            'pages' => 'Pages',
+            'posts' => 'Posts',
+            'images' => 'Images',
+            'redirects' => 'Redirections',
+        ],
+
+        'extensions' => [
+            'heading' => 'Extensions',
+            'plugins' => 'Plugins',
+            'themes' => 'Themes',
+        ],
+
+        'other' => [
+            'heading' => 'Other',
+            'update' => 'Update',
+            'logs' => 'Logs',
+        ],
+
+        'profile' => [
+            'profile' => 'Profile',
+        ],
+
+        'back' => 'Go back to website',
+        'support' => 'Support',
+        'documentation' => 'Documentation',
+    ],
+
+    'delete' => [
+        'title' => 'Delete?',
+        'description' => 'Are you sure you want to delete this? You won\'t be able to go back!',
+    ],
+
+    'footer' => 'Powered by :azuriom &copy; :year. Panel designed by :startbootstrap.',
+
+    /*
+    |
+    | Admin pages
+    |
+    */
+
+    'dashboard' => [
+        'title' => 'Dashboard',
+        'welcome' => 'Welcome to the admin panel',
+
+        'users' => 'Users',
+        'posts' => 'Posts',
+        'pages' => 'Pages',
+        'images' => 'Images',
+
+        'registered_accounts' => 'Registered accounts',
+        'published_articles' => 'Published articles',
+        'static_pages' => 'Static pages',
+        'uploaded_files' => 'Uploaded files',
+
+        'user_activity' => 'User activity',
+        'registrations_7days' => 'Registrations in the last 7 days',
+
+        'security_warning' => 'Security warning',
+        'update' => 'A new version of Azuriom is available: :version',
+        'http' => 'Your website is not using https, you should enable and force it for your security and the one of the users.',
+        'cloudflare' => 'If you are using Cloudflare, you should install the Cloudflare Support plugin.',
+        'recent_users' => 'Recent users',
+        'active_users' => 'Active users',
+        'emails' => 'Emails are disabled. If a user forgets their password, they will not be able to reset it. You can enable emails in the <a href=":url">mail settings</a>.',
+    ],
+
+    'settings' => [
+        'index' => [
+            'title' => 'Global settings',
+
+            'name' => 'Site Name',
+            'url' => 'Site URL',
+            'description' => 'Site Description',
+            'meta' => 'Meta keywords',
+            'meta_info' => 'The keywords must be separated with a comma.',
+            'favicon' => 'Favicon',
+            'background' => 'Background',
+            'logo' => 'Logo',
+            'timezone' => 'Timezone',
+            'locale' => 'Locale',
+            'money' => 'Name of the site\'s currency',
+            'copyright' => 'Copyright',
+            'user_money_transfer' => 'Enable money transfer between users',
+            'site_key' => 'Site key for azuriom.com',
+            'site_key_info' => 'The azuriom.com site key is required to install premium extensions purchased on the market. You can obtain your site key in your <a href="https://market.azuriom.com/profile" target="_blank" rel="noopener norefferer">Azuriom profile</a>.',
+            'webhook' => 'Posts Discord Webhook URL',
+            'webhook_info' => 'A Discord webhook will be sent to this URL when creating a new post, if the publication date is not in the future. Leave empty to disable.',
+        ],
+
+        'security' => [
+            'title' => 'Security settings',
+            'password_min_length' => 'Minimum Password Length',
+
+            'captcha' => [
+                'title' => 'Captcha',
+                'site_key' => 'Site key',
+                'secret_key' => 'Secret key',
+                'recaptcha' => 'You can get reCAPTCHA keys on the <a href="https://www.google.com/recaptcha/" target="_blank" rel="noopener noreferrer">Google reCAPTCHA website</a>. You need to use reCAPTCHA <strong>v2 invisible</strong> keys.',
+                'hcaptcha' => 'You can get hCaptcha keys on the <a href="https://www.hcaptcha.com/" target="_blank" rel="noopener noreferrer">hCaptcha website</a>.',
+                'turnstile' => 'You can get Turnstil keys on the <a href="https://dash.cloudflare.com/?to=/:account/turnstile" target="_blank" rel="noopener noreferrer">Cloudflare dashboard</a>. You must select "Managed" widget.',
+                'login' => 'Enable captcha on login page',
+            ],
+
+            'hash' => 'Hash algorithm',
+            'hash_error' => 'This hash algorithm is not supported by your current PHP version.',
+            'force_2fa' => 'Require 2FA for admin panel access',
+        ],
+
+        'performances' => [
+            'title' => 'Performance Settings',
+            'description' => 'Manage caching and performance optimization',
+
+            'cache_config_title' => 'Cache Configuration',
+            'cache_driver' => 'Cache Driver',
+            'cache_driver_placeholder' => 'Select cache driver',
+            'cache_driver_help' => 'Choose where cached data should be stored',
+            'cache_ttl' => 'Cache TTL (seconds)',
+            'cache_ttl_placeholder' => 'Select cache duration',
+            'cache_ttl_help' => 'How long cached data should be stored',
+            'cache_ttl_5min' => '5 minutes',
+            'cache_ttl_10min' => '10 minutes',
+            'cache_ttl_30min' => '30 minutes',
+            'cache_ttl_1hour' => '1 hour',
+            'cache_ttl_2hours' => '2 hours',
+            'cache_ttl_24hours' => '24 hours',
+
+            'cache_management_title' => 'Cache Management',
+            'clear_cache_title' => 'Clear All Caches',
+            'clear_cache_description' => 'Clear application cache, routes, config, and views',
+            'clear_cache_button' => 'Clear Cache',
+            'clear_cache_confirm' => 'Are you sure you want to clear all caches?',
+            'optimize_title' => 'Optimize Application',
+            'optimize_description' => 'Cache config and routes for better performance',
+            'optimize_button' => 'Optimize',
+
+            'save' => 'Save Changes',
+            'saving' => 'Saving...',
+
+            'cache' => [
+                'title' => 'Clear Cache',
+                'clear' => 'Clear Cache',
+                'description' => 'Clear the website cache.',
+                'error' => 'Error while clearing cache.',
+            ],
+
+            'boost' => [
+                'title' => 'AzBoost',
+                'description' => 'AzBoost improves your website performances by adding one more exclusive cache layer.',
+                'info' => 'If you have some issues after enabling an extension you should reload the cache.',
+
+                'enable' => 'Enable AzBoost',
+                'disable' => 'Disable AzBoost',
+                'reload' => 'Reload AzBoost',
+
+                'status' => 'AzBoost is currently :status.',
+                'enabled' => 'enabled',
+                'disabled' => 'disabled',
+
+                'error' => 'Error while enabling AzBoost.',
+            ],
+        ],
+
+        'seo' => [
+            'title' => 'Home settings',
+
+            'html' => 'You can include HTML in the <code>&lt;head&gt;</code> or <code>&lt;body&gt;</code> of all pages (e.g. for cookie banner or website analytics) by creating a file named <code>head.blade.php</code> or <code>body.blade.php</code> in the <code>resources/views/custom/</code> folder.',
+            'home_message' => 'Home message',
+
+            'welcome_alert' => [
+                'enable' => 'Enable welcome popup?',
+                'message' => 'Welcome Popup Message',
+                'info' => 'This popup will be displayed the first time a user visits the site.',
+            ],
+        ],
+
+        'auth' => [
+            'title' => 'Authentication',
+
+            'conditions' => 'Conditions to be accepted on registration',
+            'conditions_info' => 'Links in Markdown format, for example: <code>I accept the [conditions](/conditions-link) and [privacy policy](/privacy-policy)</code>.',
+            'registration' => 'Enable user registration',
+            'registration_info' => '<strong>The “Register” button is removed when this option is disabled.</strong> Some plugins may still allow to create new user accounts.',
+            'api' => 'Enable Auth API',
+            'api_info' => 'This API allows you to add a custom authentication to your game server. For Minecraft servers using a launcher, you can use <a href="https://github.com/Azuriom/AzAuth" target="_blank" rel="noopener noreferrer">AzAuth</a> for an easy and quick integration.',
+            'user_change_name' => 'Allow users to change username from their profile',
+            'user_avatar' => 'Allow users to upload their own avatar in their profile',
+            'user_delete' => 'Allow users to delete their account from their profile',
+        ],
+
+        'mail' => [
+            'title' => 'Mail settings',
+            'from' => 'Email address used to send emails.',
+            'mailer' => 'Email type',
+            'info' => 'For more information on the email configuration, see the <a href="https://azuriom.com/docs/mails" target="_blank" rel="noopener noreferrer">documentation</a>.',
+            'disabled' => 'When emails are disabled, users will not be able to reset their password if they forget it.',
+            'sendmail' => 'Using Sendmail is not recommended and you should instead use an SMTP server when possible.',
+            'smtp' => [
+                'host' => 'SMTP Host Address',
+                'port' => 'SMTP Host Port',
+                'scheme' => 'Scheme',
+                'username' => 'SMTP Server Username',
+                'password' => 'SMTP Server Password',
+            ],
+            'verification' => 'Enable user email address verification',
+            'send' => 'Send a test email',
+            'sent' => 'The test email has been successfully sent.',
+            'missing' => 'No email address has been specified on the account :user.',
+        ],
+
+        'maintenance' => [
+            'title' => 'Maintenance Mode',
+            'description' => 'Manage site maintenance mode and downtime messages',
+
+            'enable' => 'Enable maintenance',
+            'message' => 'Maintenance message',
+            'global' => 'Enable maintenance on all the website',
+            'paths' => 'Paths to block during maintenance',
+            'info' => 'You can use <code>/*</code> to block all pages beginning with the same path. For example, <code>/news/*</code> will block access to all news.',
+
+            'active_banner' => 'Maintenance Mode is Active',
+            'active_description' => 'Your site is currently in maintenance mode and is not accessible to visitors',
+            'active_badge' => 'Active',
+            'configuration_title' => 'Maintenance Configuration',
+            'enable_mode' => 'Enable Maintenance Mode',
+            'enable_help' => 'When enabled, your site will show a maintenance page to all visitors except administrators',
+            'message_label' => 'Maintenance Message',
+            'message_placeholder' => 'We\'re currently performing scheduled maintenance. We\'ll be back soon!',
+            'message_help' => 'This message will be displayed to visitors during maintenance',
+            'retry_after' => 'Retry After (seconds)',
+            'retry_after_placeholder' => '3600',
+            'retry_after_help' => 'Tells browsers/bots when to retry (0 = don\'t specify)',
+            'info_title' => 'Important Information',
+            'info_access_title' => 'Who can access the site?',
+            'info_access_text' => 'Only users with administrator privileges can access the site during maintenance mode.',
+            'info_seo_title' => 'Search Engine Impact:',
+            'info_seo_text' => 'The maintenance page returns a 503 Service Unavailable status code, which tells search engines that the downtime is temporary and won\'t negatively impact your SEO.',
+            'info_api_title' => 'API Access:',
+            'info_api_text' => 'API endpoints will also be unavailable during maintenance mode unless specifically exempted.',
+            'save' => 'Save Changes',
+            'saving' => 'Saving...',
+        ],
+
+        'updated' => 'The settings have been updated.',
+    ],
+
+    'navbar' => [
+        'title' => 'Navigation',
+        'index' => [
+            'title' => 'Navigation Elements',
+            'description' => 'Manage navigation bar elements (:count total)',
+            'create_button' => 'Add Element',
+            'edit_button' => 'Edit',
+            'confirm_delete' => 'Are you sure you want to delete this element?',
+            'empty' => 'No navigation elements found',
+            'columns' => [
+                'name' => 'Name',
+                'type' => 'Type',
+                'link' => 'Link',
+                'order' => 'Order',
+                'new_tab' => 'New Tab',
+                'actions' => 'Actions',
+            ],
+            'types' => [
+                'home' => 'Home Page',
+                'link' => 'External Link',
+                'page' => 'Page',
+                'post' => 'Post',
+                'posts' => 'Posts List',
+                'plugin' => 'Plugin',
+                'dropdown' => 'Dropdown Menu',
+            ],
+        ],
+        'create' => [
+            'title' => 'Add Navigation Element',
+            'description' => 'Create a new navigation bar element',
+            'back_button' => 'Back',
+            'form_title' => 'Element Information',
+            'fields' => [
+                'name' => 'Name',
+                'name_placeholder' => 'Ex: Home, Blog, Contact...',
+                'type' => 'Element Type',
+                'value_url' => 'URL',
+                'value_page' => 'Page',
+                'value_post' => 'Post',
+                'value_plugin' => 'Plugin Route',
+                'value_dropdown' => 'Menu Items',
+                'value_placeholder_link' => 'https://example.com',
+                'value_placeholder_page' => 'Select a page',
+                'value_placeholder_post' => 'Select a post',
+                'value_placeholder_plugin' => 'plugin.route.name',
+                'value_help_link' => 'Enter the full URL (https://...)',
+                'value_help_page' => 'Select the page to link',
+                'value_help_post' => 'Select the post to link',
+                'value_help_plugin' => 'Enter the plugin route name',
+                'icon' => 'Icon (optional)',
+                'icon_placeholder' => 'bi-house, bi-star, etc.',
+                'icon_help' => 'Bootstrap Icons class name (ex: bi-house)',
+                'position' => 'Position',
+                'position_help' => 'Display order (0 = first)',
+                'new_tab' => 'Open in new tab',
+            ],
+            'cancel' => 'Cancel',
+            'submit' => 'Create Element',
+            'submitting' => 'Creating...',
+        ],
+        'edit' => [
+            'title' => 'Edit Element',
+            'page_title' => 'Edit :name',
+            'description' => 'Edit navigation element :name',
+            'back_button' => 'Back',
+            'delete_button' => 'Delete',
+            'form_title' => 'Element Information',
+            'confirm_delete' => 'Are you sure you want to delete this element?',
+            'fields' => [
+                'name' => 'Name',
+                'name_placeholder' => 'Ex: Home, Blog, Contact...',
+                'type' => 'Element Type',
+                'value_url' => 'URL',
+                'value_page' => 'Page',
+                'value_post' => 'Post',
+                'value_plugin' => 'Plugin Route',
+                'value_dropdown' => 'Menu Items',
+                'value_placeholder_link' => 'https://example.com',
+                'value_placeholder_page' => 'Select a page',
+                'value_placeholder_post' => 'Select a post',
+                'value_placeholder_plugin' => 'plugin.route.name',
+                'value_help_link' => 'Enter the full URL (https://...)',
+                'value_help_page' => 'Select the page to link',
+                'value_help_post' => 'Select the post to link',
+                'value_help_plugin' => 'Enter the plugin route name',
+                'icon' => 'Icon (optional)',
+                'icon_placeholder' => 'bi-house, bi-star, etc.',
+                'icon_help' => 'Bootstrap Icons class name (ex: bi-house)',
+                'position' => 'Position',
+                'position_help' => 'Display order (0 = first)',
+                'new_tab' => 'Open in new tab',
+            ],
+            'cancel' => 'Cancel',
+            'submit' => 'Save Changes',
+            'submitting' => 'Saving...',
+        ],
+    ],
+
+    'navbar_elements' => [
+        'title' => 'Navbar',
+        'edit' => 'Edit navbar element :element',
+        'create' => 'Create navbar element',
+
+        'restrict' => 'Limit roles that will be able to see this element',
+        'dropdown' => 'Once this dropdown is saved, items can be added to it via drag and drop on the main navbar page.',
+
+        'fields' => [
+            'home' => 'Home',
+            'link' => 'External link',
+            'page' => 'Page',
+            'post' => 'Post',
+            'posts' => 'Posts list',
+            'plugin' => 'Plugin',
+            'dropdown' => 'Dropdown',
+            'new_tab' => 'Open in new tab',
+        ],
+
+        'updated' => 'Navbar updated.',
+        'not_empty' => 'You cannot delete dropdown with elements.',
+    ],
+
+    'social_links' => [
+        'title' => 'Social links',
+        'edit' => 'Edit social link :link',
+        'create' => 'Add social link',
+    ],
+
+    'servers' => [
+        'title' => 'Servers',
+        'edit' => 'Edit server :server',
+        'create' => 'Add server',
+
+        'default' => 'Default server',
+        'default_info' => 'The number of players connected from the default server will be displayed on the site if the current theme supports it.',
+
+        'home_display' => 'Display this server on the homepage',
+        'url' => 'Join button URL',
+        'url_info' => 'Leave empty to display server address. Can be a link to download the game/launcher or a URL to join the server like <code>steam://connect/&lt;ip&gt;</code>.',
+
+        'ping_info' => 'The ping link doesn\'t need a plugin, but you can\'t execute commands with it.',
+        'query_info' => 'With query link, it\'s not possible to execute commands on the server.',
+
+        'query_port_info' => 'Can be empty if it\'s the same as the game port.',
+
+        'verify' => 'Test instant commands',
+
+        'rcon_password' => 'Rcon Password',
+        'rcon_port' => 'Rcon Port',
+        'query_port' => 'Source Query Port',
+        'unturned_info' => 'You need to use SRCDS RCON type in OpenMod. RocketMod RCON is not compatible!',
+
+        'azlink' => [
+            'port' => 'AzLink Port',
+
+            'link' => 'To link your server to your website using AzLink:',
+            'link1' => '<a href="https://azuriom.com/azlink">Download the plugin AzLink</a> and install it on your server.',
+            'link2' => 'Restart the server.',
+            'link3' => 'Execute this command on the server: ',
+            'auth' => 'To automatically register users on the website, you can enable the integration of your authentication system (AuthMe, etc.) in the AzLink configuration.',
+
+            'info' => 'If you are having problems with AzLink when using Cloudflare or a firewall, try following the steps in the <a href="https://azuriom.com/docs/faq" target="_blank" rel="noopener norefferer">FAQ</a>.',
+            'command' => 'You can link your server to your website with the command: ',
+            'port_command' => 'If you are using a different AzLink port than the default, you must configure it with the command: ',
+            'ping' => 'Enable instant commands (require an open port on the server)',
+            'ping_info' => 'When instant commands are not enabled, commands will be executed with a delay of 30 seconds to 1 minute.',
+            'custom_port' => 'Use a custom AzLink port',
+
+            'error' => 'The connection to the server has failed, the address and/or port are incorrect, or the port is closed.',
+            'badresponse' => 'The connection to the server has failed (code :code), the token is invalid or the server is misconfigured. You can redo the link command to fix this.',
+        ],
+
+        'players' => ':count player|:count players',
+        'offline' => 'Offline',
+
+        'connected' => 'The connection to the server has been made successfully!',
+        'error' => 'The connection to the server failed: :error',
+
+        'type' => [
+            'mc-ping' => 'Minecraft Ping',
+            'mc-rcon' => 'Minecraft RCON',
+            'mc-azlink' => 'AzLink',
+            'source-query' => 'Source Query',
+            'source-rcon' => 'Source RCON',
+            'steam-azlink' => 'AzLink',
+            'bedrock-ping' => 'Bedrock Ping',
+            'bedrock-rcon' => 'Bedrock RCON',
+            'fivem-status' => 'FiveM status',
+            'fivem-rcon' => 'FiveM RCON',
+            'rust-rcon' => 'Rust RCON',
+            'flyff-server' => 'Flyff Server', // TODO make this dynamic
+        ],
+    ],
+
+    'users' => [
+        'title' => 'Users',
+        'edit' => 'Edit user :user',
+        'create' => 'Create user',
+
+        'index' => [
+            'title' => 'Users',
+            'description' => 'Manage users',
+            'manage_description' => 'Manage all :total users on your website',
+            'search_placeholder' => 'Search by name or email...',
+            'search' => 'Search',
+            'clear' => 'Clear',
+            'user' => 'User',
+            'email' => 'Email',
+            'role' => 'Role',
+            'money' => 'Money',
+            'created' => 'Registered',
+            'view' => 'View',
+            'edit' => 'Edit',
+            'delete' => 'Delete',
+            'showing' => 'Showing :from to :to of :total users',
+            'previous' => 'Previous',
+            'next' => 'Next',
+            'cancel' => 'Cancel',
+            'deleted' => 'User ":user" deleted successfully',
+            'delete_failed' => 'Failed to delete user',
+        ],
+
+        'create' => [
+            'title' => 'Create User',
+            'description' => 'Add a new user to the system',
+            'basic_info' => 'Basic Information',
+            'username' => 'Username',
+            'username_placeholder' => 'Username',
+            'email' => 'Email',
+            'email_placeholder' => 'user@example.com',
+            'security' => 'Security',
+            'password' => 'Password',
+            'password_confirmation' => 'Confirm Password',
+            'permissions_currency' => 'Permissions & Currency',
+            'role' => 'Role',
+            'role_placeholder' => 'Select a role',
+            'power' => 'Power',
+            'initial_money' => 'Initial Money',
+            'cancel' => 'Cancel',
+            'submit' => 'Create User',
+            'creating' => 'Creating...',
+            'success' => 'User created successfully',
+            'error' => 'Failed to create user. Please check the form.',
+            'fix_errors' => 'Please fix the errors in the form',
+        ],
+
+        'edit' => [
+            'title' => 'Edit User: :user',
+            'profile' => 'User Profile',
+            'information' => 'User Information',
+            'name' => 'Name',
+            'email' => 'Email',
+            'password' => 'Password',
+            'role' => 'Role',
+            'role_placeholder' => 'Select a role',
+            'money' => 'Money',
+            'save' => 'Save',
+            'saving' => 'Saving...',
+            'delete' => 'Delete',
+            'registered' => 'Registered',
+            'last_login' => 'Last Login',
+            'email_verified' => 'Email Verified',
+            'email_verified_yes' => 'Yes - :date',
+            'email_verified_no' => 'No',
+            'verify' => 'Verify',
+            'two_factor' => 'Two-Factor Authentication',
+            'two_factor_yes' => 'Yes',
+            'two_factor_no' => 'No',
+            'delete_title' => 'Delete User',
+            'delete_description' => 'Are you sure you want to delete this user? This action cannot be undone.',
+            'cancel' => 'Cancel',
+            'verify_sent' => 'Verification email sent',
+            'verify_failed' => 'Failed to send verification email',
+            'deleted' => 'User ":user" deleted successfully',
+            'delete_failed' => 'Failed to delete user',
+            'fix_errors' => 'Please fix the errors in the form',
+        ],
+
+        'registered' => 'Registered at',
+        'last_login' => 'Last login at',
+        'ip' => 'IP Address',
+
+        'admin' => 'Admin',
+        'banned' => 'Banned',
+        'deleted' => 'Deleted',
+
+        'ban' => 'Ban',
+        'unban' => 'Unban',
+        'delete' => 'Delete',
+
+        'alert-deleted' => 'This user is deleted, it can\'t be edited.',
+        'alert-banned' => [
+            'title' => 'This user is currently banned:',
+            'banned-by' => 'Banned by: :author',
+            'reason' => 'Reason: :reason',
+            'date' => 'Date: :date',
+        ],
+
+        'edit_profile' => 'Edit profile',
+
+        'info' => 'User information',
+
+        'ban-title' => 'Ban :user',
+        'ban-description' => 'Are you sure you want to ban this user?',
+
+        'email' => [
+            'verify' => 'Verify email',
+            'verified' => 'Email Address verified',
+            'date' => 'Yes, at :date',
+            'verify_success' => 'The Email Address has been verified.',
+        ],
+
+        '2fa' => [
+            'title' => 'Two Factor Authentication',
+            'secured' => '2FA enabled',
+            'disable' => 'Disable 2FA',
+            'disabled' => 'The Two Factor Authentication has been disabled.',
+        ],
+
+        'password' => [
+            'title' => 'Last password change',
+            'force' => 'Force change',
+            'forced' => 'Must change password',
+        ],
+
+        'status' => [
+            'banned' => 'This user is now banned.',
+            'unbanned' => 'This user has been unbanned.',
+        ],
+
+        'discord' => 'Linked Discord account',
+
+        'notify' => 'Send a notification',
+        'notify_info' => 'Send a notification to this user',
+        'notify_all' => 'Send a notification to all users',
+    ],
+
+    'roles' => [
+        'title' => 'Roles',
+        'edit' => 'Edit role :role (#:id)',
+        'create' => 'Create role',
+
+        'index' => [
+            'title' => 'Roles & Permissions',
+            'description' => 'Manage user roles and their permissions',
+            'create' => 'Create Role',
+            'role' => 'Role',
+            'power' => 'Power',
+            'permissions' => 'Permissions',
+            'admin_badge' => 'Admin',
+            'more' => '+:count more',
+            'edit' => 'Edit',
+            'delete' => 'Delete',
+            'delete_title' => 'Delete Role',
+            'delete_description' => 'Are you sure you want to delete this role? This action cannot be undone.',
+            'cancel' => 'Cancel',
+            'deleted' => 'Role ":role" deleted successfully',
+            'delete_failed' => 'Failed to delete role',
+            'available_permissions' => 'Available Permissions',
+            'available_permissions_description' => 'All permissions that can be assigned to roles',
+        ],
+
+        'create' => [
+            'title' => 'Create Role',
+            'description' => 'Add a new role with custom permissions',
+            'name' => 'Name',
+            'icon' => 'Icon',
+            'icon_placeholder' => 'bi bi-star',
+            'icon_help' => 'You can use Bootstrap Icons',
+            'color' => 'Color',
+            'permissions_title' => 'Permissions',
+            'administrator' => 'Administrator',
+            'administrator_description' => 'This role will have all permissions automatically',
+            'cancel' => 'Cancel',
+            'submit' => 'Create Role',
+            'creating' => 'Creating...',
+            'success' => 'Role created successfully',
+            'error' => 'Failed to create role. Please check the form.',
+            'fix_errors' => 'Please fix the errors in the form',
+        ],
+
+        'edit' => [
+            'title' => 'Edit Role: :role',
+            'description' => 'Edit role permissions and settings',
+            'name' => 'Name',
+            'icon' => 'Icon',
+            'icon_placeholder' => 'bi bi-star',
+            'icon_help' => 'You can use Bootstrap Icons',
+            'color' => 'Color',
+            'power' => 'Power',
+            'power_help' => 'Higher power = higher hierarchy',
+            'permissions_title' => 'Permissions',
+            'administrator' => 'Administrator',
+            'administrator_description' => 'This role will have all permissions automatically',
+            'cancel' => 'Cancel',
+            'save' => 'Save Changes',
+            'saving' => 'Saving...',
+            'delete' => 'Delete Role',
+            'delete_title' => 'Delete Role',
+            'delete_description' => 'Are you sure you want to delete this role? This action cannot be undone.',
+            'deleted' => 'Role ":role" deleted successfully',
+            'delete_failed' => 'Failed to delete role',
+            'success' => 'Role updated successfully',
+            'error' => 'Failed to update role. Please check the form.',
+            'fix_errors' => 'Please fix the errors in the form',
+        ],
+
+        'info' => '(ID: :id, Power: :power)',
+
+        'default' => 'Default',
+        'admin' => 'Admin',
+        'admin_info' => 'When the group is admin it has all the permissions.',
+
+        'updated' => 'The roles have been updated.',
+        'unauthorized' => 'This role is higher than your own role.',
+        'add_admin' => 'You can\'t add the admin permission to a role.',
+        'remove_admin' => 'You can\'t remove the admin permission of your role.',
+        'no_admin' => 'There must be at least one other admin user to remove your admin role.',
+        'delete_default' => 'This role cannot be deleted.',
+        'delete_own' => 'You cannot delete your role.',
+
+        'discord' => [
+            'title' => 'Link Discord roles',
+            'enable' => 'Enable Discord roles link',
+            'enable_info' => 'Once enabled, edit the role on Discord, and in the <b>Links</b> tab of the role, add a requirement. Users can get their role by going on Discord, in the server menu then in <b>Linked Roles</b>.',
+            'info' => 'You need to create an application on the <a href="https://discord.com/developers/applications" target="_blank">Discord developer dashboard</a> and set the <b>Linked Role Verification URL</b> to <code>:url</code>',
+            'oauth' => 'Then, in the <b>OAuth2</b> tab, in <b>General</b>, you need to add <code>:url</code> in the <b>Redirects</b>.',
+            'token_info' => 'The Bot token can be obtained by creating a bot for your application, in the <b>Bot</b> tab on the left of the Discord developer dashboard.',
+
+            'token' => 'Discord Bot Token',
+            'client_id' => 'Discord Client ID',
+            'client_secret' => 'Discord Client Secret',
+        ],
+    ],
+
+    'permissions' => [
+        'create-comments' => 'Comment a post',
+        'delete-other-comments' => 'Delete a post comment from another user',
+        'maintenance-access' => 'Access the website during a maintenance',
+        'admin-access' => 'Access to the admin dashboard',
+        'admin-logs' => 'View and manage site logs',
+        'admin-images' => 'View and manage images',
+        'admin-navbar' => 'View and manage navbar',
+        'admin-pages' => 'View and manage pages',
+        'puck-edit' => 'Edit pages with Puck visual editor',
+        'admin-redirects' => 'View and manage redirections',
+        'admin-posts' => 'View and manage posts',
+        'admin-roles' => 'View and manage roles',
+        'admin-settings' => 'View and manage settings',
+        'admin-users' => 'View and manage users',
+        'admin-users-personal' => 'View and manage personal user information',
+        'admin-themes' => 'View and manage themes',
+        'admin-plugins' => 'View and manage plugins',
+    ],
+
+    'bans' => [
+        'title' => 'Bans',
+
+        'by' => 'Banned by',
+        'reason' => 'Reason',
+        'removed' => 'Removed the :date by :user',
+    ],
+
+    'posts' => [
+        'title' => 'Posts',
+        'edit' => 'Edit post :post',
+        'create' => 'Create post',
+
+        'published_info' => 'This post will not be visible publicly until this date.',
+        'pin' => 'Pin this post',
+        'pinned' => 'Pinned',
+        'feed' => 'An RSS/Atom feed for the posts is available on <code>:rss</code> and <code>:atom</code>.',
+
+        'index' => [
+            'title' => 'Posts',
+            'description' => 'Manage blog posts and news articles (:count total)',
+            'create' => 'Create Post',
+            'table' => [
+                'title' => 'Title',
+                'author' => 'Author',
+                'status' => 'Status',
+                'published' => 'Published',
+                'actions' => 'Actions',
+            ],
+            'no_posts' => 'No posts created yet',
+            'status_published' => 'Published',
+            'status_scheduled' => 'Scheduled',
+            'edit' => 'Edit',
+            'confirm_delete' => 'Are you sure you want to delete this post?',
+            'delete_confirm_title' => 'Confirm Deletion',
+            'delete_confirm_message' => 'Are you sure you want to delete the post ":title"? This action cannot be undone.',
+            'delete_cancel' => 'Cancel',
+            'delete_confirm' => 'Delete',
+            'deleted' => 'Post ":title" deleted successfully',
+            'delete_failed' => 'Failed to delete post',
+        ],
+
+        'create' => [
+            'title' => 'Create Post',
+            'field_title' => 'Title',
+            'field_description' => 'Description',
+            'field_image' => 'Image',
+            'field_slug' => 'Slug',
+            'field_content' => 'Content',
+            'content_placeholder' => 'Write your post content here...',
+            'field_published_at' => 'Published At',
+            'field_pinned' => 'Pin',
+            'save' => 'Save',
+            'saving' => 'Saving...',
+            'success' => 'Post created successfully',
+            'error' => 'Failed to create post. Please check the form.',
+            'fix_errors' => 'Please fix the errors in the form',
+        ],
+
+        'edit' => [
+            'title' => 'Edit Post: :title',
+            'heading' => 'Edit Post',
+            'description' => 'Editing: :title',
+            'view' => 'View Post',
+            'back' => 'Back to Posts',
+            'delete' => 'Delete Post',
+            'status_label' => 'Status',
+            'status_published' => 'Published',
+            'status_scheduled' => 'Scheduled',
+            'status_pinned' => 'Pinned',
+            'author_label' => 'Author',
+            'last_updated' => 'Last updated',
+            'form_heading' => 'Post Information',
+            'field_title' => 'Post Title *',
+            'field_slug' => 'URL Slug *',
+            'slug_help' => 'Changing the slug will change the post URL',
+            'field_description' => 'Description *',
+            'field_content' => 'Post Content *',
+            'content_placeholder' => 'Write your post content here...',
+            'field_published_at' => 'Publish Date & Time *',
+            'published_at_help' => 'Set a future date to schedule the post',
+            'field_pinned' => 'Pin this post (featured at top)',
+            'cancel' => 'Cancel',
+            'save' => 'Save Changes',
+            'saving' => 'Saving...',
+            'success' => 'Post updated successfully',
+            'error' => 'Failed to update post',
+            'confirm_delete' => 'Are you sure you want to delete this post? This action cannot be undone.',
+            'deleted' => 'Post ":title" deleted successfully',
+            'delete_failed' => 'Failed to delete post',
+            'fix_errors' => 'Please fix the errors in the form',
+        ],
+    ],
+
+    'pages' => [
+        'title' => 'Pages',
+        'edit' => 'Edit page #:page',
+        'create' => 'Create page',
+
+        'enable' => 'Enable the page',
+        'restrict' => 'Limit roles that will be able to access this page',
+
+        'index' => [
+            'title' => 'Pages',
+            'description' => 'Manage custom pages and content (:count total)',
+            'create' => 'Create Page',
+            'table' => [
+                'title' => 'Title',
+                'slug' => 'Slug',
+                'status' => 'Status',
+                'created' => 'Created',
+                'actions' => 'Actions',
+            ],
+            'no_pages' => 'No pages created yet',
+            'status_published' => 'Published',
+            'status_draft' => 'Draft',
+            'edit' => 'Edit',
+            'confirm_delete' => 'Are you sure you want to delete this page?',
+            'deleted' => 'Page ":title" deleted successfully',
+            'delete_failed' => 'Failed to delete page',
+        ],
+
+        'create' => [
+            'title' => 'Create Page',
+            'field_title' => 'Title',
+            'field_description' => 'Description',
+            'field_slug' => 'Slug',
+            'field_content' => 'Content',
+            'content_placeholder' => 'Write your page content here...',
+            'field_enabled' => 'Enable',
+            'save' => 'Save',
+            'saving' => 'Saving...',
+            'success' => 'Page created successfully',
+            'error' => 'Failed to create page. Please check the form.',
+            'fix_errors' => 'Please fix the errors in the form',
+        ],
+
+        'edit' => [
+            'title' => 'Edit Page: :title',
+            'heading' => 'Edit Page',
+            'description' => 'Editing: :title',
+            'view' => 'View Page',
+            'back' => 'Back to Pages',
+            'delete' => 'Delete Page',
+            'status_label' => 'Status',
+            'status_published' => 'Published',
+            'status_draft' => 'Draft',
+            'last_updated' => 'Last updated',
+            'form_heading' => 'Page Information',
+            'field_title' => 'Page Title *',
+            'field_slug' => 'URL Slug *',
+            'slug_help' => 'Changing the slug will change the page URL',
+            'field_description' => 'Description',
+            'description_placeholder' => 'A brief description of this page for SEO',
+            'field_content' => 'Page Content *',
+            'content_placeholder' => 'Write your page content here...',
+            'field_published' => 'Published',
+            'cancel' => 'Cancel',
+            'save' => 'Save Changes',
+            'saving' => 'Saving...',
+            'success' => 'Page updated successfully',
+            'error' => 'Failed to update page',
+            'confirm_delete' => 'Are you sure you want to delete this page? This action cannot be undone.',
+            'deleted' => 'Page ":title" deleted successfully',
+            'delete_failed' => 'Failed to delete page',
+            'fix_errors' => 'Please fix the errors in the form',
+        ],
+    ],
+
+    'redirects' => [
+        'title' => 'Redirections',
+        'edit' => 'Editing redirection :redirect',
+        'create' => 'Creating redirection',
+
+        'enable' => 'Enable redirection',
+        'source' => 'Source',
+        'destination' => 'Destination',
+        'code' => 'Status code',
+
+        '301' => '301 - Permanent redirect',
+        '302' => '302 - Temporary redirect',
+    ],
+
+    'images' => [
+        'title' => 'Images',
+        'edit' => 'Edit image :image',
+        'create' => 'Upload image',
+        'help' => 'If images are not loading, try following the steps in the <a href="https://azuriom.com/docs/faq" target="_blank" rel="noopener norefferer">FAQ</a>.',
+
+        'index' => [
+            'title' => 'Images',
+            'description' => 'Manage uploaded images (:count total)',
+            'upload_heading' => 'Upload New Image',
+            'upload_button' => 'Upload',
+            'uploading' => 'Uploading...',
+            'no_images' => 'No images uploaded yet',
+            'download' => 'Download',
+            'confirm_delete' => 'Are you sure you want to delete this image? This action cannot be undone.',
+        ],
+    ],
+
+    'extensions' => [
+        'buy' => 'Buy for :price',
+        'market' => 'Information about all extensions is available on the <a href=":url" target="_blank" rel="noopener noreferrer">Azuriom Market</a>.',
+    ],
+
+    'plugins' => [
+        'title' => 'Plugins',
+
+        'list' => 'Installed plugins',
+        'available' => 'Available plugins',
+
+        'requirements' => [
+            'api' => 'This plugin version is not compatible with Azuriom v:version.',
+            'azuriom' => 'This plugin is not compatible with your Azuriom version.',
+            'game' => 'This plugin is not compatible with the game :game.',
+            'plugin' => 'The plugin ":plugin" is missing or its version is not compatible with this plugin.',
+        ],
+
+        'reloaded' => 'The plugins have been reloaded.',
+        'enabled' => 'The plugin has been enabled.',
+        'disabled' => 'The plugin has been disabled.',
+        'updated' => 'The plugin has been updated.',
+        'installed' => 'The plugin has been installed.',
+        'deleted' => 'The plugin has been deleted.',
+        'delete_enabled' => 'The plugin must be disabled before it can be deleted.',
+    ],
+
+    'themes' => [
+        'title' => 'Themes',
+
+        'current' => 'Current theme',
+        'author' => 'Author: :author',
+        'version' => 'Version: :version',
+        'list' => 'Installed themes',
+        'available' => 'Available themes',
+        'no-enabled' => 'You don\'t have any themes enabled.',
+        'legacy' => 'This theme version is not compatible with Azuriom v:version.',
+
+        'config' => 'Edit config',
+        'disable' => 'Disable theme',
+
+        'reloaded' => 'The themes have been reloaded.',
+        'no_config' => 'This theme doesn\'t have config.',
+        'config_updated' => 'The theme config has been updated.',
+        'invalid' => 'This theme is invalid (the theme folder name must be the theme id).',
+        'updated' => 'The theme has been updated.',
+        'installed' => 'The theme has been installed.',
+        'deleted' => 'The theme has been deleted.',
+        'delete_current' => 'You can\'t delete the current theme.',
+    ],
+
+    'update' => [
+        'title' => 'Update',
+
+        'has_update' => 'Update available',
+        'no_update' => 'No updates available',
+        'check' => 'Check updates',
+
+        'update' => 'The version <code>:last-version</code> of Azuriom is available and you are on version <code>:version</code>.',
+        'changelog' => 'Changelog can be found on <a href=":url" target="_blank" rel="noopener noreferrer">GitHub</a>.',
+        'download' => 'The latest version of Azuriom is ready for download.',
+        'install' => 'The latest version of Azuriom has been downloaded and is ready to be installed.',
+
+        'backup' => 'Before updating Azuriom, you should make a backup of your site!',
+
+        'latest_version' => 'You are running the latest version of Azuriom: <code>:version</code>.',
+        'latest' => 'You are using the latest version of Azuriom.',
+
+        'downloaded' => 'The latest version has been downloaded, you can now install it.',
+        'installed' => 'The update has been installed successfully.',
+
+        'php' => 'You must use PHP :version or higher to update to this version of Azuriom.',
+    ],
+
+    'logs' => [
+        'title' => 'Logs',
+
+        'clear' => 'Clear old logs (15d+)',
+        'cleared' => 'The old logs has been deleted.',
+        'changes' => 'Changes',
+        'old' => 'Old value',
+        'new' => 'New value',
+
+        'pages' => [
+            'created' => 'Created page #:id',
+            'updated' => 'Updated page #:id',
+            'deleted' => 'Deleted page #:id',
+        ],
+
+        'posts' => [
+            'created' => 'Created post #:id',
+            'updated' => 'Updated post #:id',
+            'deleted' => 'Deleted post #:id',
+        ],
+
+        'images' => [
+            'created' => 'Created image #:id',
+            'updated' => 'Updated image #:id',
+            'deleted' => 'Deleted image #:id',
+        ],
+
+        'redirects' => [
+            'created' => 'Created redirection #:id',
+            'updated' => 'Updated redirection #:id',
+            'deleted' => 'Deleted redirection #:id',
+        ],
+
+        'roles' => [
+            'created' => 'Created role #:id',
+            'updated' => 'Updated role #:id',
+            'deleted' => 'Deleted role #:id',
+        ],
+
+        'servers' => [
+            'created' => 'Created server #:id',
+            'updated' => 'Updated server #:id',
+            'deleted' => 'Deleted server #:id',
+        ],
+
+        'users' => [
+            'updated' => 'Updated user #:id',
+            'deleted' => 'Deleted user #:id',
+            'transfer' => 'Send money :money to user #:id',
+
+            'login' => 'Successful login from :ip (2FA: :2fa)',
+            'api' => [
+                'login' => 'Successful API login from :ip (2FA: :2fa)',
+                'verified' => 'Successful API token verification from :ip',
+            ],
+            '2fa' => [
+                'enabled' => 'Enabled two-factor authentication',
+                'disabled' => 'Disabled two-factor authentication',
+            ],
+        ],
+
+        'settings' => [
+            'updated' => 'Updated settings',
+        ],
+
+        'updates' => [
+            'installed' => 'Installed Azuriom update',
+        ],
+
+        'plugins' => [
+            'enabled' => 'Enabled plugin :plugin',
+            'disabled' => 'Disabled plugin :plugin',
+        ],
+
+        'themes' => [
+            'changed' => 'Changed theme to :theme',
+            'configured' => 'Updated theme :theme configuration',
+        ],
+    ],
+
+    'redirects' => [
+        'index' => [
+            'title' => 'Redirects',
+            'description' => 'Manage URL redirects (:count total)',
+            'create' => 'Create Redirect',
+            'source' => 'Source Path',
+            'destination' => 'Destination',
+            'code' => 'Code',
+            'status' => 'Status',
+            'actions' => 'Actions',
+            'empty' => 'No redirects configured yet',
+            'permanent' => '301 Permanent',
+            'temporary' => '302 Temporary',
+            'active' => 'Active',
+            'disabled' => 'Disabled',
+            'edit' => 'Edit',
+            'delete_confirm' => 'Are you sure you want to delete this redirect?',
+        ],
+        'create' => [
+            'title' => 'Create Redirect',
+            'description' => 'Add a new URL redirect',
+            'back' => 'Back to Redirects',
+            'form_title' => 'Redirect Information',
+            'source' => 'Source Path',
+            'source_help' => 'The path to redirect from (e.g., /old-page)',
+            'destination' => 'Destination URL',
+            'destination_help' => 'The URL to redirect to (can be relative or absolute)',
+            'type' => 'Redirect Type',
+            'type_placeholder' => 'Select redirect type',
+            'type_301' => '301 - Permanent Redirect',
+            'type_302' => '302 - Temporary Redirect',
+            'type_help' => '301 for permanent, 302 for temporary redirects',
+            'enable' => 'Enable redirect immediately',
+            'cancel' => 'Cancel',
+            'submit' => 'Create Redirect',
+            'creating' => 'Creating...',
+        ],
+        'edit' => [
+            'title' => 'Edit Redirect: :source',
+            'title_page' => 'Edit Redirect',
+            'description' => 'Editing: :source',
+            'back' => 'Back to Redirects',
+            'delete' => 'Delete Redirect',
+            'delete_confirm' => 'Are you sure you want to delete this redirect? This action cannot be undone.',
+            'form_title' => 'Redirect Information',
+            'source' => 'Source Path',
+            'source_help' => 'The path to redirect from (e.g., /old-page)',
+            'destination' => 'Destination URL',
+            'destination_help' => 'The URL to redirect to (can be relative or absolute)',
+            'type' => 'Redirect Type',
+            'type_placeholder' => 'Select redirect type',
+            'type_301' => '301 - Permanent Redirect',
+            'type_302' => '302 - Temporary Redirect',
+            'type_help' => '301 for permanent, 302 for temporary redirects',
+            'enabled' => 'Redirect is enabled',
+            'cancel' => 'Cancel',
+            'submit' => 'Save Changes',
+            'saving' => 'Saving...',
+        ],
+    ],
+
+    'logs' => [
+        'index' => [
+            'title' => 'Action Logs',
+            'description' => 'View system activity logs (:count total)',
+            'search_placeholder' => 'Search by user or action...',
+            'search' => 'Search',
+            'clear' => 'Clear',
+            'user' => 'User',
+            'action' => 'Action',
+            'target' => 'Target',
+            'date' => 'Date',
+            'actions' => 'Actions',
+            'empty' => 'No logs found',
+            'system' => 'System',
+            'view' => 'View',
+            'showing' => 'Showing :from to :to of :total logs',
+            'previous' => 'Previous',
+            'next' => 'Next',
+        ],
+        'show' => [
+            'title' => 'Log #:id',
+            'title_page' => 'Action Log Details',
+            'description' => 'Log ID: :id',
+            'back' => 'Back to Logs',
+            'summary' => 'Summary',
+            'action' => 'Action:',
+            'user' => 'User:',
+            'system' => 'System',
+            'target' => 'Target:',
+            'date' => 'Date & Time:',
+            'ip' => 'IP Address:',
+            'data_title' => 'Additional Data',
+            'user_agent_title' => 'User Agent',
+        ],
+    ],
+
+    'update' => [
+        'index' => [
+            'title' => 'Updates',
+            'description' => 'Manage system updates and check for new versions',
+            'check' => 'Check for Updates',
+            'system_status' => 'System Status',
+            'status_description' => 'Current version and update availability',
+            'current_version' => 'Current Version',
+            'status' => 'Status',
+            'update_available' => 'Update available',
+            'up_to_date' => 'System is up to date',
+            'latest_version' => 'Latest Version',
+            'downloaded' => 'Downloaded',
+            'description_label' => 'Description',
+            'released' => 'Released',
+            'view_changelog' => 'View Changelog',
+            'download' => 'Download Update',
+            'downloading' => 'Downloading...',
+            'install' => 'Install Update',
+            'installing' => 'Installing...',
+            'install_confirm' => 'Are you sure you want to install this update? The site may be temporarily unavailable during installation.',
+            'info_title' => 'Update Information',
+            'info_description' => 'Important notes about the update process',
+            'info_backup' => 'Always backup your database before installing updates',
+            'info_downtime' => 'The site may be temporarily unavailable during installation',
+            'info_changelog' => 'Check the changelog for breaking changes or new requirements',
+            'info_staging' => 'Test updates on a staging environment first if possible',
+        ],
+    ],
+
+    'errors' => [
+        'back' => 'Back to Dashboard',
+        '404' => 'Page Not Found',
+        'info' => 'It looks like you found a glitch in the matrix...',
+        '2fa' => 'You must enable two-factor auth to access this page.',
+    ],
+];

@@ -1,0 +1,90 @@
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Lignes de langue d'authentification
+    |--------------------------------------------------------------------------
+    */
+
+    'login' => 'Se connecter',
+    'register' => "S'inscrire",
+    'logout' => 'Déconnexion',
+
+    'name' => "Nom d'utilisateur",
+    'email' => 'Email',
+    'password' => 'Mot de passe',
+    'confirm_password' => 'Confirmer le mot de passe',
+    'remember' => 'Se souvenir de moi',
+
+    'no_account' => "Vous n'avez pas de compte ?",
+    'have_account' => 'Vous avez déjà un compte ?',
+    'continue_with' => 'Ou continuer avec',
+    'sign_in_with' => 'Connexion avec',
+    'sign_up_with' => 'Inscription avec',
+    'google' => 'Google',
+    'discord' => 'Discord',
+    'terms_agree' => 'En vous connectant, vous acceptez nos',
+    'terms_agree_register' => 'En vous inscrivant, vous acceptez nos',
+    'terms_of_service' => "Conditions d'utilisation",
+    'privacy_policy' => 'Politique de confidentialité',
+    'and' => 'et notre',
+
+    'join_community' => 'Rejoins la communauté',
+    'community_message' => 'est apprécié par des milliers de joueurs à travers le monde. Rejoins notre communauté et découvre un univers unique.',
+
+    'failed' => 'Ces identifiants ne correspondent pas à nos enregistrements.',
+    'password.incorrect' => 'Le mot de passe fourni est incorrect.',
+    'throttle' => 'Trop de tentatives de connexion. Veuillez réessayer dans :seconds secondes.',
+
+    'verify' => [
+        'title' => 'Vérifiez votre adresse email',
+        'message' => 'Avant de continuer, veuillez vérifier votre email pour un lien de vérification.',
+        'not_received' => "Si vous n'avez pas reçu l'email",
+        'request_another' => 'cliquez ici pour en demander un autre',
+        'sent' => 'Un nouveau lien de vérification a été envoyé à votre adresse email.',
+    ],
+
+    'two_factor' => [
+        'title' => 'Authentification à deux facteurs',
+        'code' => "Code d'authentification",
+        'verify' => 'Vérifier',
+    ],
+
+    'reset' => [
+        'title' => 'Réinitialiser le mot de passe',
+        'send' => 'Envoyer le lien de réinitialisation',
+        'reset' => 'Réinitialiser le mot de passe',
+        'sent' => 'Nous avons envoyé votre lien de réinitialisation par email !',
+        'throttled' => 'Veuillez patienter avant de réessayer.',
+        'token' => 'Ce jeton de réinitialisation de mot de passe est invalide.',
+        'user' => "Nous ne trouvons pas d'utilisateur avec cette adresse email.",
+    ],
+
+    'confirm' => [
+        'title' => 'Confirmer le mot de passe',
+        'message' => 'Veuillez confirmer votre mot de passe avant de continuer.',
+        'button' => 'Confirmer le mot de passe',
+    ],
+
+    'password_confirm' => 'Confirmer le mot de passe',
+    'password_confirm_description' => 'Veuillez confirmer votre mot de passe pour continuer.',
+    'confirming' => 'Confirmation...',
+    'confirm' => 'Confirmer',
+
+    'mail' => [
+        'reset' => [
+            'subject' => 'Réinitialisation du mot de passe',
+            'line1' => 'Vous recevez cet email car nous avons reçu une demande de réinitialisation du mot de passe pour votre compte.',
+            'action' => 'Réinitialiser le mot de passe',
+            'line2' => 'Ce lien de réinitialisation du mot de passe expirera dans :count minutes.',
+            'line3' => 'Si vous n\'avez pas demandé de réinitialisation de mot de passe, aucune autre action n\'est requise.',
+        ],
+        'verify' => [
+            'subject' => 'Vérifiez votre adresse email',
+            'line1' => 'Merci de cliquer sur le bouton ci-dessous pour vérifier votre adresse email.',
+            'action' => 'Vérifier l\'adresse email',
+            'line2' => 'Si vous n\'avez pas créé de compte, aucune autre action n\'est requise.',
+        ],
+    ],
+];

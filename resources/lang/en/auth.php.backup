@@ -1,0 +1,90 @@
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Language Lines
+    |--------------------------------------------------------------------------
+    */
+
+    'login' => 'Sign in',
+    'register' => 'Sign up',
+    'logout' => 'Logout',
+
+    'name' => 'Username',
+    'email' => 'Email',
+    'password' => 'Password',
+    'confirm_password' => 'Confirm Password',
+    'remember' => 'Remember me',
+
+    'no_account' => "Don't have an account?",
+    'have_account' => 'Already have an account?',
+    'continue_with' => 'Or continue with',
+    'sign_in_with' => 'Sign in with',
+    'sign_up_with' => 'Sign up with',
+    'google' => 'Google',
+    'discord' => 'Discord',
+    'terms_agree' => 'By signing in, you agree to our',
+    'terms_agree_register' => 'By signing up, you agree to our',
+    'terms_of_service' => 'Terms of Service',
+    'privacy_policy' => 'Privacy Policy',
+    'and' => 'and our',
+
+    'join_community' => 'Join the community',
+    'community_message' => 'is loved by thousands of players around the world. Join our community and discover a unique universe.',
+
+    'failed' => 'These credentials do not match our records.',
+    'password.incorrect' => 'The provided password is incorrect.',
+    'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
+
+    'verify' => [
+        'title' => 'Verify Your Email Address',
+        'message' => 'Before proceeding, please check your email for a verification link.',
+        'not_received' => 'If you did not receive the email',
+        'request_another' => 'click here to request another',
+        'sent' => 'A fresh verification link has been sent to your email address.',
+    ],
+
+    'two_factor' => [
+        'title' => 'Two Factor Authentication',
+        'code' => 'Authentication Code',
+        'verify' => 'Verify',
+    ],
+
+    'reset' => [
+        'title' => 'Reset Password',
+        'send' => 'Send Password Reset Link',
+        'reset' => 'Reset Password',
+        'sent' => 'We have emailed your password reset link!',
+        'throttled' => 'Please wait before retrying.',
+        'token' => 'This password reset token is invalid.',
+        'user' => "We can't find a user with that email address.",
+    ],
+
+    'confirm' => [
+        'title' => 'Confirm Password',
+        'message' => 'Please confirm your password before continuing.',
+        'button' => 'Confirm Password',
+    ],
+
+    'password_confirm' => 'Confirm Password',
+    'password_confirm_description' => 'Please confirm your password to continue.',
+    'confirming' => 'Confirming...',
+    'confirm' => 'Confirm',
+
+    'mail' => [
+        'reset' => [
+            'subject' => 'Reset Password',
+            'line1' => 'You are receiving this email because we received a password reset request for your account.',
+            'action' => 'Reset Password',
+            'line2' => 'This password reset link will expire in :count minutes.',
+            'line3' => 'If you did not request a password reset, no further action is required.',
+        ],
+        'verify' => [
+            'subject' => 'Verify Email Address',
+            'line1' => 'Please click the button below to verify your email address.',
+            'action' => 'Verify Email Address',
+            'line2' => 'If you did not create an account, no further action is required.',
+        ],
+    ],
+];

@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting - STRICT MODE */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* Path Aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./resources/js/*"],
+      "@/components/*": ["./resources/js/components/*"],
+      "@/layouts/*": ["./resources/js/layouts/*"],
+      "@/pages/*": ["./resources/js/pages/*"],
+      "@/types/*": ["./resources/js/types/*"],
+      "@/lib/*": ["./resources/js/lib/*"],
+      "@/hooks/*": ["./resources/js/hooks/*"]
+    }
+  },
+  "include": [
+    "resources/js/**/*.ts",
+    "resources/js/**/*.tsx",
+    "resources/js/**/*.d.ts"
+  ],
+  "exclude": ["node_modules", "vendor"]
+}

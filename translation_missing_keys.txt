@@ -1,0 +1,36 @@
+=== MISSING TRANSLATION KEYS ===
+
+Total: 10 keys
+
+These keys are used in the code but not defined in language files.
+
+
+id
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Games/Game.php
+
+auth.mail.reset.subject
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/ResetPassword.php
+
+auth.mail.reset.line1
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/ResetPassword.php
+
+auth.mail.reset.action
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/ResetPassword.php
+
+auth.mail.reset.line2
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/ResetPassword.php
+
+auth.mail.reset.line3
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/ResetPassword.php
+
+auth.mail.verify.subject
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/VerifyEmail.php
+
+auth.mail.verify.line1
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/VerifyEmail.php
+
+auth.mail.verify.action
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/VerifyEmail.php
+
+auth.mail.verify.line2
+  Used in: C:\Users\uranium\Documents\Projets\Minecraft\Outland\outland-cms-v2/app/Notifications/VerifyEmail.php
