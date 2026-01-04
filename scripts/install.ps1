@@ -161,4 +161,17 @@ $exitCode = $LASTEXITCODE
 # Cleanup
 Remove-Item $outputFile -Force -ErrorAction SilentlyContinue
 
-exit $exitCode
+# Show result
+Write-Host ""
+if ($exitCode -eq 0) {
+    Write-Success "Installation completed successfully!"
+    Write-Host ""
+    Write-Host "Next steps:" -ForegroundColor Cyan
+    Write-Host "  cd $ProjectName"
+    Write-Host "  php artisan migrate:fresh --seed"
+    Write-Host "  npm install"
+    Write-Host "  npm run build"
+    Write-Host "  php artisan serve"
+} else {
+    Write-Error "Installation failed with exit code $exitCode"
+}
