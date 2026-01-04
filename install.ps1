@@ -1,0 +1,126 @@
+# ExilonCMS Quick Install Script for Windows
+# Usage: irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex
+#        or: powershell -c "irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex"
+
+param(
+    [string]$ProjectName = "exiloncms"
+)
+
+$ErrorActionPreference = "Stop"
+
+# Colors
+function Write-Header {
+    Write-Host ""
+    Write-Host "======================================" -ForegroundColor Cyan
+    Write-Host "   ExilonCMS Installer" -ForegroundColor Cyan
+    Write-Host "======================================" -ForegroundColor Cyan
+    Write-Host ""
+}
+
+function Write-Success {
+    param([string]$Message)
+    Write-Host "✅ $Message" -ForegroundColor Green
+}
+
+function Write-Error {
+    param([string]$Message)
+    Write-Host "❌ $Message" -ForegroundColor Red
+}
+
+function Write-Info {
+    param([string]$Message)
+    Write-Host "ℹ️  $Message" -ForegroundColor Cyan
+}
+
+Write-Header
+
+if ($ProjectName -eq "--help" -or $ProjectName -eq "-h") {
+    Write-Host "Usage: powershell -c `"irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex`""
+    Write-Host ""
+    Write-Host "Examples:"
+    Write-Host "  irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex"
+    Write-Host "  powershell -c `"`$env:ProjectName='my-site'; irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex`""
+    exit 0
+}
+
+Write-Info "Project name: $ProjectName"
+
+# Check if directory exists
+if (Test-Path $ProjectName) {
+    Write-Error "Directory '$ProjectName' already exists!"
+    exit 1
+}
+
+# Check PHP
+try {
+    $phpVersion = php -r "echo PHP_VERSION;" 2>$null
+    if ($LASTEXITCODE -eq 0) {
+        Write-Success "PHP $phpVersion found"
+
+        # Check minimum version
+        $minVersion = "8.2"
+        $major, $minor = $phpVersion.Split('.')[0..1]
+        $currentVersion = "$major.$minor"
+
+        if ([version]$currentVersion -lt [version]$minVersion) {
+            Write-Error "PHP $minVersion or higher is required (you have $currentVersion)"
+            Write-Host ""
+            Write-Host "Download PHP: https://windows.php.net/download/"
+            exit 1
+        }
+    } else {
+        throw "PHP not found"
+    }
+} catch {
+    Write-Error "PHP is not installed. Please install PHP 8.2 or higher."
+    Write-Host ""
+    Write-Host "Download: https://windows.php.net/download/"
+    Write-Host "Make sure to add PHP to your system PATH"
+    exit 1
+}
+
+# Check Composer
+try {
+    composer --version 2>$null | Out-Null
+    Write-Success "Composer found"
+} catch {
+    Write-Error "Composer is not installed. Please install Composer first."
+    Write-Host "https://getcomposer.org/download/"
+    exit 1
+}
+
+# Check Node.js
+try {
+    $nodeVersion = node -v 2>$null
+    Write-Success "Node.js $nodeVersion found"
+} catch {
+    Write-Error "Node.js is not installed. Please install Node.js 18 or higher."
+    Write-Host "https://nodejs.org/"
+    exit 1
+}
+
+# Download installer
+Write-Info "Downloading ExilonCMS installer..."
+
+$installerUrl = "https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/exiloncms-installer.php"
+$outputFile = "exiloncms-installer.php"
+
+try {
+    Invoke-WebRequest -Uri $installerUrl -OutFile $outputFile -UseBasicParsing
+    Write-Success "Installer downloaded"
+} catch {
+    Write-Error "Failed to download installer."
+    exit 1
+}
+
+# Run installer
+Write-Info "Starting installation..."
+Write-Host ""
+
+& php $outputFile $ProjectName
+$exitCode = $LASTEXITCODE
+
+# Cleanup
+Remove-Item $outputFile -Force -ErrorAction SilentlyContinue
+
+exit $exitCode

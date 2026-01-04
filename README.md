@@ -40,6 +40,22 @@ A powerful, modern content management system designed specifically for game serv
 
 ## 🚀 Quick Installation
 
+### ⚡ One-Line Install (Fastest)
+
+**Linux / macOS:**
+```bash
+curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.sh | bash -s -- my-site
+```
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex
+```
+
+This will download the installer and guide you through the interactive setup wizard.
+
+---
+
 ### Option 1: Using the ExilonCMS CLI (Recommended)
 
 The easiest way to create a new ExilonCMS project is using our CLI tool:
