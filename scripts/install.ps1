@@ -81,18 +81,36 @@ try {
 
 # Check Composer
 try {
-    composer --version 2>$null | Out-Null
-    Write-Success "Composer found"
+    $null = & composer --version 2>&1
+    if ($?) {
+        Write-Success "Composer found"
+    } else {
+        throw "Composer not found"
+    }
 } catch {
-    Write-Error "Composer is not installed. Please install Composer first."
-    Write-Host "https://getcomposer.org/download/"
-    exit 1
+    # Try alternate check
+    try {
+        $composerOutput = composer 2>&1
+        if ($composerOutput -match "Composer") {
+            Write-Success "Composer found"
+        } else {
+            throw "Composer not found"
+        }
+    } catch {
+        Write-Error "Composer is not installed. Please install Composer first."
+        Write-Host "https://getcomposer.org/download/"
+        exit 1
+    }
 }
 
 # Check Node.js
 try {
-    $nodeVersion = node -v 2>$null
-    Write-Success "Node.js $nodeVersion found"
+    $nodeVersion = & node -v 2>&1
+    if ($?) {
+        Write-Success "Node.js $nodeVersion found"
+    } else {
+        throw "Node.js not found"
+    }
 } catch {
     Write-Error "Node.js is not installed. Please install Node.js 18 or higher."
     Write-Host "https://nodejs.org/"
