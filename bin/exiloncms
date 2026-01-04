@@ -105,267 +105,6 @@ function ask(string $question, $default = null): string
     return $answer ?: $default;
 }
 
-function downloadFile(string $url, string $destination): bool
-{
-    print_info("Downloading from: {$url}");
-
-    // Try file_get_contents first (works better on Windows)
-    $ctx = stream_context_create([
-        'http' => [
-            'timeout' => 300,
-            'follow_location' => true,
-        ],
-        'ssl' => [
-            'verify_peer' => false,
-            'verify_peer_name' => false,
-        ],
-    ]);
-
-    $content = @file_get_contents($url, false, $ctx);
-
-    if ($content !== false) {
-        file_put_contents($destination, $content);
-        print_success("Download complete");
-        return true;
-    }
-
-    // Fallback to curl
-    $fp = fopen($destination, 'w+');
-    if (! $fp) {
-        print_error("Could not open file for writing: {$destination}");
-        return false;
-    }
-
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL => $url,
-        CURLOPT_FILE => $fp,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT => 300,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
-        CURLOPT_NOPROGRESS => false,
-        CURLOPT_PROGRESSFUNCTION => function ($resource, $downloadSize, $downloaded, $uploadSize, $uploaded) {
-            static $lastPercent = 0;
-            if ($downloadSize > 0) {
-                $percent = intval($downloaded / $downloadSize * 100);
-                if ($percent > $lastPercent && $percent % 10 === 0) {
-                    $lastPercent = $percent;
-                    echo "\r  Downloading: {$percent}%";
-                }
-            }
-            return 0;
-        },
-    ]);
-
-    $result = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    fclose($fp);
-
-    echo "\r  Downloading: 100%" . str_repeat(' ', 20) . "\n";
-
-    if ($result && $httpCode === 200) {
-        print_success("Download complete");
-        return true;
-    }
-
-    print_error("Download failed (HTTP {$httpCode})");
-    @unlink($destination);
-    return false;
-}
-
-function extractZip(string $zipPath, string $destination): bool
-{
-    print_info("Extracting to: {$destination}");
-
-    $zip = new ZipArchive();
-    $result = $zip->open($zipPath);
-
-    if ($result !== true) {
-        print_error("Failed to open ZIP archive: {$result}");
-        return false;
-    }
-
-    if (! is_dir($destination)) {
-        mkdir($destination, 0755, true);
-    }
-
-    $zip->extractTo($destination);
-    $zip->close();
-
-    print_success("Extraction complete");
-    return true;
-}
-
-function ask_simple_choice(string $question, array $options, $default = null): string
-{
-    $keys = array_keys($options);
-    $defaultIndex = array_search($default ?? $keys[0], $keys, true);
-    if ($defaultIndex === false) {
-        $defaultIndex = 0;
-    }
-
-    $selectedIndex = $defaultIndex;
-
-    // Save terminal settings
-    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-        system('stty -echo -icanon min 0 time 0');
-    }
-
-    echo colorize($question, 'cyan') . "\n\n";
-
-    // Display menu
-    while (true) {
-        // Clear screen and redraw menu
-        echo "\033[" . (count($options) + 2) . "A"; // Move cursor up
-        echo "\033[J"; // Clear from cursor to end of screen
-
-        foreach ($options as $i => $label) {
-            $key = $keys[$i];
-            if ($i === $selectedIndex) {
-                echo colorize(" > {$label}", 'green') . "\n";
-            } else {
-                echo "   {$label}\n";
-            }
-        }
-
-        echo "\n" . colorize("Use arrow keys to navigate, Enter to select:", 'cyan');
-
-        // Read key
-        $key = fread(STDIN, 4);
-
-        // Handle arrow keys (ANSI escape sequences)
-        if (isset($key[0]) && $key[0] === "\033") {
-            if (isset($key[1]) && $key[1] === '[') {
-                if (isset($key[2])) {
-                    switch ($key[2]) {
-                        case 'A': // Up arrow
-                            $selectedIndex = ($selectedIndex - 1 + count($options)) % count($options);
-                            break;
-                        case 'B': // Down arrow
-                            $selectedIndex = ($selectedIndex + 1) % count($options);
-                            break;
-                    }
-                }
-            }
-        }
-        // Enter key
-        elseif ($key === "\n" || $key === "\r") {
-            echo "\n";
-            break;
-        }
-    }
-
-    // Restore terminal settings
-    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-        system('stty echo icanon');
-    }
-
-    return $keys[$selectedIndex];
-}
-
-function ask_choice(string $question, array $options, $default = null): string
-{
-    $keys = array_keys($options);
-    $defaultIndex = array_search($default ?? $keys[0], $keys, true);
-    if ($defaultIndex === false) {
-        $defaultIndex = 0;
-    }
-
-    $selectedIndex = $defaultIndex;
-
-    // Save terminal settings
-    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-        system('stty -echo -icanon min 0 time 0');
-    }
-
-    echo colorize($question, 'cyan') . "\n\n";
-
-    // Display menu
-    while (true) {
-        // Clear screen and redraw menu
-        echo "\033[" . (count($options) + 2) . "A"; // Move cursor up
-        echo "\033[J"; // Clear from cursor to end of screen
-
-        foreach ($options as $i => $label) {
-            $key = $keys[$i];
-            if ($i === $selectedIndex) {
-                echo colorize(" > {$key}. {$label}", 'green') . "\n";
-            } else {
-                echo "   {$key}. {$label}\n";
-            }
-        }
-
-        echo "\n" . colorize("Use arrow keys to navigate, Enter to select:", 'cyan');
-
-        // Read key
-        $key = fread(STDIN, 4);
-
-        // Handle arrow keys (ANSI escape sequences)
-        if (isset($key[0]) && $key[0] === "\033") {
-            if (isset($key[1]) && $key[1] === '[') {
-                if (isset($key[2])) {
-                    switch ($key[2]) {
-                        case 'A': // Up arrow
-                            $selectedIndex = ($selectedIndex - 1 + count($options)) % count($options);
-                            break;
-                        case 'B': // Down arrow
-                            $selectedIndex = ($selectedIndex + 1) % count($options);
-                            break;
-                    }
-                }
-            }
-        }
-        // Enter key
-        elseif ($key === "\n" || $key === "\r") {
-            echo "\n";
-            break;
-        }
-    }
-
-    // Restore terminal settings
-    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-        system('stty echo icanon');
-    }
-
-    return $keys[$selectedIndex];
-}
-
-function getMarketplaceData(): array
-{
-    print_info("Checking marketplace for themes and plugins...");
-
-    $registryUrl = "https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS-marketplace/main/registry.json";
-
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL => $registryUrl,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 10,
-    ]);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if ($httpCode === 200 && $response) {
-        $data = json_decode($response, true);
-
-        // Check if there are actual themes and plugins
-        $hasThemes = !empty($data['themes']) && count($data['themes']) > 0;
-        $hasPlugins = !empty($data['plugins']) && count($data['plugins']) > 0;
-
-        if ($hasThemes || $hasPlugins) {
-            print_success("Marketplace data loaded");
-            return $data;
-        }
-    }
-
-    // Return empty arrays - no fake defaults!
-    return ['themes' => [], 'plugins' => []];
-}
-
 function command_new(array $argv): int
 {
     $projectName = $argv[2] ?? null;
@@ -396,125 +135,104 @@ function command_new(array $argv): int
     }
 
     echo "\n";
-
-    // Get marketplace data
-    $marketplaceData = getMarketplaceData();
-    $hasThemes = !empty($marketplaceData['themes']);
-    $hasPlugins = !empty($marketplaceData['plugins']);
-
-    $selectedTheme = null;
-    $selectedPlugins = [];
-
-    // Ask about theme if available
-    if ($hasThemes) {
-        echo "\n";
-        $themeOptions = [];
-        foreach ($marketplaceData['themes'] as $i => $theme) {
-            $themeOptions[$i] = $theme['name'];
-        }
-        $themeOptions['none'] = 'Skip (use default)';
-
-        echo colorize("Theme Selection", 'yellow') . "\n";
-
-        $themeChoice = ask_simple_choice('Select a theme', $themeOptions, 'none');
-        if ($themeChoice !== 'none' && isset($marketplaceData['themes'][$themeChoice])) {
-            $selectedTheme = $marketplaceData['themes'][$themeChoice]['id'];
-        }
-    }
-
-    // Ask about plugins if available
-    if ($hasPlugins) {
-        echo "\n";
-        $pluginOptions = [];
-        foreach ($marketplaceData['plugins'] as $i => $plugin) {
-            $pluginOptions[$i] = $plugin['name'];
-        }
-        $pluginOptions['none'] = 'Skip';
-
-        echo colorize("Plugin Selection", 'yellow') . "\n";
-
-        $pluginChoice = ask_simple_choice('Select plugins (enter for none)', $pluginOptions, 'none');
-
-        if ($pluginChoice !== 'none' && isset($marketplaceData['plugins'][$pluginChoice])) {
-            $selectedPlugins[] = $marketplaceData['plugins'][$pluginChoice]['id'];
-        }
-    }
-
-    echo "\n";
     print_info("Creating ExilonCMS project: {$projectName}");
     echo "\n";
-    print_info("Database: PostgreSQL (default)");
-    print_info("Cache: File (default)");
-    echo "\n";
 
-    // Download from main branch (since no release tags exist yet)
+    // Download from main branch
     $downloadUrl = "https://github.com/Exilon-Studios/ExilonCMS/archive/refs/heads/main.zip";
+    print_info("Downloading from: {$downloadUrl}");
 
-    // Create temp directory
-    $tempDir = sys_get_temp_dir() . '/exiloncms-install';
-    if (! is_dir($tempDir)) {
-        mkdir($tempDir, 0755, true);
-    }
-
+    $tempDir = sys_get_temp_dir() . '/exiloncms-install-' . time();
+    mkdir($tempDir, 0755, true);
     $zipPath = $tempDir . '/exiloncms.zip';
 
-    // Download
-    if (! downloadFile($downloadUrl, $zipPath)) {
+    // Download using file_get_contents
+    $ctx = stream_context_create([
+        'http' => ['timeout' => 300],
+        'ssl' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+        ],
+    ]);
+
+    $content = @file_get_contents($downloadUrl, false, $ctx);
+
+    if ($content === false) {
+        print_error("Failed to download file");
         return 1;
     }
+
+    file_put_contents($zipPath, $content);
+    print_success("Download complete");
 
     // Extract
-    if (! extractZip($zipPath, $tempDir . '/extracted')) {
+    print_info("Extracting files...");
+    $zip = new ZipArchive();
+    if ($zip->open($zipPath) !== TRUE) {
+        print_error("Failed to open ZIP archive");
         return 1;
     }
 
-    // Find the extracted directory
-    $extractedDirs = glob($tempDir . '/extracted/*', GLOB_ONLYDIR);
-    $sourceDir = $extractedDirs[0] ?? $tempDir . '/extracted';
+    $extractDir = $tempDir . '/extracted';
+    mkdir($extractDir, 0755, true);
+    $zip->extractTo($extractDir);
+    $zip->close();
 
-    // Move to target directory (copy+delete on Windows for better compatibility)
+    // Find extracted directory
+    $extractedDirs = glob($extractDir . '/*', GLOB_ONLYDIR);
+    $sourceDir = $extractedDirs[0] ?? null;
+
+    if (! $sourceDir || ! is_dir($sourceDir)) {
+        print_error("Failed to find extracted files");
+        return 1;
+    }
+
+    print_success("Extraction complete");
+
+    // Copy files to target directory
     print_info("Installing to: {$targetDir}");
 
-    // Try rename first (faster)
-    if (! @rename($sourceDir, $targetDir)) {
-        // Fallback to recursive copy
-        print_info("Copying files...");
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($sourceDir, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST
-        );
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        // Windows: Use robocopy or xcopy
+        mkdir($targetDir, 0755, true);
+        $sourceDir = rtrim($sourceDir, '/');
+        $targetDir = rtrim($targetDir, '/');
 
-        foreach ($iterator as $item) {
-            $dest = $targetDir . '/' . $iterator->getSubPathName();
-            if ($item->isDir()) {
-                mkdir($dest, 0755, true);
+        // Try robocopy first (more reliable)
+        $robocopy = exec('where robocopy 2>nul');
+        if (!empty($robocopy)) {
+            exec("robocopy \"{$sourceDir}\" \"{$targetDir}\" /E /NFL /NDL /NJH /NJS", $output, $ret);
+            // Robocopy returns 0-7 for success
+            if ($ret < 8) {
+                print_success("Files installed successfully");
             } else {
-                copy($item, $dest);
+                print_error("Failed to copy files");
+                return 1;
+            }
+        } else {
+            // Fallback to xcopy
+            exec("xcopy \"{$sourceDir}\" \"{$targetDir}\" /E /I /H /Y /Q", $output, $ret);
+            if ($ret === 0) {
+                print_success("Files installed successfully");
+            } else {
+                print_error("Failed to copy files");
+                return 1;
             }
         }
-
-        // Cleanup source
-        $cleanupIterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($sourceDir, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($cleanupIterator as $item) {
-            if ($item->isDir()) {
-                rmdir($item);
-            } else {
-                unlink($item);
-            }
+    } else {
+        // Unix: Use cp -r
+        exec("cp -r \"{$sourceDir}\" \"{$targetDir}\"", $output, $ret);
+        if ($ret === 0) {
+            print_success("Files installed successfully");
+        } else {
+            print_error("Failed to copy files");
+            return 1;
         }
-        rmdir($sourceDir);
     }
 
     // Cleanup
     @unlink($zipPath);
-    @rmdir($tempDir . '/extracted');
-    @rmdir($tempDir);
-
-    print_success("Files installed successfully");
+    exec((strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? "rd /s /q \"{$tempDir}\"" : "rm -rf \"{$tempDir}\""));
 
     // Copy .env.example to .env
     $envPath = $targetDir . '/.env';
@@ -526,7 +244,7 @@ function command_new(array $argv): int
     // Generate key
     print_info("Generating application key...");
     $phpBinary = PHP_BINARY;
-    exec("cd {$targetDir} && {$phpBinary} artisan key:generate 2>&1", $output, $returnCode);
+    exec("cd \"{$targetDir}\" && \"{$phpBinary}\" artisan key:generate 2>&1", $output, $returnCode);
     if ($returnCode === 0) {
         print_success("Application key generated");
     }
@@ -534,14 +252,7 @@ function command_new(array $argv): int
     echo "\n";
     print_header("Installation Complete!");
 
-    if ($selectedTheme) {
-        echo "\n  Theme: " . colorize($selectedTheme, 'green');
-    }
-    if (! empty($selectedPlugins)) {
-        echo "\n  Plugins: " . colorize(implode(', ', $selectedPlugins), 'green');
-    }
-
-    echo colorize("\n\nNext steps:\n", 'cyan');
+    echo colorize("\nNext steps:\n", 'cyan');
     echo "\n  1. " . colorize("cd {$projectName}", 'green');
     echo "\n  2. " . colorize("composer install", 'green');
     echo "\n  3. " . colorize("npm install", 'green');
