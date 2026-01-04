@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ExilonCMS Quick Install Script
-# Usage: curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.sh | bash
-#        or: wget -qO- https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.sh | bash
+# Usage: curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.sh | bash
+#        or: wget -qO- https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.sh | bash
 
 set -e
 
@@ -40,11 +40,11 @@ print_header
 PROJECT_NAME=${1:-exiloncms}
 
 if [ "$PROJECT_NAME" = "--help" ] || [ "$PROJECT_NAME" = "-h" ]; then
-    echo "Usage: curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.sh | bash -s -- <project-name>"
+    echo "Usage: curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.sh | bash -s -- <project-name>"
     echo ""
     echo "Examples:"
-    echo "  curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.sh | bash"
-    echo "  curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.sh | bash -s -- my-site"
+    echo "  curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.sh | bash"
+    echo "  curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.sh | bash -s -- my-site"
     exit 0
 fi
 
@@ -95,34 +95,35 @@ fi
 NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
 print_success "Node.js v$NODE_VERSION found"
 
-# Download installer
-print_info "Downloading ExilonCMS installer..."
+# Download CLI
+print_info "Downloading ExilonCMS CLI..."
 
-INSTALLER_URL="https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/exiloncms-installer.php"
+CLI_URL="https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/bin/exiloncms"
 
 if command -v curl &> /dev/null; then
-    curl -sSL "$INSTALLER_URL" -o exiloncms-installer.php
+    curl -sSL "$CLI_URL" -o exiloncms
 elif command -v wget &> /dev/null; then
-    wget -q "$INSTALLER_URL" -O exiloncms-installer.php
+    wget -q "$CLI_URL" -O exiloncms
 else
     print_error "Neither curl nor wget is installed."
     exit 1
 fi
 
-if [ ! -f "exiloncms-installer.php" ]; then
-    print_error "Failed to download installer."
+if [ ! -f "exiloncms" ]; then
+    print_error "Failed to download CLI."
     exit 1
 fi
 
-print_success "Installer downloaded"
+chmod +x exiloncms
+print_success "CLI downloaded"
 
 # Run installer
 print_info "Starting installation..."
 echo ""
 
-php exiloncms-installer.php "$PROJECT_NAME"
+php exiloncms "$PROJECT_NAME"
 
 # Cleanup
-rm -f exiloncms-installer.php
+rm -f exiloncms
 
 exit $?

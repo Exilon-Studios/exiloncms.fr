@@ -58,7 +58,10 @@
       "Bash(git archive:*)",
       "Bash(git tag:*)",
       "Bash(gh release upload:*)",
-      "Bash(npm link:*)"
+      "Bash(npm link:*)",
+      "Bash(npm publish:*)",
+      "Bash(npm login)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

@@ -44,12 +44,12 @@ A powerful, modern content management system designed specifically for game serv
 
 **Linux / macOS:**
 ```bash
-curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.sh | bash -s -- my-site
+curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.sh | bash -s -- my-site
 ```
 
 **Windows (PowerShell):**
 ```powershell
-irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex
 ```
 
 This will download the installer and guide you through the interactive setup wizard.

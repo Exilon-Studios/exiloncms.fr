@@ -1,6 +1,6 @@
 # ExilonCMS Quick Install Script for Windows
-# Usage: irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex
-#        or: powershell -c "irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex"
+# Usage: irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex
+#        or: powershell -c "irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex"
 
 param(
     [string]$ProjectName = "exiloncms"
@@ -35,11 +35,11 @@ function Write-Info {
 Write-Header
 
 if ($ProjectName -eq "--help" -or $ProjectName -eq "-h") {
-    Write-Host "Usage: powershell -c `"irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex`""
+    Write-Host "Usage: powershell -c `"irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex`""
     Write-Host ""
     Write-Host "Examples:"
-    Write-Host "  irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex"
-    Write-Host "  powershell -c `"`$env:ProjectName='my-site'; irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/install.ps1 | iex`""
+    Write-Host "  irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex"
+    Write-Host "  powershell -c `"`$env:ProjectName='my-site'; irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex`""
     exit 0
 }
 
@@ -99,17 +99,17 @@ try {
     exit 1
 }
 
-# Download installer
-Write-Info "Downloading ExilonCMS installer..."
+# Download CLI
+Write-Info "Downloading ExilonCMS CLI..."
 
-$installerUrl = "https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/exiloncms-installer.php"
-$outputFile = "exiloncms-installer.php"
+$cliUrl = "https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/bin/exiloncms"
+$outputFile = "exiloncms"
 
 try {
-    Invoke-WebRequest -Uri $installerUrl -OutFile $outputFile -UseBasicParsing
-    Write-Success "Installer downloaded"
+    Invoke-WebRequest -Uri $cliUrl -OutFile $outputFile -UseBasicParsing
+    Write-Success "CLI downloaded"
 } catch {
-    Write-Error "Failed to download installer."
+    Write-Error "Failed to download CLI."
     exit 1
 }
 
