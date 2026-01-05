@@ -1,6 +1,6 @@
 <?php
 
-use ExilonCMS\MCCMS;
+use ExilonCMS\ExilonCMS;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,9 +18,14 @@ if (! function_exists('asset')) {
      */
     function asset(string $path, ?bool $secure = null): string
     {
-        // Ignore if there is already a query string
-        $query = str_contains($path, '?') ? '' : '?v'.MCCMS::version();
+        // For Vite build assets, don't add prefix or version (Vite handles it)
+        if (str_starts_with($path, 'build/')) {
+            return app('url')->asset($path, $secure);
+        }
 
-        return app('url')->asset('assets/'.$path.$query, $secure);
+        // For other assets, add version cache busting
+        $query = str_contains($path, '?') ? '' : '?v'.ExilonCMS::version();
+
+        return app('url')->asset($path.$query, $secure);
     }
 }

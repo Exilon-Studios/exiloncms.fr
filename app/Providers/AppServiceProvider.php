@@ -58,21 +58,21 @@ class AppServiceProvider extends ServiceProvider
 
         // Gates
         Gate::define('admin.dashboard', fn (User $user) => true);
-        Gate::define('admin.settings', [User::class, 'canAdminSettings']);
-        Gate::define('admin.translations', [User::class, 'canAdminTranslations']);
-        Gate::define('admin.languages', [User::class, 'canAdminLanguages']);
-        Gate::define('admin.users', [User::class, 'canAdminUsers']);
-        Gate::define('admin.roles', [User::class, 'canAdminRoles']);
-        Gate::define('admin.pages', [User::class, 'canAdminPages']);
-        Gate::define('admin.posts', [User::class, 'canAdminPosts']);
-        Gate::define('admin.servers', [User::class, 'canAdminServers']);
-        Gate::define('admin.bans', [User::class, 'canAdminBans']);
-        Gate::define('admin.plugins', [User::class, 'canAdminPlugins']);
-        Gate::define('admin.themes', [User::class, 'canAdminThemes']);
-        Gate::define('admin.navbar', [User::class, 'canAdminNavbar']);
-        Gate::define('admin.socials', [User::class, 'canAdminSocials']);
-        Gate::define('admin.images', [User::class, 'canAdminImages']);
-        Gate::define('admin.logs', [User::class, 'canAdminLogs']);
+        Gate::define('admin.settings', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.translations', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.languages', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.users', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.roles', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.pages', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.posts', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.servers', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.bans', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.plugins', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.themes', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.navbar', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.socials', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.images', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.logs', fn (User $user) => $user->isAdmin());
 
         // Notifications
         Notification::extend('alert', function ($app) {

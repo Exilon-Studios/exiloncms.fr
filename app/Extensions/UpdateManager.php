@@ -2,7 +2,7 @@
 
 namespace ExilonCMS\Extensions;
 
-use ExilonCMS\MCCMS;
+use ExilonCMS\ExilonCMS;
 use ExilonCMS\Models\User;
 use ExilonCMS\Support\Optimizer;
 use Exception;
@@ -171,7 +171,7 @@ class UpdateManager
             return false;
         }
 
-        return version_compare($release['version'], MCCMS::version(), '>');
+        return version_compare($release['version'], ExilonCMS::version(), '>');
     }
 
     /**
@@ -289,7 +289,7 @@ class UpdateManager
             return false;
         }
 
-        return version_compare($version, MCCMS::version(), '>');
+        return version_compare($version, ExilonCMS::version(), '>');
     }
 
     public function getLastVersion(bool $force = false): ?string
@@ -615,7 +615,7 @@ class UpdateManager
     {
         $info = [
             'date' => now()->toIso8601String(),
-            'version' => MCCMS::version(),
+            'version' => ExilonCMS::version(),
             'php_version' => PHP_VERSION,
             'laravel_version' => app()->version(),
             'environment' => app()->environment(),
@@ -694,10 +694,10 @@ class UpdateManager
 
     private function prepareHttpRequest(): PendingRequest
     {
-        $userAgent = 'ExilonCMS updater (v'.MCCMS::version().' - '.url('/').')';
+        $userAgent = 'ExilonCMS updater (v'.ExilonCMS::version().' - '.url('/').')';
 
         $request = Http::withUserAgent($userAgent)->withHeaders([
-            'Exilon-Version' => MCCMS::version(),
+            'Exilon-Version' => ExilonCMS::version(),
             'Exilon-PHP-Version' => PHP_VERSION,
             'Exilon-Locale' => app()->getLocale(),
             'Exilon-Game' => game()->id(),

@@ -26,7 +26,7 @@ class UpdateController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Updates/Index', [
-            'currentVersion' => MCCMS::version(),
+            'currentVersion' => ExilonCMS::version(),
             'lastVersion' => $this->updates->getUpdate(),
             'hasUpdate' => $this->updates->hasUpdate(),
             'isDownloaded' => $this->updates->isLastVersionDownloaded(),
@@ -120,7 +120,7 @@ class UpdateController extends Controller
     public function version()
     {
         return response()->json([
-            'mccms' => MCCMS::version(),
+            'mccms' => ExilonCMS::version(),
             'php' => PHP_VERSION,
         ]);
     }

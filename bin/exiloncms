@@ -105,6 +105,21 @@ function ask(string $question, $default = null): string
     return $answer ?: $default;
 }
 
+function confirm(string $question, bool $default = true): bool
+{
+    $options = $default ? ['Y', 'n'] : ['y', 'N'];
+    $prompt = $question . " [" . implode('/', $options) . "]: ";
+
+    echo colorize($prompt, 'cyan');
+    $answer = strtolower(trim(fgets(STDIN) ?: ''));
+
+    if ($answer === '') {
+        return $default;
+    }
+
+    return $answer === 'y';
+}
+
 function command_new(array $argv): int
 {
     $projectName = $argv[2] ?? null;
@@ -241,24 +256,60 @@ function command_new(array $argv): int
         print_success("Created .env file");
     }
 
-    // Generate key
+    // Generate key directly in .env
     print_info("Generating application key...");
-    $phpBinary = PHP_BINARY;
-    exec("cd \"{$targetDir}\" && \"{$phpBinary}\" artisan key:generate 2>&1", $output, $returnCode);
+    $key = base64_encode(random_bytes(32));
+    $envContent = file_get_contents($envPath);
+    $envContent = preg_replace('/APP_KEY=.*/', 'APP_KEY=' . $key, $envContent);
+    file_put_contents($envPath, $envContent);
+    print_success("Application key generated");
+
+    // Create required directories
+    $dirs = ['plugins', 'themes', 'storage/logs', 'storage/framework/cache', 'storage/framework/sessions', 'storage/framework/views'];
+    foreach ($dirs as $dir) {
+        $dirPath = $targetDir . '/' . $dir;
+        if (! is_dir($dirPath)) {
+            mkdir($dirPath, 0755, true);
+        }
+    }
+
+    // Install Composer dependencies
+    echo "\n";
+    print_info("Installing PHP dependencies (composer install)...");
+    exec("cd \"{$targetDir}\" && composer install --no-interaction 2>&1", $output, $returnCode);
     if ($returnCode === 0) {
-        print_success("Application key generated");
+        print_success("PHP dependencies installed");
+    } else {
+        print_warn("Composer install had issues, you may need to run it manually");
+    }
+
+    // Install npm dependencies
+    print_info("Installing npm dependencies...");
+    exec("cd \"{$targetDir}\" && npm install 2>&1", $output, $returnCode);
+    if ($returnCode === 0) {
+        print_success("npm dependencies installed");
+    } else {
+        print_warn("npm install had issues, you may need to run it manually");
+    }
+
+    // Build assets
+    print_info("Building frontend assets...");
+    exec("cd \"{$targetDir}\" && npm run build 2>&1", $output, $returnCode);
+    if ($returnCode === 0) {
+        print_success("Assets built successfully");
+    } else {
+        print_warn("Build had issues, you may need to run it manually");
     }
 
     echo "\n";
     print_header("Installation Complete!");
 
-    echo colorize("\nNext steps:\n", 'cyan');
-    echo "\n  1. " . colorize("cd {$projectName}", 'green');
-    echo "\n  2. " . colorize("composer install", 'green');
-    echo "\n  3. " . colorize("npm install", 'green');
-    echo "\n  4. " . colorize("npm run build", 'green');
-    echo "\n  5. " . colorize("php artisan migrate:fresh --seed", 'green');
-    echo "\n  6. " . colorize("php artisan serve", 'green');
+    echo colorize("\nYour project is ready! 🚀\n", 'green');
+    echo "\nNext steps:\n";
+    echo "\n  1. " . colorize("cd {$projectName}", 'cyan');
+    echo "\n  2. " . colorize("Configure database in .env", 'cyan');
+    echo "\n  3. " . colorize("php artisan migrate:fresh --seed", 'cyan');
+    echo "\n  4. " . colorize("php artisan serve", 'cyan');
     echo "\n\n";
 
     echo "For more information: " . colorize("https://github.com/Exilon-Studios/ExilonCMS", 'cyan') . "\n\n";

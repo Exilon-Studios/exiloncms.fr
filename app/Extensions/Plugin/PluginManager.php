@@ -2,7 +2,7 @@
 
 namespace ExilonCMS\Extensions\Plugin;
 
-use ExilonCMS\MCCMS;
+use ExilonCMS\ExilonCMS;
 use ExilonCMS\Extensions\ExtensionManager;
 use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Support\Files;
@@ -308,7 +308,7 @@ class PluginManager extends ExtensionManager
             }
 
             if ($dependency === 'mccms' || $dependency === 'azuriom') {
-                $version = MCCMS::version();
+                $version = ExilonCMS::version();
             } elseif ($this->isEnabled($dependency)) {
                 $version = $this->plugins[$dependency]->version;
             } elseif ($optional) {

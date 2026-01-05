@@ -68,7 +68,7 @@ class PluginController extends Controller
             if ($missing === 'mccms' || $missing === 'azuriom' || $missing === 'api') {
                 return to_route('admin.plugins.index')
                     ->with('error', trans('admin.plugins.requirements.'.$missing, [
-                        'version' => MCCMS::apiVersion(),
+                        'version' => ExilonCMS::apiVersion(),
                     ]));
             }
 

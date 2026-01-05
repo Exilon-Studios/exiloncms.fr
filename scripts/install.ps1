@@ -51,6 +51,20 @@ if (Test-Path $ProjectName) {
     exit 1
 }
 
+# Ask for project name
+Write-Host ""
+$projectName = Read-Host "Project name"
+if ([string]::IsNullOrWhiteSpace($projectName)) {
+    $projectName = $ProjectName
+}
+
+if ($projectName -notmatch '^[a-zA-Z0-9_-]+$') {
+    Write-Error-Func "Invalid project name. Use only letters, numbers, hyphens, and underscores."
+    exit 1
+}
+
+Write-Info "Project name: $projectName"
+
 # Check PHP
 try {
     $phpVersion = php -r "echo PHP_VERSION;" 2>$null
@@ -159,7 +173,7 @@ try {
 Write-Info "Starting installation..."
 Write-Host ""
 
-& php -f $outputFile -- new $ProjectName
+& php -f $outputFile -- new $projectName
 $exitCode = $LASTEXITCODE
 
 # Cleanup
@@ -171,7 +185,7 @@ if ($exitCode -eq 0) {
     Write-Success "Installation completed successfully!"
     Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Cyan
-    Write-Host "  cd $ProjectName"
+    Write-Host "  cd $projectName"
     Write-Host "  php artisan migrate:fresh --seed"
     Write-Host "  npm install"
     Write-Host "  npm run build"

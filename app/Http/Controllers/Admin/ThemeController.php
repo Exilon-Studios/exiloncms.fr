@@ -93,7 +93,7 @@ class ThemeController extends Controller
 
                     return to_route('admin.themes.index')
                         ->with('error', trans('admin.themes.legacy', [
-                            'version' => MCCMS::apiVersion(),
+                            'version' => ExilonCMS::apiVersion(),
                         ]));
                 }
             }
@@ -199,7 +199,7 @@ class ThemeController extends Controller
         if ($theme !== null && $this->themes->isLegacy($theme)) {
             return to_route('admin.themes.index')
                 ->with('error', trans('admin.themes.legacy', [
-                    'version' => MCCMS::apiVersion(),
+                    'version' => ExilonCMS::apiVersion(),
                 ]));
         }
 
