@@ -12,19 +12,19 @@ $ErrorActionPreference = "Stop"
 function Write-Header {
     Write-Host ""
     Write-Host "======================================" -ForegroundColor Cyan
-    Write-Host "   ExilonCMS Installer" -ForegroundColor Cyan
+    Write-Host "   Installateur ExilonCMS" -ForegroundColor Cyan
     Write-Host "======================================" -ForegroundColor Cyan
     Write-Host ""
 }
 
 function Write-Success {
     param([string]$Message)
-    Write-Host "[OK] $Message" -ForegroundColor Green
+    Write-Host "[SUCCÈS] $Message" -ForegroundColor Green
 }
 
 function Write-Error-Func {
     param([string]$Message)
-    Write-Host "[ERROR] $Message" -ForegroundColor Red
+    Write-Host "[ERREUR] $Message" -ForegroundColor Red
 }
 
 function Write-Info {
@@ -37,39 +37,39 @@ Write-Header
 if ($ProjectName -eq "--help" -or $ProjectName -eq "-h") {
     Write-Host "Usage: powershell -c `"irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex`""
     Write-Host ""
-    Write-Host "Examples:"
+    Write-Host "Exemples:"
     Write-Host "  irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex"
-    Write-Host "  powershell -c `"`$env:ProjectName='my-site'; irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex`""
+    Write-Host "  powershell -c `"`$env:ProjectName='mon-site'; irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex`""
     exit 0
 }
 
-Write-Info "Project name: $ProjectName"
+Write-Info "Nom du projet: $ProjectName"
 
 # Check if directory exists
 if (Test-Path $ProjectName) {
-    Write-Error-Func "Directory '$ProjectName' already exists!"
+    Write-Error-Func "Le répertoire '$ProjectName' existe déjà!"
     exit 1
 }
 
 # Ask for project name
 Write-Host ""
-$projectName = Read-Host "Project name"
+$projectName = Read-Host "Nom du projet"
 if ([string]::IsNullOrWhiteSpace($projectName)) {
     $projectName = $ProjectName
 }
 
 if ($projectName -notmatch '^[a-zA-Z0-9_-]+$') {
-    Write-Error-Func "Invalid project name. Use only letters, numbers, hyphens, and underscores."
+    Write-Error-Func "Nom de projet invalide. Utilisez uniquement des lettres, chiffres, tirets et underscores."
     exit 1
 }
 
-Write-Info "Project name: $projectName"
+Write-Info "Nom du projet: $projectName"
 
 # Check PHP
 try {
     $phpVersion = php -r "echo PHP_VERSION;" 2>$null
     if ($LASTEXITCODE -eq 0) {
-        Write-Success "PHP $phpVersion found"
+        Write-Success "PHP $phpVersion trouvé"
 
         # Check minimum version
         $minVersion = "8.2"
@@ -77,19 +77,19 @@ try {
         $currentVersion = "$major.$minor"
 
         if ([version]$currentVersion -lt [version]$minVersion) {
-            Write-Error-Func "PHP $minVersion or higher is required (you have $currentVersion)"
+            Write-Error-Func "PHP $minVersion ou supérieur est requis (vous avez $currentVersion)"
             Write-Host ""
-            Write-Host "Download PHP: https://windows.php.net/download/"
+            Write-Host "Téléchargez PHP: https://windows.php.net/download/"
             exit 1
         }
     } else {
-        throw "PHP not found"
+        throw "PHP non trouvé"
     }
 } catch {
-    Write-Error-Func "PHP is not installed. Please install PHP 8.2 or higher."
+    Write-Error-Func "PHP n'est pas installé. Veuillez installer PHP 8.2 ou supérieur."
     Write-Host ""
-    Write-Host "Download: https://windows.php.net/download/"
-    Write-Host "Make sure to add PHP to your system PATH"
+    Write-Host "Téléchargez: https://windows.php.net/download/"
+    Write-Host "Assurez-vous d'ajouter PHP à votre PATH système"
     exit 1
 }
 
@@ -100,7 +100,7 @@ try {
     $null = composer --version 2>&1
     if ($LASTEXITCODE -eq 0) {
         $composerFound = $true
-        Write-Success "Composer found"
+        Write-Success "Composer trouvé"
     }
 } catch {
     # Command failed, try next method
@@ -111,12 +111,12 @@ if (-not $composerFound) {
     $composerCmd = Get-Command composer -ErrorAction SilentlyContinue
     if ($composerCmd) {
         $composerFound = $true
-        Write-Success "Composer found"
+        Write-Success "Composer trouvé"
     }
 }
 
 if (-not $composerFound) {
-    Write-Error-Func "Composer is not installed. Please install Composer first."
+    Write-Error-Func "Composer n'est pas installé. Veuillez installer Composer d'abord."
     Write-Host "https://getcomposer.org/download/"
     exit 1
 }
@@ -127,7 +127,7 @@ try {
     $nodeVersion = node -v 2>&1
     if ($LASTEXITCODE -eq 0) {
         $nodeFound = $true
-        Write-Success "Node.js $nodeVersion found"
+        Write-Success "Node.js $nodeVersion trouvé"
     }
 } catch {
     # Command failed, try next method
@@ -139,12 +139,12 @@ if (-not $nodeFound) {
     if ($nodeCmd) {
         $nodeFound = $true
         $nodeVersion = & node -v 2>$null
-        Write-Success "Node.js $nodeVersion found"
+        Write-Success "Node.js $nodeVersion trouvé"
     }
 }
 
 if (-not $nodeFound) {
-    Write-Error-Func "Node.js is not installed. Please install Node.js 18 or higher."
+    Write-Error-Func "Node.js n'est pas installé. Veuillez installer Node.js 18 ou supérieur."
     Write-Host "https://nodejs.org/"
     exit 1
 }
@@ -152,7 +152,7 @@ if (-not $nodeFound) {
 $ErrorActionPreference = "Stop"
 
 # Download CLI
-Write-Info "Downloading ExilonCMS CLI..."
+Write-Info "Téléchargement du CLI ExilonCMS..."
 
 $cliUrl = "https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/bin/exiloncms"
 $outputFile = "exiloncms"
@@ -170,7 +170,7 @@ try {
 }
 
 # Run installer
-Write-Info "Starting installation..."
+Write-Info "Démarrage de l'installation..."
 Write-Host ""
 
 & php -f $outputFile -- new $projectName
@@ -182,14 +182,36 @@ Remove-Item $outputFile -Force -ErrorAction SilentlyContinue
 # Show result
 Write-Host ""
 if ($exitCode -eq 0) {
-    Write-Success "Installation completed successfully!"
+    Write-Success "Installation terminée avec succès!"
     Write-Host ""
-    Write-Host "Next steps:" -ForegroundColor Cyan
-    Write-Host "  cd $projectName"
-    Write-Host "  php artisan migrate:fresh --seed"
-    Write-Host "  npm install"
-    Write-Host "  npm run build"
-    Write-Host "  php artisan serve"
+    Write-Host "Étapes suivantes:" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "  1. Créer une base de données PostgreSQL gratuite:" -ForegroundColor Green
+    Write-Host "     - Allez sur https://neon.tech (gratuit) ou https://supabase.com" -ForegroundColor Cyan
+    Write-Host "     - Ou utilisez Docker:" -ForegroundColor Cyan
+    Write-Host "       docker run -d --name exiloncms-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=exiloncms -p 5432:5432 postgres:16" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "  2. Configurer la base de données dans .env" -ForegroundColor Green
+    Write-Host "     Modifiez les lignes:" -ForegroundColor Cyan
+    Write-Host "     DB_CONNECTION=pgsql" -ForegroundColor White
+    Write-Host "     DB_HOST=host_neon_ou_127.0.0.1" -ForegroundColor White
+    Write-Host "     DB_PORT=5432" -ForegroundColor White
+    Write-Host "     DB_DATABASE=exiloncms" -ForegroundColor White
+    Write-Host "     DB_USERNAME=votre_user_neon" -ForegroundColor White
+    Write-Host "     DB_PASSWORD=votre_password_neon" -ForegroundColor White
+    Write-Host ""
+    Write-Host "  3. Lancer les migrations:" -ForegroundColor Green
+    Write-Host "     php artisan migrate:fresh --seed" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "  4. Démarrer le serveur:" -ForegroundColor Green
+    Write-Host "     php artisan serve" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "  Identifiants par défaut:" -ForegroundColor Yellow
+    Write-Host "  Email: admin@example.com" -ForegroundColor Cyan
+    Write-Host "  Mot de passe: password" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "Documentation complète: https://github.com/Exilon-Studios/ExilonCMS/wiki" -ForegroundColor Cyan
+    Write-Host ""
 } else {
-    Write-Error-Func "Installation failed with exit code $exitCode"
+    Write-Error-Func "L'installation a échouée avec le code de sortie $exitCode"
 }

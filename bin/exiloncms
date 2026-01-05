@@ -39,22 +39,22 @@ function print_header(string $text): void
 
 function print_success(string $message): void
 {
-    echo colorize("  OK {$message}", 'green') . "\n";
+    echo colorize("  [SUCCÈS] {$message}", 'green') . "\n";
 }
 
 function print_error(string $message): void
 {
-    echo colorize("  ERROR {$message}", 'red') . "\n";
+    echo colorize("  [ERREUR] {$message}", 'red') . "\n";
 }
 
 function print_info(string $message): void
 {
-    echo colorize("  INFO {$message}", 'cyan') . "\n";
+    echo colorize("  [INFO] {$message}", 'cyan') . "\n";
 }
 
 function print_warn(string $message): void
 {
-    echo colorize("  WARN {$message}", 'yellow') . "\n";
+    echo colorize("  [ATTENTION] {$message}", 'yellow') . "\n";
 }
 
 function checkPhpVersion(): bool
@@ -63,11 +63,11 @@ function checkPhpVersion(): bool
     $currentVersion = PHP_VERSION;
 
     if (version_compare($currentVersion, $minVersion, '<')) {
-        print_error("PHP {$minVersion} or higher is required. You are running PHP {$currentVersion}");
+        print_error("PHP {$minVersion} ou supérieur est requis. Vous utilisez PHP {$currentVersion}");
         return false;
     }
 
-    print_success("PHP version: {$currentVersion}");
+    print_success("Version PHP: {$currentVersion}");
     return true;
 }
 
@@ -83,11 +83,11 @@ function checkExtensions(): bool
     }
 
     if (! empty($missing)) {
-        print_error("Missing required PHP extensions: " . implode(', ', $missing));
+        print_error("Extensions PHP requises manquantes: " . implode(', ', $missing));
         return false;
     }
 
-    print_success("All required extensions are loaded");
+    print_success("Toutes les extensions requises sont chargées");
     return true;
 }
 
@@ -107,7 +107,7 @@ function ask(string $question, $default = null): string
 
 function confirm(string $question, bool $default = true): bool
 {
-    $options = $default ? ['Y', 'n'] : ['y', 'N'];
+    $options = $default ? ['O', 'n'] : ['o', 'N'];
     $prompt = $question . " [" . implode('/', $options) . "]: ";
 
     echo colorize($prompt, 'cyan');
@@ -117,7 +117,7 @@ function confirm(string $question, bool $default = true): bool
         return $default;
     }
 
-    return $answer === 'y';
+    return $answer === 'o' || $answer === 'y';
 }
 
 function command_new(array $argv): int
@@ -134,10 +134,10 @@ function command_new(array $argv): int
     // Ask for project name if not provided
     if (! $projectName) {
         echo "\n";
-        $projectName = ask('Project name', 'exiloncms');
+        $projectName = ask('Nom du projet', 'exiloncms');
 
         if (! preg_match('/^[a-zA-Z0-9_-]+$/', $projectName)) {
-            print_error("Invalid project name. Use only letters, numbers, hyphens, and underscores.");
+            print_error("Nom de projet invalide. Utilisez uniquement des lettres, chiffres, tirets et underscores.");
             return 1;
         }
     }
@@ -145,17 +145,17 @@ function command_new(array $argv): int
     $targetDir = getcwd() . '/' . $projectName;
 
     if (is_dir($targetDir)) {
-        print_error("Directory already exists: {$targetDir}");
+        print_error("Le répertoire existe déjà: {$targetDir}");
         return 1;
     }
 
     echo "\n";
-    print_info("Creating ExilonCMS project: {$projectName}");
+    print_info("Création du projet ExilonCMS: {$projectName}");
     echo "\n";
 
     // Download from main branch
     $downloadUrl = "https://github.com/Exilon-Studios/ExilonCMS/archive/refs/heads/main.zip";
-    print_info("Downloading from: {$downloadUrl}");
+    print_info("Téléchargement depuis: {$downloadUrl}");
 
     $tempDir = sys_get_temp_dir() . '/exiloncms-install-' . time();
     mkdir($tempDir, 0755, true);
@@ -173,18 +173,18 @@ function command_new(array $argv): int
     $content = @file_get_contents($downloadUrl, false, $ctx);
 
     if ($content === false) {
-        print_error("Failed to download file");
+        print_error("Échec du téléchargement du fichier");
         return 1;
     }
 
     file_put_contents($zipPath, $content);
-    print_success("Download complete");
+    print_success("Téléchargement terminé");
 
     // Extract
-    print_info("Extracting files...");
+    print_info("Extraction des fichiers...");
     $zip = new ZipArchive();
     if ($zip->open($zipPath) !== TRUE) {
-        print_error("Failed to open ZIP archive");
+        print_error("Impossible d'ouvrir l'archive ZIP");
         return 1;
     }
 
@@ -198,14 +198,14 @@ function command_new(array $argv): int
     $sourceDir = $extractedDirs[0] ?? null;
 
     if (! $sourceDir || ! is_dir($sourceDir)) {
-        print_error("Failed to find extracted files");
+        print_error("Impossible de trouver les fichiers extraits");
         return 1;
     }
 
-    print_success("Extraction complete");
+    print_success("Extraction terminée");
 
     // Copy files to target directory
-    print_info("Installing to: {$targetDir}");
+    print_info("Installation dans: {$targetDir}");
 
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
         // Windows: Use robocopy or xcopy
@@ -219,18 +219,18 @@ function command_new(array $argv): int
             exec("robocopy \"{$sourceDir}\" \"{$targetDir}\" /E /NFL /NDL /NJH /NJS", $output, $ret);
             // Robocopy returns 0-7 for success
             if ($ret < 8) {
-                print_success("Files installed successfully");
+                print_success("Fichiers installés avec succès");
             } else {
-                print_error("Failed to copy files");
+                print_error("Échec de la copie des fichiers");
                 return 1;
             }
         } else {
             // Fallback to xcopy
             exec("xcopy \"{$sourceDir}\" \"{$targetDir}\" /E /I /H /Y /Q", $output, $ret);
             if ($ret === 0) {
-                print_success("Files installed successfully");
+                print_success("Fichiers installés avec succès");
             } else {
-                print_error("Failed to copy files");
+                print_error("Échec de la copie des fichiers");
                 return 1;
             }
         }
@@ -238,9 +238,9 @@ function command_new(array $argv): int
         // Unix: Use cp -r
         exec("cp -r \"{$sourceDir}\" \"{$targetDir}\"", $output, $ret);
         if ($ret === 0) {
-            print_success("Files installed successfully");
+            print_success("Fichiers installés avec succès");
         } else {
-            print_error("Failed to copy files");
+            print_error("Échec de la copie des fichiers");
             return 1;
         }
     }
@@ -253,16 +253,16 @@ function command_new(array $argv): int
     $envPath = $targetDir . '/.env';
     if (! file_exists($envPath) && file_exists($targetDir . '/.env.example')) {
         copy($targetDir . '/.env.example', $envPath);
-        print_success("Created .env file");
+        print_success("Fichier .env créé");
     }
 
     // Generate key directly in .env
-    print_info("Generating application key...");
+    print_info("Génération de la clé d'application...");
     $key = base64_encode(random_bytes(32));
     $envContent = file_get_contents($envPath);
     $envContent = preg_replace('/APP_KEY=.*/', 'APP_KEY=' . $key, $envContent);
     file_put_contents($envPath, $envContent);
-    print_success("Application key generated");
+    print_success("Clé d'application générée");
 
     // Create required directories
     $dirs = ['plugins', 'themes', 'storage/logs', 'storage/framework/cache', 'storage/framework/sessions', 'storage/framework/views'];
@@ -275,44 +275,63 @@ function command_new(array $argv): int
 
     // Install Composer dependencies
     echo "\n";
-    print_info("Installing PHP dependencies (composer install)...");
+    print_info("Installation des dépendances PHP (composer install)...");
     exec("cd \"{$targetDir}\" && composer install --no-interaction 2>&1", $output, $returnCode);
     if ($returnCode === 0) {
-        print_success("PHP dependencies installed");
+        print_success("Dépendances PHP installées");
     } else {
-        print_warn("Composer install had issues, you may need to run it manually");
+        print_warn("Composer install a eu des problèmes, vous devrez peut-être le lancer manuellement");
     }
 
     // Install npm dependencies
-    print_info("Installing npm dependencies...");
+    print_info("Installation des dépendances npm...");
     exec("cd \"{$targetDir}\" && npm install 2>&1", $output, $returnCode);
     if ($returnCode === 0) {
-        print_success("npm dependencies installed");
+        print_success("Dépendances npm installées");
     } else {
-        print_warn("npm install had issues, you may need to run it manually");
+        print_warn("npm install a eu des problèmes, vous devrez peut-être le lancer manuellement");
     }
 
     // Build assets
-    print_info("Building frontend assets...");
+    print_info("Construction des assets frontend...");
     exec("cd \"{$targetDir}\" && npm run build 2>&1", $output, $returnCode);
     if ($returnCode === 0) {
-        print_success("Assets built successfully");
+        print_success("Assets construits avec succès");
     } else {
-        print_warn("Build had issues, you may need to run it manually");
+        print_warn("La construction a eu des problèmes, vous devrez peut-être la lancer manuellement");
     }
 
     echo "\n";
-    print_header("Installation Complete!");
+    print_header("Installation Terminée!");
 
-    echo colorize("\nYour project is ready! 🚀\n", 'green');
-    echo "\nNext steps:\n";
-    echo "\n  1. " . colorize("cd {$projectName}", 'cyan');
-    echo "\n  2. " . colorize("Configure database in .env", 'cyan');
-    echo "\n  3. " . colorize("php artisan migrate:fresh --seed", 'cyan');
-    echo "\n  4. " . colorize("php artisan serve", 'cyan');
+    echo colorize("\nVotre projet est prêt! 🚀\n", 'green');
+    echo "\n" . colorize("Étapes suivantes:\n", 'yellow');
+    echo "\n  " . colorize("1.", 'green') . " Créer une base de données PostgreSQL gratuite:";
+    echo "\n      - Allez sur " . colorize("https://neon.tech", 'cyan') . " (gratuit) ou https://supabase.com";
+    echo "\n      - Ou utilisez Docker:";
+    echo "\n        " . colorize("docker run -d --name exiloncms-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=exiloncms -p 5432:5432 postgres:16", 'cyan');
+    echo "\n";
+    echo "\n  " . colorize("2.", 'green') . " Configurer la base de données dans " . colorize(".env", 'cyan');
+    echo "\n      Modifiez ces lignes:";
+    echo "\n      DB_CONNECTION=pgsql";
+    echo "\n      DB_HOST=host_neon_ou_127.0.0.1";
+    echo "\n      DB_PORT=5432";
+    echo "\n      DB_DATABASE=exiloncms";
+    echo "\n      DB_USERNAME=votre_user_neon";
+    echo "\n      DB_PASSWORD=votre_password_neon";
+    echo "\n";
+    echo "\n  " . colorize("3.", 'green') . " Lancer les migrations:";
+    echo "\n      " . colorize("php artisan migrate:fresh --seed", 'cyan');
+    echo "\n";
+    echo "\n  " . colorize("4.", 'green') . " Démarrer le serveur:";
+    echo "\n      " . colorize("php artisan serve", 'cyan');
+    echo "\n";
+    echo "\n  " . colorize("Identifiants par défaut:", 'yellow');
+    echo "\n      Email: " . colorize("admin@example.com", 'cyan');
+    echo "\n      Mot de passe: " . colorize("password", 'cyan');
     echo "\n\n";
 
-    echo "For more information: " . colorize("https://github.com/Exilon-Studios/ExilonCMS", 'cyan') . "\n\n";
+    echo colorize("Documentation complète: ", 'white') . colorize("https://github.com/Exilon-Studios/ExilonCMS/wiki", 'cyan') . "\n\n";
 
     return 0;
 }
