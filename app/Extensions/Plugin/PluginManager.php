@@ -489,7 +489,7 @@ class PluginManager extends ExtensionManager
     /**
      * Get navigation items from a plugin's navigation.json file.
      */
-    protected function getNavigationItemsFromPlugin(string $pluginId, string $type): Collection
+    public function getNavigationItemsFromPlugin(string $pluginId, string $type): Collection
     {
         $navigationPath = $this->pluginsPath($pluginId . '/navigation.json');
 
