@@ -98,6 +98,7 @@ Route::prefix('notifications')->name('notifications.')->middleware('auth')->grou
 
 // Posts routes (alias for /news)
 Route::redirect('/posts', '/news', 301);
+Route::get('/posts/{post:slug}', [PostController::class, 'show'])->name('posts.show');
 
 Route::prefix('news')->name('posts.')->group(function () {
     Route::get('/', [PostController::class, 'index'])->name('index');

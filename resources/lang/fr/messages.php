@@ -1,180 +1,117 @@
 <?php
 
-return [
-    /*
-    |--------------------------------------------------------------------------
-    | Lignes de langue messages
-    |--------------------------------------------------------------------------
-    |
-    | Traductions pour les messages - Version nettoyée
-    |
-    */
-
-    'nav' => [
-        'toggle' => 'Afficher/Masquer la navbar',
+return array (
+      'nav' => array (
         'profile' => 'Profil',
-        'admin' => 'Administration',
+        'admin' => 'Panel administrateur',
         'dashboard' => 'Tableau de bord',
         'logout' => 'Déconnexion',
-    ],
-
-    'user' => [
+      ),
+      'user' => array (
         'theme' => 'Thème',
-        'default_name' => 'Utilisateur',
-    ],
-
-    'theme' => [
+      ),
+      'theme' => array (
         'title' => 'Personnalisation du thème',
         'description' => 'Choisissez votre palette de couleurs et prévisualisez en temps réel',
         'light' => 'Clair',
         'dark' => 'Sombre',
-        'colors' => 'Palette de couleurs',
-        'typography' => 'Typographie',
-        'primary_font' => 'Principale',
-        'mono_font' => 'Monospace',
-        'current' => 'Sélection actuelle',
-        'preview' => 'Aperçu en temps réel',
-        'preview_text' => 'Ceci est un aperçu de votre thème',
-        'primary_button' => 'Primaire',
-        'secondary_button' => 'Secondaire',
-        'input_placeholder' => 'Champ de texte...',
+        'preview' => 'Aperçu',
+        'preview_text' => 'Aperçu du texte',
+        'primary_button' => 'Bouton principal',
+        'secondary_button' => 'Bouton secondaire',
+        'input_placeholder' => 'Texte de placeholder',
         'badge_active' => 'Actif',
         'badge_error' => 'Erreur',
         'badge_inactive' => 'Inactif',
         'full_palette' => 'Palette complète',
-        'color_primary' => 'Primary',
-        'color_secondary' => 'Second',
-        'color_accent' => 'Accent',
-        'color_muted' => 'Muted',
-        'color_error' => 'Error',
-        'color_bg' => 'BG',
+        'color_primary' => 'Couleur primaire',
+        'color_secondary' => 'Couleur secondaire',
+        'color_accent' => 'Couleur d\'accent',
+        'color_muted' => 'Couleur atténuée',
+        'color_error' => 'Couleur d\'erreur',
+        'color_bg' => 'Couleur de fond',
+        'colors' => 'Couleurs',
+        'typography' => 'Typographie',
+        'primary_font' => 'Police principale',
+        'mono_font' => 'Police monospace',
+        'current' => 'Actuel',
+        'apply' => 'Appliquer',
         'cancel' => 'Annuler',
-        'apply' => 'Appliquer le thème',
-    ],
-
-    'maintenance' => [
+      ),
+      'maintenance' => array (
         'title' => 'Maintenance en cours',
-        'subtitle' => 'Le site est actuellement en maintenance. Nous serons bientôt de retour !',
-        'message' => 'Le site est actuellement en maintenance.',
-    ],
-
-    'loading' => 'Chargement...',
-
-    'status' => [
-        'saved' => 'Enregistré avec succès',
-        'error' => 'Une erreur est survenue',
-    ],
-
-    'actions' => [
-        'save' => 'Enregistrer',
+        'message' => 'Le site est actuellement en maintenance. Revenez bientôt.',
+      ),
+      'loading' => 'Chargement...',
+      'actions' => array (
         'cancel' => 'Annuler',
         'delete' => 'Supprimer',
-        'edit' => 'Modifier',
-        'create' => 'Créer',
         'update' => 'Mettre à jour',
-        'confirm' => 'Confirmer',
-        'close' => 'Fermer',
-        'hide' => 'Masquer',
-        'show' => 'Afficher',
-        'download' => 'Télécharger',
-        'copy' => 'Copier',
-        'copied' => 'Copié !',
-    ],
-
-    'profile' => [
+      ),
+      'profile' => array (
         'title' => 'Profil',
-        'change_email' => 'Changer d\'email',
         'current_password' => 'Mot de passe actuel',
-        '2fa' => [
-            'enable' => 'Activer l\'authentification à deux facteurs',
-            'disable' => 'Désactiver l\'authentification à deux facteurs',
-            'manage' => 'Gérer l\'authentification à deux facteurs',
-        ],
-        'delete' => [
-            'btn' => 'Supprimer le compte',
-            'confirm' => 'Êtes-vous sûr de vouloir supprimer votre compte ?',
-        ],
-    ],
-
-    'fields' => [
-        'money' => 'Monnaie',
-    ],
-
-    'pages' => [
+        'change_email' => 'Changer l\'email',
+        '2fa' => array (
+          'enable' => 'Activer la double authentification',
+        ),
+        'delete' => array (
+          'btn' => 'Supprimer le compte',
+        ),
+      ),
+      'fields' => array (
+        'money' => 'Argent',
+      ),
+      'pages' => array (
         'title' => 'Accueil',
-    ],
-
-    'footer' => [
-        'copyright' => '© {year} Tous droits réservés.',
+      ),
+      'footer' => array (
         'pages' => 'Pages',
         'socials' => 'Réseaux sociaux',
+        'auth' => array (
+          'register' => 'S\'inscrire',
+          'login' => 'Se connecter',
+        ),
         'legal' => 'Mentions légales',
-        'privacy' => 'Confidentialité',
-        'terms' => 'Conditions d\'utilisation',
-        'account' => 'Compte',
-        'auth' => [
-            'register' => 'S\'inscrire',
-            'login' => 'Se connecter',
-        ],
-    ],
-
-    'socials' => [
-        'follow_us' => 'SUIVEZ-NOUS',
-    ],
-
-    'server' => [
-        'online' => 'SERVEUR EN LIGNE',
-        'offline' => 'SERVEUR HORS LIGNE',
-    ],
-
-    'hero' => [
-        'game_mode' => 'Mode de Jeu',
-        'survival_pvp' => 'Survie & PvP',
-        'community' => 'Communauté',
-        'players_count' => '2,500+ Joueurs',
-        'events' => 'Événements',
-        'weekly' => 'Hebdomadaires',
-        'performance' => 'Performance',
-        'tps' => '20 TPS',
-    ],
-
-    'blog' => [
-        'view_all' => 'Voir tout',
-        'read_more' => 'Lire plus',
-        'no_posts' => 'Aucun article pour le moment',
-        'no_posts_hint' => 'Soyez le premier à publier un article !',
-    ],
-
-    'date' => [
-        'default' => 'l j F',
-        'full' => 'l j F Y \à H:i',
-        'compact' => 'd/m/Y',
-    ],
-
-    'dashboard' => [
+        'account' => 'Mon compte',
+      ),
+      'dashboard' => array (
         'title' => 'Tableau de bord',
         'nav' => 'Tableau de bord',
-        'welcome' => 'Bienvenue, :name 👋',
-        'welcome_subtitle' => 'Voici votre tableau de bord personnel',
+        'status' => 'Statut',
+        'shop' => 'Boutique',
+        'username' => 'Nom d\'utilisateur',
+        'active' => 'Actif',
+        'welcome' => 'Bienvenue',
+        'welcome_subtitle' => 'Voici un aperçu de votre activité',
         'balance' => 'Solde',
         'account_age' => 'Âge du compte',
         'role' => 'Rôle',
-        'status' => 'Statut',
-        'active' => 'Actif',
-        'quick_actions' => 'Actions rapides',
-        'quick_actions_subtitle' => 'Gérez votre compte et vos paramètres',
-        'my_profile' => 'Mon Profil',
-        'my_profile_subtitle' => 'Gérer mes informations personnelles',
-        'notifications' => 'Notifications',
-        'notifications_subtitle' => 'Voir mes notifications',
-        'shop' => 'Boutique',
-        'shop_subtitle' => ':money disponibles: :balance :currency',
-        'shop_coming_soon' => 'La boutique sera bientôt disponible',
-        'coming_soon' => 'Bientôt disponible',
-        'account_info' => 'Informations du compte',
-        'username' => 'Nom d\'utilisateur',
-        'email' => 'Email',
-        'member_since' => 'Membre depuis',
-        'see_more' => 'Voir plus →',
-    ],
-];
+      ),
+      'hero' => array (
+        'game_mode' => 'Survival + PvP',
+        'survival_pvp' => 'Survie et PvP dans un monde ouvert',
+        'community' => 'Communauté',
+        'players_count' => '{count} joueurs en ligne',
+        'events' => 'Événements',
+        'weekly' => 'Chaque semaine',
+        'performance' => 'Performance',
+        'tps' => '{tps} TPS',
+      ),
+      'blog' => array (
+        'view_all' => 'Voir tout',
+        'read_more' => 'Lire la suite',
+        'no_posts' => 'Aucun article pour le moment',
+        'no_posts_hint' => 'Revenez bientôt pour découvrir nos dernières actualités !',
+      ),
+      'shop_plugin' => array (
+        'name' => 'Shop',
+        'version' => 'Version',
+        'description' => 'Système de boutique complet avec paiements multiples et facturation',
+        'author' => 'ExilentStudios',
+      ),
+      'sidebar' => array (
+        'documentation' => 'Documentation',
+        'official_site' => 'Site officiel',
+      ),
+    );

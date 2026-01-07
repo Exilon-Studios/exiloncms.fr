@@ -11,10 +11,18 @@ class NotificationController extends Controller
     {
         $notifications = $request->user()
             ->notifications()
-            ->where('read_at', '>', now()->subMonth())
-            ->paginate();
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
 
-        return view('notifications.index', ['allNotifications' => $notifications]);
+        return inertia('Notifications/Index', [
+            'notifications' => $notifications->items(),
+            'pagination' => [
+                'current_page' => $notifications->currentPage(),
+                'last_page' => $notifications->lastPage(),
+                'per_page' => $notifications->perPage(),
+                'total' => $notifications->total(),
+            ],
+        ]);
     }
 
     /**

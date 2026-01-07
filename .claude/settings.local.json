@@ -84,7 +84,13 @@
       "Bash(gh release delete:*)",
       "Bash(Get-Content \"C:\\\\Users\\\\uranium\\\\Documents\\\\Projets\\\\Minecraft\\\\Outland\\\\outland-cms-v2\\\\storage\\\\logs\\\\laravel.log\" -Tail 30)",
       "Bash(cd:*)",
-      "Bash(robocopy:*)"
+      "Bash(robocopy:*)",
+      "Bash(Get-Content resources/lang/fr/admin.php)",
+      "Bash(Measure-Object -Line)",
+      "Bash(Get-Content:*)",
+      "Bash(wc:*)",
+      "Bash(if not exist \"plugins\\\\shop\\\\resources\\\\views\" mkdir \"plugins\\\\shop\\\\resources\\\\views\")",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

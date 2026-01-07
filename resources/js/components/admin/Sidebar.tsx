@@ -21,8 +21,13 @@ import {
   IconX,
   IconArrowNarrowLeft,
   IconChecklist,
+  IconShoppingCart,
+  IconBell,
+  IconBellRounded,
 } from "@tabler/icons-react";
 import { DropdownUser } from "@/components/DropdownUser";
+import { usePage } from "@inertiajs/react";
+import CartSheet from "@/components/shop/CartSheet";
 
 interface Links {
   label: string;
@@ -32,6 +37,7 @@ interface Links {
   type?: string;
   children?: Links[];
   badge?: number;
+  external?: boolean;
 }
 
 interface SidebarContextProps {
@@ -235,25 +241,34 @@ export const SidebarSection = ({
         </span>
         <motion.div
           animate={{ rotate: isExpanded ? 0 : -90 }}
-          transition={{ duration: 0.2, ease: "easeInOut" }}
+          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
         >
           <IconArrowNarrowLeft className="h-3 w-3 text-muted-foreground rotate-[-90deg]" />
         </motion.div>
       </button>
-      <AnimatePresence initial={false}>
+      <AnimatePresence initial={false} mode="wait">
         {isExpanded && (
           <motion.div
-            initial={false}
+            initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.15, ease: "easeInOut" }}
+            transition={{
+              duration: 0.3,
+              ease: [0.4, 0, 0.2, 1],
+            }}
             className="overflow-hidden"
           >
-            <div className="mt-1">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
+              className="pb-1"
+            >
               {section.children?.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -278,6 +293,45 @@ export const SidebarLink = ({
   // Si c'est un séparateur
   if (link.type === 'separator') {
     return <SidebarSeparator label={link.label} className={className} />;
+  }
+
+  // Pour les liens externes, utiliser une balise <a> au lieu de Inertia Link
+  if (link.external) {
+    return (
+      <a
+        href={link.href!}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(
+          "group/sidebar flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground transition-colors relative",
+          open ? "justify-start" : "justify-center",
+          className,
+        )}
+      >
+        {link.icon}
+
+        <motion.span
+          animate={{
+            display: open ? "inline-block" : "none",
+            opacity: open ? 1 : 0,
+          }}
+          className="!m-0 inline-block !p-0 text-sm whitespace-pre text-foreground transition duration-150"
+        >
+          {link.label}
+        </motion.span>
+
+        {/* External link icon */}
+        <motion.span
+          animate={{
+            display: open ? "inline-block" : "none",
+            opacity: open ? 1 : 0,
+          }}
+          className="ml-auto text-xs text-muted-foreground"
+        >
+          ↗
+        </motion.span>
+      </a>
+    );
   }
 
   return (
@@ -361,78 +415,126 @@ export function SidebarLayout({
   userInfo: {
     name: string;
     avatar?: string;
+    email?: string;
+    role?: {
+      id: number;
+      name: string;
+      is_admin: boolean;
+    };
+    hasAdminAccess?: boolean;
   };
   siteName?: string;
 }) {
   const [open, setOpen] = useState(true);
+  const [cartOpen, setCartOpen] = useState(false);
+  const pageProps = usePage().props as any;
+  const cartCount = pageProps.cartCount || 0;
+  const auth = pageProps.auth;
 
   return (
-    <div
-      className={cn(
-        "flex w-full flex-col bg-background md:flex-row",
-        "h-screen overflow-hidden",
-        className,
-      )}
-    >
-      <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10">
-          <div className={cn(
-            "flex flex-1 flex-col overflow-x-hidden overflow-y-auto",
-            "scrollbar-hide"
-          )}>
-            {open ? <Logo siteName={siteName} /> : <LogoIcon />}
-            <div className="mt-8 flex flex-col">
-              {primaryLinks.map((link, idx) => (
+    <>
+      <div
+        className={cn(
+          "flex w-full flex-col bg-background md:flex-row",
+          "h-screen overflow-hidden",
+          className,
+        )}
+      >
+        <Sidebar open={open} setOpen={setOpen}>
+          <SidebarBody className="justify-between gap-10">
+            <div className={cn(
+              "flex flex-1 flex-col overflow-x-hidden overflow-y-auto",
+              "scrollbar-hide"
+            )}>
+              {open ? <Logo siteName={siteName} /> : <LogoIcon />}
+              <div className="mt-8 flex flex-col">
+                {primaryLinks.map((link, idx) => (
+                  <SidebarLink key={idx} link={link} />
+                ))}
+              </div>
+            </div>
+            <div className="flex flex-col gap-1 pb-2">
+              {secondaryLinks.map((link, idx) => (
                 <SidebarLink key={idx} link={link} />
               ))}
+              {open ? (
+                <div className="mt-2">
+                  <DropdownUser
+                    user={{
+                      name: userInfo.name,
+                      email: userInfo.email || '',
+                      role: userInfo.role || '',
+                      avatar: userInfo.avatar
+                    }}
+                    align="end"
+                    className="w-full justify-start"
+                  />
+                </div>
+              ) : (
+                <div className="mt-2">
+                  <SidebarLink
+                    link={{
+                      label: userInfo.name,
+                      href: "/profile",
+                      icon: userInfo.avatar ? (
+                        <img
+                          src={userInfo.avatar || `https://mc-heads.net/avatar/${userInfo.name}/64`}
+                          className="h-5 w-5 flex-shrink-0 rounded-full object-cover"
+                          width={50}
+                          height={50}
+                          alt="Avatar"
+                        />
+                      ) : (
+                        <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs">
+                          {userInfo.name.charAt(0).toUpperCase()}
+                        </div>
+                      ),
+                    }}
+                  />
+                </div>
+              )}
             </div>
+          </SidebarBody>
+        </Sidebar>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          {/* Header bar with cart button */}
+          <header className="h-14 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 md:px-6 shrink-0">
+            <div className="flex-1"></div>
+            <div className="flex items-center gap-2">
+              {auth?.user && (
+                <>
+                  {/* Notifications button */}
+                  <Link
+                    href="/notifications"
+                    className="relative flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
+                    aria-label="Notifications"
+                  >
+                    <IconBell className="h-5 w-5 text-foreground" />
+                  </Link>
+
+                  {/* Cart button */}
+                  <button
+                    onClick={() => setCartOpen(true)}
+                    className="relative flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
+                    aria-label="Panier"
+                  >
+                    <IconShoppingCart className="h-5 w-5 text-foreground" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                        {cartCount > 99 ? '99+' : cartCount}
+                      </span>
+                    )}
+                  </button>
+                </>
+              )}
+            </div>
+          </header>
+          <div className="flex-1 overflow-y-auto overflow-x-hidden">
+            {children}
           </div>
-          <div className="flex flex-col gap-1 pb-2">
-            {secondaryLinks.map((link, idx) => (
-              <SidebarLink key={idx} link={link} />
-            ))}
-            {open ? (
-              <div className="mt-2">
-                <DropdownUser
-                  user={{
-                    name: userInfo.name,
-                    email: userInfo.email || '',
-                    role: userInfo.role || '',
-                    avatar: userInfo.avatar
-                  }}
-                  align="end"
-                  className="w-full justify-start"
-                />
-              </div>
-            ) : (
-              <div className="mt-2">
-                <SidebarLink
-                  link={{
-                    label: userInfo.name,
-                    href: "/profile",
-                    icon: userInfo.avatar ? (
-                      <img
-                        src={userInfo.avatar || `https://mc-heads.net/avatar/${userInfo.name}/64`}
-                        className="h-5 w-5 flex-shrink-0 rounded-full object-cover"
-                        width={50}
-                        height={50}
-                        alt="Avatar"
-                      />
-                    ) : (
-                      <div className="h-5 w-5 flex-shrink-0 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs">
-                        {userInfo.name.charAt(0).toUpperCase()}
-                      </div>
-                    ),
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </SidebarBody>
-      </Sidebar>
-      <div className="flex flex-1 overflow-hidden">
-        {children}
+        </div>
       </div>
-    </div>
+      <CartSheet open={cartOpen} onOpenChange={setCartOpen} />
+    </>
   );
 }

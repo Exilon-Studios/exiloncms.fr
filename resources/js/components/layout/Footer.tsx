@@ -18,7 +18,7 @@ export default function Footer() {
   ];
 
   return (
-    <div className="relative w-full overflow-hidden border-t border-border bg-background px-8 py-20">
+    <div className="relative w-full overflow-hidden border-t border-border bg-background px-8 py-12">
       <div className="mx-auto flex max-w-7xl flex-col items-start justify-between text-sm text-muted-foreground sm:flex-row md:px-8">
         <div>
           <div className="mr-0 mb-4 md:mr-4 md:flex">
@@ -87,10 +87,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
-      <p className="inset-x-0 mt-20 bg-gradient-to-b from-muted/50 to-muted bg-clip-text text-center text-5xl font-bold text-transparent md:text-9xl lg:text-[12rem] xl:text-[13rem]">
-        {settings.name}
-      </p>
     </div>
   );
 }

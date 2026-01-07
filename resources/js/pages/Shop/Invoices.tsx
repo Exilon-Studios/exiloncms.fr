@@ -1,31 +1,32 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FileText, Download, ExternalLink, Calendar, CreditCard } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
+import { trans } from '@/lib/i18n';
 
-interface Invoice {
+interface Order {
     id: number;
-    order_id: number;
-    number: string;
+    status: 'pending' | 'completed' | 'cancelled' | 'refunded';
     total: number;
-    status: 'paid' | 'pending' | 'cancelled';
-    due_date?: string;
     paid_at?: string;
     created_at: string;
+    minecraft_username?: string;
 }
 
 interface InvoicesProps {
-    invoices: Invoice[];
+    invoices: Order[];
     money: string;
 }
 
 const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
-    paid: { label: 'Payée', variant: 'default' },
-    pending: { label: 'En attente', variant: 'secondary' },
-    cancelled: { label: 'Annulée', variant: 'destructive' },
+    completed: { label: trans('shop.invoice.status.paid') || 'Payée', variant: 'default' },
+    pending: { label: trans('shop.invoice.status.pending') || 'En attente', variant: 'secondary' },
+    cancelled: { label: trans('shop.invoice.status.cancelled') || 'Annulée', variant: 'destructive' },
+    refunded: { label: trans('shop.invoice.status.refunded') || 'Remboursée', variant: 'outline' },
 };
 
 export default function Invoices({ invoices, money }: InvoicesProps) {
@@ -76,18 +77,18 @@ export default function Invoices({ invoices, money }: InvoicesProps) {
                     </Card>
                 ) : (
                     <div className="space-y-4">
-                        {invoices.map((invoice) => {
-                            const status = statusLabels[invoice.status];
+                        {invoices.map((order) => {
+                            const status = statusLabels[order.status] || { label: order.status, variant: 'secondary' as const };
                             return (
-                                <Card key={invoice.id}>
+                                <Card key={order.id}>
                                     <CardHeader>
                                         <div className="flex items-start justify-between">
                                             <div>
                                                 <CardTitle className="text-lg">
-                                                    Facture {invoice.number}
+                                                    Facture #{order.id}
                                                 </CardTitle>
                                                 <CardDescription>
-                                                    Commande #{invoice.order_id}
+                                                    Commande #{order.id}
                                                 </CardDescription>
                                             </div>
                                             <Badge variant={status.variant} className="ml-2">
@@ -97,15 +98,15 @@ export default function Invoices({ invoices, money }: InvoicesProps) {
                                     </CardHeader>
                                     <CardContent>
                                         {/* Invoice Details */}
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                             <div className="flex items-center gap-3">
                                                 <Calendar className="h-5 w-5 text-muted-foreground" />
                                                 <div>
                                                     <div className="text-sm text-muted-foreground">
-                                                        Date d'émission
+                                                        Date de la commande
                                                     </div>
                                                     <div className="font-medium">
-                                                        {new Date(invoice.created_at).toLocaleDateString('fr-FR', {
+                                                        {new Date(order.created_at).toLocaleDateString('fr-FR', {
                                                             day: 'numeric',
                                                             month: 'long',
                                                             year: 'numeric',
@@ -114,25 +115,7 @@ export default function Invoices({ invoices, money }: InvoicesProps) {
                                                 </div>
                                             </div>
 
-                                            {invoice.due_date && (
-                                                <div className="flex items-center gap-3">
-                                                    <Calendar className="h-5 w-5 text-muted-foreground" />
-                                                    <div>
-                                                        <div className="text-sm text-muted-foreground">
-                                                            Date d'échéance
-                                                        </div>
-                                                        <div className="font-medium">
-                                                            {new Date(invoice.due_date).toLocaleDateString('fr-FR', {
-                                                                day: 'numeric',
-                                                                month: 'long',
-                                                                year: 'numeric',
-                                                            })}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {invoice.paid_at && (
+                                            {order.paid_at && (
                                                 <div className="flex items-center gap-3">
                                                     <CreditCard className="h-5 w-5 text-muted-foreground" />
                                                     <div>
@@ -140,7 +123,7 @@ export default function Invoices({ invoices, money }: InvoicesProps) {
                                                             Payée le
                                                         </div>
                                                         <div className="font-medium">
-                                                            {new Date(invoice.paid_at).toLocaleDateString('fr-FR', {
+                                                            {new Date(order.paid_at).toLocaleDateString('fr-FR', {
                                                                 day: 'numeric',
                                                                 month: 'long',
                                                                 year: 'numeric',
@@ -156,16 +139,20 @@ export default function Invoices({ invoices, money }: InvoicesProps) {
                                             <div className="text-lg">
                                                 <span className="text-muted-foreground">Total :</span>{' '}
                                                 <span className="font-bold text-primary">
-                                                    {invoice.total} {money}
+                                                    {order.total} {money}
                                                 </span>
                                             </div>
                                             <div className="flex gap-2">
-                                                <Button variant="outline" size="sm">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() => router.visit(route('dashboard.invoices.download', order.id))}
+                                                >
                                                     <Download className="h-4 w-4 mr-2" />
-                                                    Télécharger PDF
+                                                    Télécharger
                                                 </Button>
                                                 <Button variant="outline" size="sm" asChild>
-                                                    <Link href={`/shop/orders/${invoice.order_id}`}>
+                                                    <Link href={route('dashboard.orders.show', order.id)}>
                                                         Voir la commande
                                                     </Link>
                                                 </Button>

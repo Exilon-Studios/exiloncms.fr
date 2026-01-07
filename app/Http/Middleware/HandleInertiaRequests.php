@@ -99,6 +99,8 @@ class HandleInertiaRequests extends Middleware
                 'pages' => trans('pages'),
                 'puck' => trans('puck'),
                 'dashboard' => trans('dashboard'),
+                'shop' => trans('shop'),
+                'shop::nav' => trans('shop::nav'),
             ],
             // Share enabled plugins for dynamic navigation
             'enabledPlugins' => app(PluginManager::class)->findPluginsDescriptions()
@@ -116,7 +118,22 @@ class HandleInertiaRequests extends Middleware
             'pluginUserNavItems' => app(PluginManager::class)->getPluginUserNavItems()->toArray(),
             // Share updates count for sidebar badge
             'updatesCount' => $this->getUpdatesCount($user),
+            // Share cart count for authenticated users
+            'cartCount' => $user ? $this->getCartCount($user) : 0,
         ];
+    }
+
+    /**
+     * Get the cart count for the user
+     */
+    protected function getCartCount($user): int
+    {
+        // Check if shop plugin is enabled
+        if (!class_exists(\ExilonCMS\Plugins\Shop\Models\CartItem::class)) {
+            return 0;
+        }
+
+        return \ExilonCMS\Plugins\Shop\Models\CartItem::where('user_id', $user->id)->sum('quantity');
     }
 
     /**

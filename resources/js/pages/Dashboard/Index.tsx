@@ -79,16 +79,16 @@ interface DashboardProps extends PageProps {
 export default function DashboardIndex({ user, stats, settings, dashboardCards = [], dashboardWidgets = [], dashboardSidebarWidgets = [] }: DashboardProps) {
     return (
         <AuthenticatedLayout>
-            <Head title={trans('messages.dashboard.title')} />
+            <Head title={trans('dashboard.title')} />
 
             <div className="container mx-auto py-8 px-4">
                 {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-foreground">
-                        {trans('messages.dashboard.welcome', { name: user.name })}
+                        {trans('dashboard.welcome', { name: user.name })}
                     </h1>
                     <p className="mt-2 text-muted-foreground">
-                        {trans('messages.dashboard.welcome_subtitle')}
+                        {trans('dashboard.welcome_subtitle')}
                     </p>
                 </div>
 
@@ -97,7 +97,7 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {trans('messages.dashboard.balance')}
+                                {trans('dashboard.balance')}
                             </CardTitle>
                             <Wallet className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
@@ -111,7 +111,7 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {trans('messages.dashboard.account_age')}
+                                {trans('dashboard.account_age')}
                             </CardTitle>
                             <Calendar className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
@@ -125,7 +125,7 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {trans('messages.dashboard.role')}
+                                {trans('dashboard.role')}
                             </CardTitle>
                             <User className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
@@ -139,13 +139,13 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
                             <CardTitle className="text-sm font-medium">
-                                {trans('messages.dashboard.status')}
+                                {trans('dashboard.status')}
                             </CardTitle>
                             <Bell className="h-4 w-4 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <Badge variant="default" className="bg-green-500">
-                                {trans('messages.dashboard.active')}
+                                {trans('dashboard.active')}
                             </Badge>
                         </CardContent>
                     </Card>
@@ -171,7 +171,7 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                                             href={card.link}
                                             className="inline-flex items-center gap-2 text-primary hover:underline"
                                         >
-                                            {trans('messages.dashboard.see_more')}
+                                            {trans('dashboard.see_more')}
                                         </Link>
                                     )}
                                 </CardContent>
@@ -181,24 +181,22 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                 )}
 
                 {/* Quick Actions */}
-                <div className="grid gap-6 md:grid-cols-2 mb-8">
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+                    {/* Profile Actions */}
                     <Card>
                         <CardHeader>
-                            <CardTitle>{trans('messages.dashboard.quick_actions')}</CardTitle>
-                            <CardDescription>
-                                {trans('messages.dashboard.quick_actions_subtitle')}
-                            </CardDescription>
+                            <CardTitle>{trans('dashboard.my_account')}</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-3">
+                        <CardContent className="space-y-2">
                             <Link
                                 href="/profile"
                                 className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-colors"
                             >
                                 <User className="h-5 w-5 text-muted-foreground" />
                                 <div>
-                                    <div className="font-medium">{trans('messages.dashboard.my_profile')}</div>
+                                    <div className="font-medium">{trans('dashboard.my_profile')}</div>
                                     <div className="text-sm text-muted-foreground">
-                                        {trans('messages.dashboard.my_profile_subtitle')}
+                                        {trans('dashboard.manage_info')}
                                     </div>
                                 </div>
                             </Link>
@@ -208,28 +206,25 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                             >
                                 <Bell className="h-5 w-5 text-muted-foreground" />
                                 <div>
-                                    <div className="font-medium">{trans('messages.dashboard.notifications')}</div>
+                                    <div className="font-medium">{trans('dashboard.notifications')}</div>
                                     <div className="text-sm text-muted-foreground">
-                                        {trans('messages.dashboard.notifications_subtitle')}
+                                        {trans('dashboard.view_notifications')}
                                     </div>
                                 </div>
                             </Link>
                         </CardContent>
                     </Card>
 
-                    {/* Sidebar Widgets (e.g., Shop card with recent orders) */}
+                    {/* Shop Actions */}
                     {dashboardSidebarWidgets.map((widget) => (
                         <Card key={widget.id}>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    {widget.icon && <span className="text-2xl">{widget.icon}</span>}
+                                    {widget.icon && widget.icon !== '🛒' && <span className="text-2xl">{widget.icon}</span>}
                                     {widget.title}
                                 </CardTitle>
-                                {widget.description && (
-                                    <CardDescription>{widget.description}</CardDescription>
-                                )}
                             </CardHeader>
-                            <CardContent className="space-y-1">
+                            <CardContent className="space-y-2">
                                 {/* Shop Links */}
                                 {widget.props?.links && widget.props.links.length > 0 ? (
                                     widget.props.links.map((link: any, index: number) => {
@@ -257,45 +252,13 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                                     >
                                         <ShoppingBag className="h-5 w-5 text-muted-foreground" />
                                         <div>
-                                            <div className="font-medium">Visiter la boutique</div>
+                                            <div className="font-medium">{trans('dashboard.visit_shop')}</div>
                                             <div className="text-sm text-muted-foreground">
-                                                Acheter des articles et des prestiges
+                                                {trans('dashboard.buy_items')}
                                             </div>
                                         </div>
                                     </Link>
                                 ) : null}
-
-                                {/* Recent Orders */}
-                                {widget.props?.recentOrders && widget.props.recentOrders.length > 0 && (
-                                    <div className="pt-2 border-t">
-                                        <div className="text-sm font-medium mb-2">Commandes récentes</div>
-                                        <div className="space-y-2">
-                                            {widget.props.recentOrders.map((order: any) => (
-                                                <div
-                                                    key={order.id}
-                                                    className="flex items-center justify-between text-sm p-2 rounded-lg bg-muted/50"
-                                                >
-                                                    <div>
-                                                        <div className="font-medium">{order.item}</div>
-                                                        <div className="text-xs text-muted-foreground">{order.date}</div>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <div className="font-medium">{order.price} {settings.money}</div>
-                                                        <div
-                                                            className={`text-xs ${
-                                                                order.status === 'completed' || order.status === 'Livré'
-                                                                    ? 'text-green-600'
-                                                                    : 'text-yellow-600'
-                                                            }`}
-                                                        >
-                                                            {order.status}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
                             </CardContent>
                         </Card>
                     ))}
@@ -321,8 +284,8 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                     <Card>
                         <CardContent className="py-12">
                             <div className="text-center text-muted-foreground">
-                                <p>Aucun widget disponible pour le moment.</p>
-                                <p className="text-sm mt-2">Les plugins peuvent ajouter des widgets personnalisables à cet espace.</p>
+                                <p>{trans('dashboard.no_widgets')}</p>
+                                <p className="text-sm mt-2">{trans('dashboard.no_widgets_hint')}</p>
                             </div>
                         </CardContent>
                     </Card>

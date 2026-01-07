@@ -1,10 +1,14 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Package, Download, ExternalLink } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
+import { InvoiceDownloadButton } from '@/components/shop/invoice/InvoiceGenerator';
+import { PageProps } from '@/types';
+import { usePage } from '@inertiajs/react';
 
 interface OrderItem {
     id: number;
@@ -27,6 +31,7 @@ interface Order {
 interface OrdersProps {
     orders: Order[];
     money: string;
+    companySettings?: Record<string, string>;
 }
 
 const statusLabels: Record<string, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
@@ -36,7 +41,10 @@ const statusLabels: Record<string, { label: string; variant: 'default' | 'second
     refunded: { label: 'Remboursé', variant: 'outline' },
 };
 
-export default function Orders({ orders, money }: OrdersProps) {
+export default function Orders({ orders, money, companySettings }: OrdersProps) {
+    const pageProps = usePage<PageProps>().props;
+    // Use companySettings from props or get from page props
+    const settings = companySettings || (pageProps as any).companySettings || {};
     return (
         <AuthenticatedLayout>
             <Head title="Mes commandes" />
@@ -145,13 +153,14 @@ export default function Orders({ orders, money }: OrdersProps) {
                                             </div>
                                             <div className="flex gap-2">
                                                 {order.status === 'completed' && (
-                                                    <Button variant="outline" size="sm">
-                                                        <Download className="h-4 w-4 mr-2" />
-                                                        Facture
-                                                    </Button>
+                                                    <InvoiceDownloadButton
+                                                        orderId={order.id}
+                                                        orderData={order}
+                                                        companySettings={settings}
+                                                    />
                                                 )}
                                                 <Button variant="outline" size="sm" asChild>
-                                                    <Link href={`/shop/orders/${order.id}`}>
+                                                    <Link href={route('dashboard.orders.show', order.id)}>
                                                         Voir détails
                                                     </Link>
                                                 </Button>

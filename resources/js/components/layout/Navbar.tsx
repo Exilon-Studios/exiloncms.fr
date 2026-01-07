@@ -2,7 +2,7 @@ import { Link, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { IconMenu2, IconX } from '@tabler/icons-react';
+import { IconMenu2, IconX, IconShoppingCart } from '@tabler/icons-react';
 import { PageProps } from '@/types';
 import { trans } from '@/lib/i18n';
 import { DropdownUser } from '@/components/DropdownUser';
@@ -17,23 +17,31 @@ interface NavbarElement {
   elements: NavbarElement[];
 }
 
+interface NavbarProps {
+  showCart?: boolean;
+  cartCount?: number;
+  onCartOpen?: () => void;
+}
+
 // Helper to safely get the display name from navbar element
 function getDisplayName(element: NavbarElement): string {
   return element.name || 'Sans nom';
 }
 
-export default function Navbar() {
+export default function Navbar({ showCart = false, cartCount = 0, onCartOpen }: NavbarProps) {
   const { auth, settings, navbar } = usePage<PageProps>().props as any;
 
   return (
     <div className="w-full">
-      <DesktopNav navbar={navbar} auth={auth} settings={settings} />
-      <MobileNav navbar={navbar} auth={auth} settings={settings} />
+      <DesktopNav navbar={navbar} auth={auth} settings={settings} showCart={showCart} cartCount={cartCount} onCartOpen={onCartOpen} />
+      <MobileNav navbar={navbar} auth={auth} settings={settings} showCart={showCart} cartCount={cartCount} onCartOpen={onCartOpen} />
+      {/* Spacer for fixed navbar */}
+      <div className="h-20 lg:h-24" />
     </div>
   );
 }
 
-const DesktopNav = ({ navbar, auth, settings }: any) => {
+const DesktopNav = ({ navbar, auth, settings, showCart, cartCount, onCartOpen }: any) => {
   const [hovered, setHovered] = useState<number | null>(null);
 
   const handleLogout = (e: React.MouseEvent) => {
@@ -64,12 +72,14 @@ const DesktopNav = ({ navbar, auth, settings }: any) => {
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "fixed top-0 left-0 right-0 z-[60] mx-auto hidden w-full max-w-full flex-row items-center justify-between px-8 py-6 lg:flex",
+        "fixed top-0 left-0 right-0 z-[60] flex flex-row items-center justify-between py-6 lg:flex",
         navbarStyle === 'transparent' ? "backdrop-blur-md bg-transparent" : "bg-background/95 backdrop-blur-sm border-b"
       )}
       style={navbarBackground ? { backgroundColor: navbarBackground } : undefined}
     >
-      <Logo siteName={settings.name} />
+      {/* Container to match content width */}
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl flex items-center justify-between">
+        <Logo siteName={settings.name} />
 
       <div
         className={cn(
@@ -131,13 +141,30 @@ const DesktopNav = ({ navbar, auth, settings }: any) => {
           </Link>
         </div>
       ) : (
-        <DropdownUser user={auth.user} />
+        <div className="flex items-center gap-2">
+          {showCart && (
+            <button
+              onClick={onCartOpen}
+              className="relative flex items-center justify-center rounded-full p-2 hover:bg-accent transition-colors"
+              aria-label="Panier"
+            >
+              <IconShoppingCart className="h-5 w-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                  {cartCount > 99 ? '99+' : cartCount}
+                </span>
+              )}
+            </button>
+          )}
+          <DropdownUser user={auth.user} />
+        </div>
       )}
+      </div>
     </motion.div>
   );
 };
 
-const MobileNav = ({ navbar, auth, settings }: any) => {
+const MobileNav = ({ navbar, auth, settings, showCart, cartCount, onCartOpen }: any) => {
   const [open, setOpen] = useState(false);
 
   const handleLogout = (e: React.MouseEvent) => {
@@ -148,16 +175,18 @@ const MobileNav = ({ navbar, auth, settings }: any) => {
   return (
     <motion.div
       animate={{ borderRadius: open ? "0" : "0" }}
-      className="fixed top-0 left-0 right-0 z-[60] mx-auto flex w-full max-w-full flex-col items-center justify-between backdrop-blur-md bg-transparent px-4 py-4 lg:hidden"
+      className="fixed top-0 left-0 right-0 z-[60] flex w-full flex-col items-center justify-between backdrop-blur-md bg-transparent py-4 lg:hidden"
     >
-      <div className="flex w-full flex-row items-center justify-between">
-        <Logo siteName={settings.name} />
-        {open ? (
-          <IconX className="text-foreground" onClick={() => setOpen(!open)} />
-        ) : (
-          <IconMenu2 className="text-foreground" onClick={() => setOpen(!open)} />
-        )}
-      </div>
+      {/* Container to match content width */}
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl flex w-full flex-col items-center justify-between">
+        <div className="flex w-full flex-row items-center justify-between">
+          <Logo siteName={settings.name} />
+          {open ? (
+            <IconX className="text-foreground" onClick={() => setOpen(!open)} />
+          ) : (
+            <IconMenu2 className="text-foreground" onClick={() => setOpen(!open)} />
+          )}
+        </div>
 
       <AnimatePresence>
         {open && (
@@ -207,13 +236,23 @@ const MobileNav = ({ navbar, auth, settings }: any) => {
                 </Link>
               </>
             ) : (
-              <div className="w-full">
+              <div className="w-full flex flex-col gap-2">
+                {showCart && (
+                  <button
+                    onClick={onCartOpen}
+                    className="flex items-center gap-2 w-full rounded-lg px-8 py-2 font-medium text-foreground hover:bg-accent transition-colors"
+                  >
+                    <IconShoppingCart className="h-5 w-5" />
+                    Panier {cartCount > 0 && `(${cartCount > 99 ? '99+' : cartCount})`}
+                  </button>
+                )}
                 <DropdownUser user={auth.user} align="start" className="w-full" />
               </div>
             )}
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </motion.div>
   );
 };

@@ -30,6 +30,14 @@ return [
             'plugins' => 'Plugins',
             'themes' => 'Themes',
         ],
+        'legal' => [
+            'heading' => 'Legal',
+            'company' => 'Company',
+            'terms' => 'Terms of Service',
+            'privacy' => 'Privacy Policy',
+            'cookies' => 'Cookie Policy',
+            'refund' => 'Refund Policy',
+        ],
         'settings' => [
             'heading' => 'Settings',
             'general' => 'General',
@@ -845,6 +853,51 @@ return [
             'data_title' => 'Additional data',
             'back' => 'Back',
         ],
+        'users' => [
+            'login' => 'User login',
+            'api' => [
+                'login' => 'API login',
+                'verified' => 'API verified',
+            ],
+            '2fa' => [
+                'enabled' => '2FA enabled',
+                'disabled' => '2FA disabled',
+            ],
+            'transfer' => 'Money transfer',
+        ],
+        'settings' => [
+            'updated' => 'Settings updated',
+        ],
+        'updates' => [
+            'installed' => 'Updates installed',
+        ],
+        'plugins' => [
+            'enabled' => 'Plugin enabled',
+            'disabled' => 'Plugin disabled',
+        ],
+        'themes' => [
+            'changed' => 'Theme changed',
+            'configured' => 'Theme configured',
+            'title' => 'Themes',
+            'description' => 'Manage your themes and install new ones from the marketplace',
+            'configure' => 'Configure',
+            'refresh' => 'Refresh',
+            'installed' => 'Installed ({count})',
+            'marketplace' => 'Marketplace ({count})',
+            'search_placeholder' => 'Search for a theme...',
+            'updates_available' => '{count} update(s) available',
+            'active_theme' => 'Active theme',
+            'update' => 'Update',
+            'installed_themes' => 'Installed themes',
+            'no_theme_found' => 'No theme found',
+            'no_theme_installed' => 'No theme installed',
+            'no_theme_available' => 'No theme available on the marketplace',
+            'update_available' => 'Update available',
+            'view_on_github' => 'View on GitHub',
+            'activate' => 'Activate',
+            'already_installed' => 'Already installed',
+            'install' => 'Install',
+        ],
     ],
 
     // ==================== PUCK EDITOR ====================
@@ -859,5 +912,96 @@ return [
         'desktop' => 'Desktop',
         'tablet' => 'Tablet',
         'mobile' => 'Mobile',
+    ],
+
+    // ==================== COMPANY SETTINGS ====================
+    'company' => [
+        'title' => 'Company Settings',
+        'description' => 'Configure your company information for invoices and legal mentions',
+        'nav' => 'Company',
+        'success' => 'Company settings updated successfully.',
+        'fields' => [
+            'company_type' => 'Company type',
+            'company_name' => 'Company / Association name',
+            'company_address' => 'Address',
+            'company_postal_code' => 'Postal code',
+            'company_city' => 'City',
+            'company_country' => 'Country',
+            'company_siret' => 'SIRET',
+            'company_vat' => 'VAT Number',
+            'company_phone' => 'Phone',
+            'company_email' => 'Contact email',
+            'company_vat_rate' => 'VAT rate (%)',
+            'company_website' => 'Website',
+            'legal_notice' => 'Additional legal notices',
+        ],
+        'types' => [
+            'company' => 'Company (Ltd, LLC, etc.)',
+            'association' => 'Association under French law 1901',
+            'micro_enterprise' => 'Micro-enterprise',
+            'auto_entrepreneur' => 'Sole proprietorship',
+        ],
+        'sections' => [
+            'company_info' => 'Company information',
+            'company_info_desc' => 'This information will appear on your invoices and legal mentions',
+            'contact_info' => 'Contact information',
+            'contact_info_desc' => 'Contact information visible on invoices',
+            'legal_notices' => 'Additional legal notices',
+            'legal_notices_desc' => 'Custom text to add at the bottom of your invoices (optional)',
+        ],
+        'hints' => [
+            'siret_format' => '14 digits for companies, 10 digits (W...) for associations',
+            'rna' => 'or RNA for associations',
+            'vat_not_applicable' => 'Not applicable for this company type (VAT exempt)',
+            'vat_disabled' => 'VAT exempt - does not apply',
+        ],
+    ],
+
+    // ==================== LEGAL PAGES ====================
+    'legal_pages' => [
+        'cookies' => [
+            'title' => 'Cookie Policy',
+            'description' => 'Inform your users about the use of cookies on your site, in compliance with European regulations.',
+            'placeholder' => 'Write your cookie policy...',
+            'cancel' => 'Cancel',
+            'save' => 'Save',
+            'saving' => 'Saving...',
+        ],
+        'privacy' => [
+            'title' => 'Privacy Policy',
+            'description' => 'Mandatory document under GDPR. Explain how you collect, use and protect the personal data of your users.',
+            'placeholder' => 'Write your privacy policy...',
+            'cancel' => 'Cancel',
+            'save' => 'Save',
+            'saving' => 'Saving...',
+        ],
+        'terms' => [
+            'title' => 'Terms of Service',
+            'description' => 'Define the legal terms of use of your site. This document is mandatory and protects both your rights and those of your users.',
+            'placeholder' => 'Start writing your terms of service...',
+            'cancel' => 'Cancel',
+            'save' => 'Save',
+            'saving' => 'Saving...',
+        ],
+        'refund' => [
+            'title' => 'Refund Policy',
+            'description' => 'Mandatory document for online sales. Define your refund conditions and your customers\' withdrawal rights.',
+            'placeholder' => 'Write your refund policy...',
+            'cancel' => 'Cancel',
+            'save' => 'Save',
+            'saving' => 'Saving...',
+        ],
+    ],
+
+    // ==================== PLUGINS ====================
+    'plugins' => [
+        'title' => 'Plugins',
+        'description' => 'Manage site plugins',
+        'reloaded' => 'Plugins reloaded successfully',
+        'enabled' => 'Plugin enabled successfully',
+        'disabled' => 'Plugin disabled successfully',
+        'not_found' => 'Plugin not found',
+        'delete_confirm' => 'Are you sure you want to delete this plugin?',
+        'deleted' => 'Plugin deleted successfully',
     ],
 ];

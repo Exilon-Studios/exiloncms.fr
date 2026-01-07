@@ -1,39 +1,44 @@
 <?php
 
-return [
-    /*
-    |--------------------------------------------------------------------------
-    | Lignes de langue dashboard
-    |--------------------------------------------------------------------------
-    |
-    | Traductions pour le tableau de bord
-    |
-    */
-
-    'title' => 'Tableau de bord',
-    'description' => 'Bon retour ! Voici ce qui se passe sur votre serveur.',
-    'refresh_stats' => 'Actualiser les statistiques',
-
-    'stats' => [
-        'total_users' => 'Total utilisateurs',
+return array (
+      'title' => 'Tableau de bord',
+      'description' => 'Bon retour ! Voici ce qui se passe sur votre serveur.',
+      'welcome' => 'Bienvenue, {name} !',
+      'welcome_subtitle' => 'Voici un aperçu de votre compte',
+      'balance' => 'Solde',
+      'account_age' => 'Ancienneté du compte',
+      'role' => 'Rôle',
+      'status' => 'Statut',
+      'active' => 'Actif',
+      'see_more' => 'En voir plus',
+      'my_account' => 'Mon Compte',
+      'my_profile' => 'Mon Profil',
+      'manage_info' => 'Gérer mes informations',
+      'notifications' => 'Notifications',
+      'view_notifications' => 'Voir mes notifications',
+      'visit_shop' => 'Visiter la boutique',
+      'buy_items' => 'Acheter des articles',
+      'no_widgets' => 'Aucun widget disponible pour le moment.',
+      'no_widgets_hint' => 'Les plugins peuvent ajouter des widgets personnalisables à cet espace.',
+      'refresh_stats' => 'Actualiser les statistiques',
+      'stats' => array (
+        'total_users' => 'Utilisateurs totaux',
+        'change_from_last_month' => 'changement par rapport au mois dernier',
         'revenue' => 'Revenus',
-        'orders' => 'Commandes',
+        'change_from_last_month_revenue' => 'changement par rapport au mois dernier',
+        'change_from_yesterday' => 'changement par rapport à hier',
         'active_servers' => 'Serveurs actifs',
-        'change_from_last_month' => '+12% par rapport au mois dernier',
-        'change_from_last_month_revenue' => '+8% par rapport au mois dernier',
-        'change_from_yesterday' => '+24 depuis hier',
-        'all_systems_operational' => 'Tous les systèmes opérationnels',
-    ],
-
-    'recent_orders' => [
+        'all_systems_operational' => 'Tous les systèmes sont opérationnels',
+        'orders' => 'Commandes',
+      ),
+      'recent_orders' => array (
         'title' => 'Commandes récentes',
         'description' => 'Derniers achats de votre boutique',
-        'no_orders' => 'Aucune commande récente. Revenez plus tard.',
-    ],
-
-    'server_status' => [
+        'no_orders' => 'Aucune commande récente',
+      ),
+      'server_status' => array (
         'title' => 'Statut du serveur',
         'description' => 'Surveillance en temps réel du serveur',
-        'all_online' => 'Tous les serveurs sont en ligne et fonctionnent normalement.',
-    ],
-];
+        'all_online' => 'Tous les serveurs sont en ligne',
+      ),
+    );

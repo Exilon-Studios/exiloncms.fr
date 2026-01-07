@@ -26,12 +26,18 @@ import {
   IconLanguage,
   IconMenu2,
   IconShoppingBag,
+  IconShoppingCart,
   IconPackage,
+  IconBuilding,
 } from '@tabler/icons-react';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   const pageProps = usePage<PageProps>().props as any;
-  const { auth, settings, enabledPlugins, pluginAdminNavItems, updatesCount } = pageProps;
+  const { auth, settings, enabledPlugins, pluginAdminNavItems, pluginUserNavItems, updatesCount } = pageProps;
+
+  // Check if we're in admin section - hide user-facing shop links there
+  const url = pageProps.url || window.location.pathname;
+  const isAdminSection = url.startsWith('/admin');
 
   // Helper function to check if user has a specific permission
   const can = (permission: string): boolean => {
@@ -67,6 +73,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   // Icon mapping for plugin navigation items
   const iconMap: Record<string, React.ReactNode> = {
     'shopping-bag': <IconShoppingBag className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'shopping-cart': <IconShoppingCart className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
     'package': <IconPackage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
     'file-text': <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
     'puzzle': <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
@@ -100,6 +107,18 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         <IconBrandTabler className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
+    // User Plugin Links (Shop, Orders, Invoices, etc.) - Only show in dashboard, NOT in admin
+    ...(!isAdminSection && pluginUserNavItems && pluginUserNavItems.length > 0 ? [
+      {
+        type: 'section',
+        label: trans('shop.items'),
+        children: pluginUserNavItems.map((item: any) => ({
+          label: trans(`shop.nav.${item.label}`) || item.label,
+          href: item.href,
+          icon: typeof item.icon === 'string' ? getIconComponent(item.icon) : item.icon || getIconComponent(),
+        })),
+      },
+    ] : []),
     // Users Section
     {
       type: 'section',
@@ -193,16 +212,16 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         },
       ],
     },
-    // Plugins Configuration Section (Dynamic - from plugins)
-    ...(pluginAdminNavItems && pluginAdminNavItems.length > 0 ? [
+    // Plugins Configuration Section (Dynamic - from enabled plugins)
+    ...(enabledPlugins && Object.keys(enabledPlugins).length > 0 ? [
       {
         type: 'section',
         label: 'PLUGINS',
-        children: pluginAdminNavItems.map((item: any) => ({
-          label: item.label,
-          href: item.href,
-          permission: item.permission || 'admin.plugins',
-          icon: typeof item.icon === 'string' ? getIconComponent(item.icon) : item.icon || getIconComponent(),
+        children: Object.values(enabledPlugins).map((plugin: any) => ({
+          label: plugin.name,
+          href: `/admin/plugins/${plugin.id}`,
+          permission: 'admin.plugins',
+          icon: <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
         })),
       },
     ] : []),
@@ -266,6 +285,53 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             },
           ],
         },
+        // LÉGAL - Sous-menu déroulant pour les pages légales
+        {
+          type: 'section',
+          label: trans('admin.nav.legal.heading'),
+          children: [
+            {
+              label: trans('admin.nav.legal.company'),
+              href: '/admin/settings/company',
+              permission: 'admin.settings',
+              icon: (
+                <IconBuilding className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+              ),
+            },
+            {
+              label: trans('admin.nav.legal.terms'),
+              href: '/admin/settings/legal/terms',
+              permission: 'admin.settings',
+              icon: (
+                <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+              ),
+            },
+            {
+              label: trans('admin.nav.legal.privacy'),
+              href: '/admin/settings/legal/privacy',
+              permission: 'admin.settings',
+              icon: (
+                <IconShield className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+              ),
+            },
+            {
+              label: trans('admin.nav.legal.cookies'),
+              href: '/admin/settings/legal/cookies',
+              permission: 'admin.settings',
+              icon: (
+                <IconLanguage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+              ),
+            },
+            {
+              label: trans('admin.nav.legal.refund'),
+              href: '/admin/settings/legal/refund',
+              permission: 'admin.settings',
+              icon: (
+                <IconArrowLeft className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+              ),
+            },
+          ],
+        },
         // Autres items de paramètres (directement dans PARAMÈTRES)
         {
           label: trans('admin.nav.settings.translations'),
@@ -302,29 +368,20 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   // Secondary navigation links
   const secondaryLinks = [
     {
-      label: trans('messages.dashboard.nav'),
-      href: '/dashboard',
+      label: trans('messages.sidebar.documentation'),
+      href: 'https://docs.exiloncms.fr/',
+      icon: (
+        <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+      external: true,
+    },
+    {
+      label: trans('messages.sidebar.official_site'),
+      href: 'https://exiloncms.fr/',
       icon: (
         <IconBrandTabler className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
-    },
-    {
-      label: trans('admin.nav.back'),
-      href: '/',
-      icon: (
-        <IconHome className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-      ),
-    },
-    {
-      label: 'Logout',
-      href: '#',
-      icon: (
-        <IconArrowLeft className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-      ),
-      onClick: (e: React.MouseEvent) => {
-        e.preventDefault();
-        router.post('/logout');
-      },
+      external: true,
     },
   ];
 
@@ -337,12 +394,15 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         secondaryLinks={secondaryLinks}
         userInfo={{
           name: auth.user?.name || 'User',
+          email: auth.user?.email,
           avatar: auth.user?.avatar,
+          role: auth.user?.role,
+          hasAdminAccess: auth.user?.hasAdminAccess,
         }}
         siteName={settings.name || 'ExilonCMS'}
       >
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto px-6 md:px-8 pt-6 md:pt-8">
+        <div className="flex flex-1 flex-col">
+          <div className="flex-1 px-6 md:px-8 pt-6 md:pt-8 pb-8">
             {children}
           </div>
         </div>

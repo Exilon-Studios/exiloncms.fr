@@ -13,7 +13,7 @@ return [
     'nav' => [
         'toggle' => 'Toggle navigation',
         'profile' => 'My Profile',
-        'admin' => 'Administration',
+        'admin' => 'Admin panel',
         'dashboard' => 'Dashboard',
         'logout' => 'Logout',
     ],
@@ -176,5 +176,17 @@ return [
         'email' => 'Email',
         'member_since' => 'Member since',
         'see_more' => 'See more →',
+    ],
+
+    'shop_plugin' => [
+        'name' => 'Shop',
+        'version' => 'Version',
+        'description' => 'Complete shop system with multiple payment methods and invoicing',
+        'author' => 'ExilonStudios',
+    ],
+
+    'sidebar' => [
+        'documentation' => 'Documentation',
+        'official_site' => 'Official Site',
     ],
 ];

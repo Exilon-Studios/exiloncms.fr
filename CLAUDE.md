@@ -61,15 +61,54 @@ npm run dev
 
 ### Plugin & Theme Commands
 ```bash
-# Create a new plugin
+# Create a new plugin (with interactive options)
 php artisan plugin:create MyPlugin
 
 # Enable/disable plugins
 php artisan plugin:enable MyPlugin
 php artisan plugin:disable MyPlugin
 
+# Clear plugin cache
+php artisan plugin:clear
+
 # Create a new theme
 php artisan theme:create MyTheme
+
+# Create a new game integration
+php artisan game:create MyGame
+```
+
+### User Management Commands
+```bash
+# Create a new user
+php artisan user:create --name="John Doe" --email="john@example.com" --password="secret"
+
+# Create an admin user
+php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="password"
+
+# Change user password
+php artisan user:password --email="user@example.com" --password="newpassword"
+```
+
+### Database & Configuration Commands
+```bash
+# Interactive database configuration
+php artisan db:config
+
+# Interactive installation wizard
+php artisan install:interactive
+
+# Check game server ping/status
+php artisan game:ping
+```
+
+### Maintenance Commands
+```bash
+# Purge old attachments
+php artisan attachments:purge
+
+# Purge old logs
+php artisan logs:purge
 ```
 
 ### Testing & Quality
@@ -150,15 +189,39 @@ export default function UsersIndex({ users }) {
 
 Global props are shared via `app/Http/Middleware/HandleInertiaRequests.php`:
 
-- `auth.user`: Current authenticated user (id, name, email, role, money)
-- `flash`: Flash messages (success, error, info, warning)
+**Auth & User:**
+- `auth.user`: Current authenticated user (id, name, email, role, money, hasAdminAccess, adminPermissions)
+
+**Flash Messages:**
+- `flash.success`, `flash.error`, `flash.info`, `flash.warning`: Session flash messages
+
+**Settings:**
+- `settings.name`, `settings.description`, `settings.locale`, `settings.background`, `settings.favicon`
+- `settings.darkTheme`: Dark theme enabled flag
+- `settings.navbar`: Navbar configuration (links_position, links_spacing, style, background)
+
+**Navigation:**
+- `navbar`: Array of NavbarElement objects (dynamic navbar from database)
+- `socialLinks`: Array of social media links
+
+**Translations:**
+- `trans`: Pre-loaded translation keys (auth, messages, admin, pages, puck, dashboard, shop)
+
+**Plugin Data:**
+- `enabledPlugins`: List of enabled plugins with metadata
+- `pluginAdminNavItems`: Admin navigation from plugins
+- `pluginUserNavItems`: User navigation from plugins
+- `cartCount`: Shop cart item count (if shop plugin enabled)
+
+**Updates:**
+- `updatesCount`: Count of available CMS/plugin/theme updates (admin only)
 
 Access in React:
 ```tsx
 import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
 
-const { auth, flash } = usePage<PageProps>().props;
+const { auth, flash, settings, navbar, trans } = usePage<PageProps>().props;
 ```
 
 ### 3. Plugin System
@@ -169,24 +232,79 @@ Plugins live in `plugins/{plugin-name}/` directory.
 ```
 plugins/shop/
 ├── plugin.json              # Metadata & dependencies
+├── composer.json            # PSR-4 autoloading
+├── navigation.json          # Navigation items for admin/user menus
 ├── src/
 │   ├── Http/Controllers/
 │   ├── Models/
 │   └── Providers/
 │       └── ShopServiceProvider.php
 ├── resources/
-│   └── js/
-│       └── pages/           # React pages for plugin
-│           └── Index.tsx
+│   ├── js/
+│   │   └── pages/           # React pages for plugin
+│   │       └── Index.tsx
+│   └── lang/                # Translations (use namespace: plugin-id::file.key)
+│       └── fr/
+│           ├── nav.php
+│           └── messages.php
 ├── database/
 │   └── migrations/
+├── Widgets/                 # Optional dashboard widgets
 └── routes/
-    └── web.php
+    ├── web.php              # Public and authenticated user routes
+    └── admin.php            # Admin panel routes (optional, can use web.php)
 ```
+
+**plugin.json format:**
+```json
+{
+  "id": "shop",
+  "name": "Shop",
+  "description": "Plugin description",
+  "version": "1.0.0",
+  "author": "AuthorName",
+  "url": "https://github.com/repo",
+  "mccms_api": "0.2",
+  "providers": [
+    "ExilonCMS\\Plugins\\Shop\\Providers\\ShopServiceProvider"
+  ],
+  "requirements": {
+    "php": ">=8.2",
+    "laravel": ">=12"
+  }
+}
+```
+
+**navigation.json format:**
+```json
+{
+  "admin": [
+    {
+      "label": "Shop",
+      "href": "/admin/shop",
+      "permission": "admin.shop",
+      "icon": "shopping-bag"
+    }
+  ],
+  "user": [
+    {
+      "label": "Shop",
+      "href": "/shop",
+      "icon": "shopping-bag"
+    }
+  ]
+}
+```
+
+**Available icon names** (Lucide/Tabler icons):
+- `shopping-bag`, `package`, `file-text`, `puzzle`, `settings`, `users`
+- `shield`, `ban`, `file`, `photo`, `arrows-right-left`, `palette`, `download`
+- `list`, `language`, `home`, `server`, `credit-card`, `wallet`
+- See `resources/js/components/admin/Sidebar.tsx` for icon mapping component
 
 **Plugin Service Provider:**
 ```php
-namespace ExilonCMS\Plugin\Shop\Providers;
+namespace ExilonCMS\Plugins\Shop\Providers;
 
 use ExilonCMS\Extensions\Plugin\BasePluginServiceProvider;
 
@@ -194,25 +312,85 @@ class ShopServiceProvider extends BasePluginServiceProvider
 {
     public function boot()
     {
-        $this->loadViews();
         $this->loadTranslations();
+        $this->loadRoutes();
         $this->loadMigrations();
-
-        // Register admin routes
-        $this->registerAdminRoutes(function () {
-            Route::get('/shop', [ShopController::class, 'index']);
-        });
     }
 }
 ```
 
+**Available BasePluginServiceProvider methods:**
+- `loadTranslations()` - Load translations from `resources/lang/`
+- `loadViews()` - Load Blade views from `resources/views/`
+- `loadMigrations()` - Load migrations from `database/migrations/`
+- `loadRoutes()` - Load routes from `routes/web.php`
+- `registerAdminRoutes(Closure $callback)` - Register admin routes (`/admin/*`)
+- `registerUserRoutes(Closure $callback)` - Register authenticated user routes
+
 Plugins are loaded via `app/Providers/ExtensionServiceProvider.php` and managed by `PluginManager` in `app/Extensions/Plugin/PluginManager.php`.
+
+**Plugin translations namespace:** Use `plugin-id::file.key` format (e.g., `trans('shop::nav.shop')`). Load in HandleInertiaRequests to make available in React.
 
 ### 4. Theme System
 
 Themes live in `themes/{theme-name}/` directory. Themes can extend layouts and customize views. Managed by `ThemeManager` in `app/Extensions/Theme/`.
 
-### 5. Game Integration
+### 5. Widget System
+
+Plugins can provide dashboard widgets that appear in the user dashboard. Widgets are placed in `plugins/{plugin}/Widgets/` directory.
+
+**Widget example:**
+```php
+<?php
+
+namespace ExilonCMS\Plugins\Shop\Widgets;
+
+use ExilonCMS\Extensions\Widget\BaseWidget;
+use ExilonCMS\Models\User;
+
+class ShopWidget extends BaseWidget
+{
+    public function id(): string
+    {
+        return 'shop-widget';
+    }
+
+    public function title(): string
+    {
+        return __('shop::widget.title');
+    }
+
+    public function type(): string
+    {
+        // Types: 'card', 'sidebar', 'widget'
+        return 'sidebar';
+    }
+
+    public function icon(): ?string
+    {
+        return 'shopping-bag';
+    }
+
+    public function link(): ?string
+    {
+        return '/shop';
+    }
+
+    public function props(?User $user): array
+    {
+        return [
+            'items' => [], // Widget data
+        ];
+    }
+}
+```
+
+Widget types:
+- `card`: Large card in main dashboard area
+- `sidebar`: Sidebar widget
+- `widget`: Generic widget type
+
+### 6. Game Integration
 
 ExilonCMS supports multiple game servers:
 - Minecraft (Java & Bedrock editions)
@@ -227,7 +405,7 @@ ExilonCMS supports multiple game servers:
 
 **Server bridges:** Handle server communication (RCON, Query, Ping, AzLink) via `ServerBridge` abstract class in `app/Games/ServerBridge.php`.
 
-### 6. Roles & Permissions
+### 7. Roles & Permissions
 
 **Models:**
 - `User` (ExilonCMS\Models\User)
@@ -255,7 +433,7 @@ const { auth } = usePage<PageProps>().props;
 )}
 ```
 
-### 7. File Structure
+### 8. File Structure
 
 **Backend:**
 - `app/Models/` - Eloquent models
@@ -279,21 +457,31 @@ const { auth } = usePage<PageProps>().props;
 - `resources/js/lib/` - Utility functions
 - `resources/views/app.blade.php` - Root HTML wrapper (ONLY Blade file)
 
-### 8. TypeScript Configuration
+### 9. TypeScript Configuration
 
 TypeScript uses **strict mode** with:
 - `noUnusedLocals`, `noUnusedParameters`
 - `noImplicitReturns`, `noFallthroughCasesInSwitch`
 - `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`
 
-**Path aliases:**
+**Path aliases** (configured in `tsconfig.json` and `vite.config.ts`):
 ```typescript
 import Button from '@/components/ui/button';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
+
+// Available aliases:
+// @/*                → resources/js/*
+// @/components/*     → resources/js/components/*
+// @/layouts/*        → resources/js/layouts/*
+// @/pages/*          → resources/js/pages/*
+// @/types/*          → resources/js/types/*
+// @/lib/*            → resources/js/lib/*
+// @/hooks/*          → resources/js/hooks/*
+// @/plugins/*        → plugins/*
 ```
 
-### 9. Database & Models
+### 10. Database & Models
 
 **Database:** Uses PostgreSQL by default (configurable in `.env`).
 
@@ -310,7 +498,7 @@ import { PageProps } from '@/types';
 - `HasUser`, `Loggable`, `HasImage`, `HasMarkdown`
 - `InteractsWithMoney`, `TwoFactorAuthenticatable`
 
-### 10. Settings System
+### 11. Settings System
 
 Settings are stored in the `settings` table and accessed via helper:
 
@@ -321,7 +509,38 @@ setting('site_name'); // Without default
 
 Common settings: `name`, `description`, `locale`, `timezone`, `money` (currency name).
 
-### 11. Puck Visual Editor
+### 12. Helper Functions
+
+Available globally via `app/helpers.php`:
+
+```php
+// Installation check
+is_installed() // bool - check if CMS is installed
+
+// Settings
+setting(string $key, mixed $default = null) // Get setting value
+
+// URLs
+image_url(string $path) // Get full URL for image
+favicon() // Get favicon URL
+
+// Theme
+dark_theme() // Check if dark theme is enabled
+
+// Plugins/Themes
+plugin_path(string $plugin, string $path = '') // Get plugin path
+theme_path(string $theme, string $path = '') // Get theme path
+```
+
+Available globally via `app/color_helpers.php`:
+
+```php
+// Color utilities for theming
+get_color(string $hex, string $type) // Extract color values
+mix_colors(string $color1, string $color2, int $percentage) // Mix two colors
+```
+
+### 13. Puck Visual Editor
 
 ExilonCMS includes **Puck Editor** - a drag-and-drop visual page builder.
 
@@ -367,7 +586,7 @@ export const puckConfig: Config = {
 
 **Available components:** HeadingBlock, ParagraphBlock, ButtonBlock, ImageBlock, CardBlock, GridBlock.
 
-### 12. Frontend Libraries
+### 14. Frontend Libraries
 
 The project uses several key React libraries:
 
@@ -392,6 +611,52 @@ The project uses several key React libraries:
 **Visual Editor:**
 - `@measured/puck` - Drag-and-drop page builder
 - `@tanstack/react-table` - Table components
+
+## Plugin Creation Workflow
+
+When creating a plugin, follow these steps:
+
+1. **Create plugin structure:**
+   ```bash
+   php artisan plugin:create MyPlugin --author="YourName" --description="Description"
+   ```
+
+2. **Edit generated files:**
+   - `plugins/my-plugin/plugin.json` - Update metadata
+   - `plugins/my-plugin/composer.json` - PSR-4 autoloading
+   - `plugins/my-plugin/navigation.json` - Add navigation items
+
+3. **Create functionality:**
+   - Add controllers in `src/Http/Controllers/`
+   - Add routes in `routes/web.php`
+   - Add React pages in `resources/js/pages/`
+   - Add translations in `resources/lang/fr/`
+
+4. **Register in ServiceProvider:**
+   ```php
+   public function boot(): void
+   {
+       $this->loadTranslations();
+       $this->loadRoutes();
+       $this->loadMigrations();
+   }
+   ```
+
+5. **Enable plugin:**
+   ```bash
+   composer dump-autoload
+   php artisan plugin:enable MyPlugin
+   php artisan migrate  # If plugin has migrations
+   php artisan optimize:clear
+   ```
+
+6. **Add translations to HandleInertiaRequests** (if needed):
+   ```php
+   'trans' => [
+       // ...
+       'my-plugin::nav' => trans('my-plugin::nav'),
+   ],
+   ```
 
 ## Important Notes
 
@@ -517,6 +782,24 @@ docker exec -it exiloncms_db mysql -u root -p -e "SHOW TABLES;"
 
 ExilonCMS uses an `is_installed()` helper function (defined in `app/helpers.php`) to check if the CMS has been installed. This affects:
 - `ExtensionServiceProvider`: Skips theme loading if not installed
+- `PluginManager::cachePlugins()`: Only caches plugins if installed
 - Various routes and middleware that may check installation state
 
-The installation state is typically stored in cache or settings and can be reset during development.
+The installation state is stored in the `installed` key in the cache and can be reset during development using `Cache::forget('installed')`.
+
+## Translation Commands
+
+The project includes translation verification commands:
+
+```bash
+# Find missing translations
+php artisan translations:missing
+
+# Check for duplicate translation keys
+php artisan translations:duplicates
+
+# Verify translation file integrity
+php artisan translations:verify
+```
+
+These are useful when adding new translation keys or updating existing ones.

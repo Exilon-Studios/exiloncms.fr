@@ -127,9 +127,6 @@ class PluginManager extends ExtensionManager
 
                     $app->register($provider);
                 }
-
-                // Load plugin translations manually
-                $this->loadPluginTranslations($pluginId);
             } catch (Throwable $t) {
                 if (! $app->isProduction()) {
                     throw $t;
@@ -139,6 +136,9 @@ class PluginManager extends ExtensionManager
 
                 $this->disable($pluginId);
             }
+
+            // Load plugin translations manually (outside try-catch so it always runs)
+            $this->loadPluginTranslations($pluginId);
         }
     }
 
@@ -240,6 +240,14 @@ class PluginManager extends ExtensionManager
         $json->composer = $this->getJson($composerPath, true);
 
         return $json;
+    }
+
+    /**
+     * Check if a plugin exists locally.
+     */
+    public function has(string $plugin): bool
+    {
+        return $this->findDescription($plugin) !== null;
     }
 
     /**
@@ -729,6 +737,13 @@ class PluginManager extends ExtensionManager
         if (! isset($namespaces[$pluginId])) {
             // Add the namespace with the root lang path
             $loader->addNamespace($pluginId, $langPath);
+
+            // Debug logging
+            \Log::info("PluginManager: Added translation namespace", [
+                'plugin' => $pluginId,
+                'path' => $langPath,
+                'namespaces' => array_keys($loader->namespaces()),
+            ]);
         }
     }
 

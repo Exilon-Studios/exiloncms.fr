@@ -2,6 +2,7 @@
 
 namespace ExilonCMS\Extensions\Plugin;
 
+use Closure;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel;

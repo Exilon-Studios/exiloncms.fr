@@ -1,14 +1,16 @@
 import { Head } from '@inertiajs/react';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import PublicLayout, { PublicLayoutHeader, PublicLayoutContent, PublicLayoutSection } from '@/layouts/PublicLayout';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Package, FileText, Star, Zap, Crown, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ShoppingBag, Package, Star, Zap, Crown } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { trans } from '@/lib/i18n';
 
 interface Category {
     id: string;
     name: string;
+    slug: string;
     description: string;
     icon: string;
     items_count: number;
@@ -16,6 +18,7 @@ interface Category {
 
 interface Item {
     id: number;
+    slug: string;
     name: string;
     description: string;
     price: number;
@@ -40,90 +43,24 @@ const categoryIcons: Record<string, React.ComponentType<{ className?: string }>>
 
 export default function ShopIndex({ categories, featured_items, money }: ShopProps) {
     const typeBadges: Record<string, { label: string; variant: 'default' | 'secondary' }> = {
-        item: { label: 'Article', variant: 'secondary' },
-        package: { label: 'Pack', variant: 'default' },
-        prestige: { label: 'Prestige', variant: 'default' },
+        item: { label: trans('shop.type_badge.item'), variant: 'secondary' },
+        package: { label: trans('shop.type_badge.package'), variant: 'default' },
+        prestige: { label: trans('shop.type_badge.prestige'), variant: 'default' },
     };
 
     return (
-        <AuthenticatedLayout>
-            <Head title="Boutique" />
+        <PublicLayout showCart>
+            <Head title={trans('shop.title')} />
 
-            <div className="container mx-auto py-8 px-4">
-                {/* Header */}
-                <div className="mb-8">
-                    <div className="flex items-center gap-3 mb-2">
-                        <ShoppingBag className="h-8 w-8 text-primary" />
-                        <h1 className="text-3xl font-bold">Boutique</h1>
-                    </div>
-                    <p className="text-muted-foreground">
-                        Achetez des articles, des packs et des prestiges pour améliorer votre expérience
-                    </p>
-                </div>
+            <PublicLayoutHeader
+                icon={<ShoppingBag className="h-6 w-6" />}
+                title={trans('shop.title')}
+                description={trans('shop.description')}
+            />
 
-                {/* Quick Links */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <Card className="hover:shadow-lg transition-shadow cursor-pointer border-primary/20 group">
-                        <Link href="/shop" className="block">
-                            <CardContent className="p-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                        <ShoppingBag className="h-6 w-6 text-primary" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="font-semibold">Voir la boutique</div>
-                                        <div className="text-sm text-muted-foreground">
-                                            Parcourir tous les articles
-                                        </div>
-                                    </div>
-                                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                                </div>
-                            </CardContent>
-                        </Link>
-                    </Card>
-
-                    <Card className="hover:shadow-lg transition-shadow cursor-pointer border-primary/20 group">
-                        <Link href="/shop/orders" className="block">
-                            <CardContent className="p-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                        <Package className="h-6 w-6 text-primary" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="font-semibold">Mes commandes</div>
-                                        <div className="text-sm text-muted-foreground">
-                                            Voir mon historique
-                                        </div>
-                                    </div>
-                                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                                </div>
-                            </CardContent>
-                        </Link>
-                    </Card>
-
-                    <Card className="hover:shadow-lg transition-shadow cursor-pointer border-primary/20 group">
-                        <Link href="/shop/invoices" className="block">
-                            <CardContent className="p-6">
-                                <div className="flex items-center gap-4">
-                                    <div className="p-3 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                                        <FileText className="h-6 w-6 text-primary" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <div className="font-semibold">Mes factures</div>
-                                        <div className="text-sm text-muted-foreground">
-                                            Télécharger mes PDF
-                                        </div>
-                                    </div>
-                                    <ArrowRight className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                                </div>
-                            </CardContent>
-                        </Link>
-                    </Card>
-                </div>
-
+            <PublicLayoutContent>
                 {/* Categories */}
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold mb-4">Catégories</h2>
+                <PublicLayoutSection title={trans('shop.categories')}>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {categories.map((category) => {
                             const IconComponent = categoryIcons[category.icon] || ShoppingBag;
@@ -132,7 +69,7 @@ export default function ShopIndex({ categories, featured_items, money }: ShopPro
                                     key={category.id}
                                     className="hover:shadow-lg transition-all hover:border-primary/50 cursor-pointer group"
                                 >
-                                    <Link href={`/shop?category=${category.id}`}>
+                                    <Link href={`/shop/category/${category.slug}`}>
                                         <CardContent className="p-6">
                                             <div className="flex flex-col items-center text-center">
                                                 <div className="p-4 rounded-lg bg-primary/10 mb-3 group-hover:bg-primary/20 transition-colors">
@@ -143,7 +80,7 @@ export default function ShopIndex({ categories, featured_items, money }: ShopPro
                                                     {category.description}
                                                 </p>
                                                 <Badge variant="secondary" className="mt-2">
-                                                    {category.items_count} articles
+                                                    {category.items_count} {trans('shop.items')}
                                                 </Badge>
                                             </div>
                                         </CardContent>
@@ -152,12 +89,11 @@ export default function ShopIndex({ categories, featured_items, money }: ShopPro
                             );
                         })}
                     </div>
-                </div>
+                </PublicLayoutSection>
 
                 {/* Featured Items */}
                 {featured_items.length > 0 && (
-                    <div>
-                        <h2 className="text-2xl font-bold mb-4">Articles en vedette</h2>
+                    <PublicLayoutSection title={trans('shop.featured_items')}>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {featured_items.map((item) => {
                                 const badge = typeBadges[item.type];
@@ -166,7 +102,7 @@ export default function ShopIndex({ categories, featured_items, money }: ShopPro
                                         key={item.id}
                                         className="hover:shadow-lg transition-all hover:border-primary/50 overflow-hidden group"
                                     >
-                                        <Link href={`/shop/items/${item.id}`}>
+                                        <Link href={`/shop/item/${item.slug}`}>
                                             {item.image && (
                                                 <div className="aspect-video bg-muted relative">
                                                     <img
@@ -176,7 +112,7 @@ export default function ShopIndex({ categories, featured_items, money }: ShopPro
                                                     />
                                                     {item.featured && (
                                                         <Badge className="absolute top-2 right-2">
-                                                            Vedette
+                                                            {trans('shop.featured')}
                                                         </Badge>
                                                     )}
                                                 </div>
@@ -198,7 +134,7 @@ export default function ShopIndex({ categories, featured_items, money }: ShopPro
                                                         {item.price} {money}
                                                     </div>
                                                     <Button size="sm" className="shrink-0">
-                                                        Acheter
+                                                        {trans('shop.buy')}
                                                     </Button>
                                                 </div>
                                             </CardContent>
@@ -207,9 +143,9 @@ export default function ShopIndex({ categories, featured_items, money }: ShopPro
                                 );
                             })}
                         </div>
-                    </div>
+                    </PublicLayoutSection>
                 )}
-            </div>
-        </AuthenticatedLayout>
+            </PublicLayoutContent>
+        </PublicLayout>
     );
 }

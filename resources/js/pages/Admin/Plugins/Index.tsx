@@ -78,8 +78,9 @@ export default function PluginsIndex({ plugins, availablePlugins, pluginsUpdates
       return plugin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
              plugin.description.toLowerCase().includes(searchQuery.toLowerCase());
     }
-    // Ne pas afficher les plugins déjà installés
-    return !Object.keys(plugins).includes(plugin.id);
+    // Ne pas afficher les plugins déjà installés (utiliser extension_id si disponible)
+    const pluginInstalledId = plugin.extension_id || plugin.id;
+    return !Object.keys(plugins).includes(pluginInstalledId);
   });
 
   const handleEnable = (pluginId: string) => {
@@ -96,8 +97,10 @@ export default function PluginsIndex({ plugins, availablePlugins, pluginsUpdates
     }
   };
 
-  const handleDownload = (pluginId: string) => {
-    router.post(`/admin/plugins/${pluginId}/download`);
+  const handleDownload = (pluginId: string, extensionId?: string) => {
+    // Utiliser extension_id pour le téléchargement depuis le marketplace
+    const idToDownload = extensionId || pluginId;
+    router.post(`/admin/plugins/${idToDownload}/download`);
   };
 
   const getRepoUrl = (plugin: OnlinePlugin) => {
@@ -315,7 +318,7 @@ export default function PluginsIndex({ plugins, availablePlugins, pluginsUpdates
               </Card>
             ) : (
               filteredAvailable.map((plugin) => {
-                const isInstalled = Object.keys(plugins).includes(plugin.id);
+                const isInstalled = Object.keys(plugins).includes(plugin.extension_id || plugin.id);
 
                 return (
                   <Card key={plugin.id}>
@@ -357,7 +360,7 @@ export default function PluginsIndex({ plugins, availablePlugins, pluginsUpdates
                           <div className="flex items-center gap-2">
                             <Button
                               size="sm"
-                              onClick={() => handleDownload(plugin.id)}
+                              onClick={() => handleDownload(plugin.id, plugin.extension_id)}
                               disabled={isInstalled}
                             >
                               <Download className="h-3.5 w-3.5 mr-1.5" />

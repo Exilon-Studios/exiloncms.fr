@@ -18,7 +18,7 @@ class CanEditWithPuck
         $user = $request->user();
 
         // Check if user is authenticated and has permission to edit with Puck
-        if (!$user || !$user->can('admin.pages.puck-edit')) {
+        if (!$user || !$user->hasPermission('admin.pages.puck-edit')) {
             abort(403, 'You do not have permission to edit with Puck.');
         }
 

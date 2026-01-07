@@ -15,7 +15,7 @@ class ShopCard extends BaseWidget
 
     public function title(): string
     {
-        return __('shop::widget.title');
+        return __('shop.widget.title');
     }
 
     public function description(): ?string
@@ -55,10 +55,10 @@ class ShopCard extends BaseWidget
 
         return $navItems->map(function ($item) {
             return [
-                'label' => __("shop::nav.{$item['label']}") ?? $item['label'],
+                'label' => __("shop.nav.{$item['label']}") ?? $item['label'],
                 'href' => $item['href'],
                 'icon' => $item['icon'] ?? 'link',
-                'description' => __("shop::nav.{$item['label']}_description") ?? '',
+                'description' => __("shop.nav.{$item['label']}_description") ?? '',
             ];
         })->toArray();
     }

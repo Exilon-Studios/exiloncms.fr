@@ -26,25 +26,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Plus, Edit, Trash2, MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { trans } from '@/lib/i18n';
 
-interface Permission {
-  id: number;
-  name: string;
-  description: string;
-}
-
 interface RolesIndexProps extends PageProps {
   roles: Role[];
-  permissions: Permission[];
   linkRoles: boolean;
 }
 
-export default function RolesIndex({ roles, permissions }: RolesIndexProps) {
+export default function RolesIndex({ roles }: RolesIndexProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [roleToDelete, setRoleToDelete] = useState<{ id: number; name: string } | null>(null);
 
@@ -165,24 +157,6 @@ export default function RolesIndex({ roles, permissions }: RolesIndexProps) {
                 </TableBody>
               </Table>
             </div>
-
-            {/* All Permissions Reference */}
-            <Card>
-              <CardHeader>
-                <CardTitle>{trans('admin.roles.index.available_permissions')}</CardTitle>
-                <CardDescription>{trans('admin.roles.index.available_permissions_description')}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {permissions.map((perm) => (
-                    <div key={perm.id} className="rounded-lg border border-border p-3 bg-muted/50">
-                      <p className="font-medium text-sm">{perm.name}</p>
-                      <p className="text-xs text-muted-foreground">{perm.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </AdminLayoutContent>
       </AdminLayout>

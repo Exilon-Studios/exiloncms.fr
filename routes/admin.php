@@ -21,6 +21,11 @@ use ExilonCMS\Http\Controllers\Admin\ThemeSettingsController;
 use ExilonCMS\Http\Controllers\Admin\TranslationController;
 use ExilonCMS\Http\Controllers\Admin\UpdateController;
 use ExilonCMS\Http\Controllers\Admin\UserController;
+use ExilonCMS\Http\Controllers\Admin\ShopPluginController;
+use ExilonCMS\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use ExilonCMS\Http\Controllers\Admin\NotificationManagerController;
+use ExilonCMS\Http\Controllers\Admin\CompanySettingsController;
+use ExilonCMS\Http\Controllers\Admin\LegalPageController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AdminController::class, 'index'])->name('dashboard');
@@ -37,6 +42,25 @@ Route::prefix('settings')->name('settings.')->middleware('can:admin.settings')->
     // Separate pages for each setting category
     Route::get('/general', [SettingsController::class, 'general'])->name('general');
     Route::post('/general/update', [SettingsController::class, 'updateGeneral'])->name('general.update');
+
+    Route::get('/company', [CompanySettingsController::class, 'get'])->name('company');
+    Route::post('/company/update', [CompanySettingsController::class, 'update'])->name('company.update');
+    Route::get('/company/api', [CompanySettingsController::class, 'api'])->name('company.api');
+
+    // Legal pages routes
+    Route::prefix('legal')->name('legal.')->group(function () {
+        Route::get('/terms', [LegalPageController::class, 'terms'])->name('terms');
+        Route::post('/terms/update', [LegalPageController::class, 'updateTerms'])->name('terms.update');
+
+        Route::get('/privacy', [LegalPageController::class, 'privacy'])->name('privacy');
+        Route::post('/privacy/update', [LegalPageController::class, 'updatePrivacy'])->name('privacy.update');
+
+        Route::get('/cookies', [LegalPageController::class, 'cookies'])->name('cookies');
+        Route::post('/cookies/update', [LegalPageController::class, 'updateCookies'])->name('cookies.update');
+
+        Route::get('/refund', [LegalPageController::class, 'refund'])->name('refund');
+        Route::post('/refund/update', [LegalPageController::class, 'updateRefund'])->name('refund.update');
+    });
 
     Route::get('/security', [SettingsController::class, 'security'])->name('security');
     Route::post('/security/update', [SettingsController::class, 'updateSecurity'])->name('security.update');
@@ -60,6 +84,9 @@ Route::prefix('settings')->name('settings.')->middleware('can:admin.settings')->
     Route::get('/mail', [SettingsController::class, 'mail'])->name('mail');
     Route::post('/mail/update', [SettingsController::class, 'updateMail'])->name('mail.update');
     Route::post('/mail/test', [SettingsController::class, 'sendTestMail'])->name('mail.send');
+
+    Route::get('/payments', [SettingsController::class, 'payments'])->name('payments');
+    Route::post('/payments/update', [SettingsController::class, 'updatePayments'])->name('payments.update');
 
     Route::get('/maintenance', [SettingsController::class, 'maintenance'])->name('maintenance');
     Route::post('/maintenance/update', [SettingsController::class, 'updateMaintenance'])->name('maintenance.update');
@@ -153,6 +180,17 @@ Route::prefix('translations')->name('translations.')->middleware('can:admin.sett
     Route::post('/', [TranslationController::class, 'store'])->name('store');
     Route::post('/import', [TranslationController::class, 'import'])->name('import');
     Route::delete('/{group}/{key}/{locale}', [TranslationController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('plugins')->name('plugins.')->middleware('can:admin.plugins')->group(function () {
+    Route::get('/shop', [ShopPluginController::class, 'index'])->name('shop');
+});
+
+Route::prefix('notifications')->name('notifications.')->middleware('can:admin.users')->group(function () {
+    Route::get('/', [NotificationManagerController::class, 'index'])->name('index');
+    Route::get('/create', [NotificationManagerController::class, 'create'])->name('create');
+    Route::post('/', [NotificationManagerController::class, 'store'])->name('store');
+    Route::delete('/{notification}', [NotificationManagerController::class, 'destroy'])->name('destroy');
 });
 
 Route::fallback([AdminController::class, 'fallback']);

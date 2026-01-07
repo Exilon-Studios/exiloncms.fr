@@ -1,7 +1,7 @@
 {
   "admin": [
     {
-      "label": "admin",
+      "label": "Shop",
       "href": "/admin/shop",
       "permission": "admin.shop",
       "icon": "shopping-bag"
@@ -10,18 +10,13 @@
   "user": [
     {
       "label": "shop",
-      "href": "/dashboard/shop",
+      "href": "/shop",
       "icon": "shopping-bag"
     },
     {
       "label": "orders",
       "href": "/dashboard/orders",
       "icon": "package"
-    },
-    {
-      "label": "invoices",
-      "href": "/dashboard/invoices",
-      "icon": "file-text"
     }
   ]
 }

@@ -29,6 +29,9 @@ export function AdminLayout({ children, className }: AdminLayoutProps) {
   );
 }
 
+// Export as default for easier importing
+export default AdminLayout;
+
 export function AdminLayoutTitle({ title, description, className }: AdminLayoutTitleProps) {
   return (
     <div className={cn("flex-1", className)}>

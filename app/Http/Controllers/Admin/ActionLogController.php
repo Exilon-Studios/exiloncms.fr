@@ -42,7 +42,7 @@ class ActionLogController extends Controller
      */
     public function show(ActionLog $log)
     {
-        return Inertia::render('Admin/Logs/Show', ['log' => $log->load('entries')]);
+        return Inertia::render('Admin/Logs/Show', ['log' => $log->load(['user', 'target', 'entries'])]);
     }
 
     /**

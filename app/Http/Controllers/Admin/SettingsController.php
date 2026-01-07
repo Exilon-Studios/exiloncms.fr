@@ -578,6 +578,82 @@ class SettingsController extends Controller
             ->with('success', trans('admin.settings.updated'));
     }
 
+    /**
+     * Show the payment settings page.
+     */
+    public function payments()
+    {
+        return Inertia::render('Admin/Settings/Payments', [
+            'settings' => [
+                // Account Balance Settings
+                'balance_enabled' => (bool) setting('payments.balance.enabled', true),
+                'balance_min_amount' => (int) setting('payments.balance.min_amount', 0),
+
+                // Stripe Settings
+                'stripe_enabled' => (bool) setting('payments.stripe.enabled', false),
+                'stripe_mode' => setting('payments.stripe.mode', 'sandbox'),
+                'stripe_public_key' => setting('payments.stripe.public_key', ''),
+                'stripe_secret_key' => setting('payments.stripe.secret_key', ''),
+                'stripe_webhook_secret' => setting('payments.stripe.webhook_secret', ''),
+
+                // PayPal Settings
+                'paypal_enabled' => (bool) setting('payments.paypal.enabled', false),
+                'paypal_client_id' => setting('payments.paypal.client_id', ''),
+                'paypal_secret' => setting('payments.paypal.secret', ''),
+                'paypal_mode' => setting('payments.paypal.mode', 'sandbox'),
+            ],
+        ]);
+    }
+
+    /**
+     * Update the payment settings.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function updatePayments(Request $request)
+    {
+        $settings = $this->validate($request, [
+            // Balance Settings
+            'balance_enabled' => ['boolean'],
+            'balance_min_amount' => ['nullable', 'integer', 'min:0'],
+
+            // Stripe Settings
+            'stripe_enabled' => ['boolean'],
+            'stripe_mode' => ['nullable', 'in:sandbox,live'],
+            'stripe_public_key' => ['nullable', 'string'],
+            'stripe_secret_key' => ['nullable', 'string'],
+            'stripe_webhook_secret' => ['nullable', 'string'],
+
+            // PayPal Settings
+            'paypal_enabled' => ['boolean'],
+            'paypal_client_id' => ['nullable', 'string'],
+            'paypal_secret' => ['nullable', 'string'],
+            'paypal_mode' => ['nullable', 'in:sandbox,live'],
+        ]);
+
+        // Transform settings for database
+        $dbSettings = [
+            'payments.balance.enabled' => $settings['balance_enabled'] ?? false,
+            'payments.balance.min_amount' => $settings['balance_min_amount'] ?? 0,
+            'payments.stripe.enabled' => $settings['stripe_enabled'] ?? false,
+            'payments.stripe.mode' => $settings['stripe_mode'] ?? 'sandbox',
+            'payments.stripe.public_key' => $settings['stripe_public_key'] ?? '',
+            'payments.stripe.secret_key' => $settings['stripe_secret_key'] ?? '',
+            'payments.stripe.webhook_secret' => $settings['stripe_webhook_secret'] ?? '',
+            'payments.paypal.enabled' => $settings['paypal_enabled'] ?? false,
+            'payments.paypal.client_id' => $settings['paypal_client_id'] ?? '',
+            'payments.paypal.secret' => $settings['paypal_secret'] ?? '',
+            'payments.paypal.mode' => $settings['paypal_mode'] ?? 'sandbox',
+        ];
+
+        Setting::updateSettings($dbSettings);
+
+        ActionLog::log('settings.updated');
+
+        return to_route('admin.settings.payments')
+            ->with('success', trans('admin.settings.updated'));
+    }
+
     public function sendTestMail(Request $request)
     {
         if ($request->user()->email === null) {

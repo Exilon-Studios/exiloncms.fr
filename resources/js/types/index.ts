@@ -35,6 +35,7 @@ export interface PageProps<T extends Record<string, unknown> = Record<string, un
     warning?: string;
   };
   errors: Record<string, string>;
+  cartCount?: number;
   [key: string]: unknown;
 }
 

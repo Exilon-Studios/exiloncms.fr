@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'login.socialite' => \ExilonCMS\Http\Middleware\SocialiteLogin::class,
             'captcha' => \ExilonCMS\Http\Middleware\VerifyCaptcha::class,
             'admin' => \ExilonCMS\Http\Middleware\AdminAuthenticate::class,
+            'admin.access' => \ExilonCMS\Http\Middleware\AdminAuthenticate::class,
             'registration' => \ExilonCMS\Http\Middleware\CheckRegistrationStatus::class,
             'puck.edit' => \ExilonCMS\Http\Middleware\CanEditWithPuck::class,
         ]);
