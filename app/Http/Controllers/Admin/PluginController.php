@@ -182,13 +182,38 @@ class PluginController extends Controller
     public function download(string $pluginId)
     {
         try {
+            // Check if plugin already exists locally
+            if ($this->plugins->has($pluginId)) {
+                // Plugin exists locally, just enable it
+                $this->plugins->enable($pluginId);
+
+                return to_route('admin.plugins.index')
+                    ->with('success', trans('admin.plugins.enabled'));
+            }
+
+            // Plugin doesn't exist locally, try to restore from git first
+            $pluginPath = base_path('plugins/' . $pluginId);
+            if (! is_dir($pluginPath)) {
+                // Try to restore from git
+                $gitOutput = shell_exec('cd ' . base_path() . ' && git checkout HEAD -- plugins/' . $pluginId . ' 2>&1');
+
+                if (is_dir($pluginPath) && $this->plugins->has($pluginId)) {
+                    // Successfully restored from git, now enable it
+                    $this->plugins->enable($pluginId);
+
+                    return to_route('admin.plugins.index')
+                        ->with('success', trans('admin.plugins.installed'));
+                }
+            }
+
+            // Try to download from marketplace
             // If pluginId is numeric, find the extension_id from marketplace
             if (is_numeric($pluginId)) {
                 $plugins = app(UpdateManager::class)->getPlugins(true);
                 $plugin = collect($plugins)->firstWhere('id', $pluginId);
 
                 if (! $plugin) {
-                    throw new Exception('Plugin not found in marketplace');
+                    throw new Exception('Plugin not found in marketplace and cannot be restored from git');
                 }
 
                 $pluginId = $plugin['extension_id'];

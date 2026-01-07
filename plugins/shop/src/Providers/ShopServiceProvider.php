@@ -10,9 +10,12 @@ class ShopServiceProvider extends BasePluginServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(
-            plugin_path('shop/config/shop.php'), 'shop'
-        );
+        $configPath = plugin_path('shop/config/shop.php');
+
+        // Only merge config if the file exists
+        if (file_exists($configPath)) {
+            $this->mergeConfigFrom($configPath, 'shop');
+        }
     }
 
     public function boot(): void
