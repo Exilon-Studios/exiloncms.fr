@@ -3,10 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use ExilonCMS\Plugins\Shop\Http\Controllers\ShopController;
 
-Route::prefix('shop')
-    ->middleware(['web', 'auth'])
+Route::middleware(['web', 'auth'])
+    ->prefix('dashboard')
     ->group(function () {
-        Route::get('/', [ShopController::class, 'index'])->name('shop.index');
-        Route::get('/orders', [ShopController::class, 'orders'])->name('shop.orders');
-        Route::get('/invoices', [ShopController::class, 'invoices'])->name('shop.invoices');
+        Route::get('/shop', [ShopController::class, 'index'])->name('dashboard.shop');
+        Route::get('/orders', [ShopController::class, 'orders'])->name('dashboard.orders');
+        Route::get('/invoices', [ShopController::class, 'invoices'])->name('dashboard.invoices');
     });

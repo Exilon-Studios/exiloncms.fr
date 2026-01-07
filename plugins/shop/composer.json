@@ -1,0 +1,17 @@
+{
+  "name": "exiloncms/shop",
+  "description": "Système de boutique complet avec paiements multiples et facturation",
+  "type": "exiloncms-plugin",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "ExilonCMS\\Plugins\\Shop\\": "src/"
+    },
+    "files": [
+      "src/Providers/ShopServiceProvider.php"
+    ]
+  },
+  "require": {
+    "php": ">=8.2"
+  }
+}

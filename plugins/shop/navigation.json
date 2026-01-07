@@ -10,17 +10,17 @@
   "user": [
     {
       "label": "shop",
-      "href": "/shop",
+      "href": "/dashboard/shop",
       "icon": "shopping-bag"
     },
     {
       "label": "orders",
-      "href": "/shop/orders",
+      "href": "/dashboard/orders",
       "icon": "package"
     },
     {
       "label": "invoices",
-      "href": "/shop/invoices",
+      "href": "/dashboard/invoices",
       "icon": "file-text"
     }
   ]

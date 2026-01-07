@@ -104,7 +104,9 @@ class PluginManager extends ExtensionManager
             return;
         }
 
-        $composer = $this->files->getRequire(base_path('vendor/autoload.php'));
+        // Get the actual registered ClassLoader, not a new instance
+        $loaders = \Composer\Autoload\ClassLoader::getRegisteredLoaders();
+        $composer = reset($loaders) ?: $this->files->getRequire(base_path('vendor/autoload.php'));
 
         foreach ($plugins as $pluginId => $plugin) {
             try {
@@ -125,6 +127,9 @@ class PluginManager extends ExtensionManager
 
                     $app->register($provider);
                 }
+
+                // Load plugin translations manually
+                $this->loadPluginTranslations($pluginId);
             } catch (Throwable $t) {
                 if (! $app->isProduction()) {
                     throw $t;
@@ -699,6 +704,31 @@ class PluginManager extends ExtensionManager
 
         foreach ($autoload['files'] ?? [] as $file) {
             $this->files->getRequire($this->path($plugin, $file));
+        }
+    }
+
+    /**
+     * Load translations for a plugin manually.
+     * This is needed because plugin service providers might not be instantiated.
+     */
+    protected function loadPluginTranslations(string $pluginId): void
+    {
+        $langPath = $this->path($pluginId, 'resources/lang');
+
+        if (! $this->files->isDirectory($langPath)) {
+            return;
+        }
+
+        // Add namespace to translator
+        // Laravel expects the ROOT path of the namespace, not the locale-specific path
+        $translator = app('translator');
+        $loader = $translator->getLoader();
+
+        // Check if namespace is already registered
+        $namespaces = $loader->namespaces();
+        if (! isset($namespaces[$pluginId])) {
+            // Add the namespace with the root lang path
+            $loader->addNamespace($pluginId, $langPath);
         }
     }
 
