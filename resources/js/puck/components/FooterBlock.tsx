@@ -22,7 +22,7 @@ export const FooterBlock = ({ puck }: FooterBlockProps) => {
   const isEditing = puck?.isEditing || false;
 
   const currentYear = new Date().getFullYear();
-  const siteName = settings?.name || 'MC-CMS';
+  const siteName = settings?.name || 'ExilonCMS';
   const copyrightText = settings?.copyright || '';
 
   // Use navbar links as pages

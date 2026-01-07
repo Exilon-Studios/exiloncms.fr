@@ -17,16 +17,16 @@ class ThemeCreateCommand extends Command
                         {name : The name of the theme}
                         {id? : The id of the theme}
                         {--no-config : Disable config creation}
-                        {--author=MC-CMS : The author of the theme}
-                        {--description=Theme for MC-CMS : The description of the theme}
-                        {--url=https://mc-cms.com : The url of the theme}';
+                        {--author=ExilonCMS : The author of the theme}
+                        {--description=Theme for ExilonCMS : The description of the theme}
+                        {--url=https://exiloncms.com : The url of the theme}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new MC-CMS theme';
+    protected $description = 'Create a new ExilonCMS theme';
 
     protected Filesystem $files;
 
@@ -82,7 +82,7 @@ class ThemeCreateCommand extends Command
             'authors' => [
                 $this->option('author'),
             ],
-            'mccms_api' => '1.0.0',
+            'exiloncms_api' => '1.0.0',
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 

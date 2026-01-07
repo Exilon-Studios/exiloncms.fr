@@ -13,7 +13,8 @@ return [
     'nav' => [
         'toggle' => 'Afficher/Masquer la navbar',
         'profile' => 'Profil',
-        'admin' => 'Panel administrateur',
+        'admin' => 'Administration',
+        'dashboard' => 'Tableau de bord',
         'logout' => 'Déconnexion',
     ],
 
@@ -142,5 +143,38 @@ return [
         'read_more' => 'Lire plus',
         'no_posts' => 'Aucun article pour le moment',
         'no_posts_hint' => 'Soyez le premier à publier un article !',
+    ],
+
+    'date' => [
+        'default' => 'l j F',
+        'full' => 'l j F Y \à H:i',
+        'compact' => 'd/m/Y',
+    ],
+
+    'dashboard' => [
+        'title' => 'Tableau de bord',
+        'nav' => 'Tableau de bord',
+        'welcome' => 'Bienvenue, :name 👋',
+        'welcome_subtitle' => 'Voici votre tableau de bord personnel',
+        'balance' => 'Solde',
+        'account_age' => 'Âge du compte',
+        'role' => 'Rôle',
+        'status' => 'Statut',
+        'active' => 'Actif',
+        'quick_actions' => 'Actions rapides',
+        'quick_actions_subtitle' => 'Gérez votre compte et vos paramètres',
+        'my_profile' => 'Mon Profil',
+        'my_profile_subtitle' => 'Gérer mes informations personnelles',
+        'notifications' => 'Notifications',
+        'notifications_subtitle' => 'Voir mes notifications',
+        'shop' => 'Boutique',
+        'shop_subtitle' => ':money disponibles: :balance :currency',
+        'shop_coming_soon' => 'La boutique sera bientôt disponible',
+        'coming_soon' => 'Bientôt disponible',
+        'account_info' => 'Informations du compte',
+        'username' => 'Nom d\'utilisateur',
+        'email' => 'Email',
+        'member_since' => 'Membre depuis',
+        'see_more' => 'Voir plus →',
     ],
 ];

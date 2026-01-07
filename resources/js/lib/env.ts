@@ -14,7 +14,7 @@ export const env = createEnv({
   clientPrefix: 'VITE_',
 
   client: {
-    VITE_APP_NAME: z.string().default('MC-CMS'),
+    VITE_APP_NAME: z.string().default('ExilonCMS'),
     VITE_APP_ENV: z.enum(['local', 'development', 'staging', 'production']).default('production'),
     VITE_APP_DEBUG: z.string().transform((val) => val === 'true').default('false'),
   },

@@ -1,5 +1,5 @@
 /**
- * Utility functions for MC-CMS v2
+ * Utility functions for ExilonCMS v2
  * shadcn/ui cn() function + common helpers
  */
 

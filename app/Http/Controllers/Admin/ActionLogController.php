@@ -13,10 +13,26 @@ class ActionLogController extends Controller
      */
     public function index()
     {
-        $logs = ActionLog::onlyGlobal()
-            ->with(['user', 'target'])
+        $logs = ActionLog::with(['user', 'target'])
             ->latest()
             ->paginate();
+
+        // Format logs for frontend with action messages
+        $logs->getCollection()->transform(function ($log) {
+            return [
+                'id' => $log->id,
+                'user' => $log->user ? [
+                    'id' => $log->user->id,
+                    'name' => $log->user->name,
+                ] : null,
+                'action' => $log->action,
+                'action_message' => $log->getActionMessage(),
+                'action_type' => $log->target_type,
+                'target_id' => $log->target_id,
+                'data' => $log->data,
+                'created_at' => $log->created_at,
+            ];
+        });
 
         return Inertia::render('Admin/Logs/Index', ['logs' => $logs]);
     }

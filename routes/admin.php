@@ -88,6 +88,8 @@ Route::prefix('themes')->name('themes.')->middleware('can:admin.themes')->group(
 Route::prefix('plugins')->name('plugins.')->middleware('can:admin.plugins')->group(function () {
     Route::get('/', [PluginController::class, 'index'])->name('index');
     Route::post('/reload', [PluginController::class, 'reload'])->name('reload');
+    Route::get('/{plugin}/config', [PluginController::class, 'config'])->name('config');
+    Route::post('/{plugin}/config', [PluginController::class, 'updateConfig'])->name('config.update');
     Route::post('/{plugin}/enable', [PluginController::class, 'enable'])->name('enable');
     Route::post('/{plugin}/disable', [PluginController::class, 'disable'])->name('disable');
     Route::post('/{plugin}/update', [PluginController::class, 'update'])->name('update');

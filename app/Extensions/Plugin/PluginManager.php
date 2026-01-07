@@ -54,6 +54,26 @@ class PluginManager extends ExtensionManager
     protected Collection $userNavItems;
 
     /**
+     * The user dashboard cards.
+     */
+    protected Collection $dashboardCards;
+
+    /**
+     * The user dashboard widgets.
+     */
+    protected Collection $dashboardWidgets;
+
+    /**
+     * The admin navigation items from plugins.
+     */
+    protected Collection $pluginAdminNavItems;
+
+    /**
+     * The user navigation items from plugins.
+     */
+    protected Collection $pluginUserNavItems;
+
+    /**
      * Create a new PluginManager instance.
      */
     public function __construct(Filesystem $files)
@@ -65,6 +85,10 @@ class PluginManager extends ExtensionManager
         $this->routeDescriptions = collect();
         $this->adminNavItems = collect();
         $this->userNavItems = collect();
+        $this->dashboardCards = collect();
+        $this->dashboardWidgets = collect();
+        $this->pluginAdminNavItems = collect();
+        $this->pluginUserNavItems = collect();
     }
 
     /**
@@ -161,13 +185,29 @@ class PluginManager extends ExtensionManager
         $directories = $this->files->directories($this->pluginsPath);
         $plugins = [];
 
+        // Get marketplace plugins to add apiId
+        // Force refresh to get latest data
+        $marketplacePlugins = app(UpdateManager::class)->getPlugins(true);
+
         foreach ($directories as $dir) {
             $name = $this->files->basename($dir);
 
-            $description = $this->findDescription($name);
+            try {
+                $description = $this->findDescription($name);
 
-            if ($description) {
-                $plugins[$name] = $description;
+                if ($description) {
+                    // Add enabled state to the description
+                    $description->enabled = $this->isEnabled($name);
+
+                    // Add apiId from marketplace data
+                    $marketplacePlugin = collect($marketplacePlugins)->firstWhere('extension_id', $name);
+                    $description->apiId = $marketplacePlugin['id'] ?? null;
+
+                    $plugins[$name] = $description;
+                }
+            } catch (Throwable $e) {
+                // Skip invalid plugins
+                continue;
             }
         }
 
@@ -356,6 +396,121 @@ class PluginManager extends ExtensionManager
             ->filter(fn ($item) => ! isset($item['permission']) || Gate::allows($item['permission']));
     }
 
+    public function addDashboardCard(Closure|array $items): void
+    {
+        $this->dashboardCards->add($items);
+    }
+
+    public function getDashboardCards(): Collection
+    {
+        return $this->dashboardCards->flatMap(value(...))
+            ->filter(fn ($item) => ! isset($item['permission']) || Gate::allows($item['permission']));
+    }
+
+    public function addDashboardWidget(Closure|array $items): void
+    {
+        $this->dashboardWidgets->add($items);
+    }
+
+    public function getDashboardWidgets(): Collection
+    {
+        return $this->dashboardWidgets->flatMap(value(...))
+            ->filter(fn ($item) => ! isset($item['permission']) || Gate::allows($item['permission']));
+    }
+
+    /**
+     * Add admin navigation items from plugins.
+     * Plugins can use this to add their own admin menu items.
+     * @deprecated Plugins should use navigation.json instead
+     */
+    public function addPluginAdminNavItem(Closure|array $items): void
+    {
+        $this->pluginAdminNavItems->add($items);
+    }
+
+    /**
+     * Add user navigation items from plugins.
+     * Plugins can use this to add their own user menu items (e.g., shop link).
+     * @deprecated Plugins should use navigation.json instead
+     */
+    public function addPluginUserNavItem(Closure|array $items): void
+    {
+        $this->pluginUserNavItems->add($items);
+    }
+
+    /**
+     * Get all admin navigation items from enabled plugins.
+     * Reads navigation.json files from plugins automatically.
+     */
+    public function getPluginAdminNavItems(): Collection
+    {
+        $plugins = $this->findPluginsDescriptions();
+        $items = collect();
+
+        foreach ($plugins as $pluginId => $plugin) {
+            if (! $plugin->enabled) {
+                continue;
+            }
+
+            $navigationItems = $this->getNavigationItemsFromPlugin($pluginId, 'admin');
+            $items = $items->merge($navigationItems);
+        }
+
+        // Also include manually added items (for backward compatibility)
+        $items = $items->merge($this->pluginAdminNavItems->flatMap(value(...)));
+
+        return $items->filter(fn ($item) => ! isset($item['permission']) || Gate::allows($item['permission']));
+    }
+
+    /**
+     * Get all user navigation items from enabled plugins.
+     * Reads navigation.json files from plugins automatically.
+     */
+    public function getPluginUserNavItems(): Collection
+    {
+        $plugins = $this->findPluginsDescriptions();
+        $items = collect();
+
+        foreach ($plugins as $pluginId => $plugin) {
+            if (! $plugin->enabled) {
+                continue;
+            }
+
+            $navigationItems = $this->getNavigationItemsFromPlugin($pluginId, 'user');
+            $items = $items->merge($navigationItems);
+        }
+
+        // Also include manually added items (for backward compatibility)
+        $items = $items->merge($this->pluginUserNavItems->flatMap(value(...)));
+
+        return $items->filter(fn ($item) => ! isset($item['permission']) || Gate::allows($item['permission']));
+    }
+
+    /**
+     * Get navigation items from a plugin's navigation.json file.
+     */
+    protected function getNavigationItemsFromPlugin(string $pluginId, string $type): Collection
+    {
+        $navigationPath = $this->pluginsPath($pluginId . '/navigation.json');
+
+        if (! $this->files->exists($navigationPath)) {
+            return collect();
+        }
+
+        $navigationData = json_decode($this->files->get($navigationPath), true);
+
+        if (! is_array($navigationData)) {
+            return collect();
+        }
+
+        $items = $navigationData[$type] ?? [];
+
+        return collect($items)->map(fn ($item) => [
+            ...$item,
+            'plugin' => $pluginId,
+        ]);
+    }
+
     public function cachePlugins(?array $enabledPlugins = null): Collection
     {
         if ($enabledPlugins === null) {
@@ -395,12 +550,12 @@ class PluginManager extends ExtensionManager
     {
         $plugins = app(UpdateManager::class)->getPlugins($force);
 
-        $installedPlugins = $this->findPluginsDescriptions()
-            ->filter(fn ($plugin) => isset($plugin->apiId));
+        $installedPluginIds = $this->findPluginsDescriptions()
+            ->map(fn ($plugin) => $plugin->id);
 
         return collect($plugins)
-            ->filter(function ($plugin) use ($installedPlugins) {
-                return ! $installedPlugins->contains('apiId', $plugin['id']);
+            ->filter(function ($plugin) use ($installedPluginIds) {
+                return ! $installedPluginIds->contains($plugin['extension_id']);
             })->filter(function ($plugin) {
                 $games = Arr::get($plugin, 'games', '*');
 
@@ -412,15 +567,32 @@ class PluginManager extends ExtensionManager
     {
         $plugins = app(UpdateManager::class)->getPlugins($force);
 
-        return $this->findPluginsDescriptions()->filter(function ($plugin) use ($plugins) {
+        $allPlugins = $this->findPluginsDescriptions();
+
+        $toUpdate = [];
+
+        foreach ($allPlugins as $plugin) {
             $id = $plugin->apiId ?? 0;
 
-            if (! array_key_exists($id, $plugins)) {
-                return false;
+            if ($id === 0) {
+                continue;
             }
 
-            return version_compare($plugins[$id]['version'], $plugin->version, '>');
-        });
+            // Find the marketplace plugin by ID
+            $marketplacePlugin = collect($plugins)->firstWhere('id', $id);
+
+            if (! $marketplacePlugin) {
+                continue;
+            }
+
+            $needsUpdate = version_compare($marketplacePlugin['version'], $plugin->version, '>');
+
+            if ($needsUpdate) {
+                $toUpdate[$plugin->id] = $plugin;
+            }
+        }
+
+        return collect($toUpdate);
     }
 
     public function install($pluginId, ?string $version = null): void
@@ -429,11 +601,13 @@ class PluginManager extends ExtensionManager
 
         $plugins = $updateManager->getPlugins(true);
 
-        if (! array_key_exists($pluginId, $plugins)) {
+        // Find plugin by extension_id
+        $pluginInfo = collect($plugins)->firstWhere('extension_id', $pluginId);
+
+        if (! $pluginInfo) {
             throw new RuntimeException('Cannot find plugin with id '.$pluginId);
         }
 
-        $pluginInfo = $plugins[$pluginId];
         $plugin = $pluginInfo['extension_id'];
         $pluginDir = $this->path($plugin);
 

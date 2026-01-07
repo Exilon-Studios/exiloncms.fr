@@ -2,8 +2,8 @@
 
 namespace DummyNamespace\Games;
 
-use MCCMS\Games\Game;
-use MCCMS\Models\User;
+use ExilonCMS\Games\Game;
+use ExilonCMS\Models\User;
 use DummyNamespace\Games\DummyPluginServerBridge;
 
 class DummyPluginGame extends Game

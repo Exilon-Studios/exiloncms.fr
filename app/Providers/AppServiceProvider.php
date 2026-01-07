@@ -73,6 +73,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin.socials', fn (User $user) => $user->isAdmin());
         Gate::define('admin.images', fn (User $user) => $user->isAdmin());
         Gate::define('admin.logs', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.update', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.redirects', fn (User $user) => $user->isAdmin());
 
         // Notifications
         Notification::extend('alert', function ($app) {

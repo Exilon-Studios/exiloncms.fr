@@ -68,7 +68,7 @@ export const NavbarBlock: React.FC<NavbarBlockProps> = (props) => {
     <SafeLink href="/" className="flex items-center">
       <div className="h-6 w-6 flex-shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-primary" />
       <span className="ml-2 font-bold text-foreground">
-        {settings?.name || 'MC-CMS'}
+        {settings?.name || 'ExilonCMS'}
       </span>
     </SafeLink>
   );

@@ -45,8 +45,12 @@ class ProfileController extends Controller
         $discordLink = setting('discord.link_roles', false);
         $emailVerification = setting('mail.users_email_verification', false);
 
+        // Create a copy of user with 2FA status visible (without revealing the secret)
+        $userForFrontend = clone $user;
+        $userForFrontend->two_factor_secret = $user->hasTwoFactorAuth() ? '***' : null;
+
         return Inertia::render('Profile/Index', [
-            'user' => $user,
+            'user' => $userForFrontend,
             'canChangeName' => ! oauth_login() && setting('user.change_name', false),
             'canUploadAvatar' => setting('user.upload_avatar', false) && $user->canUploadAvatar(),
             'hasAvatar' => $user->hasUploadedAvatar(),

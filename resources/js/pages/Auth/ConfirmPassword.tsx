@@ -33,7 +33,7 @@ export default function ConfirmPassword() {
           <div className="w-full max-w-md space-y-8">
             <div className="text-center">
               <h1 className="text-3xl font-bold text-foreground">
-                {settings?.site_name || 'MC-CMS'}
+                {settings?.site_name || 'ExilonCMS'}
               </h1>
               <p className="mt-2 text-sm text-muted-foreground">
                 {settings?.site_description || 'Modern Content Management System for Game Servers'}

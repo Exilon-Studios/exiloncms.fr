@@ -31,6 +31,7 @@ interface Links {
   onClick?: (e: React.MouseEvent) => void;
   type?: string;
   children?: Links[];
+  badge?: number;
 }
 
 interface SidebarContextProps {
@@ -284,7 +285,7 @@ export const SidebarLink = ({
       href={link.href!}
       onClick={link.onClick}
       className={cn(
-        "group/sidebar flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground transition-colors",
+        "group/sidebar flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground transition-colors relative",
         open ? "justify-start" : "justify-center",
         className,
       )}
@@ -300,6 +301,18 @@ export const SidebarLink = ({
       >
         {link.label}
       </motion.span>
+
+      {/* Badge for updates count */}
+      {link.badge !== undefined && link.badge > 0 && (
+        <motion.div
+          animate={{
+            scale: open ? 1 : 0.7,
+          }}
+          className="ml-auto flex items-center justify-center bg-red-600 text-white text-xs font-bold rounded-full h-5 min-w-[20px] px-1"
+        >
+          {link.badge > 99 ? '99+' : link.badge}
+        </motion.div>
+      )}
     </Link>
   );
 };
@@ -339,7 +352,7 @@ export function SidebarLayout({
   primaryLinks,
   secondaryLinks,
   userInfo,
-  siteName = 'MC-CMS',
+  siteName = 'ExilonCMS',
 }: {
   className?: string;
   children: React.ReactNode;

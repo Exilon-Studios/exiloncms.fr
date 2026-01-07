@@ -2,7 +2,7 @@
 
 namespace DummyNamespace\Providers;
 
-use MCCMS\Extensions\Plugin\BasePluginServiceProvider;
+use ExilonCMS\Extensions\Plugin\BasePluginServiceProvider;
 
 class DummyPluginServiceProvider extends BasePluginServiceProvider
 {

@@ -149,12 +149,30 @@ class ThemeManager extends ExtensionManager
         $directories = $this->files->directories($this->themesPath);
 
         $themes = [];
+        $currentTheme = setting('theme');
+
+        // Get marketplace themes to add apiId
+        // Force refresh to get latest data
+        $marketplaceThemes = app(UpdateManager::class)->getThemes(true);
 
         foreach ($directories as $dir) {
-            $description = $this->getJson($dir.'/theme.json');
+            try {
+                $description = $this->getJson($dir.'/theme.json');
 
-            if ($description) {
-                $themes[$this->files->basename($dir)] = $description;
+                if ($description) {
+                    $themeId = $this->files->basename($dir);
+                    // Add enabled state to the description
+                    $description->enabled = ($themeId === $currentTheme);
+
+                    // Add apiId from marketplace data
+                    $marketplaceTheme = collect($marketplaceThemes)->firstWhere('extension_id', $themeId);
+                    $description->apiId = $marketplaceTheme['id'] ?? null;
+
+                    $themes[$themeId] = $description;
+                }
+            } catch (Throwable $e) {
+                // Skip invalid themes
+                continue;
             }
         }
 
@@ -228,11 +246,11 @@ class ThemeManager extends ExtensionManager
     {
         $themes = app(UpdateManager::class)->getThemes($force);
 
-        $installedThemes = $this->findThemesDescriptions()
-            ->filter(fn ($theme) => isset($theme->apiId));
+        $installedThemeIds = $this->findThemesDescriptions()
+            ->map(fn ($theme) => $theme->id);
 
-        return collect($themes)->filter(function ($theme) use ($installedThemes) {
-            return ! $installedThemes->contains('apiId', $theme['id']);
+        return collect($themes)->filter(function ($theme) use ($installedThemeIds) {
+            return ! $installedThemeIds->contains($theme['extension_id']);
         });
     }
 
@@ -243,11 +261,18 @@ class ThemeManager extends ExtensionManager
         return $this->findThemesDescriptions()->filter(function ($theme) use ($themes) {
             $id = $theme->apiId ?? 0;
 
-            if (! array_key_exists($id, $themes)) {
+            if ($id === 0) {
                 return false;
             }
 
-            return version_compare($themes[$id]['version'], $theme->version, '>');
+            // Find the marketplace theme by ID
+            $marketplaceTheme = collect($themes)->firstWhere('id', $id);
+
+            if (! $marketplaceTheme) {
+                return false;
+            }
+
+            return version_compare($marketplaceTheme['version'], $theme->version, '>');
         });
     }
 
@@ -265,11 +290,12 @@ class ThemeManager extends ExtensionManager
 
         $themes = $updateManager->getThemes(true);
 
-        if (! array_key_exists($themeId, $themes)) {
+        // Find theme by extension_id
+        $themeInfo = collect($themes)->firstWhere('extension_id', $themeId);
+
+        if (! $themeInfo) {
             throw new RuntimeException('Cannot find theme with id '.$themeId);
         }
-
-        $themeInfo = $themes[$themeId];
 
         $theme = $themeInfo['extension_id'];
 

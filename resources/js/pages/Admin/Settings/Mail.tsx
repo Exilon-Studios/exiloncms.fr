@@ -237,7 +237,7 @@ export default function MailSettings({ settings }: MailSettingsProps) {
                   type="text"
                   value={data.mail_from_name}
                   onChange={(e) => setData('mail_from_name', e.target.value)}
-                  placeholder="MC-CMS"
+                  placeholder="ExilonCMS"
                   className="bg-background"
                 />
                 {errors.mail_from_name && (

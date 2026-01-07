@@ -2,7 +2,7 @@
 
 namespace DummyNamespace\Controllers\Api;
 
-use MCCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Controllers\Controller;
 
 class ApiController extends Controller
 {

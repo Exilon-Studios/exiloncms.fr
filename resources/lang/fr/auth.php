@@ -22,7 +22,7 @@ return [
 
     'site' => [
         'name' => 'Nom du site',
-        'default_name' => 'MC-CMS',
+        'default_name' => 'ExilonCMS',
         'default_description' => 'Système de gestion de contenu moderne pour les serveurs de jeu',
     ],
 

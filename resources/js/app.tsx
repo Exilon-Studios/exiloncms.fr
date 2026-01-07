@@ -14,7 +14,7 @@ import { ModalProvider } from '@/lib/modalManager';
 import { ModalDialog } from '@/components/ui/modal-dialog';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
-const appName = import.meta.env.VITE_APP_NAME || 'MC-CMS';
+const appName = import.meta.env.VITE_APP_NAME || 'ExilonCMS';
 
 // Make Ziggy route() available globally
 declare global {

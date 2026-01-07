@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 use ExilonCMS\Models\NavbarElement;
 use ExilonCMS\Models\SocialLink;
+use ExilonCMS\Extensions\Plugin\PluginManager;
+use ExilonCMS\Extensions\Theme\ThemeManager;
+use ExilonCMS\Extensions\UpdateManager;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -40,6 +43,12 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
+        // Get admin permissions if user has admin access
+        $adminPermissions = [];
+        if ($user && $user->hasAdminAccess()) {
+            $adminPermissions = $user->role->permissions->pluck('permission')->toArray();
+        }
+
         return [
             ...parent::share($request),
             'auth' => [
@@ -50,6 +59,7 @@ class HandleInertiaRequests extends Middleware
                     'role' => $user->role,
                     'money' => $user->money ?? 0,
                     'hasAdminAccess' => $user->hasAdminAccess(),
+                    'adminPermissions' => $adminPermissions,
                 ] : null,
             ],
             'flash' => [
@@ -90,7 +100,50 @@ class HandleInertiaRequests extends Middleware
                 'puck' => trans('puck'),
                 'dashboard' => trans('dashboard'),
             ],
+            // Share enabled plugins for dynamic navigation
+            'enabledPlugins' => app(PluginManager::class)->findPluginsDescriptions()
+                ->filter(fn ($plugin) => $plugin->enabled)
+                ->map(fn ($plugin) => [
+                    'id' => $plugin->id,
+                    'name' => $plugin->name,
+                    'description' => $plugin->description,
+                    'version' => $plugin->version,
+                ])
+                ->values()
+                ->toArray(),
+            // Share plugin navigation items
+            'pluginAdminNavItems' => app(PluginManager::class)->getPluginAdminNavItems()->toArray(),
+            'pluginUserNavItems' => app(PluginManager::class)->getPluginUserNavItems()->toArray(),
+            // Share updates count for sidebar badge
+            'updatesCount' => $this->getUpdatesCount($user),
         ];
+    }
+
+    /**
+     * Get the total count of available updates (CMS + plugins + themes)
+     */
+    protected function getUpdatesCount($user): int
+    {
+        $count = 0;
+
+        // Check CMS update
+        $updateManager = app(UpdateManager::class);
+        if ($updateManager->hasUpdate()) {
+            $count++;
+        }
+
+        // Check plugins and themes updates (only for admins)
+        // Force refresh to get latest data from marketplace
+        // Use isAdmin() instead of hasAdminAccess() because permissions might not be loaded in middleware
+        if ($user && $user->role && $user->role->is_admin) {
+            $pluginManager = app(PluginManager::class);
+            $count += $pluginManager->getPluginsToUpdate(true)->count();
+
+            $themeManager = app(ThemeManager::class);
+            $count += $themeManager->getThemesToUpdate(true)->count();
+        }
+
+        return $count;
     }
 
     protected function loadNavbarElements($user): array

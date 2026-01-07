@@ -9,7 +9,7 @@ import { PageProps } from '@/types';
 
 export default function GuestLayout({ children }: PropsWithChildren) {
   const { settings } = usePage<PageProps>().props;
-  const siteName = settings?.name || 'MC-CMS';
+  const siteName = settings?.name || 'ExilonCMS';
   const currentYear = new Date().getFullYear();
 
   return (

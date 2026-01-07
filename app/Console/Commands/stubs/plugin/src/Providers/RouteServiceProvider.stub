@@ -2,7 +2,7 @@
 
 namespace DummyNamespace\Providers;
 
-use MCCMS\Extensions\Plugin\BaseRouteServiceProvider;
+use ExilonCMS\Extensions\Plugin\BaseRouteServiceProvider;
 use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends BaseRouteServiceProvider

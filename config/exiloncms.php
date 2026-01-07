@@ -3,7 +3,7 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | MC-CMS Game
+    | ExilonCMS Game
     |--------------------------------------------------------------------------
     |
     | This is the game used by the website. It should NOT be changed after
@@ -11,14 +11,14 @@ return [
     |
     */
 
-    'game' => env('MCCMS_GAME'),
+    'game' => env('EXILONCMS_GAME'),
 
     /*
     |--------------------------------------------------------------------------
-    | MC-CMS Version
+    | ExilonCMS Version
     |--------------------------------------------------------------------------
     |
-    | Current MC-CMS version
+    | Current ExilonCMS version
     |
     */
 
@@ -66,13 +66,13 @@ return [
     | API Configuration
     |--------------------------------------------------------------------------
     |
-    | Configuration for MC-CMS API
+    | Configuration for ExilonCMS API
     |
     */
 
     'api' => [
-        'enabled' => env('MCCMS_API_ENABLED', true),
-        'rate_limit' => env('MCCMS_API_RATE_LIMIT', 60),
+        'enabled' => env('EXILONCMS_API_ENABLED', true),
+        'rate_limit' => env('EXILONCMS_API_RATE_LIMIT', 60),
     ],
 
     /*
@@ -88,8 +88,8 @@ return [
         'plugins' => true,
         'themes' => true,
         'marketplace' => true,
-        'discord_integration' => env('MCCMS_DISCORD_ENABLED', false),
-        'analytics' => env('MCCMS_ANALYTICS_ENABLED', false),
+        'discord_integration' => env('EXILONCMS_DISCORD_ENABLED', false),
+        'analytics' => env('EXILONCMS_ANALYTICS_ENABLED', false),
     ],
 
     /*
@@ -97,13 +97,13 @@ return [
     | Security Configuration
     |--------------------------------------------------------------------------
     |
-    | Security-related settings for MC-CMS including Content Security Policy
+    | Security-related settings for ExilonCMS including Content Security Policy
     | and other security headers.
     |
     */
 
     'security' => [
-        'csp_enabled' => env('MCCMS_CSP_ENABLED', false),
+        'csp_enabled' => env('EXILONCMS_CSP_ENABLED', false),
         'csp_directives' => [
             "default-src 'self'",
             "script-src 'self' 'unsafe-inline' 'unsafe-eval'",

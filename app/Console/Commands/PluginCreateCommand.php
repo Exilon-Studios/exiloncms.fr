@@ -16,16 +16,16 @@ class PluginCreateCommand extends Command
     protected $signature = 'plugin:create
                         {name : The name of the plugin}
                         {id? : The id of the plugin}
-                        {--author=MC-CMS : The author of the plugin}
-                        {--description=Plugin for MC-CMS : The description of the plugin}
-                        {--url=https://mc-cms.com : The url of the plugin}';
+                        {--author=ExilonCMS : The author of the plugin}
+                        {--description=Plugin for ExilonCMS : The description of the plugin}
+                        {--url=https://exiloncms.com : The url of the plugin}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new MC-CMS plugin';
+    protected $description = 'Create a new ExilonCMS plugin';
 
     protected Filesystem $files;
 
@@ -101,7 +101,7 @@ class PluginCreateCommand extends Command
             'authors' => [
                 $this->option('author'),
             ],
-            'mccms_api' => '1.0.0',
+            'exiloncms_api' => '1.0.0',
             'providers' => [
                 "\\{$namespace}\\Providers\\{$className}ServiceProvider",
                 "\\{$namespace}\\Providers\\RouteServiceProvider",
@@ -112,8 +112,8 @@ class PluginCreateCommand extends Command
     private function createComposerJson(string $path, string $id, string $namespace)
     {
         $this->files->put($path.'/composer.json', json_encode([
-            'name' => 'mccms/'.$id,
-            'type' => 'mccms-plugin',
+            'name' => 'exiloncms/'.$id,
+            'type' => 'exiloncms-plugin',
             'description' => $this->option('description'),
             'autoload' => [
                 'psr-4' => [

@@ -2,7 +2,7 @@
 
 namespace DummyNamespace\Controllers\Admin;
 
-use MCCMS\Http\Controllers\Controller;
+use ExilonCMS\Http\Controllers\Controller;
 
 class AdminController extends Controller
 {

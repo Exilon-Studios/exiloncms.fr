@@ -38,7 +38,7 @@ export default function Login({ captcha, canRegister }: LoginProps) {
             processing={processing}
             errors={errors}
             canRegister={canRegister}
-            siteName={settings?.site_name || 'MC-CMS'}
+            siteName={settings?.site_name || 'ExilonCMS'}
             siteDescription={settings?.site_description || 'Modern Content Management System for Game Servers'}
           />
         </div>

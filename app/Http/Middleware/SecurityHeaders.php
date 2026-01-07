@@ -29,8 +29,8 @@ class SecurityHeaders
         }
 
         // Content Security Policy (configurable)
-        if (config('mccms.security.csp_enabled', false)) {
-            $csp = config('mccms.security.csp_directives', [
+        if (config('exiloncms.security.csp_enabled', false)) {
+            $csp = config('exiloncms.security.csp_directives', [
                 "default-src 'self'",
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
                 "style-src 'self' 'unsafe-inline'",

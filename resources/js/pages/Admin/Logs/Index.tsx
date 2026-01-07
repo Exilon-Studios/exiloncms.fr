@@ -29,8 +29,10 @@ interface ActionLog {
   id: number;
   user: User | null;
   action: string;
-  target_type: string | null;
+  action_message: string;
+  action_type: string | null;
   target_id: number | null;
+  data: Record<string, any> | null;
   created_at: string;
 }
 
@@ -136,21 +138,29 @@ export default function LogsIndex({ logs, search: initialSearch }: LogsIndexProp
                           )}
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={getActionColor(log.action)}>
-                            {log.action}
-                          </Badge>
+                          <span className="text-sm">{log.action_message}</span>
                         </TableCell>
                         <TableCell className="text-muted-foreground">
-                          {log.target_type && log.target_id ? (
-                            <span className="text-xs">
-                              {log.target_type} #{log.target_id}
-                            </span>
+                          {log.data && Object.keys(log.data).length > 0 ? (
+                            <div className="text-xs">
+                              {Object.entries(log.data).map(([key, value]) => (
+                                <div key={key} className="truncate max-w-[200px]">
+                                  <span className="font-medium">{key}:</span> {String(value)}
+                                </div>
+                              ))}
+                            </div>
                           ) : (
                             '-'
                           )}
                         </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {new Date(log.created_at).toLocaleString()}
+                        <TableCell className="text-muted-foreground text-sm">
+                          {new Date(log.created_at).toLocaleString('fr-FR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center justify-end gap-2">

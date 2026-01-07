@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // MC-CMS V2 - Seeders will be run manually via php artisan mccms:user
+        // ExilonCMS - Seeders will be run manually via php artisan user:create
         // This prevents automatic seeding during fresh migrations
     }
 }

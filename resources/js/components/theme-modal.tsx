@@ -120,7 +120,7 @@ export function ThemeModal({ open, onOpenChange }: ThemeModalProps) {
                       MC
                     </div>
                     <span className="font-semibold text-sm" style={{ color: `hsl(${colors.foreground})` }}>
-                      MC-CMS
+                      ExilonCMS
                     </span>
                   </div>
                   <div className="flex gap-1">

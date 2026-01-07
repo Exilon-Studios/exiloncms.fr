@@ -207,7 +207,7 @@ export default function ProfileIndex({
                       />
                       {user.email_verified_at ? (
                         <InputGroupAddon className="px-3 bg-green-500/20 text-green-600 dark:text-green-400 h-full">
-                          <span className="text-sm font-medium">✓ {trans('admin.users.edit.verify')}</span>
+                          <span className="text-sm font-medium">email</span>
                         </InputGroupAddon>
                       ) : (
                         <InputGroupAddon className="h-full">

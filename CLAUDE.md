@@ -4,27 +4,35 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**MC-CMS V2** is a modern content management system for Minecraft and game servers, built with Laravel 12 (PHP 8.2+) and React 19 + TypeScript. The project uses Inertia.js v2 for seamless SPA-like experiences without writing an API.
+**ExilonCMS** (formerly MC-CMS V2) is a modern content management system for Minecraft and game servers, built with Laravel 12 (PHP 8.2+) and React 19 + TypeScript. The project uses Inertia.js v2 for seamless SPA-like experiences without writing an API.
 
 **Stack:**
 - Backend: Laravel 12, PHP 8.2+, PostgreSQL (recommended) or MySQL
 - Frontend: React 19, TypeScript (strict mode), Inertia.js v2
-- UI: Tailwind CSS v4, shadcn/ui components
+- UI: Tailwind CSS v3, shadcn/ui components
 - Build: Vite 7 with HMR
 - Visual Editor: Puck drag-and-drop page builder
 
-**Namespace:** `MCCMS\` (not `App\`)
+**Namespace:** `ExilonCMS\` (not `App\`)
 
 **High-Level Architecture:**
 - **Monorepo-style structure** with plugins and themes as self-contained modules
 - **Inertia.js** as the bridge between Laravel backend and React frontend (no API routes)
 - **Puck Editor** for visual page building with reusable React components
 - **Role-based permissions** with gates and policies for authorization
-- **Game integration** layer supporting Minecraft (Java/Bedrock) and Steam games
+- **Game integration** layer supporting Minecraft (Java/Bedrock), FiveM, and Steam games
 
 ## Development Commands
 
 ### Setup
+
+**Interactive installer (recommended):**
+```bash
+# Run the interactive setup wizard
+php artisan install:interactive
+```
+
+**Manual setup:**
 ```bash
 # Initial setup (first time)
 composer install
@@ -33,9 +41,6 @@ php artisan migrate:fresh --seed
 php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="password"
 npm install
 npm run build
-
-# Or use composer script
-composer setup
 
 # Create Puck editor permission
 php artisan db:seed --class=PuckPermissionSeeder
@@ -48,27 +53,40 @@ composer dev
 
 # Or manually:
 # Terminal 1 - Laravel backend
-php artisan serve --port=8002
+php artisan serve --port=8000
 
 # Terminal 2 - Vite frontend with HMR
 npm run dev
 ```
 
+### Plugin & Theme Commands
+```bash
+# Create a new plugin
+php artisan plugin:create MyPlugin
+
+# Enable/disable plugins
+php artisan plugin:enable MyPlugin
+php artisan plugin:disable MyPlugin
+
+# Create a new theme
+php artisan theme:create MyTheme
+```
+
 ### Testing & Quality
 ```bash
 # Run PHPUnit tests
-composer test
-# or
 php artisan test
+# or
+composer test
 
 # Run specific test
 php artisan test --filter=UserTest
 
+# Code formatting (Laravel Pint)
+./vendor/bin/pint
+
 # Clear all caches
 php artisan optimize:clear
-
-# Linting (if configured)
-php artisan pint
 ```
 
 ### Database
@@ -79,11 +97,14 @@ php artisan migrate:fresh --seed
 # Just migrate
 php artisan migrate
 
+# Rollback last migration
+php artisan migrate:rollback
+
 # Docker setup
 docker-compose up -d
 
 # Connect to PostgreSQL database
-docker exec -it mccms_v2_db psql -U mccms -d mccms_v2
+docker exec -it exiloncms_db psql -U exiloncms -d exiloncms
 ```
 
 ### Building for Production
@@ -165,9 +186,9 @@ plugins/shop/
 
 **Plugin Service Provider:**
 ```php
-namespace MCCMS\Plugin\Shop\Providers;
+namespace ExilonCMS\Plugin\Shop\Providers;
 
-use MCCMS\Extensions\Plugin\BasePluginServiceProvider;
+use ExilonCMS\Extensions\Plugin\BasePluginServiceProvider;
 
 class ShopServiceProvider extends BasePluginServiceProvider
 {
@@ -185,7 +206,7 @@ class ShopServiceProvider extends BasePluginServiceProvider
 }
 ```
 
-Plugins are loaded via `app/Providers/ExtensionServiceProvider.php` and managed by `PluginManager`.
+Plugins are loaded via `app/Providers/ExtensionServiceProvider.php` and managed by `PluginManager` in `app/Extensions/Plugin/PluginManager.php`.
 
 ### 4. Theme System
 
@@ -193,23 +214,25 @@ Themes live in `themes/{theme-name}/` directory. Themes can extend layouts and c
 
 ### 5. Game Integration
 
-MC-CMS supports multiple game servers:
+ExilonCMS supports multiple game servers:
 - Minecraft (Java & Bedrock editions)
-- Steam games (Rust, FiveM, etc.)
+- FiveM
+- Steam games (Rust, etc.)
 
 **Game implementations:**
-- `app/Games/Game.php` - Base game interface
-- `app/Games/Minecraft/` - Minecraft-specific implementations
+- `app/Games/Game.php` - Base game abstract class
+- `app/Games/Minecraft/` - Minecraft-specific implementations (Online, Offline, Bedrock)
 - `app/Games/Steam/` - Steam-based games
+- `app/Games/FiveMGame.php` - FiveM game implementation
 
-**Server bridges:** Handle server communication (RCON, Query, Ping, AzLink).
+**Server bridges:** Handle server communication (RCON, Query, Ping, AzLink) via `ServerBridge` abstract class in `app/Games/ServerBridge.php`.
 
 ### 6. Roles & Permissions
 
 **Models:**
-- `User` (MCCMS\Models\User)
-- `Role` (MCCMS\Models\Role)
-- `Permission` (MCCMS\Models\Permission)
+- `User` (ExilonCMS\Models\User)
+- `Role` (ExilonCMS\Models\Role)
+- `Permission` (ExilonCMS\Models\Permission)
 
 **Middleware:**
 - `Authenticate` - Requires auth
@@ -292,7 +315,7 @@ import { PageProps } from '@/types';
 Settings are stored in the `settings` table and accessed via helper:
 
 ```php
-setting('site_name', 'MC-CMS'); // With default
+setting('site_name', 'ExilonCMS'); // With default
 setting('site_name'); // Without default
 ```
 
@@ -300,7 +323,7 @@ Common settings: `name`, `description`, `locale`, `timezone`, `money` (currency 
 
 ### 11. Puck Visual Editor
 
-MC-CMS includes **Puck Editor** - a drag-and-drop visual page builder.
+ExilonCMS includes **Puck Editor** - a drag-and-drop visual page builder.
 
 **Key files:**
 - `resources/js/puck/config.tsx` - Puck configuration and component registry
@@ -375,13 +398,13 @@ The project uses several key React libraries:
 1. **Never create Blade views** - Use React + Inertia only (except root `app.blade.php`)
 2. **All routes return Inertia responses** - Controllers use `Inertia::render()`
 3. **TypeScript is strict** - Handle all edge cases, nullable types
-4. **Namespace is MCCMS\\** - Not App\\
+4. **Namespace is ExilonCMS\\** - Not App\\
 5. **Database agnostic** - Migrations must work on PostgreSQL and MySQL
 6. **Plugins are modular** - Each plugin is self-contained with its own routes, controllers, models, migrations, and React pages
 7. **No direct API calls** - Use Inertia for data flow between Laravel and React
 8. **Flash messages** - Use session flash for success/error messages, accessed via `usePage().props.flash`
 9. **Helper functions** - Available globally via `app/helpers.php` and `app/color_helpers.php` (auto-loaded in composer.json)
-10. **Tailwind CSS v4** - Uses the new v4 syntax with `@import` instead of `@tailwind` directives
+10. **Tailwind CSS v3** - Uses `@tailwind` directives in `resources/css/app.css`
 
 ## Common Patterns
 
@@ -394,7 +417,7 @@ Route::get('/example', [ExampleController::class, 'index'])->name('example.index
 
 2. **Controller**:
 ```php
-namespace MCCMS\Http\Controllers\Admin;
+namespace ExilonCMS\Http\Controllers\Admin;
 
 use Inertia\Inertia;
 
@@ -472,10 +495,10 @@ export default function ExampleForm() {
 
 ```bash
 # PostgreSQL (Docker)
-docker exec -it mccms_v2_db psql -U mccms -d mccms_v2 -c "\dt"
+docker exec -it exiloncms_db psql -U exiloncms -d exiloncms -c "\dt"
 
-# MySQL (Docker)
-docker exec -it mccms_db mysql -u root -p -e "SHOW TABLES;"
+# MySQL (Docker) - adjust credentials as needed
+docker exec -it exiloncms_db mysql -u root -p -e "SHOW TABLES;"
 ```
 
 ## Troubleshooting
@@ -487,5 +510,13 @@ docker exec -it mccms_db mysql -u root -p -e "SHOW TABLES;"
 - **500 error on Inertia pages**: Check `storage/logs/laravel.log` for details
 - **PostgreSQL connection refused**: Ensure Docker is running (`docker-compose up -d`)
 - **Puck permission missing**: Run `php artisan db:seed --class=PuckPermissionSeeder`
-- **CSS not building**: Ensure Tailwind v4 syntax uses `@import "tailwindcss";` not `@tailwind` directives
 - **Composer autoload issues**: Run `composer dump-autoload`
+- **Installation state issues**: The `is_installed()` helper checks if CMS is installed. If returning false, check `installed` key in cache/settings
+
+## Installation State
+
+ExilonCMS uses an `is_installed()` helper function (defined in `app/helpers.php`) to check if the CMS has been installed. This affects:
+- `ExtensionServiceProvider`: Skips theme loading if not installed
+- Various routes and middleware that may check installation state
+
+The installation state is typically stored in cache or settings and can be reset during development.

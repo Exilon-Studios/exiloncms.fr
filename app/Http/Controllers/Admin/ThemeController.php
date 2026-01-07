@@ -2,7 +2,7 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
-use ExilonCMS\MCCMS;
+use ExilonCMS\ExilonCMS;
 use ExilonCMS\Extensions\Theme\ThemeManager;
 use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Http\Controllers\Controller;
@@ -60,7 +60,7 @@ class ThemeController extends Controller
         $response = to_route('admin.themes.index');
 
         try {
-            app(UpdateManager::class)->forceFetchUpdates();
+            app(UpdateManager::class)->forceFetchMarketplace();
         } catch (Exception $e) {
             return $response->with('error', trans('messages.status.error', [
                 'error' => $e->getMessage(),
@@ -113,6 +113,18 @@ class ThemeController extends Controller
     public function download(string $themeId)
     {
         try {
+            // If themeId is numeric, find the extension_id from marketplace
+            if (is_numeric($themeId)) {
+                $themes = app(UpdateManager::class)->getThemes(true);
+                $theme = collect($themes)->firstWhere('id', $themeId);
+
+                if (! $theme) {
+                    throw new Exception('Theme not found in marketplace');
+                }
+
+                $themeId = $theme['extension_id'];
+            }
+
             $this->themes->install($themeId);
         } catch (Throwable $t) {
             return to_route('admin.themes.index')

@@ -2,8 +2,8 @@
 
 namespace DummyNamespace\Providers;
 
-use MCCMS\Extensions\Plugin\BasePluginServiceProvider;
-use MCCMS\Providers\GameServiceProvider;
+use ExilonCMS\Extensions\Plugin\BasePluginServiceProvider;
+use ExilonCMS\Providers\GameServiceProvider;
 use DummyNamespace\Games\DummyPluginGame;
 
 class DummyPluginServiceProvider extends BasePluginServiceProvider

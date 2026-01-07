@@ -16,16 +16,16 @@ class GameCreateCommand extends PluginCreateCommand
     protected $signature = 'game:create
                         {name : The name of the game}
                         {id? : The id of the game}
-                        {--author=MC-CMS : The author of the game}
-                        {--description=Plugin for MC-CMS : The description of the game}
-                        {--url=https://mc-cms.com : The url of the game}';
+                        {--author=ExilonCMS : The author of the game}
+                        {--description=Plugin for ExilonCMS : The description of the game}
+                        {--url=https://exiloncms.com : The url of the game}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a custom game for MC-CMS through a plugin.';
+    protected $description = 'Create a custom game for ExilonCMS through a plugin.';
 
     /**
      * Create a new command instance.
@@ -64,7 +64,7 @@ class GameCreateCommand extends PluginCreateCommand
 
         $this->copyFiles($sourcePath, $path, $id, $studlyName, $namespace);
 
-        EnvEditor::updateEnv(['MCCMS_GAME' => $id]);
+        EnvEditor::updateEnv(['EXILONCMS_GAME' => $id]);
 
         return 0;
     }

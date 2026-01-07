@@ -78,7 +78,7 @@ export default function Home({ message, siteName, posts, server, servers, landin
         <div className="min-h-screen flex items-center justify-center bg-background">
           <div className="text-center p-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">
-              {siteName || 'MC-CMS'}
+              {siteName || 'ExilonCMS'}
             </h1>
             <p className="text-lg text-muted-foreground mb-6">
               Bienvenue sur notre site !

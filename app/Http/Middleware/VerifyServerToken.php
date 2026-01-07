@@ -16,7 +16,7 @@ class VerifyServerToken
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->header('MCCMS-Link-Token');
+        $token = $request->header('ExilonCMS-Link-Token');
 
         abort_if($token === null, 401, 'No server key provided.');
 

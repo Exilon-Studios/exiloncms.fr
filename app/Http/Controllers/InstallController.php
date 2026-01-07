@@ -97,7 +97,7 @@ class InstallController extends Controller
         ],
         'custom' => [
             'name' => 'Custom Game',
-            'logo' => 'assets/img/mccms.png',
+            'logo' => 'assets/img/exiloncms.png',
         ],
     ];
 
@@ -292,7 +292,7 @@ class InstallController extends Controller
     }
 
     /**
-     * Install MC-CMS for a Steam-based game.
+     * Install ExilonCMS for a Steam-based game.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -334,7 +334,7 @@ class InstallController extends Controller
     }
 
     /**
-     * Install MC-CMS for Minecraft (with register or Microsoft OAuth).
+     * Install ExilonCMS for Minecraft (with register or Microsoft OAuth).
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -433,7 +433,7 @@ class InstallController extends Controller
             'APP_LOCALE' => $request->input('locale'),
             'APP_URL' => url('/'),
             'MAIL_MAILER' => 'array',
-            'MCCMS_GAME' => $game,
+            'EXILONCMS_GAME' => $game,
         ]);
 
         if ($game === 'custom') {

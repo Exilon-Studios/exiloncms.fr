@@ -180,6 +180,10 @@ class ActionLog extends Model
             return null;
         }
 
+        // Add IP address to data for better tracking
+        $data['ip'] = request()->ip();
+        $data['user_agent'] = request()->userAgent();
+
         return self::create([
             'user_id' => Auth::id(),
             'action' => $action,

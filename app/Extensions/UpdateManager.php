@@ -50,7 +50,7 @@ class UpdateManager
      */
     public function isGithubEnabled(): bool
     {
-        return Config::get('mccms.github.enabled', false);
+        return Config::get('exiloncms.github.enabled', false);
     }
 
     /**
@@ -88,9 +88,9 @@ class UpdateManager
      */
     public function forceFetchGithubRelease(bool $cache = true): ?array
     {
-        $owner = Config::get('mccms.github.owner');
-        $repository = Config::get('mccms.github.repository');
-        $includePrereleases = Config::get('mccms.github.include_prereleases', false);
+        $owner = Config::get('exiloncms.github.owner');
+        $repository = Config::get('exiloncms.github.repository');
+        $includePrereleases = Config::get('exiloncms.github.include_prereleases', false);
 
         $url = "https://api.github.com/repos/{$owner}/{$repository}/releases";
 
@@ -193,8 +193,11 @@ class UpdateManager
             $this->files->makeDirectory($updatesPath, 0755, true);
         }
 
+        // Generate filename if 'file' key is not present
+        $filename = $info['file'] ?? ($info['extension_id'] ?? 'download') . '.zip';
+
         $dir = $updatesPath.$tempDir;
-        $path = $dir.$info['file'];
+        $path = $dir.$filename;
 
         if (! $this->files->exists($dir)) {
             $this->files->makeDirectory($dir, 0755, true);
@@ -206,7 +209,7 @@ class UpdateManager
 
         // Download from GitHub URL
         Http::withOptions(['sink' => $path])
-            ->withToken(Config::get('mccms.github.token'))
+            ->withToken(Config::get('exiloncms.github.token'))
             ->get($info['url'])
             ->throw();
 
@@ -354,11 +357,11 @@ class UpdateManager
 
     public function forceFetchMarketplace(bool $cache = true): ?array
     {
-        $marketplaceUrl = config('mccms.marketplace.url');
-        $registryFile = config('mccms.marketplace.registry', 'registry.json');
+        $registryUrl = config('exiloncms.marketplace.registry_url');
+        $registryFile = config('exiloncms.marketplace.registry', 'registry.json');
 
         $updates = $this->prepareHttpRequest()
-            ->get("{$marketplaceUrl}/{$registryFile}")
+            ->get("{$registryUrl}/{$registryFile}")
             ->throw()
             ->json();
 
@@ -366,7 +369,7 @@ class UpdateManager
             $this->updates = $updates;
         }
 
-        $cacheDuration = config('mccms.marketplace.cache_duration', 3600);
+        $cacheDuration = config('exiloncms.marketplace.cache_duration', 3600);
 
         if ($cache) {
             Cache::put('marketplace', $updates ?? [], now()->addSeconds($cacheDuration));
@@ -381,25 +384,31 @@ class UpdateManager
 
     public function download(array $info, string $tempDir = '', bool $verifyHash = true): void
     {
-        // If this is a GitHub release, use GitHub download method
-        if ($this->isGithubEnabled() && isset($info['github_url'])) {
-            $this->downloadGithubRelease($info, $tempDir);
-            return;
-        }
+        // For marketplace plugins/themes, always use direct download from URL
+        // downloadGithubRelease() is only for CMS core updates via GitHub API
 
-        // Original marketplace download method
+        // Marketplace download method
         $updatesPath = storage_path('app/updates/');
 
         if (! $this->files->exists($updatesPath)) {
             $this->files->makeDirectory($updatesPath);
         }
 
+        // If no 'file' key, use 'url' to download directly and generate filename
         if (! array_key_exists('file', $info)) {
-            throw new RuntimeException('No file available. If it\'s a paid extension, make sure you purchased it and verify the site key.');
+            if (! isset($info['url'])) {
+                throw new RuntimeException('No file available. If it\'s a paid extension, make sure you purchased it and verify the site key.');
+            }
+
+            // Generate filename from URL or extension_id
+            $filename = $info['extension_id'] ?? 'download';
+            $filename .= '.zip';
+        } else {
+            $filename = $info['file'];
         }
 
         $dir = $updatesPath.$tempDir;
-        $path = $dir.$info['file'];
+        $path = $dir.$filename;
 
         if (! $this->files->exists($dir)) {
             $this->files->makeDirectory($dir);
@@ -447,7 +456,9 @@ class UpdateManager
 
     public function extract(array $info, string $targetDir, string $tempDir = ''): void
     {
-        $file = storage_path('app/updates/'.$tempDir.$info['file']);
+        // Generate filename if 'file' key is not present
+        $filename = $info['file'] ?? ($info['extension_id'] ?? 'download') . '.zip';
+        $file = storage_path('app/updates/'.$tempDir.$filename);
 
         if ($this->files->extension($file) !== 'zip') {
             throw new RuntimeException('Invalid file extension');
@@ -696,7 +707,7 @@ class UpdateManager
     {
         $userAgent = 'ExilonCMS updater (v'.ExilonCMS::version().' - '.url('/').')';
 
-        $request = Http::withUserAgent($userAgent)->withHeaders([
+        $request = Http::withOptions(['verify' => false])->withUserAgent($userAgent)->withHeaders([
             'Exilon-Version' => ExilonCMS::version(),
             'Exilon-PHP-Version' => PHP_VERSION,
             'Exilon-Locale' => app()->getLocale(),
@@ -720,7 +731,7 @@ class UpdateManager
             'User-Agent' => 'ExilonCMS',
         ]);
 
-        $token = Config::get('mccms.github.token');
+        $token = Config::get('exiloncms.github.token');
 
         if ($token) {
             $request = $request->withToken($token);

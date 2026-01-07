@@ -35,7 +35,7 @@ class HomeController extends Controller
 
         return Inertia::render('Home', [
             'message' => setting('home_message'),
-            'siteName' => setting('name', 'MC-CMS'),
+            'siteName' => setting('name', 'ExilonCMS'),
             'posts' => $posts,
             'landingSettings' => $landingSettings,
             'server' => $server ? [

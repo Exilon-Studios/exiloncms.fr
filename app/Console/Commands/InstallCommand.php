@@ -70,8 +70,8 @@ class InstallCommand extends Command
         $this->info('Fetching marketplace data...');
 
         try {
-            $registryUrl = config('mccms.marketplace.registry_url');
-            $registryFile = config('mccms.marketplace.registry', 'registry.json');
+            $registryUrl = config('exiloncms.marketplace.registry_url');
+            $registryFile = config('exiloncms.marketplace.registry', 'registry.json');
 
             $response = Http::timeout(10)->get("{$registryUrl}/{$registryFile}");
 
@@ -617,7 +617,7 @@ DOCKERFILE;
      */
     protected function downloadFromMarketplace(string $type, string $id): ?string
     {
-        $marketplaceUrl = config('mccms.marketplace.url', 'https://marketplace.exiloncms.com');
+        $marketplaceUrl = config('exiloncms.marketplace.url', 'https://marketplace.exiloncms.com');
 
         try {
             $this->info("  Downloading {$type} {$id} from marketplace...");

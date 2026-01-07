@@ -55,7 +55,7 @@ export default function SettingsIndex({
   timezones,
 }: SettingsIndexProps) {
   const { data, setData, post, processing, errors } = useForm({
-    name: initialSettings.name || 'MC-CMS',
+    name: initialSettings.name || 'ExilonCMS',
     description: initialSettings.description || '',
     url: initialSettings.url || window.location.origin,
     locale: initialSettings.locale || 'en',

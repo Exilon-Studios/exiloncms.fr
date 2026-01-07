@@ -2,12 +2,14 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
-use ExilonCMS\MCCMS;
+use ExilonCMS\ExilonCMS;
 use ExilonCMS\Extensions\Plugin\PluginManager;
 use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\ActionLog;
+use ExilonCMS\Models\Setting;
 use Exception;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Throwable;
 
@@ -38,12 +40,50 @@ class PluginController extends Controller
         ]);
     }
 
+    public function config(string $plugin)
+    {
+        $description = $this->plugins->findDescription($plugin);
+
+        if ($description === null) {
+            abort(404);
+        }
+
+        // Get plugin configuration from settings
+        $pluginConfig = setting('plugins.config.'.$plugin, []);
+
+        return Inertia::render('Admin/Plugins/Config', [
+            'plugin' => $description,
+            'config' => $pluginConfig,
+        ]);
+    }
+
+    public function updateConfig(Request $request, string $plugin)
+    {
+        $description = $this->plugins->findDescription($plugin);
+
+        if ($description === null) {
+            abort(404);
+        }
+
+        // Validate and save plugin configuration
+        $config = $request->validate([
+            // Add plugin-specific validation rules here
+            // For now, we'll accept all config
+        ]);
+
+        // Save plugin configuration to settings
+        Setting::updateSettings('plugins.config.'.$plugin, $config);
+
+        return to_route('admin.plugins.index')
+            ->with('success', trans('admin.plugins.config_saved'));
+    }
+
     public function reload()
     {
         $response = to_route('admin.plugins.index');
 
         try {
-            app(UpdateManager::class)->forceFetchUpdates();
+            app(UpdateManager::class)->forceFetchMarketplace();
         } catch (Exception $e) {
             return $response->with('error', trans('messages.status.error', [
                 'error' => $e->getMessage(),
@@ -65,7 +105,7 @@ class PluginController extends Controller
 
             $missing = $this->plugins->getMissingRequirements($plugin);
 
-            if ($missing === 'mccms' || $missing === 'azuriom' || $missing === 'api') {
+            if ($missing === 'exiloncms' || $missing === 'azuriom' || $missing === 'api') {
                 return to_route('admin.plugins.index')
                     ->with('error', trans('admin.plugins.requirements.'.$missing, [
                         'version' => ExilonCMS::apiVersion(),
@@ -89,12 +129,13 @@ class PluginController extends Controller
                 ]));
         }
 
+        // Log action BEFORE purging cache to ensure user is still authenticated
+        ActionLog::log('plugins.enabled', data: ['plugin' => $plugin]);
+
         $response = to_route('admin.plugins.index')
             ->with('success', trans('admin.plugins.enabled'));
 
         $this->plugins->purgeInternalCache();
-
-        ActionLog::log('plugins.enabled', data: ['plugin' => $plugin]);
 
         return $response;
     }
@@ -103,12 +144,13 @@ class PluginController extends Controller
     {
         $this->plugins->disable($plugin);
 
+        // Log action BEFORE purging cache to ensure user is still authenticated
+        ActionLog::log('plugins.disabled', data: ['plugin' => $plugin]);
+
         $response = to_route('admin.plugins.index')
             ->with('success', trans('admin.plugins.disabled'));
 
         $this->plugins->purgeInternalCache();
-
-        ActionLog::log('plugins.disabled', data: ['plugin' => $plugin]);
 
         return $response;
     }
@@ -118,8 +160,9 @@ class PluginController extends Controller
         $description = $this->plugins->findDescription($plugin);
 
         try {
-            if ($description !== null && isset($description->apiId)) {
-                $this->plugins->install($description->apiId);
+            // Use plugin ID (extension_id) instead of apiId for install method
+            if ($description !== null) {
+                $this->plugins->install($plugin);
             }
         } catch (Throwable $t) {
             return to_route('admin.plugins.index')
@@ -139,6 +182,18 @@ class PluginController extends Controller
     public function download(string $pluginId)
     {
         try {
+            // If pluginId is numeric, find the extension_id from marketplace
+            if (is_numeric($pluginId)) {
+                $plugins = app(UpdateManager::class)->getPlugins(true);
+                $plugin = collect($plugins)->firstWhere('id', $pluginId);
+
+                if (! $plugin) {
+                    throw new Exception('Plugin not found in marketplace');
+                }
+
+                $pluginId = $plugin['extension_id'];
+            }
+
             $this->plugins->install($pluginId);
         } catch (Throwable $t) {
             report($t);

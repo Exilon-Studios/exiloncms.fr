@@ -245,7 +245,7 @@ export const puckConfig: Config<PuckComponents, RootProps> = {
         },
       },
       defaultProps: {
-        siteName: "MC-CMS",
+        siteName: "ExilonCMS",
         copyrightText: "",
         showSiteNameWatermark: true,
         showPagesSection: true,

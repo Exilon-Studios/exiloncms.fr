@@ -110,6 +110,54 @@ abstract class BasePluginServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom($this->pluginPath('database/migrations'));
     }
 
+    /**
+     * Register plugin routes.
+     */
+    protected function loadRoutes(): void
+    {
+        // Try to get the plugin ID - either from bound plugin or by using the helper
+        $pluginId = isset($this->plugin) ? $this->plugin->id : null;
+
+        if (!$pluginId) {
+            // Fallback: try to determine plugin ID from class name
+            $className = get_class($this);
+            if (preg_match('/\\\\Plugins\\\\([^\\\\]+)\\\\/', $className, $matches)) {
+                $pluginId = strtolower($matches[1]);
+            }
+        }
+
+        if (!$pluginId) {
+            return;
+        }
+
+        $webRoutes = base_path('plugins/' . $pluginId . '/routes/web.php');
+
+        if (file_exists($webRoutes)) {
+            $this->loadRoutesFrom($webRoutes);
+        }
+    }
+
+    /**
+     * Register admin routes.
+     * These routes are prefixed with /admin and require admin access.
+     */
+    protected function registerAdminRoutes(Closure $callback): void
+    {
+        $this->app['router']->prefix('admin')
+            ->middleware(['web', 'auth', 'admin'])
+            ->group($callback);
+    }
+
+    /**
+     * Register user routes.
+     * These routes are for authenticated users.
+     */
+    protected function registerUserRoutes(Closure $callback): void
+    {
+        $this->app['router']->middleware(['web', 'auth'])
+            ->group($callback);
+    }
+
     protected function registerRouteDescriptions(): void
     {
         $this->app['plugins']->addRouteDescription(function () {

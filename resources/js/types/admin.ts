@@ -1,5 +1,5 @@
 /**
- * Admin Type Definitions for MC-CMS v2
+ * Admin Type Definitions for ExilonCMS v2
  * Centralized types for all admin pages
  */
 

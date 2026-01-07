@@ -146,7 +146,7 @@ export const Button = <T extends React.ElementType = "button">({
   );
 };
 
-export const AuthIllustration = ({ siteName = "MC-CMS" }: { siteName?: string }) => {
+export const AuthIllustration = ({ siteName = "ExilonCMS" }: { siteName?: string }) => {
   return (
     <div className="relative flex min-h-80 flex-col items-start justify-end overflow-hidden rounded-2xl bg-black p-4 md:p-8">
       <div className="relative z-40 mb-2 flex items-center gap-2">

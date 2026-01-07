@@ -127,7 +127,7 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
-        // MC-CMS specific log channels
+        // ExilonCMS specific log channels
         'security' => [
             'driver' => 'daily',
             'path' => storage_path('logs/security.log'),

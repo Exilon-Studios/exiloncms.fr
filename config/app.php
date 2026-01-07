@@ -16,7 +16,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'MC-CMS'),
+    'name' => env('APP_NAME', 'ExilonCMS'),
 
     /*
     |--------------------------------------------------------------------------
@@ -163,7 +163,7 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
-        'MCCMS' => ExilonCMS\MCCMS::class,
+        'ExilonCMS' => ExilonCMS\ExilonCMS::class,
     ])->toArray(),
 
 ];

@@ -33,7 +33,7 @@ export default function GeneralSettings({
   const { trans } = useTrans();
 
   const { data, setData, post, processing, errors, reset } = useForm({
-    name: initialSettings.name || 'MC-CMS',
+    name: initialSettings.name || 'ExilonCMS',
     description: initialSettings.description || '',
     url: initialSettings.url || window.location.origin,
     locale: initialSettings.locale || 'en',
@@ -47,7 +47,7 @@ export default function GeneralSettings({
   // IMPORTANT: Reset form data when page props change (after save/reload)
   useEffect(() => {
     reset({
-      name: initialSettings.name || 'MC-CMS',
+      name: initialSettings.name || 'ExilonCMS',
       description: initialSettings.description || '',
       url: initialSettings.url || window.location.origin,
       locale: initialSettings.locale || 'en',

@@ -1,5 +1,5 @@
 /**
- * Theme definitions for MC-CMS V2
+ * Theme definitions for ExilonCMS V2
  * Each theme defines a complete color palette for light and dark modes
  */
 

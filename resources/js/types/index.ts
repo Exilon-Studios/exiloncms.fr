@@ -1,5 +1,5 @@
 /**
- * Global Type Definitions for MC-CMS v2
+ * Global Type Definitions for ExilonCMS v2
  * Type-safe, DRY, and fully typed
  */
 

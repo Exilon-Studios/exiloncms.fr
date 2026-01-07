@@ -1,0 +1,27 @@
+{
+  "admin": [
+    {
+      "label": "shop.admin",
+      "href": "/admin/shop",
+      "permission": "admin.shop",
+      "icon": "shopping-bag"
+    }
+  ],
+  "user": [
+    {
+      "label": "shop.shop",
+      "href": "/shop",
+      "icon": "shopping-bag"
+    },
+    {
+      "label": "shop.orders",
+      "href": "/shop/orders",
+      "icon": "package"
+    },
+    {
+      "label": "shop.invoices",
+      "href": "/shop/invoices",
+      "icon": "file-text"
+    }
+  ]
+}

@@ -21,6 +21,7 @@ export default defineConfig({
             '@/types': path.resolve(__dirname, './resources/js/types'),
             '@/lib': path.resolve(__dirname, './resources/js/lib'),
             '@/hooks': path.resolve(__dirname, './resources/js/hooks'),
+            '@/plugins': path.resolve(__dirname, './plugins'),
         },
     },
     server: {

@@ -13,7 +13,8 @@ return [
     'nav' => [
         'toggle' => 'Toggle navigation',
         'profile' => 'My Profile',
-        'admin' => 'Admin dashboard',
+        'admin' => 'Administration',
+        'dashboard' => 'Dashboard',
         'logout' => 'Logout',
     ],
 
@@ -142,5 +143,38 @@ return [
         'read_more' => 'Read more',
         'no_posts' => 'No posts yet',
         'no_posts_hint' => 'Be the first to publish a post!',
+    ],
+
+    'date' => [
+        'default' => 'l F j',
+        'full' => 'F j, Y \a\t g:i A',
+        'compact' => 'm/d/Y',
+    ],
+
+    'dashboard' => [
+        'title' => 'Dashboard',
+        'nav' => 'Dashboard',
+        'welcome' => 'Welcome, :name 👋',
+        'welcome_subtitle' => 'Here is your personal dashboard',
+        'balance' => 'Balance',
+        'account_age' => 'Account age',
+        'role' => 'Role',
+        'status' => 'Status',
+        'active' => 'Active',
+        'quick_actions' => 'Quick Actions',
+        'quick_actions_subtitle' => 'Manage your account and settings',
+        'my_profile' => 'My Profile',
+        'my_profile_subtitle' => 'Manage my personal information',
+        'notifications' => 'Notifications',
+        'notifications_subtitle' => 'View my notifications',
+        'shop' => 'Shop',
+        'shop_subtitle' => ':money available: :balance :currency',
+        'shop_coming_soon' => 'The shop will be available soon',
+        'coming_soon' => 'Coming soon',
+        'account_info' => 'Account Information',
+        'username' => 'Username',
+        'email' => 'Email',
+        'member_since' => 'Member since',
+        'see_more' => 'See more →',
     ],
 ];

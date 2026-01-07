@@ -2,6 +2,9 @@
 
 namespace ExilonCMS;
 
+use ExilonCMS\Extensions\Plugin\PluginManager;
+use ExilonCMS\Games\Game as GameGame;
+use ExilonCMS\Support\SettingsRepository;
 use Illuminate\Support\Str;
 
 class ExilonCMS
@@ -27,5 +30,64 @@ class ExilonCMS
     public static function apiVersion(): string
     {
         return Str::beforeLast(static::VERSION, '.');
+    }
+
+    /**
+     * Get a setting value.
+     *
+     * @param  string|null  $name  Setting name (null to get all settings)
+     * @param  mixed  $default  Default value if setting doesn't exist
+     * @return mixed
+     */
+    public static function setting(?string $name = null, mixed $default = null): mixed
+    {
+        /** @var SettingsRepository $settings */
+        $settings = app(SettingsRepository::class);
+
+        if ($name === null) {
+            return $settings;
+        }
+
+        return $settings->get($name, $default);
+    }
+
+    /**
+     * Get the plugin manager instance.
+     */
+    public static function plugin(): PluginManager
+    {
+        return app(PluginManager::class);
+    }
+
+    /**
+     * Get the current game instance.
+     */
+    public static function game(): GameGame
+    {
+        return app(GameGame::class);
+    }
+
+    /**
+     * Get the site name.
+     */
+    public static function siteName(): string
+    {
+        return static::setting('name', config('app.name'));
+    }
+
+    /**
+     * Get the money name/label.
+     */
+    public static function moneyName(): string
+    {
+        return static::setting('money', 'Points');
+    }
+
+    /**
+     * Get the site URL.
+     */
+    public static function url(): string
+    {
+        return config('app.url');
     }
 }

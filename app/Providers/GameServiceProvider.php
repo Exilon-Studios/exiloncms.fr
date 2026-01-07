@@ -52,7 +52,7 @@ class GameServiceProvider extends ServiceProvider
     {
         $this->registerSocialiteProviders();
 
-        $gameType = config('mccms.game') ?? '';
+        $gameType = config('exiloncms.game') ?? '';
         $game = Arr::get(static::$games, $gameType, FallbackGame::class);
 
         if (is_string($game)) {

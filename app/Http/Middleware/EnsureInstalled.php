@@ -22,7 +22,7 @@ class EnsureInstalled
             return $next($request); // Already installed
         }
 
-        // MC-CMS is not installed... yet !
+        // ExilonCMS is not installed... yet !
         // Unregister view composers because database is not setup
         Event::forget('composing: *');
 
@@ -62,7 +62,7 @@ class EnsureInstalled
             return $locale;
         }
 
-        if ($locales->contains($locale = $request->cookie('mccms_locale'))) {
+        if ($locales->contains($locale = $request->cookie('exiloncms_locale'))) {
             return $locale;
         }
 
@@ -71,7 +71,7 @@ class EnsureInstalled
 
     protected function addLocaleCookieToResponse(Response $response, string $locale): Response
     {
-        $response->headers->setCookie(cookie('mccms_locale', $locale, 60 * 24));
+        $response->headers->setCookie(cookie('exiloncms_locale', $locale, 60 * 24));
 
         return $response;
     }

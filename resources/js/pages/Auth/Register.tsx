@@ -39,7 +39,7 @@ export default function Register({ captcha, registerConditions }: RegisterProps)
             onSubmit={handleSubmit}
             processing={processing}
             errors={errors}
-            siteName={settings?.site_name || 'MC-CMS'}
+            siteName={settings?.site_name || 'ExilonCMS'}
             siteDescription={settings?.site_description || 'Modern Content Management System for Game Servers'}
             registerConditions={registerConditions}
           />

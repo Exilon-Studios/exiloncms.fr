@@ -86,7 +86,7 @@ export function DropdownUser({ user, align = "end", className }: DropdownUserPro
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => router.visit('/dashboard')}>
             <IconLayoutDashboard className="mr-2 h-4 w-4" />
-            <span>{trans('admin.nav.dashboard')}</span>
+            <span>{trans('messages.nav.dashboard')}</span>
           </DropdownMenuItem>
           {isAdmin && (
             <DropdownMenuItem onClick={() => router.visit('/admin')}>

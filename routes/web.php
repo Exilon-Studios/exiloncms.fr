@@ -1,6 +1,7 @@
 <?php
 
 use ExilonCMS\Http\Controllers\Auth\LoginController;
+use ExilonCMS\Http\Controllers\DashboardController;
 use ExilonCMS\Http\Controllers\FallbackController;
 use ExilonCMS\Http\Controllers\HomeController;
 use ExilonCMS\Http\Controllers\NotificationController;
@@ -13,6 +14,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// User Dashboard (for non-admin users)
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
 // Authentication Routes (Inertia)
 use ExilonCMS\Http\Controllers\Auth\RegisterController;

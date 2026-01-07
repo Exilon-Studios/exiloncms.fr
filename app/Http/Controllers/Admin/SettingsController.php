@@ -51,7 +51,7 @@ class SettingsController extends Controller
     private Cache $cache;
 
     /**
-     * The MC-CMS optimizer.
+     * The ExilonCMS optimizer.
      */
     private Optimizer $optimizer;
 
@@ -530,7 +530,7 @@ class SettingsController extends Controller
                 'mail_password' => setting('mail.password', ''), // Never expose password
                 'mail_encryption' => setting('mail.encryption', config('mail.mailers.smtp.encryption', 'tls')),
                 'mail_from_address' => setting('mail.from.address', config('mail.from.address', '')),
-                'mail_from_name' => setting('mail.from.name', config('mail.from.name', 'MC-CMS')),
+                'mail_from_name' => setting('mail.from.name', config('mail.from.name', 'ExilonCMS')),
             ],
         ]);
     }

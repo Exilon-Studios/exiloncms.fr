@@ -21,7 +21,7 @@ interface FooterProps {
 }
 
 export default function Footer({
-  siteName = "MC-CMS",
+  siteName = "ExilonCMS",
   logoUrl,
   pages = [],
   socials = [],

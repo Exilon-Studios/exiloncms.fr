@@ -15,7 +15,7 @@ import { ArrowLeft, Lock } from 'lucide-react';
 
 export default function TwoFactor() {
   const { settings } = usePage<PageProps>().props;
-  const siteName = settings?.site_name || settings?.name || 'MC-CMS';
+  const siteName = settings?.site_name || settings?.name || 'ExilonCMS';
   const t = useTrans();
 
   const { data, setData, post, processing, errors } = useForm({
