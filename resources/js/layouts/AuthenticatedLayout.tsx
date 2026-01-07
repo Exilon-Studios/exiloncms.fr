@@ -25,6 +25,8 @@ import {
   IconList,
   IconLanguage,
   IconMenu2,
+  IconShoppingBag,
+  IconPackage,
 } from '@tabler/icons-react';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
@@ -60,6 +62,31 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
       }
       return true;
     });
+  };
+
+  // Icon mapping for plugin navigation items
+  const iconMap: Record<string, React.ReactNode> = {
+    'shopping-bag': <IconShoppingBag className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'package': <IconPackage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'file-text': <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'puzzle': <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'settings': <IconSettings className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'users': <IconUsers className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'shield': <IconShield className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'ban': <IconBan className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'file': <IconFile className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'photo': <IconPhoto className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'arrows-right-left': <IconArrowsRightLeft className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'palette': <IconPalette className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'download': <IconDownload className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'list': <IconList className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+    'language': <IconLanguage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
+  };
+
+  // Helper function to get icon component from string name
+  const getIconComponent = (iconName?: string): React.ReactNode => {
+    if (!iconName) return <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />;
+    return iconMap[iconName] || <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />;
   };
 
   // Primary navigation links - Sections rétractables
@@ -175,9 +202,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
           label: item.label,
           href: item.href,
           permission: item.permission || 'admin.plugins',
-          icon: item.icon || (
-            <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
+          icon: typeof item.icon === 'string' ? getIconComponent(item.icon) : item.icon || getIconComponent(),
         })),
       },
     ] : []),

@@ -2,7 +2,7 @@
   "id": "shop",
   "name": "Shop",
   "description": "Système de boutique complet avec paiements multiples et facturation",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "author": "ExilonStudios",
   "url": "https://github.com/Exilon-Studios/ExilonCMS-marketplace",
   "mccms_api": "0.2",
