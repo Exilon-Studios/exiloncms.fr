@@ -36,6 +36,7 @@ class AdminUserSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'role_id' => $adminRole->id,
                 'email_verified_at' => now(),
+                'password_changed_at' => now(),
             ]
         );
 
