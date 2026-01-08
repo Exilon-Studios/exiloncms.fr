@@ -15,7 +15,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // ExilonCMS - Seeders will be run manually via php artisan user:create
-        // This prevents automatic seeding during fresh migrations
+        // Call individual seeders
+        $this->call([
+            AdminUserSeeder::class,
+            CompanySettingsSeeder::class,
+            LandingSettingsSeeder::class,
+            PuckPermissionSeeder::class,
+            ShopSeeder::class,
+        ]);
     }
 }
