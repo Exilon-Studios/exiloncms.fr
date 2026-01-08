@@ -29,6 +29,7 @@ import {
   IconShoppingCart,
   IconPackage,
   IconBuilding,
+  IconDatabase,
 } from '@tabler/icons-react';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
@@ -356,6 +357,14 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
           permission: 'admin.logs',
           icon: (
             <IconList className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: trans('admin.database.title'),
+          href: '/admin/database',
+          permission: 'admin.settings',
+          icon: (
+            <IconDatabase className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
         },
       ],

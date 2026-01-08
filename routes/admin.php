@@ -3,6 +3,7 @@
 use ExilonCMS\Http\Controllers\Admin\ActionLogController;
 use ExilonCMS\Http\Controllers\Admin\AdminController;
 use ExilonCMS\Http\Controllers\Admin\BanController;
+use ExilonCMS\Http\Controllers\Admin\DatabaseManagerController;
 use ExilonCMS\Http\Controllers\Admin\ImageController;
 use ExilonCMS\Http\Controllers\Admin\LanguageController;
 use ExilonCMS\Http\Controllers\Admin\NavbarController;
@@ -191,6 +192,20 @@ Route::prefix('notifications')->name('notifications.')->middleware('can:admin.us
     Route::get('/create', [NotificationManagerController::class, 'create'])->name('create');
     Route::post('/', [NotificationManagerController::class, 'store'])->name('store');
     Route::delete('/{notification}', [NotificationManagerController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('database')->name('database.')->middleware('can:admin.settings')->group(function () {
+    Route::get('/', [DatabaseManagerController::class, 'index'])->name('index');
+    Route::get('/tables', [DatabaseManagerController::class, 'tables'])->name('tables');
+    Route::post('/backup', [DatabaseManagerController::class, 'backup'])->name('backup');
+    Route::get('/backup/{filename}', [DatabaseManagerController::class, 'download'])->name('download');
+    Route::delete('/backup/{filename}', [DatabaseManagerController::class, 'deleteBackup'])->name('delete-backup');
+    Route::post('/restore', [DatabaseManagerController::class, 'restore'])->name('restore');
+    Route::get('/export', [DatabaseManagerController::class, 'export'])->name('export');
+    Route::get('/export/sqlite', [DatabaseManagerController::class, 'exportSqlite'])->name('export.sqlite');
+    Route::post('/import', [DatabaseManagerController::class, 'import'])->name('import');
+    Route::post('/optimize', [DatabaseManagerController::class, 'optimize'])->name('optimize');
+    Route::post('/truncate', [DatabaseManagerController::class, 'truncate'])->name('truncate');
 });
 
 Route::fallback([AdminController::class, 'fallback']);

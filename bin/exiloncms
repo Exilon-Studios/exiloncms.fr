@@ -256,13 +256,25 @@ function command_new(array $argv): int
         print_success("Fichier .env créé");
     }
 
-    // Generate key directly in .env
+    // Create SQLite database file
+    $dbPath = $targetDir . '/database/database.sqlite';
+    $dbDir = dirname($dbPath);
+    if (! is_dir($dbDir)) {
+        mkdir($dbDir, 0755, true);
+    }
+    if (! file_exists($dbPath)) {
+        touch($dbPath);
+        print_success("Base de données SQLite créée");
+    }
+
+    // Generate key using Laravel artisan command
     print_info("Génération de la clé d'application...");
-    $key = base64_encode(random_bytes(32));
-    $envContent = file_get_contents($envPath);
-    $envContent = preg_replace('/APP_KEY=.*/', 'APP_KEY=' . $key, $envContent);
-    file_put_contents($envPath, $envContent);
-    print_success("Clé d'application générée");
+    exec("cd \"{$targetDir}\" && php artisan key:generate 2>&1", $output, $returnCode);
+    if ($returnCode === 0) {
+        print_success("Clé d'application générée");
+    } else {
+        print_warn("Génération de clé échouée, vous devrez peut-être lancer 'php artisan key:generate' manuellement");
+    }
 
     // Create required directories
     $dirs = ['plugins', 'themes', 'storage/logs', 'storage/framework/cache', 'storage/framework/sessions', 'storage/framework/views'];
@@ -306,25 +318,20 @@ function command_new(array $argv): int
 
     echo colorize("\nVotre projet est prêt! 🚀\n", 'green');
     echo "\n" . colorize("Étapes suivantes:\n", 'yellow');
-    echo "\n  " . colorize("1.", 'green') . " Créer une base de données PostgreSQL gratuite:";
-    echo "\n      - Allez sur " . colorize("https://neon.tech", 'cyan') . " (gratuit) ou https://supabase.com";
-    echo "\n      - Ou utilisez Docker:";
-    echo "\n        " . colorize("docker run -d --name exiloncms-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=exiloncms -p 5432:5432 postgres:16", 'cyan');
-    echo "\n";
-    echo "\n  " . colorize("2.", 'green') . " Configurer la base de données dans " . colorize(".env", 'cyan');
-    echo "\n      Modifiez ces lignes:";
-    echo "\n      DB_CONNECTION=pgsql";
-    echo "\n      DB_HOST=host_neon_ou_127.0.0.1";
-    echo "\n      DB_PORT=5432";
-    echo "\n      DB_DATABASE=exiloncms";
-    echo "\n      DB_USERNAME=votre_user_neon";
-    echo "\n      DB_PASSWORD=votre_password_neon";
-    echo "\n";
-    echo "\n  " . colorize("3.", 'green') . " Lancer les migrations:";
+    echo "\n  " . colorize("1.", 'green') . " Lancer les migrations:";
+    echo "\n      " . colorize("cd {$projectName}", 'cyan');
     echo "\n      " . colorize("php artisan migrate:fresh --seed", 'cyan');
     echo "\n";
-    echo "\n  " . colorize("4.", 'green') . " Démarrer le serveur:";
+    echo "\n  " . colorize("2.", 'green') . " Démarrer le serveur:";
     echo "\n      " . colorize("php artisan serve", 'cyan');
+    echo "\n";
+    echo "\n  " . colorize("C'est tout! 🎉", 'green');
+    echo "\n  " . colorize("SQLite est utilisé par défaut - aucune configuration de base de données nécessaire!", 'cyan');
+    echo "\n";
+    echo "\n  " . colorize("Pour migrer vers PostgreSQL plus tard:", 'yellow');
+    echo "\n      - Allez sur " . colorize("https://neon.tech", 'cyan') . " (gratuit) ou https://supabase.com";
+    echo "\n      - Configurez " . colorize("DB_CONNECTION", 'cyan') . " dans " . colorize(".env", 'cyan');
+    echo "\n      - Exportez votre DB SQLite depuis le panel admin";
     echo "\n";
     echo "\n  " . colorize("Identifiants par défaut:", 'yellow');
     echo "\n      Email: " . colorize("admin@example.com", 'cyan');

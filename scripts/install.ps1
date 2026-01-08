@@ -186,25 +186,20 @@ if ($exitCode -eq 0) {
     Write-Host ""
     Write-Host "Étapes suivantes:" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  1. Créer une base de données PostgreSQL gratuite:" -ForegroundColor Green
-    Write-Host "     - Allez sur https://neon.tech (gratuit) ou https://supabase.com" -ForegroundColor Cyan
-    Write-Host "     - Ou utilisez Docker:" -ForegroundColor Cyan
-    Write-Host "       docker run -d --name exiloncms-db -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=exiloncms -p 5432:5432 postgres:16" -ForegroundColor Yellow
-    Write-Host ""
-    Write-Host "  2. Configurer la base de données dans .env" -ForegroundColor Green
-    Write-Host "     Modifiez les lignes:" -ForegroundColor Cyan
-    Write-Host "     DB_CONNECTION=pgsql" -ForegroundColor White
-    Write-Host "     DB_HOST=host_neon_ou_127.0.0.1" -ForegroundColor White
-    Write-Host "     DB_PORT=5432" -ForegroundColor White
-    Write-Host "     DB_DATABASE=exiloncms" -ForegroundColor White
-    Write-Host "     DB_USERNAME=votre_user_neon" -ForegroundColor White
-    Write-Host "     DB_PASSWORD=votre_password_neon" -ForegroundColor White
-    Write-Host ""
-    Write-Host "  3. Lancer les migrations:" -ForegroundColor Green
+    Write-Host "  1. Lancer les migrations:" -ForegroundColor Green
+    Write-Host "     cd $projectName" -ForegroundColor Cyan
     Write-Host "     php artisan migrate:fresh --seed" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "  4. Démarrer le serveur:" -ForegroundColor Green
+    Write-Host "  2. Démarrer le serveur:" -ForegroundColor Green
     Write-Host "     php artisan serve" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "  C'est tout! 🎉" -ForegroundColor Green
+    Write-Host "  SQLite est utilisé par défaut - aucune configuration de base de données nécessaire!" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "  Pour migrer vers PostgreSQL plus tard:" -ForegroundColor Yellow
+    Write-Host "     - Allez sur https://neon.tech (gratuit) ou https://supabase.com" -ForegroundColor Cyan
+    Write-Host "     - Configurez DB_CONNECTION dans .env" -ForegroundColor Cyan
+    Write-Host "     - Exportez votre DB SQLite depuis le panel admin" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "  Identifiants par défaut:" -ForegroundColor Yellow
     Write-Host "  Email: admin@example.com" -ForegroundColor Cyan
