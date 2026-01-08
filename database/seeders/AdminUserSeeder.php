@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use ExilonCMS\Models\User;
 use ExilonCMS\Models\Role;
+use ExilonCMS\Models\Permission;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -38,11 +39,14 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // Sync all permissions to admin role
+        // Create all permissions for admin role
         if ($adminRole->permissions()->count() === 0) {
-            $adminRole->permissions()->attach(
-                \ExilonCMS\Models\Permission::pluck('id')->toArray()
-            );
+            foreach (Permission::permissions() as $permission) {
+                Permission::create([
+                    'permission' => $permission,
+                    'role_id' => $adminRole->id,
+                ]);
+            }
         }
     }
 }
