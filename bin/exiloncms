@@ -256,26 +256,6 @@ function command_new(array $argv): int
         print_success("Fichier .env créé");
     }
 
-    // Create SQLite database file
-    $dbPath = $targetDir . '/database/database.sqlite';
-    $dbDir = dirname($dbPath);
-    if (! is_dir($dbDir)) {
-        mkdir($dbDir, 0755, true);
-    }
-    if (! file_exists($dbPath)) {
-        touch($dbPath);
-        print_success("Base de données SQLite créée");
-    }
-
-    // Generate key using Laravel artisan command
-    print_info("Génération de la clé d'application...");
-    exec("cd \"{$targetDir}\" && php artisan key:generate 2>&1", $output, $returnCode);
-    if ($returnCode === 0) {
-        print_success("Clé d'application générée");
-    } else {
-        print_warn("Génération de clé échouée, vous devrez peut-être lancer 'php artisan key:generate' manuellement");
-    }
-
     // Create required directories
     $dirs = ['plugins', 'themes', 'storage/logs', 'storage/framework/cache', 'storage/framework/sessions', 'storage/framework/views'];
     foreach ($dirs as $dir) {
@@ -311,6 +291,28 @@ function command_new(array $argv): int
         print_success("Assets construits avec succès");
     } else {
         print_warn("La construction a eu des problèmes, vous devrez peut-être la lancer manuellement");
+    }
+
+    // Create SQLite database file
+    echo "\n";
+    print_info("Création de la base de données SQLite...");
+    $dbPath = $targetDir . '/database/database.sqlite';
+    $dbDir = dirname($dbPath);
+    if (! is_dir($dbDir)) {
+        mkdir($dbDir, 0755, true);
+    }
+    if (! file_exists($dbPath)) {
+        touch($dbPath);
+        print_success("Base de données SQLite créée");
+    }
+
+    // Generate APP_KEY using artisan command
+    print_info("Génération de la clé d'application...");
+    exec("cd \"{$targetDir}\" && php artisan key:generate --force 2>&1", $output, $returnCode);
+    if ($returnCode === 0) {
+        print_success("Clé d'application générée");
+    } else {
+        print_warn("Génération de clé échouée, lancez 'php artisan key:generate' manuellement");
     }
 
     echo "\n";
