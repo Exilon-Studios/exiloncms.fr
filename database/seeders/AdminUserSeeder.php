@@ -21,7 +21,7 @@ class AdminUserSeeder extends Seeder
         $adminRole = Role::firstOrCreate(
             ['name' => 'admin'],
             [
-                'label' => 'Administrator',
+                'color' => 'FF0000',
                 'is_admin' => true,
                 'power' => 100,
             ]
