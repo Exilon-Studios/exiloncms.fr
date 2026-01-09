@@ -76,15 +76,21 @@ echo "[1/7] Cleaning previous build...\n";
 cleanDirectory($buildDir);
 cleanDirectory($distDir);
 @unlink($releaseFile);
+
+// Clean vendor directory to avoid corruption issues
+$vendorDir = __DIR__.'/vendor';
+if (is_dir($vendorDir)) {
+    cleanDirectory($vendorDir);
+}
 echo "       ✓ Cleaned\n\n";
 
 // Step 2: Install dependencies
 echo "[2/7] Installing dependencies...\n";
-echo "       → Running composer install...\n";
+echo "       → Running composer update...\n";
 $composerOutput = [];
-$composerResult = exec('composer install --no-dev --optimize-autoloader --no-interaction 2>&1', $composerOutput, $composerReturn);
+$composerResult = exec('composer update --no-dev --optimize-autoloader --no-interaction 2>&1', $composerOutput, $composerReturn);
 if ($composerReturn !== 0) {
-    echo "       ✗ Composer install failed!\n";
+    echo "       ✗ Composer update failed!\n";
     echo implode("\n", $composerOutput);
     exit(1);
 }
