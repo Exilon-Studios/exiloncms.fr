@@ -302,6 +302,55 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             // Delete the zip file
             unlink($file);
 
+            // Check if files are in a subdirectory (exiloncms-vX.X.X/)
+            $dirs = glob(__DIR__.'/*', GLOB_ONLYDIR);
+            $cmsDir = null;
+
+            foreach ($dirs as $dir) {
+                $basename = basename($dir);
+
+                // Check if this is the CMS directory (contains app/vendor/config)
+                if (preg_match('/^exiloncms-v[\d.]+$/', $basename) &&
+                    is_dir($dir.'/app') && is_dir($dir.'/vendor')) {
+                    $cmsDir = $dir;
+                    break;
+                }
+            }
+
+            // Move files from subdirectory to root
+            if ($cmsDir !== null) {
+                $iterator = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($cmsDir, RecursiveDirectoryIterator::SKIP_DOTS),
+                    RecursiveIteratorIterator::SELF_FIRST
+                );
+
+                foreach ($iterator as $item) {
+                    $destPath = __DIR__.'/'.$iterator->getSubPathName();
+
+                    if ($item->isDir()) {
+                        if (! is_dir($destPath)) {
+                            mkdir($destPath, 0755, true);
+                        }
+                    } else {
+                        copy($item->getPathname(), $destPath);
+                    }
+                }
+
+                // Remove the now-empty subdirectory
+                $it = new RecursiveDirectoryIterator($cmsDir, RecursiveDirectoryIterator::SKIP_DOTS);
+                $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
+
+                foreach ($files as $file) {
+                    if ($file->isDir()) {
+                        rmdir($file->getPathname());
+                    } else {
+                        unlink($file->getPathname());
+                    }
+                }
+
+                rmdir($cmsDir);
+            }
+
             // Delete the install.php file itself
             if (file_exists(__DIR__.'/install.php')) {
                 unlink(__DIR__.'/install.php');
