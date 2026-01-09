@@ -37,6 +37,8 @@ $buildDir = __DIR__.'/.release-cache';
 $distDir = __DIR__.'/.dist';
 $releaseName = "exiloncms-v{$version}";
 $releaseFile = __DIR__."/{$releaseName}.zip";
+$releaseLiteName = "exiloncms-v{$version}-lite";
+$releaseLiteFile = __DIR__."/{$releaseLiteName}.zip";
 
 // Files and directories to exclude from the release
 $exclude = [
@@ -60,6 +62,42 @@ $exclude = [
     '*.log',
     '.DS_Store',
     'Thumbs.db',
+    // Exclude storage contents (will create structure later)
+    'storage/*.key',
+    'storage/logs/*',
+    'storage/framework/cache/*',
+    'storage/framework/sessions/*',
+    'storage/framework/views/*',
+    'storage/app/public/*',
+    // Exclude development files
+    'docs',
+    '.vscode',
+    '.idea',
+    'CLAUDE.md',
+    'PLUGIN_CREATION_GUIDE.md',
+    'PLUGIN_EXAMPLE.md',
+    'INSTALL.md',
+    'README.md',
+    // Exclude vendor tests and docs (reduce size significantly)
+    'vendor/*/tests',
+    'vendor/*/test',
+    'vendor/*/Tests',
+    'vendor/*/Test',
+    'vendor/*/docs',
+    'vendor/*/doc',
+    'vendor/*/examples',
+    'vendor/*/example',
+    'vendor/*/demo',
+    // Exclude specific heavy vendor packages
+    'vendor/sebastian',
+    'vendor/phpstan',
+    'vendor/phpunit',
+    'vendor/squizlabs',
+    'vendor/slevomat',
+    'vendor/php-webdriver',
+    'vendor/bamarni',
+    'vendor/mockery',
+    'vendor/myclabs',
 ];
 
 // Patterns to exclude (regex)
@@ -121,7 +159,12 @@ echo "       ✓ Assets built\n\n";
 echo "[4/7] Copying files to build directory...\n";
 $filesToCopy = getFilesToCopy(__DIR__, $exclude, $excludePatterns);
 copyFiles($filesToCopy, __DIR__, $buildDir);
-echo "       ✓ ".count($filesToCopy)." files copied\n\n";
+echo "       ✓ ".count($filesToCopy)." files copied\n";
+
+// Clean up vendor directory to reduce file count
+echo "       → Removing vendor tests and docs...\n";
+$cleanupCount = cleanVendorDirectory($buildDir.'/vendor');
+echo "       ✓ Removed {$cleanupCount} files\n\n";
 
 // Step 5: Set permissions
 echo "[5/7] Setting permissions...\n";
@@ -130,7 +173,8 @@ echo "       ✓ Permissions set\n\n";
 
 // Step 6: Create zip
 echo "[6/7] Creating release zip...\n";
-createZip($buildDir, $releaseFile, $releaseName);
+// Use empty string as root to put files directly at zip root (like Azuriom)
+createZip($buildDir, $releaseFile, '');
 
 $zipSize = filesize($releaseFile);
 $zipSizeMB = round($zipSize / 1024 / 1024, 2);
@@ -203,7 +247,8 @@ function getFilesToCopy(string $sourceDir, array $exclude, array $excludePattern
         // Skip excluded files/directories
         $skip = false;
         foreach ($exclude as $excluded) {
-            if (str_starts_with($relativePath, $excluded) || $relativePath === $excluded) {
+            // Use fnmatch for wildcard support
+            if (fnmatch($excluded, $relativePath) || str_starts_with($relativePath, $excluded) || $relativePath === $excluded) {
                 $skip = true;
                 break;
             }
@@ -272,6 +317,57 @@ function setPermissions(string $dir): void
 }
 
 /**
+ * Clean vendor directory to reduce file count.
+ */
+function cleanVendorDirectory(string $vendorDir): int
+{
+    if (! is_dir($vendorDir)) {
+        return 0;
+    }
+
+    $removed = 0;
+    $dirsToRemove = ['tests', 'Tests', 'test', 'Test', 'docs', 'doc', 'examples', 'example', 'demo', '.github'];
+
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($vendorDir, RecursiveDirectoryIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+
+    foreach ($iterator as $file) {
+        $relativePath = str_replace($vendorDir.'/', '', $file->getPathname());
+        $parts = explode('/', $relativePath);
+
+        // Check if this is a test/doc/example directory
+        foreach ($parts as $part) {
+            if (in_array($part, $dirsToRemove, true)) {
+                if (is_file($file->getPathname())) {
+                    unlink($file->getPathname());
+                    $removed++;
+                }
+                break;
+            }
+        }
+    }
+
+    // Now remove empty directories
+    foreach ($iterator as $dir) {
+        if ($dir->isDir()) {
+            $relativePath = str_replace($vendorDir.'/', '', $dir->getPathname());
+            $parts = explode('/', $relativePath);
+
+            foreach ($parts as $part) {
+                if (in_array($part, $dirsToRemove, true)) {
+                    @rmdir($dir->getPathname());
+                    break;
+                }
+            }
+        }
+    }
+
+    return $removed;
+}
+
+/**
  * Create a zip archive.
  */
 function createZip(string $sourceDir, string $destFile, string $zipRoot): void
@@ -288,7 +384,10 @@ function createZip(string $sourceDir, string $destFile, string $zipRoot): void
 
     foreach ($iterator as $file) {
         $relativePath = substr($file->getPathname(), strlen($sourceDir) + 1);
-        $zipPath = $zipRoot.'/'.$relativePath;
+        // Convert Windows backslashes to Unix forward slashes
+        $relativePath = str_replace('\\', '/', $relativePath);
+        // Build zip path: if root is empty, don't add leading slash
+        $zipPath = $zipRoot === '' ? $relativePath : $zipRoot.'/'.$relativePath;
 
         if (is_file($file->getPathname())) {
             $zip->addFile($file->getPathname(), $zipPath);
