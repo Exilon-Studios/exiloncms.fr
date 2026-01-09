@@ -356,23 +356,8 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 unlink(__DIR__.'/install.php');
             }
 
-            // Delete the public folder if it exists
-            if (is_dir(__DIR__.'/public')) {
-                $files = new RecursiveIteratorIterator(
-                    new RecursiveDirectoryIterator(__DIR__.'/public', RecursiveDirectoryIterator::SKIP_DOTS),
-                    RecursiveIteratorIterator::CHILD_FIRST
-                );
-
-                foreach ($files as $fileinfo) {
-                    if ($fileinfo->isDir()) {
-                        rmdir($fileinfo->getPathname());
-                    } else {
-                        unlink($fileinfo->getPathname());
-                    }
-                }
-
-                rmdir(__DIR__.'/public');
-            }
+            // Don't delete the public folder anymore - it's part of the CMS!
+            // The installer's public folder only contained a redirect file
 
             send_json_response([
                 'success' => true,
