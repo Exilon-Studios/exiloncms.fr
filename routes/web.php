@@ -4,6 +4,7 @@ use ExilonCMS\Http\Controllers\Auth\LoginController;
 use ExilonCMS\Http\Controllers\DashboardController;
 use ExilonCMS\Http\Controllers\FallbackController;
 use ExilonCMS\Http\Controllers\HomeController;
+use ExilonCMS\Http\Controllers\InstallController;
 use ExilonCMS\Http\Controllers\NotificationController;
 use ExilonCMS\Http\Controllers\PostCommentController;
 use ExilonCMS\Http\Controllers\PostController;
@@ -12,6 +13,20 @@ use ExilonCMS\Http\Controllers\ProfileController;
 use ExilonCMS\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+// ============================================================
+// INSTALLER ROUTES (Must be before auth middleware)
+// ============================================================
+Route::middleware(['web'])->group(function () {
+    Route::get('/install', [InstallController::class, 'showWelcome'])->name('install.welcome');
+    Route::get('/install/requirements', [InstallController::class, 'showRequirements'])->name('install.requirements');
+    Route::post('/install/requirements', [InstallController::class, 'checkRequirements'])->name('install.requirements.check');
+    Route::get('/install/database', [InstallController::class, 'showDatabase'])->name('install.database');
+    Route::post('/install/database', [InstallController::class, 'configureDatabase'])->name('install.database.save');
+    Route::get('/install/admin', [InstallController::class, 'showAdmin'])->name('install.admin');
+    Route::post('/install/admin', [InstallController::class, 'createAdmin'])->name('install.admin.save');
+    Route::get('/install/complete', [InstallController::class, 'showComplete'])->name('install.complete');
+});
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

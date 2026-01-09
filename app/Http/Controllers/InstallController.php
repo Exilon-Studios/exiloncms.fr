@@ -24,10 +24,14 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Inertia;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Inertia\Responses;
 use RuntimeException;
 use Throwable;
 
@@ -551,5 +555,278 @@ class InstallController extends Controller
     {
         return collect(File::directories(app()->langPath()))
             ->map(fn (string $path) => basename($path));
+    }
+
+    // ============================================================
+    // WEB INSTALLER (Inertia/React)
+    // ============================================================
+
+    /**
+     * Show welcome page for web installer.
+     */
+    public function showWelcome(): Responses
+    {
+        return Inertia::render('Install/Welcome');
+    }
+
+    /**
+     * Show requirements check page.
+     */
+    public function showRequirements(): Responses
+    {
+        return Inertia::render('Install/Requirements', [
+            'requirements' => $this->getWebRequirements(),
+        ]);
+    }
+
+    /**
+     * Check system requirements via AJAX.
+     */
+    public function checkRequirements(): Responses
+    {
+        return Inertia::render('Install/Requirements', [
+            'requirements' => $this->getWebRequirements(),
+        ]);
+    }
+
+    /**
+     * Show database configuration page.
+     */
+    public function showDatabase(): Responses
+    {
+        return Inertia::render('Install/Database');
+    }
+
+    /**
+     * Save database configuration and test connection.
+     */
+    public function configureDatabase(Request $request)
+    {
+        $validated = $this->validate($request, [
+            'connection' => ['required', 'in:sqlite,mysql,pgsql'],
+            'host' => ['required_if:connection,mysql,pgsql', 'nullable', 'string'],
+            'port' => ['nullable', 'integer', 'between:1,65535'],
+            'database' => ['required', 'string'],
+            'username' => ['required_if:connection,mysql,pgsql', 'nullable', 'string'],
+            'password' => ['nullable', 'string'],
+        ]);
+
+        try {
+            if ($validated['connection'] === 'sqlite') {
+                // Create SQLite database
+                $dbPath = database_path('database.sqlite');
+                if (! file_exists($dbPath)) {
+                    touch($dbPath);
+                }
+
+                // Test connection
+                DB::connection('sqlite')->getPdo();
+
+                // Update .env
+                $this->updateEnvironmentFile([
+                    'DB_CONNECTION' => 'sqlite',
+                    'DB_DATABASE' => database_path('database.sqlite'),
+                ]);
+            } else {
+                // Test MySQL/PostgreSQL connection
+                Config::set('database.connections.install_test', [
+                    'driver' => $validated['connection'],
+                    'host' => $validated['host'] ?? 'localhost',
+                    'port' => $validated['port'] ?? ($validated['connection'] === 'mysql' ? 3306 : 5432),
+                    'database' => $validated['database'],
+                    'username' => $validated['username'],
+                    'password' => $validated['password'],
+                ]);
+
+                DB::connection('install_test')->getPdo();
+
+                // Update .env
+                $this->updateEnvironmentFile([
+                    'DB_CONNECTION' => $validated['connection'],
+                    'DB_HOST' => $validated['host'] ?? 'localhost',
+                    'DB_PORT' => $validated['port'] ?? ($validated['connection'] === 'mysql' ? 3306 : 5432),
+                    'DB_DATABASE' => $validated['database'],
+                    'DB_USERNAME' => $validated['username'],
+                    'DB_PASSWORD' => $validated['password'] ?? '',
+                ]);
+            }
+
+            return back();
+        } catch (Throwable $e) {
+            throw ValidationException::withMessages([
+                'connection' => 'Impossible de se connecter à la base de données: '.$e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Show admin user creation page.
+     */
+    public function showAdmin(): Responses
+    {
+        return Inertia::render('Install/Admin');
+    }
+
+    /**
+     * Create admin user and complete installation.
+     */
+    public function createAdmin(Request $request)
+    {
+        $validated = $this->validate($request, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        try {
+            // Run migrations
+            Artisan::call('migrate:fresh', [
+                '--force' => true,
+                '--seed' => true,
+            ]);
+
+            // Create storage link
+            if (! file_exists(public_path('storage'))) {
+                Artisan::call('storage:link', ! windows_os() ? ['--relative' => true] : []);
+            }
+
+            // Get admin role
+            $adminRole = Role::where('is_admin', true)->firstOrFail();
+
+            // Create admin user
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role_id' => $adminRole->id,
+                'email_verified_at' => now(),
+                'password_changed_at' => now(),
+            ]);
+
+            // Generate APP_KEY
+            $this->updateEnvironmentFile([
+                'APP_KEY' => 'base64:'.base64_encode(Encrypter::generateKey(config('app.cipher'))),
+                'APP_URL' => url('/'),
+            ]);
+
+            // Clear cache
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('view:clear');
+
+            // Create installation marker
+            $this->createInstallationMarker();
+
+            return Inertia::render('Install/Complete', [
+                'adminEmail' => $validated['email'],
+                'adminPassword' => $validated['password'],
+            ]);
+        } catch (Throwable $e) {
+            throw ValidationException::withMessages([
+                'name' => 'Erreur lors de l\'installation: '.$e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Show installation complete page.
+     */
+    public function showComplete(): Responses
+    {
+        return Inertia::render('Install/Complete');
+    }
+
+    /**
+     * Get requirements formatted for web installer.
+     *
+     * @return array<int, array{name: string, status: 'success'|'error', message?: string}>
+     */
+    protected function getWebRequirements(): array
+    {
+        $requirements = [];
+
+        // PHP Version
+        $requirements[] = [
+            'name' => 'PHP '.static::MIN_PHP_VERSION.' ou supérieur',
+            'status' => version_compare(PHP_VERSION, static::MIN_PHP_VERSION, '>=')
+                ? 'success'
+                : 'error',
+            'message' => 'Installé: '.PHP_VERSION,
+        ];
+
+        // Required extensions
+        foreach (static::REQUIRED_EXTENSIONS as $extension) {
+            $loaded = extension_loaded($extension);
+            $requirements[] = [
+                'name' => 'Extension PHP: '.$extension,
+                'status' => $loaded ? 'success' : 'error',
+                'message' => $loaded ? 'Activée' : 'Manquante',
+            ];
+        }
+
+        // Writable directories
+        $writableDirs = [
+            'storage',
+            'bootstrap/cache',
+        ];
+
+        foreach ($writableDirs as $dir) {
+            $path = base_path($dir);
+            $writable = is_writable($path);
+            $requirements[] = [
+                'name' => 'Dossier writable: '.$dir,
+                'status' => $writable ? 'success' : 'error',
+                'message' => $writable ? 'Writable' : 'Non writable',
+            ];
+        }
+
+        return $requirements;
+    }
+
+    /**
+     * Update environment file with given values.
+     */
+    protected function updateEnvironmentFile(array $values): void
+    {
+        $envPath = App::environmentFilePath();
+
+        if (! file_exists($envPath)) {
+            copy(base_path('.env.example'), $envPath);
+        }
+
+        foreach ($values as $key => $value) {
+            EnvEditor::updateEnv([
+                $key => $value,
+            ]);
+        }
+    }
+
+    /**
+     * Create installation marker file.
+     */
+    protected function createInstallationMarker(): void
+    {
+        $markerFile = storage_path('installed.json');
+
+        file_put_contents($markerFile, json_encode([
+            'installed' => true,
+            'installed_at' => now()->toIso8601String(),
+            'version' => $this->getAppVersion(),
+        ], JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Get application version from version.json or return default.
+     */
+    protected function getAppVersion(): string
+    {
+        $versionFile = base_path('version.json');
+
+        if (file_exists($versionFile)) {
+            $versionData = json_decode(file_get_contents($versionFile), true);
+            return $versionData['version'] ?? '1.0.0';
+        }
+
+        return '1.0.0';
     }
 }

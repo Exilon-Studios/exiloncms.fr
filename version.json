@@ -1,0 +1,21 @@
+{
+  "version": "1.0.0",
+  "build_date": "2025-01-09",
+  "codename": "Outland",
+  "description": "ExilonCMS - Modern Content Management System for Gaming Servers",
+  "type": "release",
+  "php_required": ">=8.2",
+  "extensions_required": [
+    "bcmath",
+    "ctype",
+    "json",
+    "mbstring",
+    "openssl",
+    "PDO",
+    "tokenizer",
+    "xml",
+    "curl",
+    "fileinfo",
+    "zip"
+  ]
+}
