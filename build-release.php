@@ -50,8 +50,11 @@ $exclude = [
     'tests',
     'phpunit.xml',
     '.phpunit.result.cache',
+    // Exclude only exact .env file, not .env.example
     '.env',
     '.env.backup',
+    '.env.local',
+    '.env.production',
     'composer.lock',
     'package-lock.json',
     'pnpm-lock.yaml',
@@ -248,7 +251,12 @@ function getFilesToCopy(string $sourceDir, array $exclude, array $excludePattern
         $skip = false;
         foreach ($exclude as $excluded) {
             // Use fnmatch for wildcard support
-            if (fnmatch($excluded, $relativePath) || str_starts_with($relativePath, $excluded) || $relativePath === $excluded) {
+            if (fnmatch($excluded, $relativePath) || $relativePath === $excluded) {
+                $skip = true;
+                break;
+            }
+            // For directory exclusions, check if path starts with directory name
+            if (!str_contains($excluded, '.') && !str_contains($excluded, '*') && str_starts_with($relativePath, $excluded.'/')) {
                 $skip = true;
                 break;
             }

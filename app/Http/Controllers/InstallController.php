@@ -117,13 +117,41 @@ class InstallController extends Controller
         $this->requirements = static::getRequirements();
         $this->hasRequirements = ! in_array(false, $this->requirements, true);
 
+        // Middleware pour les anciennes routes Blade (avec sélection de jeu)
         $this->middleware(function (Request $request, callable $next) {
             if (! $this->hasRequirements || config('app.key') !== self::TEMP_KEY) {
                 return to_route('home');
             }
 
             return $next($request);
-        });
+        })->only([
+            'showDatabase',
+            'database',
+            'showGames',
+            'showGame',
+            'setupGame',
+            'finishInstall',
+        ]);
+
+        // Middleware pour les nouvelles routes Web (Inertia/React)
+        // Permet l'accès si le CMS n'est pas installé
+        $this->middleware(function (Request $request, callable $next) {
+            // Permettre l'accès si le CMS n'est pas encore installé
+            if (is_installed()) {
+                return to_route('home');
+            }
+
+            return $next($request);
+        })->only([
+            'showWelcomeWeb',
+            'showRequirementsWeb',
+            'checkRequirementsWeb',
+            'showDatabaseWeb',
+            'configureDatabaseWeb',
+            'showAdminWeb',
+            'createAdminWeb',
+            'showCompleteWeb',
+        ]);
 
         $this->middleware(function (Request $request, callable $next) {
             return file_exists(App::environmentFilePath())
