@@ -146,7 +146,14 @@ class ThemeManager extends ExtensionManager
      */
     public function findThemesDescriptions(): Collection
     {
-        $directories = $this->files->directories($this->themesPath);
+        // Ensure themes directory exists
+        if (!$this->files->exists($this->themesPath)) {
+            $this->files->makeDirectory($this->themesPath, 0755, true);
+        }
+
+        $directories = $this->files->exists($this->themesPath)
+            ? $this->files->directories($this->themesPath)
+            : [];
 
         $themes = [];
         $currentTheme = setting('theme');
