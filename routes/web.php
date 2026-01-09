@@ -18,14 +18,14 @@ use Illuminate\Support\Facades\Route;
 // INSTALLER ROUTES (Must be before auth middleware)
 // ============================================================
 Route::middleware(['web'])->group(function () {
-    Route::get('/install', [InstallController::class, 'showWelcome'])->name('install.welcome');
-    Route::get('/install/requirements', [InstallController::class, 'showRequirements'])->name('install.requirements');
-    Route::post('/install/requirements', [InstallController::class, 'checkRequirements'])->name('install.requirements.check');
-    Route::get('/install/database', [InstallController::class, 'showDatabase'])->name('install.database');
-    Route::post('/install/database', [InstallController::class, 'configureDatabase'])->name('install.database.save');
-    Route::get('/install/admin', [InstallController::class, 'showAdmin'])->name('install.admin');
-    Route::post('/install/admin', [InstallController::class, 'createAdmin'])->name('install.admin.save');
-    Route::get('/install/complete', [InstallController::class, 'showComplete'])->name('install.complete');
+    Route::get('/install', [InstallController::class, 'showWelcomeWeb'])->name('install.welcome');
+    Route::get('/install/requirements', [InstallController::class, 'showRequirementsWeb'])->name('install.requirements');
+    Route::post('/install/requirements', [InstallController::class, 'checkRequirementsWeb'])->name('install.requirements.check');
+    Route::get('/install/database', [InstallController::class, 'showDatabaseWeb'])->name('install.database');
+    Route::post('/install/database', [InstallController::class, 'configureDatabaseWeb'])->name('install.database.save');
+    Route::get('/install/admin', [InstallController::class, 'showAdminWeb'])->name('install.admin');
+    Route::post('/install/admin', [InstallController::class, 'createAdminWeb'])->name('install.admin.save');
+    Route::get('/install/complete', [InstallController::class, 'showCompleteWeb'])->name('install.complete');
 });
 
 Route::get('/', [HomeController::class, 'index'])->name('home');

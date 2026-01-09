@@ -564,7 +564,7 @@ class InstallController extends Controller
     /**
      * Show welcome page for web installer.
      */
-    public function showWelcome(): Responses
+    public function showWelcomeWeb(): Responses
     {
         return Inertia::render('Install/Welcome');
     }
@@ -572,7 +572,7 @@ class InstallController extends Controller
     /**
      * Show requirements check page.
      */
-    public function showRequirements(): Responses
+    public function showRequirementsWeb(): Responses
     {
         return Inertia::render('Install/Requirements', [
             'requirements' => $this->getWebRequirements(),
@@ -582,7 +582,7 @@ class InstallController extends Controller
     /**
      * Check system requirements via AJAX.
      */
-    public function checkRequirements(): Responses
+    public function checkRequirementsWeb(): Responses
     {
         return Inertia::render('Install/Requirements', [
             'requirements' => $this->getWebRequirements(),
@@ -592,7 +592,7 @@ class InstallController extends Controller
     /**
      * Show database configuration page.
      */
-    public function showDatabase(): Responses
+    public function showDatabaseWeb(): Responses
     {
         return Inertia::render('Install/Database');
     }
@@ -600,7 +600,7 @@ class InstallController extends Controller
     /**
      * Save database configuration and test connection.
      */
-    public function configureDatabase(Request $request)
+    public function configureDatabaseWeb(Request $request)
     {
         $validated = $this->validate($request, [
             'connection' => ['required', 'in:sqlite,mysql,pgsql'],
@@ -662,7 +662,7 @@ class InstallController extends Controller
     /**
      * Show admin user creation page.
      */
-    public function showAdmin(): Responses
+    public function showAdminWeb(): Responses
     {
         return Inertia::render('Install/Admin');
     }
@@ -670,7 +670,7 @@ class InstallController extends Controller
     /**
      * Create admin user and complete installation.
      */
-    public function createAdmin(Request $request)
+    public function createAdminWeb(Request $request)
     {
         $validated = $this->validate($request, [
             'name' => ['required', 'string', 'max:255'],
@@ -731,7 +731,7 @@ class InstallController extends Controller
     /**
      * Show installation complete page.
      */
-    public function showComplete(): Responses
+    public function showCompleteWeb(): Responses
     {
         return Inertia::render('Install/Complete');
     }
