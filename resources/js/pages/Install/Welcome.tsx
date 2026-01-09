@@ -63,6 +63,17 @@ export default function Welcome() {
             </div>
           </div>
 
+          {/* Important Info */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-8">
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center">
+              <CheckCircle2 className="w-5 h-5 mr-2" />
+              Installation simplifiée
+            </h3>
+            <p className="text-blue-800 dark:text-blue-200">
+              Toutes les dépendances sont déjà incluses dans ce zip ! Aucune installation de Composer, NPM ou autre n'est nécessaire sur votre hébergement.
+            </p>
+          </div>
+
           {/* Steps Overview */}
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
