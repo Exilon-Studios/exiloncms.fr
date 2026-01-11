@@ -1020,55 +1020,44 @@ class InstallController extends Controller
     }
 
     /**
-     * Create installation marker file.
-     * Uses multiple methods to ensure installation is marked.
+     * Create installation marker - MOST IMPORTANT: Database method
      */
     protected function createInstallationMarker(): void
     {
-        // Method 1: Create file in storage path
-        $markerFile = storage_path('installed.json');
-        $markerContent = json_encode([
-            'installed' => true,
-            'installed_at' => now()->toIso8601String(),
-            'version' => $this->getAppVersion(),
-        ], JSON_PRETTY_PRINT);
+        $timestamp = now()->toIso8601String();
+        $version = $this->getAppVersion();
 
-        // Try to create with absolute path
-        $absolutePath = realpath(storage_path()) . '/installed.json';
-        @file_put_contents($absolutePath, $markerContent);
-
-        // Fallback: try relative path
-        if (!file_exists($absolutePath)) {
-            @file_put_contents($markerFile, $markerContent);
-        }
-
-        // Method 2: Create a marker in bootstrap/cache (always writable)
-        $bootstrapMarker = base_path('bootstrap/cache/installed');
-        @file_put_contents($bootstrapMarker, $markerContent);
-
-        // Method 3: Set a setting in database (if settings table exists)
+        // ===== PRIMARY METHOD: Database (most reliable) =====
         try {
-            if (Schema::hasTable('settings')) {
-                Setting::updateOrCreate(
-                    ['key' => 'installed_at'],
-                    ['value' => now()->toIso8601String()]
-                );
-                Setting::updateOrCreate(
-                    ['key' => 'installed_version'],
-                    ['value' => $this->getAppVersion()]
-                );
-            }
+            // Direct DB insert - no Eloquent
+            DB::table('settings')->updateOrInsert(
+                ['key' => 'installed_at'],
+                ['value' => $timestamp, 'updated_at' => now()]
+            );
+            DB::table('settings')->updateOrInsert(
+                ['key' => 'installed_version'],
+                ['value' => $version, 'updated_at' => now()]
+            );
         } catch (\Exception $e) {
-            // Silently fail if DB is not available
+            // Log error but continue
         }
 
-        // Method 4: Create a simple .env flag
+        // ===== FALLBACK: Try multiple file locations =====
+        $content = json_encode(['installed' => true, 'installed_at' => $timestamp, 'version' => $version]);
+
+        // Try public directory (usually always writable)
+        @file_put_contents(public_path('installed.json'), $content);
+
+        // Try bootstrap/cache
+        @file_put_contents(base_path('bootstrap/cache/installed'), $content);
+
+        // Try storage
+        @file_put_contents(storage_path('installed.json'), $content);
+
+        // Try .env flag
         $envPath = base_path('.env');
-        if (file_exists($envPath)) {
-            $envContent = file_get_contents($envPath);
-            if (!str_contains($envContent, 'APP_INSTALLED=true')) {
-                @file_put_contents($envPath, $envContent . "\nAPP_INSTALLED=true\n");
-            }
+        if (is_writable($envPath)) {
+            @file_put_contents($envPath, "\nAPP_INSTALLED=true\n", FILE_APPEND);
         }
     }
 
