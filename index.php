@@ -1,8 +1,9 @@
 <?php
 
-/**
- * ExilonCMS entry point for servers that can't change document root
- * This file forwards traffic to the public/ directory (like Azuriom)
- */
+if (defined('EXILONCMS_NO_URL_REWRITE')) {
+    exit('An error occurred, please try to refresh the page.');
+}
 
-require_once __DIR__.'/public/index.php';
+define('EXILONCMS_NO_URL_REWRITE', 'true');
+
+require __DIR__.'/public/index.php';
