@@ -31,28 +31,17 @@ if ($zip->open($outputFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true
     exit(1);
 }
 
-// Add index.php (entry point for Plesk compatibility)
-$zip->addFile($installerDir.'/index.php', 'index.php');
-echo "  ✓ Added index.php\n";
+// Add .htaccess (must be first for Apache to recognize it)
+$zip->addFile($installerDir.'/.htaccess', '.htaccess');
+echo "  ✓ Added .htaccess\n";
 
-// Add install.php
+// Add install.php (main installer file)
 $zip->addFile($installerDir.'/install.php', 'install.php');
 echo "  ✓ Added install.php\n";
-
-// Add public/index.php
-$zip->addFile($installerDir.'/public/index.php', 'public/index.php');
-echo "  ✓ Added public/index.php\n";
 
 // Add README.txt
 $zip->addFile($installerDir.'/README.txt', 'README.txt');
 echo "  ✓ Added README.txt\n";
-
-// Add .htaccess files for proper URL routing
-$zip->addFile($installerDir.'/.htaccess', '.htaccess');
-echo "  ✓ Added .htaccess\n";
-
-$zip->addFile($installerDir.'/public/.htaccess', 'public/.htaccess');
-echo "  ✓ Added public/.htaccess\n";
 
 $zip->close();
 

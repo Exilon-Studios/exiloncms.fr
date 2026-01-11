@@ -1,10 +1,7 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
+# ExilonCMS Installer - .htaccess for Apache/Plesk
 
-    # Redirect all requests to install.php
-    RewriteCond %{REQUEST_URI} !^/install\.php$
-    RewriteRule ^ install.php [L]
-</IfModule>
+# Set install.php as default index file
+DirectoryIndex install.php index.html index.htm
 
 # Prevent directory listing
 Options -Indexes
