@@ -27,10 +27,16 @@ if (! function_exists('add_active')) {
 if (! function_exists('is_installed')) {
     /**
      * Determine whether the application is installed or not.
-     * Checks if app key is set AND if the settings table exists.
+     * Checks if installation marker file exists.
      */
     function is_installed(): bool
     {
+        // Check for installation marker file first (created after successful installation)
+        $markerFile = storage_path('installed.json');
+        if (file_exists($markerFile)) {
+            return true;
+        }
+
         $key = config('app.key');
 
         // Check if app key is properly set

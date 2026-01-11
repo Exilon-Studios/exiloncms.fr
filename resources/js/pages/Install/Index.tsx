@@ -1,5 +1,6 @@
 import { useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
+import { useState } from 'react';
 
 interface Props {
     phpVersion: string;
@@ -7,230 +8,270 @@ interface Props {
 }
 
 export default function InstallIndex({ phpVersion, minPhpVersion }: Props) {
-    const { data, setData, post, processing, errors } = useForm({
-        name: 'Admin',
-        email: 'admin@example.com',
-        password: '',
-        password_confirmation: '',
+    const { data, setData, get, processing } = useForm({
         app_url: window.location.origin,
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('install.submit'));
+        // Store app_url in sessionStorage and go to plugins step
+        sessionStorage.setItem('install_app_url', data.app_url);
+        get(route('install.plugins'));
     };
 
     const phpOk = phpVersion >= minPhpVersion;
 
     return (
         <>
-            <Head title="Installation" />
+            <Head title="Installation - ExilonCMS" />
             <div style={{
-                minHeight: '100vh',
+                height: '100vh',
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                padding: '20px'
+                background: '#000000',
+                fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif',
+                overflow: 'hidden',
             }}>
+                {/* Left side - branding */}
                 <div style={{
-                    background: 'white',
-                    borderRadius: '16px',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-                    maxWidth: '500px',
-                    width: '100%',
-                    padding: '40px'
+                    flex: '1',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    padding: '60px',
+                    background: '#0a0a0a',
+                    position: 'relative',
+                    overflow: 'hidden',
                 }}>
-                    <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-                        <h1 style={{ fontSize: '28px', marginBottom: '10px' }}>🚀 ExilonCMS</h1>
-                        <p style={{ color: '#666' }}>Complete your installation</p>
-                    </div>
-
-                    {/* PHP Version Check */}
+                    {/* Subtle grid pattern */}
                     <div style={{
-                        padding: '15px',
-                        borderRadius: '8px',
-                        marginBottom: '20px',
-                        background: phpOk ? '#d4edda' : '#f8d7da',
-                        color: phpOk ? '#155724' : '#721c24'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <span style={{ fontSize: '20px', marginRight: '10px' }}>
-                                {phpOk ? '✅' : '❌'}
-                            </span>
-                            <div>
-                                <strong>PHP {phpVersion}</strong>
-                                {!phpOk && <span style={{ marginLeft: '10px' }}>(requires {minPhpVersion}+)</span>}
-                            </div>
+                        position: 'absolute',
+                        inset: 0,
+                        backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+                        backgroundSize: '50px 50px',
+                    }} />
+
+                    {/* Subtle glow */}
+                    <div style={{
+                        position: 'absolute',
+                        width: '600px',
+                        height: '600px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)',
+                        top: '-200px',
+                        left: '-200px',
+                    }} />
+
+                    {/* Content */}
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                        <div style={{
+                            width: '64px',
+                            height: '64px',
+                            background: '#111111',
+                            borderRadius: '14px',
+                            marginBottom: '24px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                        }}>
+                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                                <path d="M2 17l10 5 10-5" />
+                                <path d="M2 12l10 5 10-5" />
+                            </svg>
                         </div>
+                        <h1 style={{
+                            fontSize: '48px',
+                            fontWeight: '600',
+                            color: '#ffffff',
+                            margin: '0 0 12px 0',
+                            letterSpacing: '-1.5px',
+                        }}>
+                            ExilonCMS
+                        </h1>
+                        <p style={{
+                            fontSize: '15px',
+                            color: '#666666',
+                            margin: '0 0 36px 0',
+                            maxWidth: '320px',
+                            lineHeight: '1.5',
+                        }}>
+                            Modern CMS for gaming communities
+                        </p>
+
+                        {/* Steps indicator */}
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <div style={{
+                                width: '24px',
+                                height: '4px',
+                                borderRadius: '2px',
+                                background: '#ffffff',
+                            }} />
+                            <div style={{
+                                width: '24px',
+                                height: '4px',
+                                borderRadius: '2px',
+                                background: '#333333',
+                            }} />
+                            <div style={{
+                                width: '24px',
+                                height: '4px',
+                                borderRadius: '2px',
+                                background: '#333333',
+                            }} />
+                        </div>
+                        <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
+                            Step 1 of 3: Configuration
+                        </p>
                     </div>
+                </div>
 
-                    <form onSubmit={submit}>
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{
-                                display: 'block',
-                                fontWeight: '600',
-                                marginBottom: '8px',
-                                fontSize: '14px'
-                            }}>
-                                Site URL
-                            </label>
-                            <input
-                                type="url"
-                                value={data.app_url}
-                                onChange={e => setData('app_url', e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box'
-                                }}
-                                placeholder="https://example.com"
-                            />
-                            {errors.app_url && <div style={{ color: '#c33', marginTop: '5px', fontSize: '13px' }}>{errors.app_url}</div>}
+                {/* Right side - form */}
+                <div style={{
+                    flex: '0 0 ' + Math.min(400, window.innerWidth * 0.5) + 'px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    padding: '60px 48px',
+                    background: '#000000',
+                    borderLeft: '1px solid rgba(255,255,255,0.05)',
+                }}>
+                    <div style={{ maxWidth: '300px', margin: '0 auto', width: '100%' }}>
+                        <h2 style={{
+                            fontSize: '22px',
+                            fontWeight: '500',
+                            color: '#ffffff',
+                            margin: '0 0 6px 0',
+                            letterSpacing: '-0.5px',
+                        }}>
+                            Installation
+                        </h2>
+                        <p style={{
+                            color: '#666666',
+                            fontSize: '13px',
+                            margin: '0 0 32px 0',
+                        }}>
+                            Let's get started with your site
+                        </p>
+
+                        {/* PHP Status */}
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            padding: '10px 12px',
+                            borderRadius: '6px',
+                            marginBottom: '24px',
+                            background: phpOk ? 'rgba(34, 197, 94, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                            border: '1px solid ' + (phpOk ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.15)'),
+                        }}>
+                            {phpOk ? (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="1.5" style={{ marginRight: '8px' }}>
+                                    <polyline points="20 6 9 17 4 12" />
+                                </svg>
+                            ) : (
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="1.5" style={{ marginRight: '8px' }}>
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="15" y1="9" x2="9" y2="15" />
+                                    <line x1="9" y1="9" x2="15" y2="15" />
+                                </svg>
+                            )}
+                            <span style={{ color: phpOk ? '#22c55e' : '#ef4444', fontSize: '12px', fontWeight: '500' }}>
+                                PHP {phpVersion} {phpOk ? 'compatible' : `requires ${minPhpVersion}+`}
+                            </span>
                         </div>
 
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{
-                                display: 'block',
-                                fontWeight: '600',
-                                marginBottom: '8px',
-                                fontSize: '14px'
-                            }}>
-                                Admin Name
-                            </label>
-                            <input
-                                type="text"
-                                value={data.name}
-                                onChange={e => setData('name', e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box'
-                                }}
-                                placeholder="Admin"
-                            />
-                            {errors.name && <div style={{ color: '#c33', marginTop: '5px', fontSize: '13px' }}>{errors.name}</div>}
-                        </div>
-
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{
-                                display: 'block',
-                                fontWeight: '600',
-                                marginBottom: '8px',
-                                fontSize: '14px'
-                            }}>
-                                Admin Email
-                            </label>
-                            <input
-                                type="email"
-                                value={data.email}
-                                onChange={e => setData('email', e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box'
-                                }}
-                                placeholder="admin@example.com"
-                            />
-                            {errors.email && <div style={{ color: '#c33', marginTop: '5px', fontSize: '13px' }}>{errors.email}</div>}
-                        </div>
-
-                        <div style={{ marginBottom: '20px' }}>
-                            <label style={{
-                                display: 'block',
-                                fontWeight: '600',
-                                marginBottom: '8px',
-                                fontSize: '14px'
-                            }}>
-                                Admin Password
-                            </label>
-                            <input
-                                type="password"
-                                value={data.password}
-                                onChange={e => setData('password', e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box'
-                                }}
-                                placeholder="••••••••"
-                            />
-                            {errors.password && <div style={{ color: '#c33', marginTop: '5px', fontSize: '13px' }}>{errors.password}</div>}
-                        </div>
-
-                        <div style={{ marginBottom: '30px' }}>
-                            <label style={{
-                                display: 'block',
-                                fontWeight: '600',
-                                marginBottom: '8px',
-                                fontSize: '14px'
-                            }}>
-                                Confirm Password
-                            </label>
-                            <input
-                                type="password"
-                                value={data.password_confirmation}
-                                onChange={e => setData('password_confirmation', e.target.value)}
-                                style={{
-                                    width: '100%',
-                                    padding: '12px',
-                                    border: '1px solid #ddd',
-                                    borderRadius: '8px',
-                                    fontSize: '14px',
-                                    boxSizing: 'border-box'
-                                }}
-                                placeholder="••••••••"
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={processing || !phpOk}
-                            style={{
-                                width: '100%',
-                                padding: '15px',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '16px',
-                                fontWeight: '600',
-                                cursor: phpOk ? 'pointer' : 'not-allowed',
-                                background: phpOk ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#ccc',
-                                color: 'white',
-                                opacity: processing ? 0.5 : 1,
-                                transition: 'transform 0.2s'
-                            }}
-                            onMouseOver={(e) => {
-                                if (phpOk && !processing) {
-                                    e.currentTarget.style.transform = 'translateY(-2px)';
-                                }
-                            }}
-                            onMouseOut={(e) => {
-                                e.currentTarget.style.transform = 'translateY(0)';
-                            }}
-                        >
-                            {processing ? 'Installing...' : 'Complete Installation'}
-                        </button>
-
-                        {processing && (
-                            <div style={{ textAlign: 'center', marginTop: '20px', color: '#666', fontSize: '14px' }}>
-                                This may take a minute...
+                        <form onSubmit={submit}>
+                            <div style={{ marginBottom: '24px' }}>
+                                <label style={{
+                                    display: 'block',
+                                    color: '#888888',
+                                    fontSize: '11px',
+                                    fontWeight: '500',
+                                    marginBottom: '6px',
+                                    letterSpacing: '0.3px',
+                                }}>
+                                    Site URL
+                                </label>
+                                <input
+                                    type="url"
+                                    value={data.app_url}
+                                    onChange={e => setData('app_url', e.target.value)}
+                                    style={{
+                                        width: '100%',
+                                        padding: '10px 12px',
+                                        background: '#0a0a0a',
+                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        borderRadius: '6px',
+                                        color: '#ffffff',
+                                        fontSize: '13px',
+                                        boxSizing: 'border-box',
+                                        outline: 'none',
+                                        transition: 'all 0.15s',
+                                    }}
+                                    onFocus={(e) => {
+                                        e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+                                        e.target.style.background = '#0f0f0f';
+                                    }}
+                                    onBlur={(e) => {
+                                        e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+                                        e.target.style.background = '#0a0a0a';
+                                    }}
+                                    placeholder="https://yourdomain.com"
+                                />
                             </div>
-                        )}
-                    </form>
+
+                            <button
+                                type="submit"
+                                disabled={processing || !phpOk}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    background: phpOk ? '#ffffff' : '#1a1a1a',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    color: phpOk ? '#000000' : '#666666',
+                                    fontSize: '13px',
+                                    fontWeight: '500',
+                                    cursor: phpOk && !processing ? 'pointer' : 'not-allowed',
+                                    opacity: processing ? 0.6 : 1,
+                                    transition: 'all 0.15s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    gap: '8px',
+                                }}
+                                onMouseOver={(e) => {
+                                    if (phpOk && !processing) {
+                                        e.currentTarget.style.background = '#f0f0f0';
+                                    }
+                                }}
+                                onMouseOut={(e) => {
+                                    if (phpOk && !processing) {
+                                        e.currentTarget.style.background = '#ffffff';
+                                    }
+                                }}
+                            >
+                                Continue
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M5 12h14" />
+                                    <path d="M12 5l7 7-7 7" />
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
+            <style>{`
+                @media (max-width: 900px) {
+                    div[style*="flex: 1; display: flex; flex-direction: column"] {
+                        display: none !important;
+                    }
+                    div[style*="flex: 0 0"] {
+                        flex: 1 !important;
+                        padding: 32px 24px !important;
+                    }
+                }
+            `}</style>
         </>
     );
 }

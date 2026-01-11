@@ -226,7 +226,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             'rewrite' => isset($validInstallationUrlRewrite),
         ];
 
-        $extracted = file_exists(__DIR__.'/app') || file_exists(__DIR__.'/vendor');
+        $extracted = file_exists(__DIR__.'/app') && file_exists(__DIR__.'/artisan');
 
         foreach ($requiredExtensions as $extension) {
             $requirements['extension-'.$extension] = extension_loaded($extension);
@@ -253,7 +253,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 throw new RuntimeException('The response from GitHub API is not a valid JSON.');
             }
 
-            // Find the zip asset
+            // Find the CMS zip asset (any zip that's not the installer)
             $zipAsset = null;
             foreach ($response->assets as $asset) {
                 if (str_ends_with($asset->name, '.zip') && strpos($asset->name, 'installer') === false) {
@@ -310,15 +310,15 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             foreach ($dirs as $dir) {
                 $basename = basename($dir);
 
-                // Check if this is the CMS directory (contains app/vendor/config)
+                // Check if this is the CMS directory (contains app/ and artisan)
                 if (preg_match('/^exiloncms-v[\d.]+$/', $basename) &&
-                    is_dir($dir.'/app') && is_dir($dir.'/vendor')) {
+                    is_dir($dir.'/app') && file_exists($dir.'/artisan')) {
                     $cmsDir = $dir;
                     break;
                 }
             }
 
-            // Move files from subdirectory to root
+            // Move files from subdirectory to root (if applicable)
             if ($cmsDir !== null) {
                 $iterator = new RecursiveIteratorIterator(
                     new RecursiveDirectoryIterator($cmsDir, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -358,7 +358,37 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 rmdir($cmsDir);
             }
 
+            // Create required Laravel directories that may be missing
+            $requiredDirs = [
+                'storage/framework',
+                'storage/framework/cache',
+                'storage/framework/sessions',
+                'storage/framework/views',
+                'storage/logs',
+                'bootstrap/cache',
+            ];
+
+            foreach ($requiredDirs as $dir) {
+                $path = __DIR__.'/'.$dir;
+                if (! is_dir($path)) {
+                    mkdir($path, 0755, true);
+                }
+            }
+
+            // Restore installer files if they were overwritten
+            // The CMS extraction may have overwritten our installer files
+            $installerBackup = __DIR__.'/.installer_backup';
+            if (! is_dir($installerBackup)) {
+                mkdir($installerBackup, 0755, true);
+                // Copy current installer files as backup for future extractions
+                copy(__FILE__, $installerBackup.'/index.php');
+                if (file_exists(__DIR__.'/public/index.php')) {
+                    copy(__DIR__.'/public/index.php', $installerBackup.'/public_index.php');
+                }
+            }
+
             // Create minimal .env file with temporary APP_KEY to allow Laravel to boot
+            // Note: DB_DATABASE path is relative to Laravel base_path()
             $envContent = <<<ENV
 APP_NAME="ExilonCMS"
 APP_ENV=production
@@ -381,13 +411,29 @@ ENV;
 
             file_put_contents(__DIR__.'/.env', $envContent);
 
+            // Create the SQLite database file to prevent connection errors
+            // Laravel uses database/database.sqlite by default for sqlite
+            $dbDir = __DIR__.'/database';
+            if (! is_dir($dbDir)) {
+                mkdir($dbDir, 0755, true);
+            }
+            $dbFile = $dbDir.'/database.sqlite';
+            if (! file_exists($dbFile)) {
+                touch($dbFile);
+            }
+
             // Note: Installer files have already been overwritten by CMS extraction
             // No need to delete them manually
+
+            // Verify vendor exists (should be included in the zip)
+            if (! file_exists(__DIR__.'/vendor')) {
+                throw new RuntimeException('Vendor folder not found. Please make sure the zip includes vendor.');
+            }
 
             send_json_response([
                 'success' => true,
                 'redirect' => '/install',
-                'message' => 'ExilonCMS files extracted successfully! Redirecting to installation wizard...'
+                'message' => 'ExilonCMS installed successfully! Redirecting to installation wizard...'
             ]);
         }
 
@@ -411,106 +457,214 @@ ENV;
       box-sizing: border-box;
     }
 
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+      background: #000000;
+      display: flex;
+    }
+
+    .split-container {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+    }
+
+    /* Left side - branding */
+    .left-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px;
+      background: #0a0a0a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle grid pattern */
+    .grid-pattern {
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    /* Subtle glow */
+    .glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+      top: -200px;
+      left: -200px;
+    }
+
+    .logo-section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-icon {
+      width: 64px;
+      height: 64px;
+      background: #111111;
+      border-radius: 14px;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
-    .container {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 600px;
+    .logo-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .logo-section h1 {
+      font-size: 48px;
+      font-weight: 600;
+      color: #ffffff;
+      margin: 0 0 12px 0;
+      letter-spacing: -1.5px;
+    }
+
+    .logo-section p {
+      font-size: 15px;
+      color: #666666;
+      margin: 0 0 36px 0;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    /* Steps indicator */
+    .steps {
+      display: flex;
+      gap: 8px;
+    }
+
+    .step {
+      width: 24px;
+      height: 4px;
+      border-radius: 2px;
+      background: #ffffff;
+    }
+
+    .step.inactive {
+      background: #333333;
+    }
+
+    .step-text {
+      color: #666666;
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    /* Right side - requirements */
+    .right-side {
+      flex: 0 0 480px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 48px;
+      background: #000000;
+      border-left: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .right-content {
+      max-width: 380px;
       width: 100%;
-      padding: 40px;
     }
 
-    .logo {
-      text-align: center;
-      margin-bottom: 30px;
+    .right-content h2 {
+      font-size: 22px;
+      font-weight: 500;
+      color: #ffffff;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.5px;
     }
 
-    .logo h1 {
-      font-size: 32px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .logo p {
-      color: #666;
-      margin-top: 10px;
+    .right-content p {
+      color: #666666;
+      font-size: 15px;
+      margin: 0 0 32px 0;
     }
 
     .requirements {
-      margin: 30px 0;
+      margin-bottom: 24px;
     }
 
     .requirement-item {
       display: flex;
       align-items: center;
-      padding: 12px;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      background: #0a0a0a;
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 6px;
     }
 
     .requirement-item:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
     }
 
     .requirement-icon {
-      width: 24px;
-      height: 24px;
-      margin-right: 12px;
+      width: 18px;
+      height: 18px;
+      margin-left: 12px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 11px;
+      flex-shrink: 0;
     }
 
     .requirement-icon.success {
-      background: #10b981;
-      color: white;
+      background: rgba(34, 197, 94, 0.15);
+      color: #22c55e;
     }
 
     .requirement-icon.error {
-      background: #ef4444;
-      color: white;
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
     }
 
     .requirement-text {
       flex: 1;
-      font-size: 14px;
-      color: #333;
+      font-size: 15px;
+      color: #888888;
     }
 
     .button {
       width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      padding: 12px;
+      background: #ffffff;
+      color: #000000;
       border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 500;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      margin-top: 20px;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .button:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+      background: #f0f0f0;
     }
 
     .button:disabled {
-      opacity: 0.5;
+      opacity: 0.3;
       cursor: not-allowed;
     }
 
@@ -521,71 +675,116 @@ ENV;
 
     .progress-bar {
       width: 100%;
-      height: 8px;
-      background: #f0f0f0;
-      border-radius: 4px;
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 2px;
       overflow: hidden;
+      margin-bottom: 12px;
     }
 
     .progress-fill {
       height: 100%;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: #ffffff;
       width: 0%;
       transition: width 0.3s;
     }
 
     .progress-text {
       text-align: center;
-      margin-top: 10px;
-      font-size: 14px;
-      color: #666;
+      font-size: 13px;
+      color: #666666;
     }
 
     .error {
-      background: #fee;
-      color: #c33;
-      padding: 12px;
-      border-radius: 8px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      padding: 12px 14px;
+      border-radius: 6px;
       margin-top: 20px;
       font-size: 14px;
       display: none;
+      border: 1px solid rgba(239, 68, 68, 0.2);
     }
 
     .success {
-      background: #efe;
-      color: #3c3;
-      padding: 12px;
-      border-radius: 8px;
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+      padding: 12px 14px;
+      border-radius: 6px;
       margin-top: 20px;
       font-size: 14px;
       display: none;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    @media (max-width: 900px) {
+      .left-side {
+        display: none !important;
+      }
+      .right-side {
+        flex: 1 !important;
+        padding: 32px 24px !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="logo">
-      <h1>🚀 ExilonCMS</h1>
-      <p>Installation rapide et facile</p>
-    </div>
+  <div class="split-container">
+    <!-- Left side - branding -->
+    <div class="left-side">
+      <div class="grid-pattern"></div>
+      <div class="glow"></div>
 
-    <div class="requirements" id="requirements">
-      <!-- Requirements will be loaded here -->
-    </div>
+      <div class="logo-section">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" />
+            <path d="M2 17l10 5 10-5" />
+            <path d="M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <h1>ExilonCMS</h1>
+        <p>Modern CMS for gaming communities</p>
 
-    <div class="error" id="error"></div>
-    <div class="success" id="success"></div>
-
-    <div class="progress" id="progress">
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
+        <div class="steps">
+          <div class="step"></div>
+          <div class="step inactive"></div>
+          <div class="step inactive"></div>
+        </div>
+        <p class="step-text">Step 1 of 3: Download & Install</p>
       </div>
-      <div class="progress-text" id="progressText">Téléchargement en cours...</div>
     </div>
 
-    <button class="button" id="installBtn" disabled>
-      Installer ExilonCMS
-    </button>
+    <!-- Right side - requirements -->
+    <div class="right-side">
+      <div class="right-content">
+        <h2>System Requirements</h2>
+        <p>Checking your server compatibility...</p>
+
+        <div class="requirements" id="requirements">
+          <!-- Requirements will be loaded here -->
+        </div>
+
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
+
+        <div class="progress" id="progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <div class="progress-text" id="progressText">Téléchargement en cours...</div>
+        </div>
+
+        <button class="button" id="installBtn" disabled>
+          Télécharger et Installer
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -625,10 +824,10 @@ ENV;
         const passed = data.requirements[req.key];
         return `
           <div class="requirement-item">
+            <div class="requirement-text">${req.label}</div>
             <div class="requirement-icon ${passed ? 'success' : 'error'}">
               ${passed ? '✓' : '✗'}
             </div>
-            <div class="requirement-text">${req.label}</div>
           </div>
         `;
       }).join('');
@@ -643,7 +842,7 @@ ENV;
       if (data.extracted) {
         installBtn.textContent = 'Déjà installé ! Redirection...';
         setTimeout(() => {
-          window.location.href = window.location.href.replace('install.php', '');
+          window.location.href = '/install';
         }, 2000);
       }
     }
@@ -661,8 +860,8 @@ ENV;
       errorDiv.style.display = 'none';
 
       try {
-        progressText.textContent = 'Téléchargement depuis GitHub (~27 MB)...';
-        progressFill.style.width = '30%';
+        progressText.textContent = 'Installation en cours...';
+        progressFill.style.width = '20%';
 
         const response = await fetch('?execute=php', {
           method: 'POST',
@@ -670,10 +869,13 @@ ENV;
           body: JSON.stringify({ action: 'download' })
         });
 
-        progressFill.style.width = '80%';
+        progressFill.style.width = '60%';
         progressText.textContent = 'Extraction des fichiers...';
 
         const result = await response.json();
+
+        progressFill.style.width = '80%';
+        progressText.textContent = 'Configuration en cours...';
 
         if (!response.ok) {
           throw new Error(result.message || 'Erreur lors de l\'installation');
@@ -686,10 +888,9 @@ ENV;
         successDiv.textContent = result.message || 'ExilonCMS a été installé avec succès !';
 
         setTimeout(() => {
-          // Use the redirect URL from server response, or default to removing install.php from URL
-          const redirectUrl = result.redirect || window.location.href.replace('install.php', '');
+          const redirectUrl = result.redirect || '/install';
           window.location.href = redirectUrl;
-        }, 2000);
+        }, 1500);
 
       } catch (error) {
         showError('Erreur lors de l\'installation: ' + error.message);

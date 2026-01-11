@@ -1,184 +1,504 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, ArrowRight, Loader2, CheckCircle2, User } from 'lucide-react';
+import { Head } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { AdminConfig } from './types';
 
 interface Props {
-  errors?: Record<string, string>;
-  siteName?: string;
+  phpVersion: string;
+  minPhpVersion: string;
 }
 
-export default function Admin({ errors: initialErrors = {}, siteName = 'Mon Site ExilonCMS' }: Props) {
-  const [data, setData] = useState<AdminConfig>({
+export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Get data from sessionStorage
+  const appUrl = sessionStorage.getItem('install_app_url') || window.location.origin;
+  const selectedPlugins = JSON.parse(sessionStorage.getItem('install_selected_plugins') || '[]');
+  const selectedTheme = sessionStorage.getItem('install_selected_theme') || '';
+
+  const { data, setData, post, processing, errors } = useForm({
+    app_url: appUrl,
     name: 'Admin',
     email: 'admin@example.com',
     password: '',
     password_confirmation: '',
+    selected_plugins: selectedPlugins,
+    selected_theme: selectedTheme,
   });
-  const [submitting, setSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>(initialErrors);
-  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
+    post(route('install.submit'));
+  };
 
-    try {
-      await router.post(route('install.admin.save'), data, {
-        onSuccess: () => {
-          setSuccess(true);
-          setTimeout(() => {
-            router.visit(route('install.complete'));
-          }, 1000);
-        },
-        onError: (errors) => {
-          setErrors(errors as Record<string, string>);
-        },
-      });
-    } finally {
-      setSubmitting(false);
-    }
+  const phpOk = phpVersion >= minPhpVersion;
+
+  const inputWrapperStyle = { position: 'relative' } as const;
+  const toggleButtonStyle = {
+    position: 'absolute' as const,
+    right: '12px',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    color: '#666666',
+    padding: '4px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   };
 
   return (
     <>
-      <Head title="Administrateur - Installation - ExilonCMS" />
+      <Head title="Admin Account - ExilonCMS" />
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        background: '#000000',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif',
+        overflow: 'hidden',
+      }}>
+        {/* Left side - branding */}
+        <div style={{
+          flex: '1',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: '60px',
+          background: '#0a0a0a',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Subtle grid pattern */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }} />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <User className="w-8 h-8 text-white" />
+          {/* Subtle glow */}
+          <div style={{
+            position: 'absolute',
+            width: '600px',
+            height: '600px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)',
+            top: '-200px',
+            left: '-200px',
+          }} />
+
+          {/* Content */}
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              background: '#111111',
+              borderRadius: '14px',
+              marginBottom: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Création du compte administrateur
+            <h1 style={{
+              fontSize: '48px',
+              fontWeight: '600',
+              color: '#ffffff',
+              margin: '0 0 12px 0',
+              letterSpacing: '-1.5px',
+            }}>
+              ExilonCMS
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Créez votre compte pour accéder au panneau d'administration
+            <p style={{
+              fontSize: '15px',
+              color: '#666666',
+              margin: '0 0 36px 0',
+              maxWidth: '320px',
+              lineHeight: '1.5',
+            }}>
+              Modern CMS for gaming communities
             </p>
+
+            {/* Steps indicator */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#333333',
+              }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#333333',
+              }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#ffffff',
+              }} />
+            </div>
+            <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
+              Step 3 of 3: Create admin account
+            </p>
+
+            {/* Summary */}
+            {selectedPlugins.length > 0 && (
+              <div style={{ marginTop: '24px' }}>
+                <p style={{ color: '#666666', fontSize: '11px', marginBottom: '8px' }}>
+                  Plugins to install:
+                </p>
+                {selectedPlugins.map((plugin: string) => (
+                  <div key={plugin} style={{
+                    display: 'inline-block',
+                    padding: '4px 8px',
+                    background: '#111111',
+                    borderRadius: '4px',
+                    color: '#888888',
+                    fontSize: '11px',
+                    marginRight: '4px',
+                    marginBottom: '4px',
+                  }}>
+                    {plugin}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+        </div>
 
-          {/* Success Alert */}
-          {success && (
-            <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/20">
-              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <AlertDescription className="text-green-800 dark:text-green-200">
-                Installation en cours... Redirection...
-              </AlertDescription>
-            </Alert>
-          )}
+        {/* Right side - form */}
+        <div style={{
+          flex: '0 0 ' + Math.min(400, window.innerWidth * 0.5) + 'px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: '60px 48px',
+          background: '#000000',
+          borderLeft: '1px solid rgba(255,255,255,0.05)',
+          overflowY: 'auto',
+        }}>
+          <div style={{ maxWidth: '340px', margin: '0 auto', width: '100%' }}>
+            <h2 style={{
+              fontSize: '22px',
+              fontWeight: '500',
+              color: '#ffffff',
+              margin: '0 0 6px 0',
+              letterSpacing: '-0.5px',
+            }}>
+              Create Admin Account
+            </h2>
+            <p style={{
+              color: '#666666',
+              fontSize: '13px',
+              margin: '0 0 32px 0',
+            }}>
+              Last step! Create your administrator account
+            </p>
 
-          {/* Form */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <Label htmlFor="name">Nom complet</Label>
-                <Input
-                  id="name"
+            <form onSubmit={submit}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  color: '#888888',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  marginBottom: '6px',
+                  letterSpacing: '0.3px',
+                }}>
+                  Admin Name
+                </label>
+                <input
                   type="text"
                   value={data.name}
-                  onChange={(e) => setData({ ...data, name: e.target.value })}
-                  placeholder="Jean Dupont"
-                  className="mt-2"
-                  required
+                  onChange={e => setData('name', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: '#0a0a0a',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '6px',
+                    color: '#ffffff',
+                    fontSize: '13px',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    transition: 'all 0.15s',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+                    e.target.style.background = '#0f0f0f';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+                    e.target.style.background = '#0a0a0a';
+                  }}
+                  placeholder="Your name"
+                  autoComplete="name"
                 />
                 {errors.name && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>
+                  <div style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.name}</div>
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="email">Adresse email</Label>
-                <Input
-                  id="email"
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  color: '#888888',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  marginBottom: '6px',
+                  letterSpacing: '0.3px',
+                }}>
+                  Admin Email
+                </label>
+                <input
                   type="email"
                   value={data.email}
-                  onChange={(e) => setData({ ...data, email: e.target.value })}
+                  onChange={e => setData('email', e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    background: '#0a0a0a',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '6px',
+                    color: '#ffffff',
+                    fontSize: '13px',
+                    boxSizing: 'border-box',
+                    outline: 'none',
+                    transition: 'all 0.15s',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+                    e.target.style.background = '#0f0f0f';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+                    e.target.style.background = '#0a0a0a';
+                  }}
                   placeholder="admin@example.com"
-                  className="mt-2"
-                  required
+                  autoComplete="email"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
+                  <div style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.email}</div>
                 )}
               </div>
 
-              <div>
-                <Label htmlFor="password">Mot de passe</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={data.password}
-                  onChange={(e) => setData({ ...data, password: e.target.value })}
-                  placeholder="••••••••"
-                  className="mt-2"
-                  required
-                  minLength={8}
-                />
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  color: '#888888',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  marginBottom: '6px',
+                  letterSpacing: '0.3px',
+                }}>
+                  Password
+                </label>
+                <div style={inputWrapperStyle}>
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={data.password}
+                    onChange={e => setData('password', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 36px 10px 12px',
+                      background: '#0a0a0a',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '6px',
+                      color: '#ffffff',
+                      fontSize: '13px',
+                      boxSizing: 'border-box',
+                      outline: 'none',
+                      transition: 'all 0.15s',
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+                      e.target.style.background = '#0f0f0f';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+                      e.target.style.background = '#0a0a0a';
+                    }}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={toggleButtonStyle}
+                  >
+                    {showPassword ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-5.06 5.94M1 1l22 22" />
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
                 {errors.password && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
+                  <div style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.password}</div>
                 )}
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Minimum 8 caractères
-                </p>
               </div>
 
-              <div>
-                <Label htmlFor="password_confirmation">Confirmer le mot de passe</Label>
-                <Input
-                  id="password_confirmation"
-                  type="password"
-                  value={data.password_confirmation}
-                  onChange={(e) => setData({ ...data, password_confirmation: e.target.value })}
-                  placeholder="••••••••"
-                  className="mt-2"
-                  required
-                  minLength={8}
-                />
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{
+                  display: 'block',
+                  color: '#888888',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  marginBottom: '6px',
+                  letterSpacing: '0.3px',
+                }}>
+                  Confirm Password
+                </label>
+                <div style={inputWrapperStyle}>
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={data.password_confirmation}
+                    onChange={e => setData('password_confirmation', e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 36px 10px 12px',
+                      background: '#0a0a0a',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      borderRadius: '6px',
+                      color: '#ffffff',
+                      fontSize: '13px',
+                      boxSizing: 'border-box',
+                      outline: 'none',
+                      transition: 'all 0.15s',
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+                      e.target.style.background = '#0f0f0f';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+                      e.target.style.background = '#0a0a0a';
+                    }}
+                    placeholder="••••••••"
+                    autoComplete="new-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={toggleButtonStyle}
+                  >
+                    {showConfirmPassword ? (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-5.06 5.94M1 1l22 22" />
+                      </svg>
+                    ) : (
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
                 {errors.password_confirmation && (
-                  <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password_confirmation}</p>
+                  <div style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.password_confirmation}</div>
                 )}
               </div>
 
-              {/* Security Notice */}
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                  <strong>Important :</strong> Choisissez un mot de passe sécurisé. Vous pourrez le modifier plus tard depuis le panneau d'administration.
-                </p>
-              </div>
+              <button
+                type="submit"
+                disabled={processing || !phpOk}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  background: phpOk ? '#ffffff' : '#1a1a1a',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: phpOk ? '#000000' : '#666666',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: phpOk && !processing ? 'pointer' : 'not-allowed',
+                  opacity: processing ? 0.6 : 1,
+                  transition: 'all 0.15s',
+                }}
+                onMouseOver={(e) => {
+                  if (phpOk && !processing) {
+                    e.currentTarget.style.background = '#f0f0f0';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (phpOk && !processing) {
+                    e.currentTarget.style.background = '#ffffff';
+                  }
+                }}
+              >
+                {processing ? (
+                  <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+                      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                    </svg>
+                    Installing...
+                  </span>
+                ) : (
+                  'Complete Installation'
+                )}
+              </button>
 
-              {/* Navigation */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Link href={route('install.database')}>
-                  <Button type="button" variant="outline">
-                    <ArrowLeft className="mr-2 w-4 h-4" />
-                    Retour
-                  </Button>
-                </Link>
+              {processing && (
+                <div style={{ textAlign: 'center', marginTop: '12px', color: '#666666', fontSize: '11px' }}>
+                  Setting up your site...
+                </div>
+              )}
 
-                <Button type="submit" disabled={submitting}>
-                  {submitting ? (
-                    <>
-                      <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-                      Installation en cours...
-                    </>
-                  ) : (
-                    <>
-                      Terminer l'installation
-                      <ArrowRight className="ml-2 w-4 h-4" />
-                    </>
-                  )}
-                </Button>
-              </div>
+              {/* Back button */}
+              <a
+                href="/install/plugins"
+                style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  marginTop: '16px',
+                  color: '#666666',
+                  fontSize: '12px',
+                  textDecoration: 'none',
+                  transition: 'color 0.15s',
+                }}
+                onMouseOver={(e) => { e.currentTarget.style.color = '#888888'; }}
+                onMouseOut={(e) => { e.currentTarget.style.color = '#666666'; }}
+              >
+                ← Back to plugins
+              </a>
             </form>
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @media (max-width: 900px) {
+          div[style*="flex: 1; display: flex; flex-direction: column"] {
+            display: none !important;
+          }
+          div[style*="flex: 0 0"] {
+            flex: 1 !important;
+            padding: 32px 24px !important;
+          }
+        }
+        button[type="button"]:hover {
+          color: #888888 !important;
+        }
+      `}</style>
     </>
   );
 }

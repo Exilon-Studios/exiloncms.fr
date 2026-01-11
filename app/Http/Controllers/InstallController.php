@@ -3,6 +3,7 @@
 namespace ExilonCMS\Http\Controllers;
 
 use ExilonCMS\Extensions\Plugin\PluginManager;
+use ExilonCMS\Extensions\Theme\ThemeManager;
 use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Games\FiveMGame;
 use ExilonCMS\Games\Minecraft\MinecraftBedrockGame;
@@ -25,13 +26,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Inertia;
 use Illuminate\Support\Facades\Schema;
+use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
-use Inertia\Responses;
+use Inertia\Response;
 use RuntimeException;
 use Throwable;
 
@@ -588,7 +589,7 @@ class InstallController extends Controller
     /**
      * Show simple installation page (one-step installer).
      */
-    public function index(): Responses
+    public function index(): Response
     {
         return Inertia::render('Install/Index', [
             'phpVersion' => PHP_VERSION,
@@ -597,15 +598,79 @@ class InstallController extends Controller
     }
 
     /**
+     * Show plugins selection step.
+     */
+    public function showPlugins(): Response
+    {
+        return Inertia::render('Install/Plugins', [
+            'availablePlugins' => $this->getAvailablePlugins(),
+            'availableThemes' => $this->getAvailableThemes(),
+        ]);
+    }
+
+    /**
+     * Get available plugins for installation.
+     *
+     * @return array<int, array{id: string, name: string, description: string, version: string}>
+     */
+    protected function getAvailablePlugins(): array
+    {
+        $plugins = [];
+        $pluginDirs = glob(base_path('plugins/*/plugin.json'));
+
+        foreach ($pluginDirs as $pluginFile) {
+            $data = json_decode(file_get_contents($pluginFile), true);
+            if ($data && isset($data['id'], $data['name'])) {
+                $plugins[] = [
+                    'id' => $data['id'],
+                    'name' => $data['name'],
+                    'description' => $data['description'] ?? '',
+                    'version' => $data['version'] ?? '1.0.0',
+                ];
+            }
+        }
+
+        return $plugins;
+    }
+
+    /**
+     * Get available themes for installation.
+     *
+     * @return array<int, array{id: string, name: string, description: string, version: string}>
+     */
+    protected function getAvailableThemes(): array
+    {
+        $themes = [];
+        $themeDirs = glob(base_path('themes/*/theme.json'));
+
+        foreach ($themeDirs as $themeFile) {
+            $data = json_decode(file_get_contents($themeFile), true);
+            if ($data && isset($data['id'], $data['name'])) {
+                $themes[] = [
+                    'id' => $data['id'],
+                    'name' => $data['name'],
+                    'description' => $data['description'] ?? '',
+                    'version' => $data['version'] ?? '1.0.0',
+                ];
+            }
+        }
+
+        return $themes;
+    }
+
+    /**
      * Process installation in one step.
      */
     public function install(Request $request)
     {
         $validated = $this->validate($request, [
+            'app_url' => ['required', 'url'],
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'app_url' => ['required', 'url'],
+            'selected_plugins' => ['nullable', 'array'],
+            'selected_plugins.*' => ['string'],
+            'selected_theme' => ['nullable', 'string'],
         ]);
 
         try {
@@ -615,29 +680,75 @@ class InstallController extends Controller
                 touch($dbPath);
             }
 
-            // Run migrations
+            // Run migrations WITHOUT seed to avoid duplicate admin user
             Artisan::call('migrate:fresh', [
                 '--force' => true,
-                '--seed' => true,
             ]);
+
+            // Create admin role manually (from AdminUserSeeder)
+            $adminRole = Role::firstOrCreate(
+                ['is_admin' => true],
+                [
+                    'name' => 'Admin',
+                    'power' => 100,
+                ]
+            );
+
+            // Create or update admin user (in case of reinstall)
+            $user = User::updateOrCreate(
+                ['email' => $validated['email']], // Find by email
+                [
+                    'name' => $validated['name'],
+                    'password' => Hash::make($validated['password']),
+                    'role_id' => $adminRole->id,
+                    'email_verified_at' => now(),
+                    'password_changed_at' => now(),
+                ]
+            );
+
+            // Run additional seeders (company, landing, puck) but NOT AdminUserSeeder
+            $seeders = [
+                \Database\Seeders\CompanySettingsSeeder::class,
+                \Database\Seeders\LandingSettingsSeeder::class,
+                \Database\Seeders\PuckPermissionSeeder::class,
+            ];
+
+            foreach ($seeders as $seeder) {
+                if (class_exists($seeder)) {
+                    Artisan::call('db:seed', ['--class' => $seeder, '--force' => true]);
+                }
+            }
+
+            // Enable selected plugins
+            $selectedPlugins = $validated['selected_plugins'] ?? [];
+            if (! empty($selectedPlugins)) {
+                $pluginManager = app(PluginManager::class);
+
+                foreach ($selectedPlugins as $pluginId) {
+                    try {
+                        $pluginManager->enable($pluginId);
+                        // Run plugin migrations
+                        Artisan::call('migrate', ['--force' => true]);
+                    } catch (Throwable $e) {
+                        // Continue even if plugin fails to enable
+                    }
+                }
+            }
+
+            // Set selected theme if provided
+            if (! empty($validated['selected_theme'])) {
+                $themeManager = app(ThemeManager::class);
+                try {
+                    $themeManager->setActive($validated['selected_theme']);
+                } catch (Throwable $e) {
+                    // Continue even if theme fails to set
+                }
+            }
 
             // Create storage link
             if (! file_exists(public_path('storage'))) {
                 Artisan::call('storage:link', ! windows_os() ? ['--relative' => true] : []);
             }
-
-            // Get admin role
-            $adminRole = Role::where('is_admin', true)->firstOrFail();
-
-            // Create admin user
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role_id' => $adminRole->id,
-                'email_verified_at' => now(),
-                'password_changed_at' => now(),
-            ]);
 
             // Update .env with real APP_KEY and APP_URL
             $this->updateEnvironmentFile([
@@ -652,7 +763,8 @@ class InstallController extends Controller
             // Create installation marker
             $this->createInstallationMarker();
 
-            return redirect()->route('home');
+            // Use Inertia location for proper full page redirect
+            return Inertia::location(route('home'));
         } catch (Throwable $e) {
             throw ValidationException::withMessages([
                 'name' => 'Installation error: '.$e->getMessage(),
@@ -667,7 +779,7 @@ class InstallController extends Controller
     /**
      * Show welcome page for web installer.
      */
-    public function showWelcomeWeb(): Responses
+    public function showWelcomeWeb(): Response
     {
         return Inertia::render('Install/Welcome');
     }
@@ -675,7 +787,7 @@ class InstallController extends Controller
     /**
      * Show requirements check page.
      */
-    public function showRequirementsWeb(): Responses
+    public function showRequirementsWeb(): Response
     {
         return Inertia::render('Install/Requirements', [
             'requirements' => $this->getWebRequirements(),
@@ -685,7 +797,7 @@ class InstallController extends Controller
     /**
      * Check system requirements via AJAX.
      */
-    public function checkRequirementsWeb(): Responses
+    public function checkRequirementsWeb(): Response
     {
         return Inertia::render('Install/Requirements', [
             'requirements' => $this->getWebRequirements(),
@@ -695,7 +807,7 @@ class InstallController extends Controller
     /**
      * Show database configuration page.
      */
-    public function showDatabaseWeb(): Responses
+    public function showDatabaseWeb(): Response
     {
         return Inertia::render('Install/Database');
     }
@@ -765,9 +877,12 @@ class InstallController extends Controller
     /**
      * Show admin user creation page.
      */
-    public function showAdminWeb(): Responses
+    public function showAdminWeb(): Response
     {
-        return Inertia::render('Install/Admin');
+        return Inertia::render('Install/Admin', [
+            'phpVersion' => PHP_VERSION,
+            'minPhpVersion' => static::MIN_PHP_VERSION,
+        ]);
     }
 
     /**
@@ -820,10 +935,8 @@ class InstallController extends Controller
             // Create installation marker
             $this->createInstallationMarker();
 
-            return Inertia::render('Install/Complete', [
-                'adminEmail' => $validated['email'],
-                'adminPassword' => $validated['password'],
-            ]);
+            // Use Inertia location for proper full page redirect
+            return Inertia::location(route('home'));
         } catch (Throwable $e) {
             throw ValidationException::withMessages([
                 'name' => 'Erreur lors de l\'installation: '.$e->getMessage(),
@@ -834,7 +947,7 @@ class InstallController extends Controller
     /**
      * Show installation complete page.
      */
-    public function showCompleteWeb(): Responses
+    public function showCompleteWeb(): Response
     {
         return Inertia::render('Install/Complete');
     }
