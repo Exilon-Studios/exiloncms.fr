@@ -28,9 +28,11 @@ class RedirectIfNotInstalled
             return $next($request);
         }
 
-        // If request is for the install page, let it through
-        if ($request->is($this->except)) {
-            return $next($request);
+        // If request is for the install page or debug routes, let it through
+        foreach ($this->except as $pattern) {
+            if ($request->is($pattern)) {
+                return $next($request);
+            }
         }
 
         // Otherwise, redirect to install page

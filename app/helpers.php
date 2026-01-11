@@ -31,18 +31,11 @@ if (! function_exists('is_installed')) {
      */
     function is_installed(): bool
     {
-        $request = request();
-
-        // Don't check if on install route
-        if ($request && ($request->is('install*') || $request->route() && str_starts_with($request->route()->getName() ?? '', 'install.'))) {
-            return false;
-        }
-
         // ===== PRIMARY CHECK: Database (most reliable) =====
         try {
             $installed = DB::table('settings')->where('key', 'installed_at')->first();
             if ($installed && !empty($installed->value)) {
-                return true;
+                return true;  // Installed!
             }
         } catch (\Exception $e) {
             // Continue to file checks
