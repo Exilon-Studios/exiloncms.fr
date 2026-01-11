@@ -1,16 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-/**
- * ExilonCMS Lightweight Installer Builder
- *
- * Creates a small installer zip (~8KB) that downloads the full CMS from GitHub.
- * This is similar to Azuriom's installer approach.
- */
-
 echo "\n";
 echo "╔═══════════════════════════════════════════════════════════╗\n";
-echo "║       ExilonCMS Lightweight Installer Builder             ║\n";
+echo "║       ExilonCMS Installer Builder (ALL FILES AT ROOT)      ║\n";
 echo "╚═══════════════════════════════════════════════════════════╝\n";
 echo "\n";
 
@@ -23,7 +16,7 @@ if (file_exists($outputFile)) {
     unlink($outputFile);
 }
 
-echo "Creating lightweight installer zip...\n";
+echo "Creating installer ZIP (ALL files at ROOT like Azuriom)...\n";
 
 $zip = new ZipArchive();
 if ($zip->open($outputFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
@@ -31,19 +24,19 @@ if ($zip->open($outputFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true
     exit(1);
 }
 
-// Add .htaccess (root)
+// Add .htaccess (ROOT)
 $zip->addFile($installerDir.'/.htaccess', '.htaccess');
-echo "  ✓ Added .htaccess\n";
+echo "  ✓ Added .htaccess (root)\n";
 
-// Add index.php (main installer)
+// Add index.php (ROOT - main installer)
 $zip->addFile($installerDir.'/index.php', 'index.php');
-echo "  ✓ Added index.php\n";
+echo "  ✓ Added index.php (root)\n";
 
-// Add public/.htaccess
+// Add public/.htaccess (in public folder)
 $zip->addFile($installerDir.'/public/.htaccess', 'public/.htaccess');
 echo "  ✓ Added public/.htaccess\n";
 
-// Add public/index.php
+// Add public/index.php (in public folder - redirects to ../index.php)
 $zip->addFile($installerDir.'/public/index.php', 'public/index.php');
 echo "  ✓ Added public/index.php\n";
 
@@ -63,6 +56,7 @@ echo "╠═══════════════════════�
 echo "║  File:     exiloncms-installer.zip                       ║\n";
 echo "║  Size:     {$fileSizeKB} KB".str_repeat(' ', 46 - strlen($fileSizeKB) - 8)."║\n";
 echo "╠═══════════════════════════════════════════════════════════╣\n";
-echo "║  Upload this file to GitHub Releases                       ║\n";
+echo "║  Structure: SAME AS AZURIOM                              ║\n";
+echo "║  Extract: In httpdocs/ OR public_html/                   ║\n";
 echo "╚═══════════════════════════════════════════════════════════╝\n";
 echo "\n";
