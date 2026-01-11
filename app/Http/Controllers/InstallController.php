@@ -139,11 +139,13 @@ class InstallController extends Controller
         $this->middleware(function (Request $request, callable $next) {
             // Permettre l'accès si le CMS n'est pas encore installé
             if (is_installed()) {
-                return to_route('home');
+                return redirect()->route('home');
             }
 
             return $next($request);
         })->only([
+            'index',
+            'showPlugins',
             'showWelcomeWeb',
             'showRequirementsWeb',
             'checkRequirementsWeb',
@@ -760,11 +762,11 @@ class InstallController extends Controller
             Artisan::call('cache:clear');
             Artisan::call('config:clear');
 
-            // Create installation marker
+            // Create installation marker FIRST
             $this->createInstallationMarker();
 
-            // Use Inertia location for proper full page redirect
-            return Inertia::location(route('home'));
+            // Force a real HTTP redirect (not Inertia)
+            return redirect()->away(url('/'));
         } catch (Throwable $e) {
             throw ValidationException::withMessages([
                 'name' => 'Installation error: '.$e->getMessage(),
@@ -932,11 +934,11 @@ class InstallController extends Controller
             Artisan::call('config:clear');
             Artisan::call('view:clear');
 
-            // Create installation marker
+            // Create installation marker FIRST
             $this->createInstallationMarker();
 
-            // Use Inertia location for proper full page redirect
-            return Inertia::location(route('home'));
+            // Force a real HTTP redirect (not Inertia)
+            return redirect()->away(url('/'));
         } catch (Throwable $e) {
             throw ValidationException::withMessages([
                 'name' => 'Erreur lors de l\'installation: '.$e->getMessage(),
