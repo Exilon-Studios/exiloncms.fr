@@ -375,24 +375,8 @@ ENV;
 
             file_put_contents(__DIR__.'/.env', $envContent);
 
-            // Delete the install.php file itself to allow Laravel routes to work
-            if (file_exists(__DIR__.'/install.php')) {
-                unlink(__DIR__.'/install.php');
-            }
-
-            // Delete the installer's public folder redirect
-            if (is_dir(__DIR__.'/public')) {
-                $it = new RecursiveDirectoryIterator(__DIR__.'/public', RecursiveDirectoryIterator::SKIP_DOTS);
-                $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
-                foreach ($files as $file) {
-                    if ($file->isDir()) {
-                        rmdir($file->getPathname());
-                    } else {
-                        unlink($file->getPathname());
-                    }
-                }
-                rmdir(__DIR__.'/public');
-            }
+            // Note: Installer files have already been overwritten by CMS extraction
+            // No need to delete them manually
 
             send_json_response([
                 'success' => true,
