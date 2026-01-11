@@ -326,7 +326,13 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 );
 
                 foreach ($iterator as $item) {
-                    $destPath = __DIR__.'/'.$iterator->getSubPathName();
+                    $relativePath = $iterator->getSubPathName();
+                    $destPath = __DIR__.'/'.$relativePath;
+
+                    // Don't overwrite installer files
+                    if ($relativePath === 'index.php' || $relativePath === 'public/index.php' || $relativePath === '.htaccess' || $relativePath === 'public/.htaccess') {
+                        continue;
+                    }
 
                     if ($item->isDir()) {
                         if (! is_dir($destPath)) {
