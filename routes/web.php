@@ -2,6 +2,7 @@
 
 use ExilonCMS\Http\Controllers\Auth\LoginController;
 use ExilonCMS\Http\Controllers\DashboardController;
+use ExilonCMS\Http\Controllers\DebugController;
 use ExilonCMS\Http\Controllers\FallbackController;
 use ExilonCMS\Http\Controllers\HomeController;
 use ExilonCMS\Http\Controllers\InstallController;
@@ -13,6 +14,12 @@ use ExilonCMS\Http\Controllers\ProfileController;
 use ExilonCMS\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+// ============================================================
+// DEBUG ROUTES (Temporary - for installation troubleshooting)
+// ============================================================
+Route::get('/install-debug', [DebugController::class, 'installStatus'])->name('install.debug');
+Route::get('/install-force', [DebugController::class, 'forceInstall'])->name('install.force');
 
 // ============================================================
 // INSTALLER ROUTES (Must be before auth middleware)

@@ -31,21 +31,20 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function () {
+            // API routes
             Route::middleware('api')
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
-            Route::middleware('admin-access')
-                ->prefix('admin')
-                ->name('admin.')
-                ->group(base_path('routes/admin.php'));
-
-            if (! is_installed()) {
-                Route::prefix('install')
-                    ->name('install.')
-                    ->group(base_path('routes/install.php'));
+            // Admin routes (only if installed)
+            if (is_installed()) {
+                Route::middleware('admin-access')
+                    ->prefix('admin')
+                    ->name('admin.')
+                    ->group(base_path('routes/admin.php'));
             }
 
+            // Web routes - ALWAYS loaded (includes install routes + debug routes)
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });
