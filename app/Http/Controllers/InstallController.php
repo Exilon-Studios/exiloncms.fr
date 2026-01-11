@@ -1031,13 +1031,13 @@ class InstallController extends Controller
 
         // ===== PRIMARY METHOD: Database (most reliable) =====
         try {
-            // Direct DB insert - no Eloquent
+            // Direct DB insert - table uses 'name' column NOT 'key' !!
             DB::table('settings')->updateOrInsert(
-                ['key' => 'installed_at'],
+                ['name' => 'installed_at'],
                 ['value' => $timestamp, 'updated_at' => now()]
             );
             DB::table('settings')->updateOrInsert(
-                ['key' => 'installed_version'],
+                ['name' => 'installed_version'],
                 ['value' => $version, 'updated_at' => now()]
             );
         } catch (\Exception $e) {

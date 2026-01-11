@@ -27,13 +27,14 @@ if (! function_exists('add_active')) {
 if (! function_exists('is_installed')) {
     /**
      * Determine whether the application is installed or not.
-     * PRIMARY CHECK: Database 'installed_at' setting
+     * PRIMARY CHECK: Database 'installed_at' setting (column is 'name' NOT 'key'!!)
      */
     function is_installed(): bool
     {
         // ===== PRIMARY CHECK: Database (most reliable) =====
         try {
-            $installed = DB::table('settings')->where('key', 'installed_at')->first();
+            // IMPORTANT: settings table uses 'name' column, NOT 'key' !!
+            $installed = DB::table('settings')->where('name', 'installed_at')->first();
             if ($installed && !empty($installed->value)) {
                 return true;  // Installed!
             }

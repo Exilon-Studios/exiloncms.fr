@@ -21,8 +21,8 @@ try {
     $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='settings'");
     $results['settings_table_exists'] = $stmt->fetch() !== false;
 
-    // Get installed_at setting
-    $stmt = $pdo->query("SELECT * FROM settings WHERE `key`='installed_at'");
+    // Get installed_at setting - use 'name' column !!
+    $stmt = $pdo->query("SELECT * FROM settings WHERE name='installed_at'");
     $installed = $stmt->fetch(PDO::FETCH_ASSOC);
     $results['installed_at_setting'] = $installed;
 
