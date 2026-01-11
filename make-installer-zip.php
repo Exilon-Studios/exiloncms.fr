@@ -47,6 +47,13 @@ echo "  ✓ Added public/index.php\n";
 $zip->addFile($installerDir.'/README.txt', 'README.txt');
 echo "  ✓ Added README.txt\n";
 
+// Add .htaccess files for proper URL routing
+$zip->addFile($installerDir.'/.htaccess', '.htaccess');
+echo "  ✓ Added .htaccess\n";
+
+$zip->addFile($installerDir.'/public/.htaccess', 'public/.htaccess');
+echo "  ✓ Added public/.htaccess\n";
+
 $zip->close();
 
 $fileSize = filesize($outputFile);

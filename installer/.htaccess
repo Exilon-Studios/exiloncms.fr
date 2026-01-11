@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirect all requests to install.php
+    RewriteCond %{REQUEST_URI} !^/install\.php$
+    RewriteRule ^ install.php [L]
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
