@@ -27,13 +27,31 @@ if (! function_exists('add_active')) {
 if (! function_exists('is_installed')) {
     /**
      * Determine whether the application is installed or not.
-     * Checks if installation marker file exists.
+     * Checks multiple installation markers.
      */
     function is_installed(): bool
     {
-        // Check for installation marker file first (created after successful installation)
+        $request = request();
+
+        // Check if we're currently on an install route - don't check database
+        if ($request && ($request->is('install*') || $request->route() && str_starts_with($request->route()->getName() ?? '', 'install.'))) {
+            return false;
+        }
+
+        // Method 1: Check storage/installed.json
         $markerFile = storage_path('installed.json');
         if (file_exists($markerFile)) {
+            return true;
+        }
+
+        // Method 2: Check bootstrap/cache/installed
+        $bootstrapMarker = base_path('bootstrap/cache/installed');
+        if (file_exists($bootstrapMarker)) {
+            return true;
+        }
+
+        // Method 3: Check .env for APP_INSTALLED flag
+        if (config('app.installed') === true) {
             return true;
         }
 
@@ -44,19 +62,20 @@ if (! function_exists('is_installed')) {
             return false;
         }
 
-        // Check if we're currently on an install route - don't check database
-        $request = request();
-        if ($request && ($request->is('install*') || $request->route() && str_starts_with($request->route()->getName() ?? '', 'install.'))) {
-            return false;
-        }
-
-        // Check if database tables exist by trying to access the settings table
+        // Method 4: Check database for installation marker
         try {
-            // Don't use cache for installation check - it can cause issues during install
+            if (class_exists(\ExilonCMS\Models\Setting::class)) {
+                $installedAt = \ExilonCMS\Models\Setting::where('key', 'installed_at')->first();
+                if ($installedAt && !empty($installedAt->value)) {
+                    return true;
+                }
+            }
+
+            // Fallback: Check if database tables exist
             $schemaManager = app('db.connection')->getSchemaBuilder();
             return $schemaManager->hasTable('settings');
         } catch (\Exception $e) {
-            // If database connection fails or tables don't exist, assume not installed
+            // If database connection fails, assume not installed
             return false;
         }
     }

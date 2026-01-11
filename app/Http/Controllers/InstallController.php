@@ -1019,16 +1019,55 @@ class InstallController extends Controller
 
     /**
      * Create installation marker file.
+     * Uses multiple methods to ensure installation is marked.
      */
     protected function createInstallationMarker(): void
     {
+        // Method 1: Create file in storage path
         $markerFile = storage_path('installed.json');
-
-        file_put_contents($markerFile, json_encode([
+        $markerContent = json_encode([
             'installed' => true,
             'installed_at' => now()->toIso8601String(),
             'version' => $this->getAppVersion(),
-        ], JSON_PRETTY_PRINT));
+        ], JSON_PRETTY_PRINT);
+
+        // Try to create with absolute path
+        $absolutePath = realpath(storage_path()) . '/installed.json';
+        @file_put_contents($absolutePath, $markerContent);
+
+        // Fallback: try relative path
+        if (!file_exists($absolutePath)) {
+            @file_put_contents($markerFile, $markerContent);
+        }
+
+        // Method 2: Create a marker in bootstrap/cache (always writable)
+        $bootstrapMarker = base_path('bootstrap/cache/installed');
+        @file_put_contents($bootstrapMarker, $markerContent);
+
+        // Method 3: Set a setting in database (if settings table exists)
+        try {
+            if (Schema::hasTable('settings')) {
+                Setting::updateOrCreate(
+                    ['key' => 'installed_at'],
+                    ['value' => now()->toIso8601String()]
+                );
+                Setting::updateOrCreate(
+                    ['key' => 'installed_version'],
+                    ['value' => $this->getAppVersion()]
+                );
+            }
+        } catch (\Exception $e) {
+            // Silently fail if DB is not available
+        }
+
+        // Method 4: Create a simple .env flag
+        $envPath = base_path('.env');
+        if (file_exists($envPath)) {
+            $envContent = file_get_contents($envPath);
+            if (!str_contains($envContent, 'APP_INSTALLED=true')) {
+                @file_put_contents($envPath, $envContent . "\nAPP_INSTALLED=true\n");
+            }
+        }
     }
 
     /**
