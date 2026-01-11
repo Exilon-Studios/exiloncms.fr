@@ -1,7 +1,4 @@
 # ExilonCMS Installer - .htaccess for Apache/Plesk
 
-# Set install.php as default index file
-DirectoryIndex install.php index.html index.htm
-
 # Prevent directory listing
 Options -Indexes
