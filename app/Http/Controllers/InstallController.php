@@ -765,8 +765,9 @@ class InstallController extends Controller
             // Create installation marker FIRST
             $this->createInstallationMarker();
 
-            // Force a real HTTP redirect (not Inertia)
-            return redirect()->away(url('/'));
+            // Force HTTP redirect - bypass all Laravel responses
+            header('Location: ' . url('/'));
+            exit;
         } catch (Throwable $e) {
             throw ValidationException::withMessages([
                 'name' => 'Installation error: '.$e->getMessage(),
@@ -937,8 +938,9 @@ class InstallController extends Controller
             // Create installation marker FIRST
             $this->createInstallationMarker();
 
-            // Force a real HTTP redirect (not Inertia)
-            return redirect()->away(url('/'));
+            // Force HTTP redirect - bypass all Laravel responses
+            header('Location: ' . url('/'));
+            exit;
         } catch (Throwable $e) {
             throw ValidationException::withMessages([
                 'name' => 'Erreur lors de l\'installation: '.$e->getMessage(),
