@@ -585,6 +585,81 @@ class InstallController extends Controller
             ->map(fn (string $path) => basename($path));
     }
 
+    /**
+     * Show simple installation page (one-step installer).
+     */
+    public function index(): Responses
+    {
+        return Inertia::render('Install/Index', [
+            'phpVersion' => PHP_VERSION,
+            'minPhpVersion' => static::MIN_PHP_VERSION,
+        ]);
+    }
+
+    /**
+     * Process installation in one step.
+     */
+    public function install(Request $request)
+    {
+        $validated = $this->validate($request, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'app_url' => ['required', 'url'],
+        ]);
+
+        try {
+            // Create SQLite database
+            $dbPath = database_path('database.sqlite');
+            if (! file_exists($dbPath)) {
+                touch($dbPath);
+            }
+
+            // Run migrations
+            Artisan::call('migrate:fresh', [
+                '--force' => true,
+                '--seed' => true,
+            ]);
+
+            // Create storage link
+            if (! file_exists(public_path('storage'))) {
+                Artisan::call('storage:link', ! windows_os() ? ['--relative' => true] : []);
+            }
+
+            // Get admin role
+            $adminRole = Role::where('is_admin', true)->firstOrFail();
+
+            // Create admin user
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role_id' => $adminRole->id,
+                'email_verified_at' => now(),
+                'password_changed_at' => now(),
+            ]);
+
+            // Update .env with real APP_KEY and APP_URL
+            $this->updateEnvironmentFile([
+                'APP_KEY' => 'base64:'.base64_encode(Encrypter::generateKey(config('app.cipher'))),
+                'APP_URL' => $validated['app_url'],
+            ]);
+
+            // Clear cache
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+
+            // Create installation marker
+            $this->createInstallationMarker();
+
+            return redirect()->route('home');
+        } catch (Throwable $e) {
+            throw ValidationException::withMessages([
+                'name' => 'Installation error: '.$e->getMessage(),
+            ]);
+        }
+    }
+
     // ============================================================
     // WEB INSTALLER (Inertia/React)
     // ============================================================

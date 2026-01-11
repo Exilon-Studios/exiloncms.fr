@@ -31,9 +31,21 @@ if ($zip->open($outputFile, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true
     exit(1);
 }
 
-// Add index.php (main entry point - renamed from install.php)
+// Add .htaccess (root)
+$zip->addFile($installerDir.'/.htaccess', '.htaccess');
+echo "  ✓ Added .htaccess\n";
+
+// Add index.php (main installer)
 $zip->addFile($installerDir.'/index.php', 'index.php');
 echo "  ✓ Added index.php\n";
+
+// Add public/.htaccess
+$zip->addFile($installerDir.'/public/.htaccess', 'public/.htaccess');
+echo "  ✓ Added public/.htaccess\n";
+
+// Add public/index.php
+$zip->addFile($installerDir.'/public/index.php', 'public/index.php');
+echo "  ✓ Added public/index.php\n";
 
 // Add README.txt
 $zip->addFile($installerDir.'/README.txt', 'README.txt');

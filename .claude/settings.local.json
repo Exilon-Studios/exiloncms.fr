@@ -90,7 +90,22 @@
       "Bash(Get-Content:*)",
       "Bash(wc:*)",
       "Bash(if not exist \"plugins\\\\shop\\\\resources\\\\views\" mkdir \"plugins\\\\shop\\\\resources\\\\views\")",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(gh release list:*)",
+      "Bash(gh repo list:*)",
+      "Bash(gh repo view:*)",
+      "Bash(git branch:*)",
+      "Bash(npm view @exiloncms/cli)",
+      "Bash(npm version patch:*)",
+      "Bash(npm view:*)",
+      "Bash(tree:*)",
+      "Bash(npm version:*)",
+      "Bash(git update-index:*)",
+      "Bash(composer update:*)",
+      "Bash(du:*)",
+      "Bash(file:*)",
+      "Bash(gh release edit:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [],
     "ask": []

@@ -223,6 +223,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             'php' => version_compare(PHP_VERSION, $minPhpVersion, '>='),
             'writable' => $writable,
             'function-symlink' => has_function('symlink'),
+            'rewrite' => isset($validInstallationUrlRewrite),
         ];
 
         $extracted = file_exists(__DIR__.'/app') || file_exists(__DIR__.'/vendor');

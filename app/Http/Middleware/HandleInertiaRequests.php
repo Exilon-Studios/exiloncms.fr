@@ -43,6 +43,32 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
+        // If CMS is not installed, return minimal data without database queries
+        if (! is_installed()) {
+            return [
+                ...parent::share($request),
+                'auth' => ['user' => null],
+                'flash' => [
+                    'success' => fn () => $request->session()->get('success'),
+                    'error' => fn () => $request->session()->get('error'),
+                    'info' => fn () => $request->session()->get('info'),
+                    'warning' => fn () => $request->session()->get('warning'),
+                ],
+                'settings' => [
+                    'name' => config('app.name'),
+                    'locale' => app()->getLocale(),
+                ],
+                'navbar' => [],
+                'socialLinks' => [],
+                'trans' => [],
+                'enabledPlugins' => [],
+                'pluginAdminNavItems' => [],
+                'pluginUserNavItems' => [],
+                'updatesCount' => 0,
+                'cartCount' => 0,
+            ];
+        }
+
         // Get admin permissions if user has admin access
         $adminPermissions = [];
         if ($user && $user->hasAdminAccess()) {

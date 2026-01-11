@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            \ExilonCMS\Http\Middleware\RedirectIfNotInstalled::class,
             \ExilonCMS\Http\Middleware\CheckForMaintenanceSettings::class,
             \ExilonCMS\Http\Middleware\SetLocale::class,
             \ExilonCMS\Http\Middleware\HandleInertiaRequests::class,
