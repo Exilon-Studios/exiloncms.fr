@@ -27,12 +27,32 @@ if (! function_exists('add_active')) {
 if (! function_exists('is_installed')) {
     /**
      * Determine whether the application is installed or not.
+     * Checks if app key is set AND if the settings table exists.
      */
     function is_installed(): bool
     {
         $key = config('app.key');
 
-        return ! empty($key) && $key !== InstallController::TEMP_KEY;
+        // Check if app key is properly set
+        if (empty($key) || $key === InstallController::TEMP_KEY) {
+            return false;
+        }
+
+        // Check if we're currently on an install route - don't check database
+        $request = request();
+        if ($request && ($request->is('install*') || $request->route() && str_starts_with($request->route()->getName() ?? '', 'install.'))) {
+            return false;
+        }
+
+        // Check if database tables exist by trying to access the settings table
+        try {
+            // Don't use cache for installation check - it can cause issues during install
+            $schemaManager = app('db.connection')->getSchemaBuilder();
+            return $schemaManager->hasTable('settings');
+        } catch (\Exception $e) {
+            // If database connection fails or tables don't exist, assume not installed
+            return false;
+        }
     }
 }
 
