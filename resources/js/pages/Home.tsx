@@ -6,8 +6,8 @@ import { puckConfig } from '@/puck/config';
 import { Post } from '@/types';
 import { trans } from '@/lib/i18n';
 import styles from './Home.module.css';
-import { Link } from '@inertiajs/react';
-import { ArrowRight, Server, Users, Newspaper, Shield, Zap, Settings } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { PageProps } from '@/types';
 
 interface Server {
   id: number;
@@ -33,272 +33,420 @@ interface Props {
   landingSettings: LandingSettings;
 }
 
-function DefaultHomePage({ siteName, posts, servers }: { siteName?: string; posts: Post[]; servers: Server[] }) {
-  const recentPosts = posts?.slice(0, 3) || [];
+function SplitHomePage({ siteName, servers }: { siteName?: string; servers: Server[] }) {
+  const { auth } = usePage<PageProps>().props;
+  const isAuthenticated = !!auth.user;
   const onlineServers = servers?.filter(s => s.isOnline) || [];
+  const totalPlayers = onlineServers.reduce((sum, s) => sum + (s.onlinePlayers || 0), 0);
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.02)_1px,transparent_1px)] bg-[size:64px_64px]"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px]"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[100px]"></div>
+    <div style={{
+      height: '100vh',
+      display: 'flex',
+      background: '#000000',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif',
+      overflow: 'hidden',
+    }}>
+      {/* Left side - content */}
+      <div style={{
+        flex: '1',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        padding: '60px',
+        background: '#0a0a0a',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        {/* Subtle grid pattern */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+          backgroundSize: '50px 50px',
+        }} />
 
-        <div className="relative container mx-auto px-4 py-24 md:py-32">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-              {siteName || 'ExilonCMS'}
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8">
-              La solution moderne pour votre serveur de jeu
-            </p>
-            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Gérez votre communauté avec une plateforme puissante, intuitive et entièrement personnalisable.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/news"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl"
-              >
-                Actualités
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link
-                href="/shop"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-secondary text-secondary-foreground font-semibold hover:bg-secondary/90 transition-all shadow-lg hover:shadow-xl"
-              >
-                Boutique
-              </Link>
-            </div>
+        {/* Subtle glow */}
+        <div style={{
+          position: 'absolute',
+          width: '600px',
+          height: '600px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)',
+          top: '-200px',
+          left: '-200px',
+        }} />
+
+        {/* Content */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            background: '#111111',
+            borderRadius: '14px',
+            marginBottom: '24px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
           </div>
-        </div>
-      </section>
+          <h1 style={{
+            fontSize: '48px',
+            fontWeight: '600',
+            color: '#ffffff',
+            margin: '0 0 12px 0',
+            letterSpacing: '-1.5px',
+          }}>
+            {siteName || 'ExilonCMS'}
+          </h1>
+          <p style={{
+            fontSize: '15px',
+            color: '#666666',
+            margin: '0 0 36px 0',
+            maxWidth: '320px',
+            lineHeight: '1.5',
+          }}>
+            Modern CMS for gaming communities
+          </p>
 
-      {/* Features Section */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Fonctionnalités
-            </h2>
-            <p className="text-muted-foreground text-lg">
-              Tout ce dont vous avez besoin pour gérer votre serveur
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Server className="h-8 w-8" />,
-                title: "Serveurs de Jeu",
-                description: "Supporte Minecraft, FiveM, Rust et plus encore"
-              },
-              {
-                icon: <Users className="h-8 w-8" />,
-                title: "Gestion des Utilisateurs",
-                description: "Système complet avec rôles et permissions"
-              },
-              {
-                icon: <Newspaper className="h-8 w-8" />,
-                title: "Blog & Actualités",
-                description: "Partagez vos nouveautés avec votre communauté"
-              },
-              {
-                icon: <Shield className="h-8 w-8" />,
-                title: "Sécurité Avancée",
-                description: "2FA, protection et modération intégrées"
-              },
-              {
-                icon: <Zap className="h-8 w-8" />,
-                title: "Performance",
-                description: "Optimisé pour la vitesse et l'évolutivité"
-              },
-              {
-                icon: <Settings className="h-8 w-8" />,
-                title: "100% Personnalisable",
-                description: "Thèmes, plugins et éditeur visuel Puck"
-              }
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className="group p-6 rounded-2xl border bg-card hover:shadow-lg transition-all"
-              >
-                <div className="text-primary mb-4">
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-muted-foreground">
-                  {feature.description}
-                </p>
+          {/* Server Status */}
+          {onlineServers.length > 0 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '24px',
+              marginBottom: '36px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#22c55e',
+                }} />
+                <span style={{ color: '#888888', fontSize: '13px' }}>
+                  {onlineServers.length} server{onlineServers.length > 1 ? 's' : ''} online
+                </span>
               </div>
-            ))}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: '#666666' }}>
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <span style={{ color: '#888888', fontSize: '13px' }}>
+                  {totalPlayers} player{totalPlayers > 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Features list */}
+          <div style={{ display: 'flex', gap: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#444444', fontSize: '13px' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Plugin System</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#444444', fontSize: '13px' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span>Visual Editor</span>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Servers Section */}
-      {onlineServers.length > 0 && (
-        <section className="py-20 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Nos Serveurs
-              </h2>
-              <p className="text-muted-foreground text-lg">
-                Rejoignez nos serveurs maintenant
-              </p>
-            </div>
+      {/* Right side - CTA */}
+      <div style={{
+        flex: '0 0 ' + Math.min(400, window.innerWidth * 0.5) + 'px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        padding: '60px 48px',
+        background: '#000000',
+        borderLeft: '1px solid rgba(255,255,255,0.05)',
+      }}>
+        <div style={{ maxWidth: '300px', margin: '0 auto', width: '100%' }}>
+          <h2 style={{
+            fontSize: '22px',
+            fontWeight: '500',
+            color: '#ffffff',
+            margin: '0 0 8px 0',
+            letterSpacing: '-0.5px',
+          }}>
+            Join Us
+          </h2>
+          <p style={{
+            color: '#666666',
+            fontSize: '13px',
+            margin: '0 0 32px 0',
+          }}>
+            Create your account and join our community
+          </p>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Server List */}
+          {onlineServers.length > 0 && (
+            <div style={{ marginBottom: '32px' }}>
               {onlineServers.map((server) => (
                 <div
                   key={server.id}
-                  className="p-6 rounded-2xl border bg-card hover:shadow-lg transition-all"
+                  style={{
+                    padding: '12px',
+                    marginBottom: '8px',
+                    background: '#0a0a0a',
+                    border: '1px solid rgba(255,255,255,0.05)',
+                    borderRadius: '6px',
+                  }}
                 >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-xl font-semibold">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>
                       {server.name}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                      <span className="text-sm text-green-600 font-medium">
-                        En ligne
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {server.fullAddress}
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Users className="h-4 w-4" />
-                      <span className="font-medium">
+                    </span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <div style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        background: '#22c55e',
+                      }} />
+                      <span style={{ color: '#22c55e', fontSize: '11px' }}>
                         {server.onlinePlayers} / {server.maxPlayers}
                       </span>
                     </div>
-                    {server.joinUrl && (
-                      <a
-                        href={server.joinUrl}
-                        className="inline-flex items-center gap-1 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
-                      >
-                        Rejoindre
-                        <ArrowRight className="h-3 w-3" />
-                      </a>
-                    )}
                   </div>
+                  <p style={{ color: '#666666', fontSize: '11px' }}>
+                    {server.fullAddress}
+                  </p>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          )}
 
-      {/* Blog Section */}
-      {recentPosts.length > 0 && (
-        <section className="py-20 bg-background">
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-2">
-                  Dernières Actualités
-                </h2>
-                <p className="text-muted-foreground">
-                  Restez informé des nouveautés
-                </p>
-              </div>
-              <Link
-                href="/news"
-                className="hidden sm:inline-flex items-center gap-2 px-6 py-3 rounded-xl border hover:bg-accent transition-colors"
-              >
-                Voir tout
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+          {/* CTA Buttons */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {isAuthenticated ? (
+              <>
+                {/* Logged in: Show user info and dashboard link */}
+                <div style={{
+                  padding: '16px',
+                  background: '#0a0a0a',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '6px',
+                  marginBottom: '8px',
+                }}>
+                  <p style={{ color: '#888888', fontSize: '11px', margin: '0 0 8px 0' }}>
+                    Welcome back,
+                  </p>
+                  <p style={{ color: '#ffffff', fontSize: '14px', fontWeight: '500', margin: '0 0 12px 0' }}>
+                    {auth.user?.name}
+                  </p>
+                  <Link
+                    href="/dashboard"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      width: '100%',
+                      padding: '10px',
+                      background: '#ffffff',
+                      color: '#000000',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      textDecoration: 'none',
+                      transition: 'all 0.15s',
+                    }}
+                    onMouseOver={(e) => { e.currentTarget.style.background = '#f0f0f0'; }}
+                    onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff'; }}
+                  >
+                    Go to Dashboard
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14" />
+                      <path d="M12 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {recentPosts.map((post) => (
                 <Link
-                  key={post.id}
-                  href={`/news/${post.slug}`}
-                  className="group"
+                  href="/news"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '12px',
+                    background: 'transparent',
+                    color: '#666666',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    textDecoration: 'none',
+                    transition: 'color 0.15s',
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.color = '#888888'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.color = '#666666'; }}
                 >
-                  <article className="overflow-hidden rounded-2xl border bg-card hover:shadow-lg transition-all">
-                    {post.image_url ? (
-                      <div className="aspect-video overflow-hidden">
-                        <img
-                          src={post.image_url}
-                          alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-video bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                        <Newspaper className="h-16 w-16 text-primary/30" />
-                      </div>
-                    )}
-                    <div className="p-6">
-                      <p className="text-sm text-muted-foreground mb-2">
-                        {new Date(post.published_at || '').toLocaleDateString('fr-FR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })}
-                      </p>
-                      <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                        {post.title}
-                      </h3>
-                      <p className="text-muted-foreground text-sm line-clamp-2">
-                        {post.excerpt || post.content?.substring(0, 150)}
-                      </p>
-                    </div>
-                  </article>
+                  View News
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14" />
+                    <path d="M12 5l7 7-7 7" />
+                  </svg>
                 </Link>
-              ))}
-            </div>
 
-            <div className="mt-8 text-center sm:hidden">
-              <Link
-                href="/news"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border hover:bg-accent transition-colors"
-              >
-                Voir tout
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
+                <Link
+                  href="/logout"
+                  method="post"
+                  as="button"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '12px',
+                    background: 'transparent',
+                    color: '#ef4444',
+                    border: '1px solid rgba(239,68,68,0.2)',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(239,68,68,0.4)';
+                    e.currentTarget.style.background = 'rgba(239,68,68,0.05)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(239,68,68,0.2)';
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                >
+                  Sign Out
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                </Link>
+              </>
+            ) : (
+              <>
+                {/* Not logged in: Show register and sign in */}
+                <Link
+                  href="/register"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '12px',
+                    background: '#ffffff',
+                    color: '#000000',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.background = '#f0f0f0'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff'; }}
+                >
+                  Create Account
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14" />
+                    <path d="M12 5v14" />
+                  </svg>
+                </Link>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Prêt à commencer ?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Rejoignez notre communauté et découvrez tout ce que nous avons à offrir
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 transition-all shadow-lg hover:shadow-xl"
-              >
-                Créer un compte
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-xl border bg-background hover:bg-accent font-semibold transition-all"
-              >
-                Se connecter
-              </Link>
-            </div>
+                <Link
+                  href="/login"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '12px',
+                    background: 'transparent',
+                    color: '#888888',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                    e.currentTarget.style.color = '#ffffff';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.color = '#888888';
+                  }}
+                >
+                  Sign In
+                </Link>
+
+                <Link
+                  href="/news"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '12px',
+                    background: 'transparent',
+                    color: '#666666',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '12px',
+                    textDecoration: 'none',
+                    transition: 'color 0.15s',
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.color = '#888888'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.color = '#666666'; }}
+                >
+                  View News
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M5 12h14" />
+                    <path d="M12 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </>
+            )}
           </div>
         </div>
-      </section>
+      </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          div[style*="flex: 1; display: flex; flex-direction: column"] {
+            display: none !important;
+          }
+          div[style*="flex: 0 0"] {
+            flex: '1 !important';
+            padding: '32px 24px !important';
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -347,9 +495,8 @@ export default function Home({ message, siteName, posts, server, servers, landin
           <Render config={puckConfig} data={puckData} />
         </div>
       ) : (
-        <DefaultHomePage
+        <SplitHomePage
           siteName={siteName}
-          posts={posts}
           servers={servers}
         />
       )}
