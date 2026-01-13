@@ -518,7 +518,7 @@ ENV;
 
     /* Right side - requirements */
     .right-side {
-      flex: 0 0 480px;
+      flex: 0 0 550px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -528,7 +528,7 @@ ENV;
     }
 
     .right-content {
-      max-width: 380px;
+      max-width: 460px;
       width: 100%;
     }
 
@@ -707,8 +707,8 @@ ENV;
     <!-- Right side - requirements -->
     <div class="right-side">
       <div class="right-content">
-        <h2>System Requirements</h2>
-        <p>Checking your server compatibility...</p>
+        <h2>Prérequis système</h2>
+        <p>Vérification de la compatibilité du serveur...</p>
 
         <div class="requirements" id="requirements">
           <!-- Requirements will be loaded here -->
