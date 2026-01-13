@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
+import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/Install/Toast';
 
 interface Props {
     phpVersion: string;
@@ -8,15 +9,34 @@ interface Props {
 }
 
 export default function InstallIndex({ phpVersion, minPhpVersion }: Props) {
+    const { toasts, error, remove } = useToast();
+
     const { data, setData, get, processing } = useForm({
         app_url: window.location.origin,
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        console.log('[Install/Index] Navigating to plugins step...');
+
         // Store app_url in sessionStorage and go to plugins step
         sessionStorage.setItem('install_app_url', data.app_url);
-        get(route('install.plugins'));
+
+        try {
+            let targetUrl: string;
+            if (typeof (window as any).route === 'function') {
+                targetUrl = (window as any).route('install.plugins');
+                console.log('[Install/Index] Route URL from ziggy:', targetUrl);
+            } else {
+                targetUrl = '/install/plugins';
+                console.log('[Install/Index] Using fallback URL:', targetUrl);
+            }
+            get(targetUrl as any);
+        } catch (err) {
+            console.error('[Install/Index] Navigation failed:', err);
+            error('Navigation failed. Please try refreshing the page.');
+        }
     };
 
     const phpOk = phpVersion >= minPhpVersion;
@@ -24,6 +44,8 @@ export default function InstallIndex({ phpVersion, minPhpVersion }: Props) {
     return (
         <>
             <Head title="Installation - ExilonCMS" />
+            <ToastContainer toasts={toasts} onRemove={remove} />
+
             <div style={{
                 height: '100vh',
                 display: 'flex',

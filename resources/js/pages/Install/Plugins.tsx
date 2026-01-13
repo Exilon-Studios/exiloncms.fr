@@ -1,6 +1,8 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { router } from '@inertiajs/react';
+import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/Install/Toast';
 
 interface Plugin {
   id: string;
@@ -24,6 +26,7 @@ interface Props {
 export default function InstallPlugins({ availablePlugins, availableThemes }: Props) {
   const [selectedPlugins, setSelectedPlugins] = useState<string[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
+  const { toasts, error, remove } = useToast();
 
   const togglePlugin = (pluginId: string) => {
     setSelectedPlugins(prev =>
@@ -35,15 +38,36 @@ export default function InstallPlugins({ availablePlugins, availableThemes }: Pr
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    console.log('[Install/Plugins] Proceeding to admin step...');
+    console.log('[Install/Plugins] Selected plugins:', selectedPlugins);
+    console.log('[Install/Plugins] Selected theme:', selectedTheme);
+
     // Store selections in sessionStorage and go to admin step
     sessionStorage.setItem('install_selected_plugins', JSON.stringify(selectedPlugins));
     sessionStorage.setItem('install_selected_theme', selectedTheme || '');
-    router.get(route('install.admin'));
+
+    try {
+      let targetUrl: string;
+      if (typeof (window as any).route === 'function') {
+        targetUrl = (window as any).route('install.admin');
+        console.log('[Install/Plugins] Route URL from ziggy:', targetUrl);
+      } else {
+        targetUrl = '/install/admin';
+        console.log('[Install/Plugins] Using fallback URL:', targetUrl);
+      }
+      router.get(targetUrl);
+    } catch (err) {
+      console.error('[Install/Plugins] Navigation failed:', err);
+      error('Navigation failed. Please try refreshing the page.');
+    }
   };
 
   return (
     <>
       <Head title="Plugins & Themes - ExilonCMS" />
+      <ToastContainer toasts={toasts} onRemove={remove} />
+
       <div style={{
         height: '100vh',
         display: 'flex',

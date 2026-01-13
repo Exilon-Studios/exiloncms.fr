@@ -1,6 +1,9 @@
 import { Head } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react';
 import { useState } from 'react';
+import { router } from '@inertiajs/react';
+import { useToast } from '@/hooks/useToast';
+import { ToastContainer } from '@/components/Install/Toast';
 
 interface Props {
   phpVersion: string;
@@ -10,13 +13,16 @@ interface Props {
 export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverErrors, setServerErrors] = useState<Record<string, string>>({});
+  const { toasts, success, error, info, remove } = useToast();
 
   // Get data from sessionStorage
   const appUrl = sessionStorage.getItem('install_app_url') || window.location.origin;
   const selectedPlugins = JSON.parse(sessionStorage.getItem('install_selected_plugins') || '[]');
   const selectedTheme = sessionStorage.getItem('install_selected_theme') || '';
 
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData } = useForm({
     app_url: appUrl,
     name: 'Admin',
     email: 'admin@example.com',
@@ -26,10 +32,63 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
     selected_theme: selectedTheme,
   });
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('install.submit'));
+    setServerErrors({});
+    setIsSubmitting(true);
+
+    info('Starting installation...');
+
+    // Get the submit URL - use install.admin.save not install.submit!
+    let submitUrl: string;
+    try {
+      if (typeof (window as any).route === 'function') {
+        submitUrl = (window as any).route('install.admin.save');
+        console.log('[Install] Route URL from ziggy:', submitUrl);
+      } else {
+        submitUrl = '/install/admin';
+        console.log('[Install] Using fallback URL:', submitUrl);
+      }
+    } catch (err) {
+      console.error('[Install] Error getting route:', err);
+      error('Failed to get route URL. Please refresh the page.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!submitUrl || typeof submitUrl !== 'string') {
+      error('Invalid submit URL. Please refresh the page.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    try {
+      console.log('[Install] Submitting form to:', submitUrl);
+      console.log('[Install] Form data:', { ...data, password: '***' });
+
+      // Use router.post directly with proper options
+      router.post(submitUrl, data, {
+        onError: (errors) => {
+          console.error('[Install] Validation errors:', errors);
+          setServerErrors(errors as Record<string, string>);
+          setIsSubmitting(false);
+          error('Please fix the errors and try again.');
+        },
+        onSuccess: () => {
+          console.log('[Install] Installation successful!');
+          success('Installation completed successfully!');
+        },
+      });
+    } catch (err) {
+      console.error('[Install] Submission failed:', err);
+      error('Installation failed. Please try again.');
+      setIsSubmitting(false);
+    }
   };
+
+  const processing = isSubmitting;
+  const errors = serverErrors;
+  const clearErrors = () => setServerErrors({});
 
   const phpOk = phpVersion >= minPhpVersion;
 
@@ -52,6 +111,8 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
   return (
     <>
       <Head title="Admin Account - ExilonCMS" />
+      <ToastContainer toasts={toasts} onRemove={remove} />
+
       <div style={{
         height: '100vh',
         display: 'flex',

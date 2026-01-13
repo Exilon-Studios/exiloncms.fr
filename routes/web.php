@@ -5,7 +5,6 @@ use ExilonCMS\Http\Controllers\DashboardController;
 use ExilonCMS\Http\Controllers\DebugController;
 use ExilonCMS\Http\Controllers\FallbackController;
 use ExilonCMS\Http\Controllers\HomeController;
-use ExilonCMS\Http\Controllers\InstallController;
 use ExilonCMS\Http\Controllers\NotificationController;
 use ExilonCMS\Http\Controllers\PostCommentController;
 use ExilonCMS\Http\Controllers\PostController;
@@ -22,26 +21,8 @@ Route::get('/install-debug', [DebugController::class, 'installStatus'])->name('i
 Route::get('/install-force', [DebugController::class, 'forceInstall'])->name('install.force');
 
 // ============================================================
-// INSTALLER ROUTES (Must be before auth middleware)
-// Simple one-page installer (like Azuriom)
-// CSRF verification is disabled in app/Http/Middleware/VerifyCsrfToken
+// Installation routes are now in routes/install.php (CSRF disabled)
 // ============================================================
-Route::middleware(['web'])->group(function () {
-    Route::get('/install', [InstallController::class, 'index'])->name('install.index');
-    Route::post('/install', [InstallController::class, 'install'])->name('install.submit');
-});
-
-// Web installer steps (alternative, not used by default)
-Route::middleware(['web'])->group(function () {
-    Route::get('/install/requirements', [InstallController::class, 'showRequirementsWeb'])->name('install.requirements');
-    Route::post('/install/requirements', [InstallController::class, 'checkRequirementsWeb'])->name('install.requirements.check');
-    Route::get('/install/database', [InstallController::class, 'showDatabaseWeb'])->name('install.database');
-    Route::post('/install/database', [InstallController::class, 'configureDatabaseWeb'])->name('install.database.save');
-    Route::get('/install/plugins', [InstallController::class, 'showPlugins'])->name('install.plugins');
-    Route::get('/install/admin', [InstallController::class, 'showAdminWeb'])->name('install.admin');
-    Route::post('/install/admin', [InstallController::class, 'createAdminWeb'])->name('install.admin.save');
-    Route::get('/install/complete', [InstallController::class, 'showCompleteWeb'])->name('install.complete');
-});
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 

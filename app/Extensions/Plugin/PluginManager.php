@@ -187,6 +187,11 @@ class PluginManager extends ExtensionManager
      */
     public function findPluginsDescriptions(): Collection
     {
+        // Create plugins directory if it doesn't exist
+        if (! is_dir($this->pluginsPath)) {
+            return collect([]);
+        }
+
         $directories = $this->files->directories($this->pluginsPath);
         $plugins = [];
 

@@ -20,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
@@ -136,6 +137,7 @@ class InstallController extends Controller
 
         // Middleware pour les nouvelles routes Web (Inertia/React)
         // Permet l'accès si le CMS n'est pas installé
+        // Note: createAdminWeb is excluded because it creates the installation marker
         $this->middleware(function (Request $request, callable $next) {
             // Permettre l'accès si le CMS n'est pas encore installé
             if (is_installed()) {
@@ -152,7 +154,6 @@ class InstallController extends Controller
             'showDatabaseWeb',
             'configureDatabaseWeb',
             'showAdminWeb',
-            'createAdminWeb',
             'showCompleteWeb',
         ]);
 
@@ -600,6 +601,33 @@ class InstallController extends Controller
     }
 
     /**
+     * Post-installation redirect handler.
+     * This route is called after installation completes and handles the redirect to home.
+     * It bypasses the installation check middleware.
+     */
+    public function installed(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        // Check if user is authenticated
+        if (Auth::check()) {
+            return redirect('/')->with('success', 'Installation completed successfully!');
+        }
+
+        // Try to authenticate with the session
+        $userId = session()->get('install_user_id');
+        if ($userId) {
+            $user = User::find($userId);
+            if ($user) {
+                Auth::login($user);
+                session()->forget('install_user_id');
+                return redirect('/')->with('success', 'Installation completed successfully!');
+            }
+        }
+
+        // Just redirect to home - the middleware will handle authentication
+        return redirect('/')->with('success', 'Installation completed successfully!');
+    }
+
+    /**
      * Show plugins selection step.
      */
     public function showPlugins(): Response
@@ -617,22 +645,37 @@ class InstallController extends Controller
      */
     protected function getAvailablePlugins(): array
     {
-        $plugins = [];
-        $pluginDirs = glob(base_path('plugins/*/plugin.json'));
+        try {
+            $updateManager = app(UpdateManager::class);
+            $plugins = $updateManager->getPlugins(true); // Force refresh from registry
 
-        foreach ($pluginDirs as $pluginFile) {
-            $data = json_decode(file_get_contents($pluginFile), true);
-            if ($data && isset($data['id'], $data['name'])) {
-                $plugins[] = [
-                    'id' => $data['id'],
-                    'name' => $data['name'],
-                    'description' => $data['description'] ?? '',
-                    'version' => $data['version'] ?? '1.0.0',
+            return collect($plugins)->map(function ($plugin) {
+                return [
+                    'id' => $plugin['extension_id'] ?? $plugin['id'] ?? '',
+                    'name' => $plugin['name'] ?? 'Unknown',
+                    'description' => $plugin['description'] ?? '',
+                    'version' => $plugin['version'] ?? '1.0.0',
                 ];
-            }
-        }
+            })->toArray();
+        } catch (Throwable $e) {
+            // Fallback to local plugins if registry fails
+            $plugins = [];
+            $pluginDirs = glob(base_path('plugins/*/plugin.json'));
 
-        return $plugins;
+            foreach ($pluginDirs as $pluginFile) {
+                $data = json_decode(file_get_contents($pluginFile), true);
+                if ($data && isset($data['id'], $data['name'])) {
+                    $plugins[] = [
+                        'id' => $data['id'],
+                        'name' => $data['name'],
+                        'description' => $data['description'] ?? '',
+                        'version' => $data['version'] ?? '1.0.0',
+                    ];
+                }
+            }
+
+            return $plugins;
+        }
     }
 
     /**
@@ -642,22 +685,37 @@ class InstallController extends Controller
      */
     protected function getAvailableThemes(): array
     {
-        $themes = [];
-        $themeDirs = glob(base_path('themes/*/theme.json'));
+        try {
+            $updateManager = app(UpdateManager::class);
+            $themes = $updateManager->getThemes(true); // Force refresh from registry
 
-        foreach ($themeDirs as $themeFile) {
-            $data = json_decode(file_get_contents($themeFile), true);
-            if ($data && isset($data['id'], $data['name'])) {
-                $themes[] = [
-                    'id' => $data['id'],
-                    'name' => $data['name'],
-                    'description' => $data['description'] ?? '',
-                    'version' => $data['version'] ?? '1.0.0',
+            return collect($themes)->map(function ($theme) {
+                return [
+                    'id' => $theme['extension_id'] ?? $theme['id'] ?? '',
+                    'name' => $theme['name'] ?? 'Unknown',
+                    'description' => $theme['description'] ?? '',
+                    'version' => $theme['version'] ?? '1.0.0',
                 ];
-            }
-        }
+            })->toArray();
+        } catch (Throwable $e) {
+            // Fallback to local themes if registry fails
+            $themes = [];
+            $themeDirs = glob(base_path('themes/*/theme.json'));
 
-        return $themes;
+            foreach ($themeDirs as $themeFile) {
+                $data = json_decode(file_get_contents($themeFile), true);
+                if ($data && isset($data['id'], $data['name'])) {
+                    $themes[] = [
+                        'id' => $data['id'],
+                        'name' => $data['name'],
+                        'description' => $data['description'] ?? '',
+                        'version' => $data['version'] ?? '1.0.0',
+                    ];
+                }
+            }
+
+            return $themes;
+        }
     }
 
     /**
@@ -761,14 +819,35 @@ class InstallController extends Controller
             // Clear cache
             Artisan::call('cache:clear');
             Artisan::call('config:clear');
+            Artisan::call('view:clear');
 
-            // Create installation marker FIRST
+            // Save user ID to session for auth persistence
+            session()->put('install_user_id', $user->id);
+            session()->save();
+
+            // Create installation marker LAST (before any redirects)
             $this->createInstallationMarker();
 
-            // Force HTTP redirect - bypass all Laravel responses
-            header('Location: ' . url('/'));
-            exit;
+            // Log the user in
+            Auth::login($user, remember: true);
+
+            // Save session again after login
+            session()->save();
+
+            // Redirect to the installed route which handles the final redirect
+            // This bypasses the installation check middleware
+            return redirect()->route('install.installed');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (Throwable $e) {
+            // Log the actual error for debugging
+            \Log::error('Installation error', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             throw ValidationException::withMessages([
                 'name' => 'Installation error: '.$e->getMessage(),
             ]);
@@ -893,18 +972,30 @@ class InstallController extends Controller
      */
     public function createAdminWeb(Request $request)
     {
-        $validated = $this->validate($request, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
-
+        // First, run migrations BEFORE validation (database tables don't exist yet)
         try {
-            // Run migrations
             Artisan::call('migrate:fresh', [
                 '--force' => true,
                 '--seed' => true,
             ]);
+        } catch (Throwable $e) {
+            \Log::error('Migration error during installation', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw ValidationException::withMessages([
+                'name' => 'Erreur lors des migrations: '.$e->getMessage(),
+            ]);
+        }
+
+        // Now validate (without unique rule since DB is fresh)
+        $validated = $this->validate($request, [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        try {
 
             // Create storage link
             if (! file_exists(public_path('storage'))) {
@@ -935,13 +1026,32 @@ class InstallController extends Controller
             Artisan::call('config:clear');
             Artisan::call('view:clear');
 
-            // Create installation marker FIRST
+            // Save user ID to session for auth persistence
+            session()->put('install_user_id', $user->id);
+            session()->save();
+
+            // Create installation marker LAST (before any redirects)
             $this->createInstallationMarker();
 
-            // Force HTTP redirect - bypass all Laravel responses
-            header('Location: ' . url('/'));
-            exit;
+            // Log the user in
+            Auth::login($user, remember: true);
+
+            // Save session again after login
+            session()->save();
+
+            // Redirect to the installed route which handles the final redirect
+            return redirect()->route('install.installed');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (Throwable $e) {
+            // Log the actual error for debugging
+            \Log::error('Installation error (createAdminWeb)', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
             throw ValidationException::withMessages([
                 'name' => 'Erreur lors de l\'installation: '.$e->getMessage(),
             ]);
