@@ -1005,15 +1005,17 @@ class InstallController extends Controller
             // Get admin role
             $adminRole = Role::where('is_admin', true)->firstOrFail();
 
-            // Create admin user
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role_id' => $adminRole->id,
-                'email_verified_at' => now(),
-                'password_changed_at' => now(),
-            ]);
+            // Create or update admin user (update if exists from seeder)
+            $user = User::updateOrCreate(
+                ['email' => $validated['email']], // Find by email
+                [
+                    'name' => $validated['name'],
+                    'password' => Hash::make($validated['password']),
+                    'role_id' => $adminRole->id,
+                    'email_verified_at' => now(),
+                    'password_changed_at' => now(),
+                ]
+            );
 
             // Generate APP_KEY
             $this->updateEnvironmentFile([
