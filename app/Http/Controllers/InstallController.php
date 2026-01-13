@@ -1203,11 +1203,34 @@ class InstallController extends Controller
             copy(base_path('.env.example'), $envPath);
         }
 
+        // Read current env content
+        $envContent = file_get_contents($envPath);
+        $lines = explode("\n", $envContent);
+        $updatedKeys = [];
+
+        // Update or add each key
         foreach ($values as $key => $value) {
-            EnvEditor::updateEnv([
-                $key => $value,
-            ]);
+            $found = false;
+            $value = addslashes($value);
+
+            for ($i = 0; $i < count($lines); $i++) {
+                // Check if this line contains the key (not commented)
+                if (preg_match('/^' . preg_quote($key) . '=/', $lines[$i])) {
+                    $lines[$i] = $key . '=' . $value;
+                    $found = true;
+                    $updatedKeys[] = $key;
+                    break;
+                }
+            }
+
+            // If key not found, add it at the end
+            if (! $found) {
+                $lines[] = $key . '=' . $value;
+            }
         }
+
+        // Write back
+        file_put_contents($envPath, implode("\n", $lines));
     }
 
     /**
