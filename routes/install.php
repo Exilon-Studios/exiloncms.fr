@@ -17,7 +17,7 @@ Route::middleware([
     // ============================================================
     // Simple one-page installer
     // ============================================================
-    Route::get('/install', [InstallController::class, 'index'])->name('install.index');
+    Route::get('/install', [InstallController::class, 'showRequirementsWeb'])->name('install.index');
     Route::post('/install', [InstallController::class, 'install'])->name('install.submit');
 
     // ============================================================
