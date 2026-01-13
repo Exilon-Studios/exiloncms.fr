@@ -57,6 +57,11 @@ class NotificationService
 
         $admins = User::where('role_id', $adminRole->id)->get();
 
+        // Don't create any notifications if there are no admins yet (during installation)
+        if ($admins->isEmpty()) {
+            return 0;
+        }
+
         foreach ($admins as $admin) {
             Notification::create([
                 'user_id' => $admin->id,
