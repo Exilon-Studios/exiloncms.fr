@@ -44,6 +44,7 @@ return [
             'general_page' => 'Home',
             'security' => 'Security',
             'mail' => 'Mail',
+            'integrations' => 'Integrations',
             'maintenance' => 'Maintenance',
             'navbar' => 'Navigation',
             'servers' => 'Servers',

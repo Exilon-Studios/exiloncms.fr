@@ -34,6 +34,7 @@ return array (
           'general' => 'Général',
           'general_page' => 'Général',
           'mail' => 'Email',
+          'integrations' => 'Intégrations',
           'maintenance' => 'Maintenance',
           'navbar' => 'Navigation',
           'security' => 'Sécurité',

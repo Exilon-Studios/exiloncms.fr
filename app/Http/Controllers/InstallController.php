@@ -948,12 +948,36 @@ class InstallController extends Controller
                 ]);
             }
 
-            return back();
+            return redirect()->route('install.mode');
         } catch (Throwable $e) {
             throw ValidationException::withMessages([
                 'connection' => 'Impossible de se connecter à la base de données: '.$e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * Show installation mode selection page.
+     */
+    public function showModeWeb(): Response
+    {
+        return Inertia::render('Install/Mode');
+    }
+
+    /**
+     * Save installation mode selection.
+     */
+    public function saveModeWeb(Request $request)
+    {
+        $validated = $this->validate($request, [
+            'mode' => ['required', 'in:production,demo'],
+        ]);
+
+        // Store mode in session for later steps
+        session()->put('install_mode', $validated['mode']);
+        session()->save();
+
+        return redirect()->route('install.admin');
     }
 
     /**
@@ -1000,6 +1024,59 @@ class InstallController extends Controller
             // Create storage link
             if (! file_exists(public_path('storage'))) {
                 Artisan::call('storage:link', ! windows_os() ? ['--relative' => true] : []);
+            }
+
+            // Save installation mode to database
+            $installMode = session('install_mode', 'production');
+            \ExilonCMS\Models\Setting::updateOrCreate(
+                ['key' => 'install_mode'],
+                [
+                    'name' => 'Installation Mode',
+                    'value' => $installMode,
+                    'type' => 'text',
+                    'group' => 'system',
+                ]
+            );
+
+            // If demo mode, disable registration and create demo users
+            if ($installMode === 'demo') {
+                \ExilonCMS\Models\Setting::updateOrCreate(
+                    ['key' => 'registration_enabled'],
+                    [
+                        'name' => 'Allow Registration',
+                        'value' => '0',
+                        'type' => 'boolean',
+                        'group' => 'auth',
+                    ]
+                );
+
+                // Create demo admin user (for quick login)
+                $demoAdminRole = \ExilonCMS\Models\Role::where('is_admin', true)->first();
+                \ExilonCMS\Models\User::updateOrCreate(
+                    ['email' => 'admin@demo.local'],
+                    [
+                        'name' => 'Demo Admin',
+                        'password' => Hash::make('demo123'),
+                        'role_id' => $demoAdminRole->id,
+                        'email_verified_at' => now(),
+                        'password_changed_at' => now(),
+                    ]
+                );
+
+                // Create demo player user (for quick login)
+                $playerRole = \ExilonCMS\Models\Role::where('is_admin', false)->first();
+                if ($playerRole) {
+                    \ExilonCMS\Models\User::updateOrCreate(
+                        ['email' => 'player@demo.local'],
+                        [
+                            'name' => 'Demo Player',
+                            'password' => Hash::make('demo123'),
+                            'role_id' => $playerRole->id,
+                            'email_verified_at' => now(),
+                            'password_changed_at' => now(),
+                        ]
+                    );
+                }
             }
 
             // Get admin role

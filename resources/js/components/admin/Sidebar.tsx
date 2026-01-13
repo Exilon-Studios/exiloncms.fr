@@ -28,6 +28,7 @@ import {
 import { DropdownUser } from "@/components/DropdownUser";
 import { usePage } from "@inertiajs/react";
 import CartSheet from "@/components/shop/CartSheet";
+import { NotificationDropdown } from "@/components/admin/NotificationDropdown";
 
 interface Links {
   label: string;
@@ -43,6 +44,25 @@ interface Links {
 interface SidebarContextProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+interface SidebarLayoutProps {
+  className?: string;
+  children: React.ReactNode;
+  primaryLinks: Links[];
+  secondaryLinks: Links[];
+  userInfo: {
+    name: string;
+    avatar?: string;
+    email?: string;
+    role?: {
+      id: number;
+      name: string;
+      is_admin: boolean;
+    };
+    hasAdminAccess?: boolean;
+  };
+  siteName?: string;
 }
 
 const SidebarContext = createContext<SidebarContextProps | undefined>(
@@ -407,28 +427,12 @@ export function SidebarLayout({
   secondaryLinks,
   userInfo,
   siteName = 'ExilonCMS',
-}: {
-  className?: string;
-  children: React.ReactNode;
-  primaryLinks: Links[];
-  secondaryLinks: Links[];
-  userInfo: {
-    name: string;
-    avatar?: string;
-    email?: string;
-    role?: {
-      id: number;
-      name: string;
-      is_admin: boolean;
-    };
-    hasAdminAccess?: boolean;
-  };
-  siteName?: string;
-}) {
+}: SidebarLayoutProps) {
   const [open, setOpen] = useState(true);
   const [cartOpen, setCartOpen] = useState(false);
   const pageProps = usePage().props as any;
   const cartCount = pageProps.cartCount || 0;
+  const unreadNotificationsCount = pageProps.unreadNotificationsCount || 0;
   const auth = pageProps.auth;
 
   return (
@@ -503,14 +507,8 @@ export function SidebarLayout({
             <div className="flex items-center gap-2">
               {auth?.user && (
                 <>
-                  {/* Notifications button */}
-                  <Link
-                    href="/notifications"
-                    className="relative flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
-                    aria-label="Notifications"
-                  >
-                    <IconBell className="h-5 w-5 text-foreground" />
-                  </Link>
+                  {/* Notifications dropdown */}
+                  <NotificationDropdown unreadCount={unreadNotificationsCount} />
 
                   {/* Cart button */}
                   <button

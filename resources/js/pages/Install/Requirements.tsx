@@ -1,8 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle2, XCircle, Loader2, ArrowLeft, ArrowRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Requirement } from './types';
 
 interface Props {
@@ -61,110 +58,356 @@ export default function Requirements({ requirements: initialRequirements }: Prop
 
   return (
     <>
-      <Head title="Prérequis - Installation - ExilonCMS" />
+      <Head title="Prérequis - ExilonCMS" />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Vérification des prérequis
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        background: '#000000',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif',
+        overflow: 'hidden',
+      }}>
+        {/* Left side - branding */}
+        <div style={{
+          flex: '1',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: '60px',
+          background: '#0a0a0a',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Subtle grid pattern */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }} />
+
+          {/* Subtle glow */}
+          <div style={{
+            position: 'absolute',
+            width: '600px',
+            height: '600px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)',
+            top: '-200px',
+            left: '-200px',
+          }} />
+
+          {/* Content */}
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              background: '#111111',
+              borderRadius: '14px',
+              marginBottom: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <h1 style={{
+              fontSize: '48px',
+              fontWeight: '600',
+              color: '#ffffff',
+              margin: '0 0 12px 0',
+              letterSpacing: '-1.5px',
+            }}>
+              ExilonCMS
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Nous vérifions que votre serveur est compatible avec ExilonCMS
+            <p style={{
+              fontSize: '15px',
+              color: '#666666',
+              margin: '0 0 36px 0',
+              maxWidth: '320px',
+              lineHeight: '1.5',
+            }}>
+              Modern CMS for gaming communities
             </p>
-          </div>
 
-          {/* Requirements List */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-            {checking ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                <span className="ml-3 text-gray-600 dark:text-gray-400">Vérification en cours...</span>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {requirements.map((req, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 rounded-lg border ${
-                      req.status === 'success'
-                        ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
-                        : req.status === 'error'
-                        ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
-                        : 'bg-gray-50 border-gray-200 dark:bg-gray-900/20 dark:border-gray-700'
-                    }"
-                  >
-                    <div className="flex items-center gap-3">
-                      {req.status === 'success' ? (
-                        <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
-                      ) : req.status === 'error' ? (
-                        <XCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
-                      ) : (
-                        <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
-                      )}
-                      <span className="font-medium text-gray-900 dark:text-white">
+            {/* Steps indicator */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#ffffff',
+              }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#333333',
+              }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#333333',
+              }} />
+            </div>
+            <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
+              Step 1 of 3: Check requirements
+            </p>
+
+            {/* Status indicator */}
+            <div style={{ marginTop: '24px' }}>
+              {checking && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#888888' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                  <span style={{ fontSize: '12px' }}>Checking system...</span>
+                </div>
+              )}
+              {!checking && allOk && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#22c55e' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span style={{ fontSize: '12px' }}>All requirements met</span>
+                </div>
+              )}
+              {!checking && hasErrors && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#ef4444' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4" />
+                    <path d="M12 16h.01" />
+                  </svg>
+                  <span style={{ fontSize: '12px' }}>Some requirements missing</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right side - requirements */}
+        <div style={{
+          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: '60px 48px',
+          background: '#000000',
+          borderLeft: '1px solid rgba(255,255,255,0.05)',
+          overflowY: 'auto',
+        }}>
+          <div style={{ maxWidth: '460px', margin: '0 auto', width: '100%' }}>
+            <h2 style={{
+              fontSize: '22px',
+              fontWeight: '500',
+              color: '#ffffff',
+              margin: '0 0 6px 0',
+              letterSpacing: '-0.5px',
+            }}>
+              System Requirements
+            </h2>
+            <p style={{
+              color: '#666666',
+              fontSize: '13px',
+              margin: '0 0 32px 0',
+            }}>
+              We're checking if your server is compatible
+            </p>
+
+            {/* Requirements List */}
+            <div style={{
+              background: '#0a0a0a',
+              border: '1px solid rgba(255,255,255,0.05)',
+              borderRadius: '8px',
+              padding: '16px',
+              marginBottom: '24px',
+            }}>
+              {checking ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite', color: '#888888' }}>
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                  <span style={{ marginLeft: '12px', color: '#666666', fontSize: '13px' }}>Checking...</span>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {requirements.map((req, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '10px 12px',
+                        borderRadius: '6px',
+                        background: req.status === 'success'
+                          ? 'rgba(34, 197, 94, 0.1)'
+                          : req.status === 'error'
+                          ? 'rgba(239, 68, 68, 0.1)'
+                          : '#0f0f0f',
+                        border: '1px solid ' + (
+                          req.status === 'success'
+                            ? 'rgba(34, 197, 94, 0.2)'
+                            : req.status === 'error'
+                            ? 'rgba(239, 68, 68, 0.2)'
+                            : 'rgba(255,255,255,0.05)'
+                        ),
+                      }}
+                    >
+                      <span style={{
+                        color: req.status === 'success' ? '#22c55e' :
+                               req.status === 'error' ? '#ef4444' :
+                               '#888888',
+                        fontSize: '13px',
+                      }}>
                         {req.name}
                       </span>
+                      {req.status === 'success' && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                      {req.status === 'error' && (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10" />
+                          <path d="M12 8v4" />
+                          <path d="M12 16h.01" />
+                        </svg>
+                      )}
                     </div>
-                    {req.message && (
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {req.message}
-                      </span>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Alert */}
+            {hasErrors && !checking && (
+              <div style={{
+                padding: '12px',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                borderRadius: '6px',
+                marginBottom: '24px',
+              }}>
+                <p style={{ color: '#ef4444', fontSize: '12px', margin: 0 }}>
+                  Some requirements are not met. Please contact your hosting provider.
+                </p>
               </div>
             )}
-          </div>
 
-          {/* Alert */}
-          {hasErrors && (
-            <Alert variant="destructive" className="mb-6">
-              <XCircle className="h-4 w-4" />
-              <AlertDescription>
-                Certains prérequis ne sont pas remplis. Veuillez contacter votre hébergeur ou installer les extensions manquantes.
-              </AlertDescription>
-            </Alert>
-          )}
+            {allOk && !checking && (
+              <div style={{
+                padding: '12px',
+                background: 'rgba(34, 197, 94, 0.1)',
+                border: '1px solid rgba(34, 197, 94, 0.2)',
+                borderRadius: '6px',
+                marginBottom: '24px',
+              }}>
+                <p style={{ color: '#22c55e', fontSize: '12px', margin: 0 }}>
+                  All requirements are met! You can continue the installation.
+                </p>
+              </div>
+            )}
 
-          {allOk && !checking && (
-            <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/20">
-              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <AlertDescription className="text-green-800 dark:text-green-200">
-                Tous les prérequis sont remplis ! Vous pouvez continuer l'installation.
-              </AlertDescription>
-            </Alert>
-          )}
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={checkRequirements}
+                disabled={checking}
+                style={{
+                  flex: '1',
+                  padding: '12px',
+                  background: checking ? '#1a1a1a' : 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  borderRadius: '6px',
+                  color: checking ? '#666666' : '#ffffff',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: checking ? 'not-allowed' : 'pointer',
+                  opacity: checking ? 0.5 : 1,
+                  transition: 'all 0.15s',
+                }}
+                onMouseOver={(e) => {
+                  if (!checking) {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!checking) {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.05)';
+                  }
+                }}
+              >
+                Recheck
+              </button>
 
-          {/* Navigation */}
-          <div className="flex items-center justify-between">
-            <Link href={route('install.welcome')}>
-              <Button variant="outline">
-                <ArrowLeft className="mr-2 w-4 h-4" />
-                Retour
-              </Button>
-            </Link>
-
-            <div className="flex items-center gap-3">
-              {!checking && (
-                <Button
-                  onClick={checkRequirements}
-                  variant="outline"
-                >
-                  Revérifier
-                </Button>
-              )}
-              <Link href={canContinue ? route('install.database') : '#'}>
-                <Button disabled={!canContinue || checking}>
-                  Continuer
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
+              <a
+                href={canContinue ? '/install/database' : '#'}
+                onClick={(e) => !canContinue && checking && e.preventDefault()}
+                style={{
+                  flex: '1',
+                  padding: '12px',
+                  background: canContinue ? '#ffffff' : '#1a1a1a',
+                  border: 'none',
+                  borderRadius: '6px',
+                  color: canContinue ? '#000000' : '#666666',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: canContinue ? 'pointer' : 'not-allowed',
+                  textDecoration: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  opacity: checking ? 0.5 : 1,
+                  transition: 'all 0.15s',
+                }}
+                onMouseOver={(e) => {
+                  if (canContinue && !checking) {
+                    e.currentTarget.style.background = '#f0f0f0';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (canContinue && !checking) {
+                    e.currentTarget.style.background = '#ffffff';
+                  }
+                }}
+              >
+                Continue
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14" />
+                  <path d="M12 5l7 7-7 7" />
+                </svg>
+              </a>
             </div>
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @media (max-width: 900px) {
+          div[style*="flex: 1; display: flex; flex-direction: column"] {
+            display: none !important;
+          }
+          div[style*="flex: 0 0"] {
+            flex: 1 !important;
+            padding: 32px 24px !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

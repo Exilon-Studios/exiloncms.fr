@@ -206,11 +206,17 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
                 width: '24px',
                 height: '4px',
                 borderRadius: '2px',
+                background: '#333333',
+              }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
                 background: '#ffffff',
               }} />
             </div>
             <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
-              Step 3 of 3: Create admin account
+              Step 4 of 4: Create admin account
             </p>
 
             {/* Summary */}
@@ -240,7 +246,7 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
 
         {/* Right side - form */}
         <div style={{
-          flex: '0 0 ' + Math.min(400, window.innerWidth * 0.5) + 'px',
+          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -249,7 +255,7 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
           borderLeft: '1px solid rgba(255,255,255,0.05)',
           overflowY: 'auto',
         }}>
-          <div style={{ maxWidth: '340px', margin: '0 auto', width: '100%' }}>
+          <div style={{ maxWidth: '460px', margin: '0 auto', width: '100%' }}>
             <h2 style={{
               fontSize: '22px',
               fontWeight: '500',

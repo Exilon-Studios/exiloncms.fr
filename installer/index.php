@@ -22,8 +22,7 @@
 /**
  * The ExilonCMS installer.
  *
- * This file is not a part of ExilonCMS itself,
- * and can be removed when ExilonCMS is installed.
+ * Based on Azuriom's installer approach.
  *
  * @author ExilonCMS
  */
@@ -47,11 +46,9 @@ set_error_handler(function ($level, $message, $file = 'unknown', $line = 0) {
 function parse_php_version()
 {
     preg_match('/^(\d+)\.(\d+)/', PHP_VERSION, $matches);
-
     if (count($matches) > 2) {
         return "{$matches[1]}.{$matches[2]}";
     }
-
     return PHP_VERSION;
 }
 
@@ -60,19 +57,15 @@ function array_get($array, $key, $default = null)
     if (array_key_exists($key, $array)) {
         return $array[$key];
     }
-
     if (strpos($key, '.') === false) {
         return isset($array[$key]) ? $array[$key] : $default;
     }
-
     foreach (explode('.', $key) as $segment) {
         if (! array_key_exists($segment, $array)) {
             return $default;
         }
-
         $array = $array[$segment];
     }
-
     return $array;
 }
 
@@ -86,7 +79,6 @@ function request_url()
     $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
     $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
     $path = ! empty($_SERVER['REQUEST_URI']) ? explode('?', $_SERVER['REQUEST_URI'])[0] : '';
-
     return "{$scheme}://{$host}{$path}";
 }
 
@@ -95,21 +87,14 @@ $requestContent = null;
 function request_input($key, $default = null)
 {
     global $requestContent;
-
     if (! in_array(request_method(), ['GET', 'HEAD'], true)) {
         if ($requestContent === null) {
             $requestContent = json_decode(file_get_contents('php://input'), true);
         }
-
-        if ($requestContent) {
-            $value = array_get($requestContent, $key);
-
-            if ($value !== null) {
-                return $value;
-            }
+        if ($requestContent && isset($requestContent[$key])) {
+            return $requestContent[$key];
         }
     }
-
     return array_get($_GET, $key, $default);
 }
 
@@ -118,24 +103,19 @@ function send_json_response($data = null, $status = 200)
     if ($data === null && $status === 200) {
         $status = 204;
     }
-
     if ($status !== 200) {
         http_response_code($status);
     }
-
     header('Content-Type: application/json');
-
     if ($data === null) {
         exit();
     }
-
     exit(json_encode($data));
 }
 
 function read_url($url, $curlOptions = null)
 {
     $ch = curl_init($url);
-
     curl_setopt_array($ch, [
         CURLOPT_CONNECTTIMEOUT => 150,
         CURLOPT_HTTPHEADER => [
@@ -146,27 +126,20 @@ function read_url($url, $curlOptions = null)
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
     ]);
-
     if ($curlOptions !== null) {
         curl_setopt_array($ch, $curlOptions);
     }
-
     $response = curl_exec($ch);
     $errno = curl_errno($ch);
-
     if ($errno || $response === false) {
         $error = curl_error($ch);
         throw new RuntimeException("cURL error {$errno}: {$error}");
     }
-
     $statusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-
     if ($statusCode >= 400) {
         throw new RuntimeException("HTTP code {$statusCode} returned for '{$url}'.", $statusCode);
     }
-
     curl_close($ch);
-
     return $response;
 }
 
@@ -180,7 +153,6 @@ function has_function($function)
     if (! function_exists($function)) {
         return false;
     }
-
     try {
         return strpos(ini_get('disable_functions'), $function) === false;
     } catch (Exception $e) {
@@ -226,7 +198,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             'rewrite' => isset($validInstallationUrlRewrite),
         ];
 
-        $extracted = file_exists(__DIR__.'/app') && file_exists(__DIR__.'/artisan');
+        $extracted = file_exists(__DIR__.'/vendor');
 
         foreach ($requiredExtensions as $extension) {
             $requirements['extension-'.$extension] = extension_loaded($extension);
@@ -246,31 +218,29 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
         if ($action === 'download') {
             // Get the latest release from GitHub
             $json = read_url('https://api.github.com/repos/Exilon-Studios/ExilonCMS/releases/latest');
-
             $response = json_decode($json);
 
             if (! $response) {
                 throw new RuntimeException('The response from GitHub API is not a valid JSON.');
             }
 
-            // Find the CMS zip asset (any zip that's not the installer)
+            // Find the CMS zip asset (look for exiloncms-full.zip)
             $zipAsset = null;
             foreach ($response->assets as $asset) {
-                if (str_ends_with($asset->name, '.zip') && strpos($asset->name, 'installer') === false) {
+                if ($asset->name === 'exiloncms-full.zip') {
                     $zipAsset = $asset;
                     break;
                 }
             }
 
             if (! $zipAsset) {
-                throw new RuntimeException('No zip file found in the latest release.');
+                throw new RuntimeException('exiloncms-full.zip not found in release assets.');
             }
 
             $file = __DIR__.'/exiloncms.zip';
             $needDownload = true;
 
             if (file_exists($file)) {
-                // Check if the file size matches
                 if (filesize($file) === $zipAsset->size) {
                     $needDownload = false;
                 } else {
@@ -279,7 +249,6 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             }
 
             if ($needDownload) {
-                // Download with progress tracking
                 download_file($zipAsset->browser_download_url, $file);
             }
 
@@ -289,7 +258,6 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
 
             // Extract the zip
             $zip = new ZipArchive();
-
             if (($status = $zip->open($file)) !== true) {
                 throw new RuntimeException('Unable to open zip: '.$status.'.');
             }
@@ -303,14 +271,12 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             // Delete the zip file
             unlink($file);
 
-            // Check if files are in a subdirectory (exiloncms-vX.X.X/)
+            // Check if files are in a subdirectory
             $dirs = glob(__DIR__.'/*', GLOB_ONLYDIR);
             $cmsDir = null;
 
             foreach ($dirs as $dir) {
                 $basename = basename($dir);
-
-                // Check if this is the CMS directory (contains app/ and artisan)
                 if (preg_match('/^exiloncms-v[\d.]+$/', $basename) &&
                     is_dir($dir.'/app') && file_exists($dir.'/artisan')) {
                     $cmsDir = $dir;
@@ -318,7 +284,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 }
             }
 
-            // Move files from subdirectory to root (if applicable)
+            // Move files from subdirectory to root
             if ($cmsDir !== null) {
                 $iterator = new RecursiveIteratorIterator(
                     new RecursiveDirectoryIterator($cmsDir, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -329,8 +295,10 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                     $relativePath = $iterator->getSubPathName();
                     $destPath = __DIR__.'/'.$relativePath;
 
-                    // Don't overwrite installer files
-                    if ($relativePath === 'index.php' || $relativePath === 'public/index.php' || $relativePath === '.htaccess' || $relativePath === 'public/.htaccess') {
+                    // Let CMS files overwrite installer files (especially .htaccess)
+                    if ($relativePath === 'index.php') {
+                        // Don't overwrite installer's index.php during extraction
+                        // (it will be deleted at the end)
                         continue;
                     }
 
@@ -343,10 +311,9 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                     }
                 }
 
-                // Remove the now-empty subdirectory
+                // Remove the subdirectory
                 $it = new RecursiveDirectoryIterator($cmsDir, RecursiveDirectoryIterator::SKIP_DOTS);
                 $files = new RecursiveIteratorIterator($it, RecursiveIteratorIterator::CHILD_FIRST);
-
                 foreach ($files as $file) {
                     if ($file->isDir()) {
                         rmdir($file->getPathname());
@@ -354,11 +321,10 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                         unlink($file->getPathname());
                     }
                 }
-
                 rmdir($cmsDir);
             }
 
-            // Create required Laravel directories that may be missing
+            // Create required Laravel directories
             $requiredDirs = [
                 'storage/framework',
                 'storage/framework/cache',
@@ -375,20 +341,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 }
             }
 
-            // Restore installer files if they were overwritten
-            // The CMS extraction may have overwritten our installer files
-            $installerBackup = __DIR__.'/.installer_backup';
-            if (! is_dir($installerBackup)) {
-                mkdir($installerBackup, 0755, true);
-                // Copy current installer files as backup for future extractions
-                copy(__FILE__, $installerBackup.'/index.php');
-                if (file_exists(__DIR__.'/public/index.php')) {
-                    copy(__DIR__.'/public/index.php', $installerBackup.'/public_index.php');
-                }
-            }
-
-            // Create minimal .env file with temporary APP_KEY to allow Laravel to boot
-            // Note: DB_DATABASE path is relative to Laravel base_path()
+            // Create minimal .env file
             $envContent = <<<ENV
 APP_NAME="ExilonCMS"
 APP_ENV=production
@@ -411,8 +364,7 @@ ENV;
 
             file_put_contents(__DIR__.'/.env', $envContent);
 
-            // Create the SQLite database file to prevent connection errors
-            // Laravel uses database/database.sqlite by default for sqlite
+            // Create SQLite database
             $dbDir = __DIR__.'/database';
             if (! is_dir($dbDir)) {
                 mkdir($dbDir, 0755, true);
@@ -422,18 +374,18 @@ ENV;
                 touch($dbFile);
             }
 
-            // Note: Installer files have already been overwritten by CMS extraction
-            // No need to delete them manually
-
-            // Verify vendor exists (should be included in the zip)
-            if (! file_exists(__DIR__.'/vendor')) {
-                throw new RuntimeException('Vendor folder not found. Please make sure the zip includes vendor.');
+            // Delete installer's index.php so CMS can take over
+            if (file_exists(__FILE__)) {
+                unlink(__FILE__);
             }
+
+            // Note: public/ and .htaccess were already overwritten by CMS extraction
+            // No need to manually delete them
 
             send_json_response([
                 'success' => true,
                 'redirect' => '/install',
-                'message' => 'ExilonCMS installed successfully! Redirecting to installation wizard...'
+                'message' => 'ExilonCMS installed successfully! Redirecting...'
             ]);
         }
 
@@ -486,15 +438,14 @@ ENV;
       overflow: hidden;
     }
 
-    /* Subtle grid pattern */
     .grid-pattern {
       position: absolute;
       inset: 0;
-      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
       background-size: 50px 50px;
     }
 
-    /* Subtle glow */
     .glow {
       position: absolute;
       width: 600px;
@@ -543,7 +494,6 @@ ENV;
       line-height: 1.5;
     }
 
-    /* Steps indicator */
     .steps {
       display: flex;
       gap: 8px;
@@ -693,6 +643,7 @@ ENV;
       text-align: center;
       font-size: 13px;
       color: #666666;
+      display: none;
     }
 
     .error {
@@ -838,7 +789,6 @@ ENV;
         showError('Certains prérequis ne sont pas remplis. Veuillez contacter votre hébergeur.');
       }
 
-      // Already installed?
       if (data.extracted) {
         installBtn.textContent = 'Déjà installé ! Redirection...';
         setTimeout(() => {
@@ -860,7 +810,7 @@ ENV;
       errorDiv.style.display = 'none';
 
       try {
-        progressText.textContent = 'Installation en cours...';
+        progressText.textContent = 'Téléchargement depuis GitHub (~15 MB)...';
         progressFill.style.width = '20%';
 
         const response = await fetch('?execute=php', {

@@ -12,4 +12,5 @@ return [
     Laravel\Ui\UiServiceProvider::class,
     Laravel\Socialite\SocialiteServiceProvider::class,
     ExilonCMS\Providers\GameServiceProvider::class,
+    Inertia\ServiceProvider::class,
 ];

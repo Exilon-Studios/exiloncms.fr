@@ -15,13 +15,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Call individual seeders
-        $this->call([
+        // Core seeders
+        $seeders = [
             AdminUserSeeder::class,
             CompanySettingsSeeder::class,
             LandingSettingsSeeder::class,
             PuckPermissionSeeder::class,
-            ShopSeeder::class,
-        ]);
+        ];
+
+        // Only add ShopSeeder if the plugin is available
+        if (class_exists('ExilonCMS\\Plugins\\Shop\\ShopServiceProvider')) {
+            $seeders[] = ShopSeeder::class;
+        }
+
+        $this->call($seeders);
     }
 }

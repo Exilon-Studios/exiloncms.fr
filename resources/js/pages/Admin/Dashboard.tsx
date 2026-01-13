@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Users, FileText, File, Image, AlertTriangle, Info, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { trans } from '@/lib/i18n';
+import { OnboardingChecklist } from '@/components/admin/OnboardingChecklist';
 
 interface DashboardStats {
   totalUsers: number;
@@ -31,6 +32,8 @@ interface DashboardProps extends PageProps {
   activeUsers: Record<string, number>;
   newVersion: string | null;
   apiAlerts: any[];
+  onboardingComplete: boolean;
+  onboardingProgress: any[];
 }
 
 export default function Dashboard({
@@ -40,6 +43,8 @@ export default function Dashboard({
   activeUsers,
   newVersion,
   apiAlerts,
+  onboardingComplete,
+  onboardingProgress,
 }: DashboardProps) {
   return (
     <AuthenticatedLayout>
@@ -55,6 +60,12 @@ export default function Dashboard({
 
         <AdminLayoutContent>
           <div className="space-y-6">
+            {/* Onboarding Checklist */}
+            <OnboardingChecklist
+              onboardingComplete={onboardingComplete}
+              onboardingProgress={onboardingProgress}
+            />
+
             {/* Alerts */}
             {!secure && (
               <Card>

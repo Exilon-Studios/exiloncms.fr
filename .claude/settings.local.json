@@ -105,7 +105,15 @@
       "Bash(du:*)",
       "Bash(file:*)",
       "Bash(gh release edit:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(REQUEST_URI=\"/installer?execute=php\" php -r '\n$_SERVER[\"\"HTTP_HOST\"\"] = \"\"localhost\"\";\n$_SERVER[\"\"REQUEST_URI\"\"] = \"\"/installer?execute=php\"\";\n$_SERVER[\"\"REQUEST_METHOD\"\"] = \"\"GET\"\";\n$_GET[\"\"execute\"\"] = \"\"php\"\";\nrequire \"\"index.php\"\";\n')",
+      "Bash(REQUEST_URI=\"/installer?execute=php\" php -r '\n$_SERVER[\"\"HTTP_HOST\"\"] = \"\"localhost\"\";\n$_SERVER[\"\"REQUEST_URI\"\"] = \"\"/installer?execute=php\"\";\n$_SERVER[\"\"REQUEST_METHOD\"\"] = \"\"POST\"\";\n$_SERVER[\"\"HTTP_X_REQUESTED_WITH\"\"] = \"\"XMLHttpRequest\"\";\n$_GET[\"\"execute\"\"] = \"\"php\"\";\n$_POST = json_decode\\(\"\"{\\\\\"\"action\\\\\"\":\\\\\"\"download\\\\\"\"}\"\", true\\);\n$requestContent = $_POST;\nrequire \"\"index.php\"\";\n')",
+      "Bash(choco install:*)",
+      "Bash(gh release delete-asset:*)",
+      "Bash(cmd /c \"rd /s /q \"\"%TEMP%\\\\exiloncms_zip_0.0.2\"\" 2>nul\")",
+      "Bash(powershell.exe:*)",
+      "Bash(xargs:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

@@ -5,6 +5,7 @@ use ExilonCMS\Http\Controllers\Admin\AdminController;
 use ExilonCMS\Http\Controllers\Admin\BanController;
 use ExilonCMS\Http\Controllers\Admin\DatabaseManagerController;
 use ExilonCMS\Http\Controllers\Admin\ImageController;
+use ExilonCMS\Http\Controllers\Admin\IntegrationsController;
 use ExilonCMS\Http\Controllers\Admin\LanguageController;
 use ExilonCMS\Http\Controllers\Admin\NavbarController;
 use ExilonCMS\Http\Controllers\Admin\PageAttachmentController;
@@ -27,9 +28,20 @@ use ExilonCMS\Http\Controllers\Admin\NotificationController as AdminNotification
 use ExilonCMS\Http\Controllers\Admin\NotificationManagerController;
 use ExilonCMS\Http\Controllers\Admin\CompanySettingsController;
 use ExilonCMS\Http\Controllers\Admin\LegalPageController;
+use ExilonCMS\Http\Controllers\Admin\OnboardingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AdminController::class, 'index'])->name('dashboard');
+
+// ============================================================
+// ONBOARDING ROUTES
+// ============================================================
+Route::prefix('onboarding')->name('onboarding.')->group(function () {
+    Route::get('/', [OnboardingController::class, 'index'])->name('index');
+    Route::post('/{step}', [OnboardingController::class, 'saveStep'])->name('save');
+    Route::post('/{step}/skip', [OnboardingController::class, 'skipStep'])->name('skip');
+    Route::post('/complete', [OnboardingController::class, 'complete'])->name('complete');
+});
 
 Route::prefix('theme-settings')->name('theme-settings.')->middleware('can:admin.settings')->group(function () {
     Route::get('/', [ThemeSettingsController::class, 'index'])->name('index');
@@ -85,6 +97,10 @@ Route::prefix('settings')->name('settings.')->middleware('can:admin.settings')->
     Route::get('/mail', [SettingsController::class, 'mail'])->name('mail');
     Route::post('/mail/update', [SettingsController::class, 'updateMail'])->name('mail.update');
     Route::post('/mail/test', [SettingsController::class, 'sendTestMail'])->name('mail.send');
+
+    Route::get('/integrations', [IntegrationsController::class, 'index'])->name('integrations');
+    Route::post('/integrations/update', [IntegrationsController::class, 'update'])->name('integrations.update');
+    Route::post('/integrations/test', [IntegrationsController::class, 'testWebhook'])->name('integrations.test');
 
     Route::get('/payments', [SettingsController::class, 'payments'])->name('payments');
     Route::post('/payments/update', [SettingsController::class, 'updatePayments'])->name('payments.update');

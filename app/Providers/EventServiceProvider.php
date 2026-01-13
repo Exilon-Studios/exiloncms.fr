@@ -3,6 +3,8 @@
 namespace ExilonCMS\Providers;
 
 use ExilonCMS\Listeners\UpdatePasswordChangedDate;
+use ExilonCMS\Models\User;
+use ExilonCMS\Observers\UserObserver;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -29,7 +31,8 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Register observers
+        User::observe(UserObserver::class);
     }
 
     /**

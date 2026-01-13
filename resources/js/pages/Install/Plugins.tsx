@@ -172,7 +172,7 @@ export default function InstallPlugins({ availablePlugins, availableThemes }: Pr
 
         {/* Right side - plugin selection */}
         <div style={{
-          flex: '0 0 ' + Math.min(500, window.innerWidth * 0.55) + 'px',
+          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -181,7 +181,7 @@ export default function InstallPlugins({ availablePlugins, availableThemes }: Pr
           borderLeft: '1px solid rgba(255,255,255,0.05)',
           overflowY: 'auto',
         }}>
-          <div style={{ maxWidth: '400px', margin: '0 auto', width: '100%' }}>
+          <div style={{ maxWidth: '460px', margin: '0 auto', width: '100%' }}>
             <h2 style={{
               fontSize: '22px',
               fontWeight: '500',

@@ -1,9 +1,4 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { ArrowLeft, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { DatabaseConfig } from './types';
 
@@ -39,9 +34,10 @@ export default function Database({ errors: initialErrors = {} }: Props) {
         },
         onError: (errors) => {
           setErrors(errors as Record<string, string>);
+          setTesting(false);
         },
       });
-    } finally {
+    } catch {
       setTesting(false);
     }
   };
@@ -50,130 +46,387 @@ export default function Database({ errors: initialErrors = {} }: Props) {
   const isPgSQL = data.connection === 'pgsql';
   const isSQLite = data.connection === 'sqlite';
 
+  const inputStyle = {
+    width: '100%',
+    padding: '10px 12px',
+    background: '#0a0a0a',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '6px',
+    color: '#ffffff',
+    fontSize: '13px',
+    boxSizing: 'border-box' as const,
+    outline: 'none',
+    transition: 'all 0.15s',
+  };
+
+  const focusProps = {
+    onFocus: (e: any) => {
+      e.target.style.borderColor = 'rgba(255,255,255,0.2)';
+      e.target.style.background = '#0f0f0f';
+    },
+    onBlur: (e: any) => {
+      e.target.style.borderColor = 'rgba(255,255,255,0.1)';
+      e.target.style.background = '#0a0a0a';
+    },
+  };
+
+  const selectStyle = {
+    ...inputStyle,
+    appearance: 'none' as const,
+    backgroundImage: `url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat' as const,
+    backgroundPosition: 'right 12px center' as const,
+    paddingRight: '36px',
+  };
+
   return (
     <>
-      <Head title="Base de données - Installation - ExilonCMS" />
+      <Head title="Database - ExilonCMS" />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-        <div className="max-w-2xl w-full">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-              Configuration de la base de données
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        background: '#000000',
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif',
+        overflow: 'hidden',
+      }}>
+        {/* Left side - branding */}
+        <div style={{
+          flex: '1',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: '60px',
+          background: '#0a0a0a',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Subtle grid pattern */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }} />
+
+          {/* Subtle glow */}
+          <div style={{
+            position: 'absolute',
+            width: '600px',
+            height: '600px',
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)',
+            top: '-200px',
+            left: '-200px',
+          }} />
+
+          {/* Content */}
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <div style={{
+              width: '64px',
+              height: '64px',
+              background: '#111111',
+              borderRadius: '14px',
+              marginBottom: '24px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid rgba(255,255,255,0.1)',
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
+                <ellipse cx="12" cy="5" rx="9" ry="3" />
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+              </svg>
+            </div>
+            <h1 style={{
+              fontSize: '48px',
+              fontWeight: '600',
+              color: '#ffffff',
+              margin: '0 0 12px 0',
+              letterSpacing: '-1.5px',
+            }}>
+              ExilonCMS
             </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Configurez la connexion à votre base de données
+            <p style={{
+              fontSize: '15px',
+              color: '#666666',
+              margin: '0 0 36px 0',
+              maxWidth: '320px',
+              lineHeight: '1.5',
+            }}>
+              Modern CMS for gaming communities
             </p>
+
+            {/* Steps indicator */}
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#ffffff',
+              }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#ffffff',
+              }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#333333',
+              }} />
+            </div>
+            <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
+              Step 2 of 3: Configure database
+            </p>
+
+            {/* Database type info */}
+            <div style={{ marginTop: '24px' }}>
+              <p style={{ color: '#888888', fontSize: '11px', marginBottom: '8px' }}>
+                Selected: {isSQLite ? 'SQLite' : isMySQL ? 'MySQL' : 'PostgreSQL'}
+              </p>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 12px',
+                background: '#111111',
+                borderRadius: '6px',
+              }}>
+                {isSQLite ? (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                ) : (
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
+                    <ellipse cx="12" cy="5" rx="9" ry="3" />
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+                  </svg>
+                )}
+                <span style={{ color: '#888888', fontSize: '12px' }}>
+                  {isSQLite ? 'No configuration needed' : 'Requires connection details'}
+                </span>
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* Success Alert */}
-          {testSuccess && (
-            <Alert className="mb-6 border-green-200 bg-green-50 dark:bg-green-900/20">
-              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-              <AlertDescription className="text-green-800 dark:text-green-200">
-                Connexion réussie ! Redirection...
-              </AlertDescription>
-            </Alert>
-          )}
+        {/* Right side - form */}
+        <div style={{
+          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: '60px 48px',
+          background: '#000000',
+          borderLeft: '1px solid rgba(255,255,255,0.05)',
+          overflowY: 'auto',
+        }}>
+          <div style={{ maxWidth: '460px', margin: '0 auto', width: '100%' }}>
+            <h2 style={{
+              fontSize: '22px',
+              fontWeight: '500',
+              color: '#ffffff',
+              margin: '0 0 6px 0',
+              letterSpacing: '-0.5px',
+            }}>
+              Database Configuration
+            </h2>
+            <p style={{
+              color: '#666666',
+              fontSize: '13px',
+              margin: '0 0 32px 0',
+            }}>
+              Connect your database to store site data
+            </p>
 
-          {/* Form */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Success Alert */}
+            {testSuccess && (
+              <div style={{
+                padding: '12px',
+                background: 'rgba(34, 197, 94, 0.1)',
+                border: '1px solid rgba(34, 197, 94, 0.2)',
+                borderRadius: '6px',
+                marginBottom: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                <span style={{ color: '#22c55e', fontSize: '12px' }}>
+                  Connection successful! Redirecting...
+                </span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
               {/* Database Type */}
-              <div>
-                <Label htmlFor="connection">Type de base de données</Label>
-                <select
-                  id="connection"
-                  value={data.connection}
-                  onChange={(e) => setData({ ...data, connection: e.target.value as any })}
-                  className="mt-2 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="sqlite">SQLite (Recommandé - Aucune configuration requise)</option>
-                  <option value="mysql">MySQL / MariaDB</option>
-                  <option value="pgsql">PostgreSQL</option>
-                </select>
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                  {isSQLite && 'SQLite utilise un fichier local, aucune configuration supplémentaire nécessaire'}
-                  {isMySQL && 'Utilisé par la plupart des hébergements web'}
-                  {isPgSQL && 'Base de données performante et robuste'}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{
+                  display: 'block',
+                  color: '#888888',
+                  fontSize: '11px',
+                  fontWeight: '500',
+                  marginBottom: '6px',
+                  letterSpacing: '0.3px',
+                }}>
+                  Database Type
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <select
+                    id="connection"
+                    value={data.connection}
+                    onChange={(e) => setData({ ...data, connection: e.target.value as any })}
+                    style={selectStyle}
+                  >
+                    <option value="sqlite">SQLite (Recommended - No config needed)</option>
+                    <option value="mysql">MySQL / MariaDB</option>
+                    <option value="pgsql">PostgreSQL</option>
+                  </select>
+                </div>
+                <p style={{
+                  marginTop: '8px',
+                  color: '#666666',
+                  fontSize: '11px',
+                }}>
+                  {isSQLite && 'Uses a local file, no additional configuration needed'}
+                  {isMySQL && 'Used by most web hosting providers'}
+                  {isPgSQL && 'Performant and robust database'}
                 </p>
               </div>
 
               {/* MySQL/PGSQL Fields */}
               {(isMySQL || isPgSQL) && (
                 <>
-                  <div>
-                    <Label htmlFor="host">Hôte</Label>
-                    <Input
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{
+                      display: 'block',
+                      color: '#888888',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      marginBottom: '6px',
+                      letterSpacing: '0.3px',
+                    }}>
+                      Host
+                    </label>
+                    <input
                       id="host"
                       type="text"
                       value={data.host}
                       onChange={(e) => setData({ ...data, host: e.target.value })}
                       placeholder="localhost"
-                      className="mt-2"
+                      style={inputStyle}
+                      {...focusProps}
                     />
                     {errors.host && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.host}</p>
+                      <p style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.host}</p>
                     )}
                   </div>
 
-                  <div>
-                    <Label htmlFor="port">Port</Label>
-                    <Input
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{
+                      display: 'block',
+                      color: '#888888',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      marginBottom: '6px',
+                      letterSpacing: '0.3px',
+                    }}>
+                      Port
+                    </label>
+                    <input
                       id="port"
                       type="number"
                       value={data.port}
                       onChange={(e) => setData({ ...data, port: parseInt(e.target.value) || 3306 })}
                       placeholder={isMySQL ? '3306' : '5432'}
-                      className="mt-2"
+                      style={inputStyle}
+                      {...focusProps}
                     />
                     {errors.port && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.port}</p>
+                      <p style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.port}</p>
                     )}
                   </div>
 
-                  <div>
-                    <Label htmlFor="database">Nom de la base de données</Label>
-                    <Input
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{
+                      display: 'block',
+                      color: '#888888',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      marginBottom: '6px',
+                      letterSpacing: '0.3px',
+                    }}>
+                      Database Name
+                    </label>
+                    <input
                       id="database"
                       type="text"
                       value={data.database}
                       onChange={(e) => setData({ ...data, database: e.target.value })}
                       placeholder="exiloncms"
-                      className="mt-2"
+                      style={inputStyle}
+                      {...focusProps}
                     />
                     {errors.database && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.database}</p>
+                      <p style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.database}</p>
                     )}
                   </div>
 
-                  <div>
-                    <Label htmlFor="username">Nom d'utilisateur</Label>
-                    <Input
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{
+                      display: 'block',
+                      color: '#888888',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      marginBottom: '6px',
+                      letterSpacing: '0.3px',
+                    }}>
+                      Username
+                    </label>
+                    <input
                       id="username"
                       type="text"
                       value={data.username}
                       onChange={(e) => setData({ ...data, username: e.target.value })}
                       placeholder="root"
-                      className="mt-2"
+                      style={inputStyle}
+                      {...focusProps}
                     />
                     {errors.username && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.username}</p>
+                      <p style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.username}</p>
                     )}
                   </div>
 
-                  <div>
-                    <Label htmlFor="password">Mot de passe</Label>
-                    <Input
+                  <div style={{ marginBottom: '24px' }}>
+                    <label style={{
+                      display: 'block',
+                      color: '#888888',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      marginBottom: '6px',
+                      letterSpacing: '0.3px',
+                    }}>
+                      Password
+                    </label>
+                    <input
                       id="password"
                       type="password"
                       value={data.password}
                       onChange={(e) => setData({ ...data, password: e.target.value })}
                       placeholder="••••••••"
-                      className="mt-2"
+                      style={inputStyle}
+                      {...focusProps}
                     />
                     {errors.password && (
-                      <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password}</p>
+                      <p style={{ color: '#ef4444', fontSize: '11px', marginTop: '4px' }}>{errors.password}</p>
                     )}
                   </div>
                 </>
@@ -181,41 +434,123 @@ export default function Database({ errors: initialErrors = {} }: Props) {
 
               {/* SQLite Info */}
               {isSQLite && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    <strong>SQLite</strong> sera utilisé. Les données seront stockées dans le fichier
-                    <code className="mx-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/40 rounded">database/database.sqlite</code>
+                <div style={{
+                  padding: '12px',
+                  background: 'rgba(59, 130, 246, 0.1)',
+                  border: '1px solid rgba(59, 130, 246, 0.2)',
+                  borderRadius: '6px',
+                  marginBottom: '24px',
+                }}>
+                  <p style={{ color: '#3b82f6', fontSize: '12px', margin: 0 }}>
+                    <strong>SQLite</strong> will be used. Data will be stored in
+                    <code style={{
+                      marginLeft: '4px',
+                      padding: '2px 6px',
+                      background: 'rgba(59, 130, 246, 0.2)',
+                      borderRadius: '3px',
+                      fontSize: '11px',
+                    }}>
+                      database/database.sqlite
+                    </code>
                   </p>
                 </div>
               )}
 
-              {/* Navigation */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Link href={route('install.requirements')}>
-                  <Button type="button" variant="outline">
-                    <ArrowLeft className="mr-2 w-4 h-4" />
-                    Retour
-                  </Button>
-                </Link>
-
-                <Button type="submit" disabled={testing}>
+              {/* Buttons */}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  type="submit"
+                  disabled={testing}
+                  style={{
+                    flex: '1',
+                    padding: '12px',
+                    background: testing ? '#1a1a1a' : '#ffffff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    color: testing ? '#666666' : '#000000',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: testing ? 'not-allowed' : 'pointer',
+                    opacity: testing ? 0.5 : 1,
+                    transition: 'all 0.15s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                  }}
+                  onMouseOver={(e) => {
+                    if (!testing) {
+                      e.currentTarget.style.background = '#f0f0f0';
+                    }
+                  }}
+                  onMouseOut={(e) => {
+                    if (!testing) {
+                      e.currentTarget.style.background = '#ffffff';
+                    }
+                  }}
+                >
                   {testing ? (
                     <>
-                      <Loader2 className="mr-2 w-4 h-4 animate-spin" />
-                      Test de connexion...
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite' }}>
+                        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                      </svg>
+                      Testing...
                     </>
                   ) : (
                     <>
-                      Continuer
-                      <ArrowRight className="ml-2 w-4 h-4" />
+                      Continue
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M5 12h14" />
+                        <path d="M12 5l7 7-7 7" />
+                      </svg>
                     </>
                   )}
-                </Button>
+                </button>
+
+                <a
+                  href="/install/requirements"
+                  style={{
+                    padding: '12px 20px',
+                    background: 'transparent',
+                    color: '#888888',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    textDecoration: 'none',
+                    transition: 'all 0.15s',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+                    e.currentTarget.style.color = '#ffffff';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                    e.currentTarget.style.color = '#888888';
+                  }}
+                >
+                  Back
+                </a>
               </div>
             </form>
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @media (max-width: 900px) {
+          div[style*="flex: 1; display: flex; flex-direction: column"] {
+            display: none !important;
+          }
+          div[style*="flex: 0 0"] {
+            flex: 1 !important;
+            padding: 32px 24px !important;
+          }
+        }
+      `}</style>
     </>
   );
 }

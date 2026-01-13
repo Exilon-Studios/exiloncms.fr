@@ -4,10 +4,13 @@ import { PageProps } from '@/types';
 import { LoginProps, LoginFormData } from '@/types/auth';
 import { LoginFormWithGradient } from '@/components/auth/LoginForm';
 import { useTrans } from '@/lib/trans';
+import { DemoLoginButtons } from '@/components/auth/DemoLoginButtons';
 
 export default function Login({ captcha, canRegister }: LoginProps) {
   const { settings } = usePage<PageProps>().props;
   const t = useTrans();
+  const isDemoMode = settings?.installMode === 'demo';
+
   const { data, setData, post, processing, errors } = useForm<LoginFormData>({
     email: '',
     password: '',
@@ -31,16 +34,23 @@ export default function Login({ captcha, canRegister }: LoginProps) {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
 
         <div className="relative flex min-h-screen w-full items-center justify-center">
-          <LoginFormWithGradient
-            data={data}
-            setData={setData}
-            onSubmit={handleSubmit}
-            processing={processing}
-            errors={errors}
-            canRegister={canRegister}
-            siteName={settings?.site_name || 'ExilonCMS'}
-            siteDescription={settings?.site_description || 'Modern Content Management System for Game Servers'}
-          />
+          {isDemoMode ? (
+            <DemoLoginButtons
+              siteName={settings?.name || 'ExilonCMS'}
+              siteDescription={settings?.description || 'Modern Content Management System for Game Servers'}
+            />
+          ) : (
+            <LoginFormWithGradient
+              data={data}
+              setData={setData}
+              onSubmit={handleSubmit}
+              processing={processing}
+              errors={errors}
+              canRegister={canRegister}
+              siteName={settings?.name || 'ExilonCMS'}
+              siteDescription={settings?.description || 'Modern Content Management System for Game Servers'}
+            />
+          )}
         </div>
       </div>
     </>

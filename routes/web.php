@@ -103,8 +103,11 @@ Route::prefix('profile')->name('profile.')->middleware('auth')->group(function (
 
 Route::prefix('notifications')->name('notifications.')->middleware('auth')->group(function () {
     Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::get('/recent', [NotificationController::class, 'recent'])->name('recent');
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread.count');
     Route::post('/{notification}/read', [NotificationController::class, 'markAsRead'])->name('read');
-    Route::post('/read', [NotificationController::class, 'markAllAsRead'])->name('read.all');
+    Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read.all');
+    Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
 });
 
 // Posts routes (alias for /news)

@@ -4,9 +4,11 @@ namespace ExilonCMS\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
 use ExilonCMS\Models\NavbarElement;
 use ExilonCMS\Models\SocialLink;
+use ExilonCMS\Models\OnboardingStep;
 use ExilonCMS\Extensions\Plugin\PluginManager;
 use ExilonCMS\Extensions\Theme\ThemeManager;
 use ExilonCMS\Extensions\UpdateManager;
@@ -102,6 +104,8 @@ class HandleInertiaRequests extends Middleware
                 'favicon' => favicon(),
                 'copyright' => str_replace('{year}', date('Y'), setting('copyright', '')),
                 'darkTheme' => dark_theme(),
+                // Installation mode (demo or production)
+                'installMode' => setting('install_mode', 'production'),
                 // Navbar settings
                 'navbar' => [
                     'links_position' => setting('navbar.links_position', 'left'),
@@ -125,8 +129,6 @@ class HandleInertiaRequests extends Middleware
                 'pages' => trans('pages'),
                 'puck' => trans('puck'),
                 'dashboard' => trans('dashboard'),
-                'shop' => trans('shop'),
-                'shop::nav' => trans('shop::nav'),
             ],
             // Share enabled plugins for dynamic navigation
             'enabledPlugins' => app(PluginManager::class)->findPluginsDescriptions()
@@ -146,6 +148,11 @@ class HandleInertiaRequests extends Middleware
             'updatesCount' => $this->getUpdatesCount($user),
             // Share cart count for authenticated users
             'cartCount' => $user ? $this->getCartCount($user) : 0,
+            // Share unread notifications count for authenticated users
+            'unreadNotificationsCount' => $user ? $this->getUnreadNotificationsCount($user) : 0,
+            // Share onboarding progress for admin users
+            'onboardingComplete' => $user && $user->role && $user->role->is_admin ? OnboardingStep::isComplete($user->id) : true,
+            'onboardingProgress' => $user && $user->role && $user->role->is_admin ? OnboardingStep::getUserProgress($user->id) : [],
         ];
     }
 
@@ -159,7 +166,27 @@ class HandleInertiaRequests extends Middleware
             return 0;
         }
 
+        // Check if the shop_cart_items table exists (migrations might not have run yet)
+        if (!Schema::hasTable('shop_cart_items')) {
+            return 0;
+        }
+
         return \ExilonCMS\Plugins\Shop\Models\CartItem::where('user_id', $user->id)->sum('quantity');
+    }
+
+    /**
+     * Get the unread notifications count for the user
+     */
+    protected function getUnreadNotificationsCount($user): int
+    {
+        // Check if the notifications table exists
+        if (!Schema::hasTable('notifications')) {
+            return 0;
+        }
+
+        return \ExilonCMS\Models\Notification::where('user_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
     }
 
     /**
