@@ -204,25 +204,25 @@ export default function Requirements({ requirements: initialRequirements }: Prop
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          padding: '60px 48px',
+          padding: '40px 32px',
           background: '#000000',
           borderLeft: '1px solid rgba(255,255,255,0.05)',
           overflowY: 'auto',
         }}>
           <div style={{ maxWidth: '460px', margin: '0 auto', width: '100%' }}>
             <h2 style={{
-              fontSize: '22px',
+              fontSize: '18px',
               fontWeight: '500',
               color: '#ffffff',
-              margin: '0 0 6px 0',
+              margin: '0 0 4px 0',
               letterSpacing: '-0.5px',
             }}>
               System Requirements
             </h2>
             <p style={{
               color: '#666666',
-              fontSize: '13px',
-              margin: '0 0 32px 0',
+              fontSize: '12px',
+              margin: '0 0 20px 0',
             }}>
               We're checking if your server is compatible
             </p>
@@ -232,18 +232,18 @@ export default function Requirements({ requirements: initialRequirements }: Prop
               background: '#0a0a0a',
               border: '1px solid rgba(255,255,255,0.05)',
               borderRadius: '8px',
-              padding: '16px',
-              marginBottom: '24px',
+              padding: '12px',
+              marginBottom: '20px',
             }}>
               {checking ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite', color: '#888888' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite', color: '#888888' }}>
                     <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                   </svg>
-                  <span style={{ marginLeft: '12px', color: '#666666', fontSize: '13px' }}>Checking...</span>
+                  <span style={{ marginLeft: '10px', color: '#666666', fontSize: '12px' }}>Checking...</span>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   {requirements.map((req, index) => (
                     <div
                       key={index}
@@ -251,7 +251,7 @@ export default function Requirements({ requirements: initialRequirements }: Prop
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        padding: '10px 12px',
+                        padding: '8px 10px',
                         borderRadius: '6px',
                         background: req.status === 'success'
                           ? 'rgba(34, 197, 94, 0.1)'
@@ -271,17 +271,17 @@ export default function Requirements({ requirements: initialRequirements }: Prop
                         color: req.status === 'success' ? '#22c55e' :
                                req.status === 'error' ? '#ef4444' :
                                '#888888',
-                        fontSize: '13px',
+                        fontSize: '12px',
                       }}>
                         {req.name}
                       </span>
                       {req.status === 'success' && (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
                           <polyline points="20 6 9 17 4 12" />
                         </svg>
                       )}
                       {req.status === 'error' && (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
                           <circle cx="12" cy="12" r="10" />
                           <path d="M12 8v4" />
                           <path d="M12 16h.01" />
@@ -296,11 +296,11 @@ export default function Requirements({ requirements: initialRequirements }: Prop
             {/* Alert */}
             {hasErrors && !checking && (
               <div style={{
-                padding: '12px',
+                padding: '10px',
                 background: 'rgba(239, 68, 68, 0.1)',
                 border: '1px solid rgba(239, 68, 68, 0.2)',
                 borderRadius: '6px',
-                marginBottom: '24px',
+                marginBottom: '16px',
               }}>
                 <p style={{ color: '#ef4444', fontSize: '12px', margin: 0 }}>
                   Some requirements are not met. Please contact your hosting provider.
@@ -310,11 +310,11 @@ export default function Requirements({ requirements: initialRequirements }: Prop
 
             {allOk && !checking && (
               <div style={{
-                padding: '12px',
+                padding: '10px',
                 background: 'rgba(34, 197, 94, 0.1)',
                 border: '1px solid rgba(34, 197, 94, 0.2)',
                 borderRadius: '6px',
-                marginBottom: '24px',
+                marginBottom: '16px',
               }}>
                 <p style={{ color: '#22c55e', fontSize: '12px', margin: 0 }}>
                   All requirements are met! You can continue the installation.
@@ -323,19 +323,19 @@ export default function Requirements({ requirements: initialRequirements }: Prop
             )}
 
             {/* Buttons */}
-            <div style={{ display: 'flex', gap: '12px' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 type="button"
                 onClick={checkRequirements}
                 disabled={checking}
                 style={{
                   flex: '1',
-                  padding: '12px',
+                  padding: '10px',
                   background: checking ? '#1a1a1a' : 'rgba(255,255,255,0.05)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: '6px',
                   color: checking ? '#666666' : '#ffffff',
-                  fontSize: '13px',
+                  fontSize: '12px',
                   fontWeight: '500',
                   cursor: checking ? 'not-allowed' : 'pointer',
                   opacity: checking ? 0.5 : 1,
@@ -362,19 +362,19 @@ export default function Requirements({ requirements: initialRequirements }: Prop
                 onClick={(e) => !canContinue && checking && e.preventDefault()}
                 style={{
                   flex: '1',
-                  padding: '12px',
+                  padding: '10px',
                   background: canContinue ? '#ffffff' : '#1a1a1a',
                   border: 'none',
                   borderRadius: '6px',
                   color: canContinue ? '#000000' : '#666666',
-                  fontSize: '13px',
+                  fontSize: '12px',
                   fontWeight: '500',
                   cursor: canContinue ? 'pointer' : 'not-allowed',
                   textDecoration: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   opacity: checking ? 0.5 : 1,
                   transition: 'all 0.15s',
                 }}
@@ -390,7 +390,7 @@ export default function Requirements({ requirements: initialRequirements }: Prop
                 }}
               >
                 Continue
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M5 12h14" />
                   <path d="M12 5l7 7-7 7" />
                 </svg>
