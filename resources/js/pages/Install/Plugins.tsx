@@ -172,7 +172,7 @@ export default function InstallPlugins({ availablePlugins, availableThemes }: Pr
 
         {/* Right side - plugin selection */}
         <div style={{
-          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
+          flex: '0 0 550px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',

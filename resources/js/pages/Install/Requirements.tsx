@@ -155,9 +155,15 @@ export default function Requirements({ requirements: initialRequirements }: Prop
                 borderRadius: '2px',
                 background: '#333333',
               }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#333333',
+              }} />
             </div>
             <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
-              Step 1 of 3: Check requirements
+              Step 1 of 4: Check requirements
             </p>
 
             {/* Status indicator */}
@@ -194,7 +200,7 @@ export default function Requirements({ requirements: initialRequirements }: Prop
 
         {/* Right side - requirements */}
         <div style={{
-          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
+          flex: '0 0 550px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',

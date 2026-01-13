@@ -29,7 +29,7 @@ export default function Database({ errors: initialErrors = {} }: Props) {
         onSuccess: () => {
           setTestSuccess(true);
           setTimeout(() => {
-            router.visit(route('install.admin'));
+            router.visit(route('install.mode'));
           }, 1000);
         },
         onError: (errors) => {
@@ -178,9 +178,15 @@ export default function Database({ errors: initialErrors = {} }: Props) {
                 borderRadius: '2px',
                 background: '#333333',
               }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#333333',
+              }} />
             </div>
             <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
-              Step 2 of 3: Configure database
+              Step 2 of 4: Configure database
             </p>
 
             {/* Database type info */}
@@ -218,7 +224,7 @@ export default function Database({ errors: initialErrors = {} }: Props) {
 
         {/* Right side - form */}
         <div style={{
-          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
+          flex: '0 0 550px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',

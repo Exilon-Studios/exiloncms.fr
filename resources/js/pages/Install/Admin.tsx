@@ -246,7 +246,7 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
 
         {/* Right side - form */}
         <div style={{
-          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
+          flex: '0 0 550px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -529,7 +529,7 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
 
               {/* Back button */}
               <a
-                href="/install/plugins"
+                href="/install/mode"
                 style={{
                   display: 'block',
                   textAlign: 'center',
@@ -542,7 +542,7 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
                 onMouseOver={(e) => { e.currentTarget.style.color = '#888888'; }}
                 onMouseOut={(e) => { e.currentTarget.style.color = '#666666'; }}
               >
-                ← Back to plugins
+                ← Back
               </a>
             </form>
           </div>

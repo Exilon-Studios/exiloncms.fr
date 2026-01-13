@@ -145,16 +145,22 @@ export default function Mode() {
                 borderRadius: '2px',
                 background: '#ffffff',
               }} />
+              <div style={{
+                width: '24px',
+                height: '4px',
+                borderRadius: '2px',
+                background: '#333333',
+              }} />
             </div>
             <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
-              Step 3 of 3: Choose installation mode
+              Step 3 of 4: Choose installation mode
             </p>
           </div>
         </div>
 
         {/* Right side - mode selection */}
         <div style={{
-          flex: '0 0 ' + Math.min(550, window.innerWidth * 0.60) + 'px',
+          flex: '0 0 550px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
