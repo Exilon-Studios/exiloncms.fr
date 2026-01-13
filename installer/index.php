@@ -699,10 +699,8 @@ ENV;
 
         <div class="steps">
           <div class="step"></div>
-          <div class="step inactive"></div>
-          <div class="step inactive"></div>
         </div>
-        <p class="step-text">Step 1 of 3: Download & Install</p>
+        <p class="step-text">Installation d'ExilonCMS</p>
       </div>
     </div>
 
