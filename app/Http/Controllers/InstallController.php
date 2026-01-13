@@ -903,7 +903,7 @@ class InstallController extends Controller
             'connection' => ['required', 'in:sqlite,mysql,pgsql'],
             'host' => ['required_if:connection,mysql,pgsql', 'nullable', 'string'],
             'port' => ['nullable', 'integer', 'between:1,65535'],
-            'database' => ['required', 'string'],
+            'database' => ['required_if:connection,mysql,pgsql', 'nullable', 'string'],
             'username' => ['required_if:connection,mysql,pgsql', 'nullable', 'string'],
             'password' => ['nullable', 'string'],
         ]);
