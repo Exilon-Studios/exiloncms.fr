@@ -8,7 +8,7 @@ import { trans } from '@/lib/i18n';
 import styles from './Home.module.css';
 import { Link, usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import LandingPage from '@/components/LandingPage';
+import HeroWithSocial from '@/components/HeroWithSocial';
 
 interface Server {
   id: number;
@@ -80,20 +80,21 @@ export default function Home({ message, siteName, posts, server, servers, landin
       ) : (
         <>
           {/*
-            Modular Landing Page
+            Gaming Landing Page with Social Links
 
-            Using the LandingPage component which combines:
-            - Navbar (optional, can be disabled with showNavbar={false})
-            - Hero section with grid background
+            This is the default landing page when no Puck content is set.
+            Features:
+            - Vertical social links on the left
+            - Gaming-style grid background
+            - Server status display
+            - Auth-aware CTAs
+            - Fully responsive
 
-            You can also use components separately:
-            - <Navbar /> for standalone navbar
-            - <Hero /> for standalone hero section
+            Customize in: Admin → Pages
           */}
-          <LandingPage
+          <HeroWithSocial
             siteName={siteName}
             servers={servers}
-            showNavbar={true}
             showCustomizationNote={true}
           />
         </>
