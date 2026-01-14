@@ -885,7 +885,7 @@ ENV;
               <p>Installation directe à la racine</p>
             </div>
 
-            <div class="hosting-card" data-hosting="direct" onclick="selectHosting('direct')">
+            <a href="https://docs.exiloncms.fr" target="_blank" class="hosting-card" style="text-decoration: none; display: block;">
               <div class="icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -893,8 +893,8 @@ ENV;
                 </svg>
               </div>
               <h3>VPS/Dédié</h3>
-              <p>Installation directe à la racine</p>
-            </div>
+              <p>Installation via CLI → voir documentation</p>
+            </a>
           </div>
 
           <div class="error" id="hosting-error"></div>
