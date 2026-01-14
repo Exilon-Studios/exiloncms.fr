@@ -383,26 +383,22 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 }
             }
 
-            // Create minimal .env file
-            $envContent = <<<ENV
-APP_NAME="ExilonCMS"
-APP_ENV=production
-APP_KEY=base64:hmU1T3OuvHdi5t1wULI8Xp7geI+JIWGog9pBCNxslY8=
-APP_DEBUG=false
-APP_URL=http://localhost
-
-LOG_CHANNEL=stack
-LOG_LEVEL=debug
-
-DB_CONNECTION=sqlite
-
-BROADCAST_DRIVER=log
-CACHE_DRIVER=file
-FILESYSTEM_DISK=local
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=file
-SESSION_LIFETIME=120
-ENV;
+            // Create minimal .env file with generated APP_KEY
+            $appKey = 'base64:'.base64_encode(random_bytes(32));
+            $envContent = "APP_NAME=\"ExilonCMS\"\n";
+            $envContent .= "APP_ENV=production\n";
+            $envContent .= "APP_KEY=".$appKey."\n";
+            $envContent .= "APP_DEBUG=false\n";
+            $envContent .= "APP_URL=http://localhost\n\n";
+            $envContent .= "LOG_CHANNEL=stack\n";
+            $envContent .= "LOG_LEVEL=debug\n\n";
+            $envContent .= "DB_CONNECTION=sqlite\n\n";
+            $envContent .= "BROADCAST_DRIVER=log\n";
+            $envContent .= "CACHE_DRIVER=file\n";
+            $envContent .= "FILESYSTEM_DISK=local\n";
+            $envContent .= "QUEUE_CONNECTION=sync\n";
+            $envContent .= "SESSION_DRIVER=file\n";
+            $envContent .= "SESSION_LIFETIME=120\n";
 
             file_put_contents($extractPath.'/.env', $envContent);
 
@@ -634,23 +630,6 @@ ENV;
       font-size: 12px;
       color: #666;
       margin: 0;
-    }
-
-    .hosting-card a {
-      display: flex;
-      flex-direction: column;
-      text-decoration: none;
-    }
-
-    .hosting-card a .external-icon {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      opacity: 0.5;
-    }
-
-    .hosting-card a:hover .external-icon {
-      opacity: 0.8;
     }
 
     /* Step 2: Requirements */
@@ -901,22 +880,6 @@ ENV;
               <h3>DirectAdmin</h3>
               <p>Installation directe à la racine</p>
             </div>
-
-            <a href="https://docs.exiloncms.fr" target="_blank" class="hosting-card" style="text-decoration: none; display: block; position: relative;">
-              <svg class="external-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
-              </svg>
-              <div class="icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                  <circle cx="12" cy="7" r="4" />
-                </svg>
-              </div>
-              <h3>VPS/Dédié</h3>
-              <p>Installation via CLI → voir documentation</p>
-            </a>
           </div>
 
           <div class="error" id="hosting-error"></div>
@@ -927,6 +890,41 @@ ENV;
               <polyline points="9 18 15 12 9 6" />
             </svg>
           </button>
+
+          <!-- Documentation links -->
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
+            <p style="color: #666; font-size: 13px; margin-bottom: 12px;">Autres solutions d'installation :</p>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+              <li>
+                <a href="https://docs.exiloncms.fr" target="_blank" style="color: #888; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                  </svg>
+                  Documentation complète
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto;">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </li>
+              <li>
+                <a href="https://docs.exiloncms.fr/installation/vps.html" target="_blank" style="color: #888; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  Installation VPS/Dédié (CLI)
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto;">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <!-- STEP 2: Requirements & Install -->
