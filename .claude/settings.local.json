@@ -113,7 +113,9 @@
       "Bash(cmd /c \"rd /s /q \"\"%TEMP%\\\\exiloncms_zip_0.0.2\"\" 2>nul\")",
       "Bash(powershell.exe:*)",
       "Bash(xargs:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(where:*)",
+      "Bash(7z:*)"
     ],
     "deny": [],
     "ask": []

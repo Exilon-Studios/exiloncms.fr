@@ -291,13 +291,19 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $extractPath = __DIR__;
             $redirectPath = '/install';
 
+            // Detect base URL for APP_URL
+            $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
+            $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
+            $appUrl = $scheme.'://'.$host;
+
             if ($hostingType === 'cpanel') {
                 // For cPanel, extract to exiloncms subdirectory
                 $extractPath = __DIR__.'/exiloncms';
                 if (! is_dir($extractPath)) {
                     mkdir($extractPath, 0755, true);
                 }
-                $redirectPath = '/exiloncms/public/install';
+                // Note: User must configure Document Root to exiloncms/public
+                // So URLs will be https://domain.com/install (not /exiloncms/public/install)
             }
 
             // Extract the zip
@@ -389,7 +395,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $envContent .= "APP_ENV=production\n";
             $envContent .= "APP_KEY=".$appKey."\n";
             $envContent .= "APP_DEBUG=false\n";
-            $envContent .= "APP_URL=http://localhost\n\n";
+            $envContent .= "APP_URL=".$appUrl."\n\n";
             $envContent .= "LOG_CHANNEL=stack\n";
             $envContent .= "LOG_LEVEL=debug\n\n";
             $envContent .= "DB_CONNECTION=sqlite\n\n";
@@ -412,6 +418,18 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 touch($dbFile);
             }
 
+            // For cPanel: Create .htaccess at root to redirect to exiloncms/public
+            if ($hostingType === 'cpanel') {
+                $rootHtaccess = __DIR__.'/.htaccess';
+                $htaccessContent = "<IfModule mod_rewrite.c>\n";
+                $htaccessContent .= "    RewriteEngine On\n\n";
+                $htaccessContent .= "    # Redirect all requests to exiloncms/public/\n";
+                $htaccessContent .= "    RewriteCond %{REQUEST_URI} !^/exiloncms/public/\n";
+                $htaccessContent .= "    RewriteRule ^(.*)$ /exiloncms/public/$1 [L]\n";
+                $htaccessContent .= "</IfModule>\n";
+                file_put_contents($rootHtaccess, $htaccessContent);
+            }
+
             // For direct extraction (Plesk, etc.), delete installer's index.php
             if ($hostingType !== 'cpanel' && file_exists(__FILE__)) {
                 unlink(__FILE__);
@@ -431,6 +449,40 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
     }
 }
 
+// ============================================================
+// CHECK IF CMS IS ALREADY EXTRACTED
+// If vendor/ folder exists (in root or exiloncms/), CMS is extracted
+// ============================================================
+$cmsExtracted = file_exists(__DIR__.'/vendor') || file_exists(__DIR__.'/exiloncms/vendor');
+
+if ($cmsExtracted) {
+    // CMS is already extracted, redirect to Laravel installer
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+
+    // Only redirect if not already on /install
+    if ($requestPath !== '/install' && !str_starts_with($requestPath, '/install/')) {
+        // Always redirect to /install - Document Root should be configured correctly
+        header('Location: /install', true, 302);
+        exit;
+    }
+    // If already on /install, let Laravel handle it
+    // For this to work, we need to include Laravel's bootstrap
+    if (file_exists(__DIR__.'/exiloncms/vendor/autoload.php')) {
+        // CMS is in exiloncms subdirectory (cPanel)
+        require __DIR__.'/exiloncms/vendor/autoload.php';
+        $app = require_once __DIR__.'/exiloncms/bootstrap/app.php';
+        $app->handleRequest(Illuminate\Http\Request::capture());
+        exit;
+    } elseif (file_exists(__DIR__.'/vendor/autoload.php')) {
+        // CMS is at root (Plesk, DirectAdmin, etc.)
+        require __DIR__.'/vendor/autoload.php';
+        $app = require_once __DIR__.'/bootstrap/app.php';
+        $app->handleRequest(Illuminate\Http\Request::capture());
+        exit;
+    }
+}
+
+// If CMS is not extracted, show the standalone installer HTML below
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -1049,22 +1101,26 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
         { key: 'extension-zip', label: 'Extension Zip' },
       ];
 
-      container.innerHTML = requirements.map(req => {
-        const passed = data.requirements[req.key];
-        return `
-          <div class="requirement-item">
-            <div class="requirement-text">${req.label}</div>
-            <div class="requirement-icon ${passed ? 'success' : 'error'}">
-              ${passed ? '✓' : '✗'}
-            </div>
+      // Only show failing requirements
+      const failingReqs = requirements.filter(req => !data.requirements[req.key]);
+
+      if (failingReqs.length === 0) {
+        // All requirements met - show simple success message
+        container.innerHTML = `
+          <div style="padding: 16px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; color: #22c55e; text-align: center;">
+            ✓ Tous les prérequis sont satisfaits
           </div>
         `;
-      }).join('');
-
-      if (data.compatible) {
         installBtn.disabled = false;
       } else {
-        showError('Certains prérequis ne sont pas remplis. Veuillez contacter votre hébergeur.');
+        // Show only failing requirements
+        container.innerHTML = failingReqs.map(req => `
+          <div class="requirement-item" style="border-color: rgba(239, 68, 68, 0.3);">
+            <div class="requirement-text" style="color: #ef4444;">✗ ${req.label}</div>
+          </div>
+        `).join('');
+        installBtn.disabled = true;
+        showError(`${failingReqs.length} prérequis ne sont pas remplis. Veuillez contacter votre hébergeur.`);
       }
     }
 

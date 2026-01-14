@@ -55,17 +55,17 @@ export default function Requirements({ requirements: initialRequirements }: Prop
 
   const allOk = requirements.every(r => r.status === 'success');
   const hasErrors = requirements.some(r => r.status === 'error');
+  const failedRequirements = requirements.filter(r => r.status === 'error');
 
   return (
     <>
       <Head title="Prérequis - ExilonCMS" />
 
       <div style={{
-        height: '100vh',
+        minHeight: '100vh',
         display: 'flex',
         background: '#000000',
         fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif',
-        overflow: 'hidden',
       }}>
         {/* Left side - branding */}
         <div style={{
@@ -207,7 +207,6 @@ export default function Requirements({ requirements: initialRequirements }: Prop
           padding: '40px 32px',
           background: '#000000',
           borderLeft: '1px solid rgba(255,255,255,0.05)',
-          overflowY: 'auto',
         }}>
           <div style={{ maxWidth: '460px', margin: '0 auto', width: '100%' }}>
             <h2 style={{
@@ -227,99 +226,93 @@ export default function Requirements({ requirements: initialRequirements }: Prop
               We're checking if your server is compatible
             </p>
 
-            {/* Requirements List */}
-            <div style={{
-              background: '#0a0a0a',
-              border: '1px solid rgba(255,255,255,0.05)',
-              borderRadius: '8px',
-              padding: '12px',
-              marginBottom: '20px',
-            }}>
-              {checking ? (
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite', color: '#888888' }}>
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-                  </svg>
-                  <span style={{ marginLeft: '10px', color: '#666666', fontSize: '12px' }}>Checking...</span>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  {requirements.map((req, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '8px 10px',
-                        borderRadius: '6px',
-                        background: req.status === 'success'
-                          ? 'rgba(34, 197, 94, 0.1)'
-                          : req.status === 'error'
-                          ? 'rgba(239, 68, 68, 0.1)'
-                          : '#0f0f0f',
-                        border: '1px solid ' + (
-                          req.status === 'success'
-                            ? 'rgba(34, 197, 94, 0.2)'
-                            : req.status === 'error'
-                            ? 'rgba(239, 68, 68, 0.2)'
-                            : 'rgba(255,255,255,0.05)'
-                        ),
-                      }}
-                    >
-                      <span style={{
-                        color: req.status === 'success' ? '#22c55e' :
-                               req.status === 'error' ? '#ef4444' :
-                               '#888888',
-                        fontSize: '12px',
-                      }}>
-                        {req.name}
-                      </span>
-                      {req.status === 'success' && (
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                      {req.status === 'error' && (
+            {/* Status Message - Only show this instead of full list */}
+            {checking ? (
+              <div style={{
+                background: '#0a0a0a',
+                border: '1px solid rgba(255,255,255,0.05)',
+                borderRadius: '8px',
+                padding: '40px 20px',
+                marginBottom: '20px',
+                textAlign: 'center',
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: 'spin 1s linear infinite', color: '#888888', marginBottom: '12px' }}>
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+                <p style={{ color: '#666666', fontSize: '12px', margin: 0 }}>Checking requirements...</p>
+              </div>
+            ) : hasErrors ? (
+              <>
+                {/* Show only failed requirements */}
+                <div style={{
+                  background: '#0a0a0a',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  borderRadius: '8px',
+                  padding: '12px',
+                  marginBottom: '20px',
+                }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    {failedRequirements.map((req, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          padding: '8px 10px',
+                          borderRadius: '6px',
+                          background: 'rgba(239, 68, 68, 0.1)',
+                          border: '1px solid rgba(239, 68, 68, 0.2)',
+                        }}
+                      >
+                        <span style={{ color: '#ef4444', fontSize: '12px' }}>
+                          {req.name}
+                        </span>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2">
                           <circle cx="12" cy="12" r="10" />
                           <path d="M12 8v4" />
                           <path d="M12 16h.01" />
                         </svg>
-                      )}
-                    </div>
-                  ))}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              )}
-            </div>
 
-            {/* Alert */}
-            {hasErrors && !checking && (
-              <div style={{
-                padding: '10px',
-                background: 'rgba(239, 68, 68, 0.1)',
-                border: '1px solid rgba(239, 68, 68, 0.2)',
-                borderRadius: '6px',
-                marginBottom: '16px',
-              }}>
-                <p style={{ color: '#ef4444', fontSize: '12px', margin: 0 }}>
-                  Some requirements are not met. Please contact your hosting provider.
-                </p>
-              </div>
-            )}
-
-            {allOk && !checking && (
-              <div style={{
-                padding: '10px',
-                background: 'rgba(34, 197, 94, 0.1)',
-                border: '1px solid rgba(34, 197, 94, 0.2)',
-                borderRadius: '6px',
-                marginBottom: '16px',
-              }}>
-                <p style={{ color: '#22c55e', fontSize: '12px', margin: 0 }}>
-                  All requirements are met! You can continue the installation.
-                </p>
-              </div>
+                {/* Error Alert */}
+                <div style={{
+                  padding: '10px',
+                  background: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.2)',
+                  borderRadius: '6px',
+                  marginBottom: '16px',
+                }}>
+                  <p style={{ color: '#ef4444', fontSize: '12px', margin: 0 }}>
+                    Some requirements are not met. Please contact your hosting provider.
+                  </p>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Success Message - All requirements met */}
+                <div style={{
+                  background: 'rgba(34, 197, 94, 0.1)',
+                  border: '1px solid rgba(34, 197, 94, 0.2)',
+                  borderRadius: '8px',
+                  padding: '40px 20px',
+                  marginBottom: '20px',
+                  textAlign: 'center',
+                }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" style={{ marginBottom: '12px' }}>
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <p style={{ color: '#22c55e', fontSize: '14px', margin: 0, fontWeight: '500' }}>
+                    All requirements are met!
+                  </p>
+                  <p style={{ color: '#666666', fontSize: '12px', margin: '8px 0 0 0' }}>
+                    You can continue the installation.
+                  </p>
+                </div>
+              </>
             )}
 
             {/* Buttons */}
@@ -358,7 +351,7 @@ export default function Requirements({ requirements: initialRequirements }: Prop
               </button>
 
               <a
-                href={canContinue ? '/install/database' : '#'}
+                href={canContinue ? route('install.database') : '#'}
                 onClick={(e) => !canContinue && checking && e.preventDefault()}
                 style={{
                   flex: '1',
