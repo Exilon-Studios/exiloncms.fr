@@ -38,7 +38,10 @@ function shouldExclude($path) {
         if (strpos($path, $ex) !== false) return true;
     }
     $basename = basename($path);
+    // Exclude build scripts and unnecessary files
     if (preg_match('/^(make|build|create|check)-|\.zip$|nul$/', $basename)) return true;
+    // Exclude debug/force install files
+    if (in_array($basename, ['diag.php', 'force_install.php', 'info.txt', 'test.php', 'diagnostic.php'])) return true;
     return false;
 }
 

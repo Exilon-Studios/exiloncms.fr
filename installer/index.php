@@ -22,14 +22,12 @@
 /**
  * The ExilonCMS installer.
  *
- * This file is not a part of ExilonCMS itself,
- * and can be removed when ExilonCMS is installed.
+ * Based on Azuriom's installer approach.
  *
  * @author ExilonCMS
  */
 
 $installerVersion = '1.0.0';
-
 $minPhpVersion = '8.2';
 
 $requiredExtensions = [
@@ -42,17 +40,15 @@ set_error_handler(function ($level, $message, $file = 'unknown', $line = 0) {
 });
 
 //
-// Some helper functions
+// Helper functions
 //
 
 function parse_php_version()
 {
     preg_match('/^(\d+)\.(\d+)/', PHP_VERSION, $matches);
-
     if (count($matches) > 2) {
         return "{$matches[1]}.{$matches[2]}";
     }
-
     return PHP_VERSION;
 }
 
@@ -61,19 +57,15 @@ function array_get($array, $key, $default = null)
     if (array_key_exists($key, $array)) {
         return $array[$key];
     }
-
     if (strpos($key, '.') === false) {
         return isset($array[$key]) ? $array[$key] : $default;
     }
-
     foreach (explode('.', $key) as $segment) {
         if (! array_key_exists($segment, $array)) {
             return $default;
         }
-
         $array = $array[$segment];
     }
-
     return $array;
 }
 
@@ -87,7 +79,6 @@ function request_url()
     $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
     $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'];
     $path = ! empty($_SERVER['REQUEST_URI']) ? explode('?', $_SERVER['REQUEST_URI'])[0] : '';
-
     return "{$scheme}://{$host}{$path}";
 }
 
@@ -96,21 +87,14 @@ $requestContent = null;
 function request_input($key, $default = null)
 {
     global $requestContent;
-
     if (! in_array(request_method(), ['GET', 'HEAD'], true)) {
         if ($requestContent === null) {
             $requestContent = json_decode(file_get_contents('php://input'), true);
         }
-
-        if ($requestContent) {
-            $value = array_get($requestContent, $key);
-
-            if ($value !== null) {
-                return $value;
-            }
+        if ($requestContent && isset($requestContent[$key])) {
+            return $requestContent[$key];
         }
     }
-
     return array_get($_GET, $key, $default);
 }
 
@@ -119,24 +103,19 @@ function send_json_response($data = null, $status = 200)
     if ($data === null && $status === 200) {
         $status = 204;
     }
-
     if ($status !== 200) {
         http_response_code($status);
     }
-
     header('Content-Type: application/json');
-
     if ($data === null) {
         exit();
     }
-
     exit(json_encode($data));
 }
 
 function read_url($url, $curlOptions = null)
 {
     $ch = curl_init($url);
-
     curl_setopt_array($ch, [
         CURLOPT_CONNECTTIMEOUT => 150,
         CURLOPT_HTTPHEADER => [
@@ -147,28 +126,20 @@ function read_url($url, $curlOptions = null)
         CURLOPT_SSL_VERIFYPEER => true,
         CURLOPT_SSL_VERIFYHOST => 2,
     ]);
-
     if ($curlOptions !== null) {
         curl_setopt_array($ch, $curlOptions);
     }
-
     $response = curl_exec($ch);
     $errno = curl_errno($ch);
-
     if ($errno || $response === false) {
         $error = curl_error($ch);
-
         throw new RuntimeException("cURL error {$errno}: {$error}");
     }
-
     $statusCode = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-
     if ($statusCode >= 400) {
         throw new RuntimeException("HTTP code {$statusCode} returned for '{$url}'.", $statusCode);
     }
-
     curl_close($ch);
-
     return $response;
 }
 
@@ -182,7 +153,6 @@ function has_function($function)
     if (! function_exists($function)) {
         return false;
     }
-
     try {
         return strpos(ini_get('disable_functions'), $function) === false;
     } catch (Exception $e) {
@@ -201,8 +171,9 @@ if (array_get($_GET, 'phpinfo') === '') {
 }
 
 //
-// Give the requested data if the request is from AJAX.
+// AJAX API
 //
+
 if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
     || array_get($_GET, 'execute') === 'php') {
     try {
@@ -214,16 +185,17 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             'phpIniPath' => php_ini_loaded_file(),
             'path' => __DIR__,
             'file' => __FILE__,
-            'htaccess' => file_exists(__DIR__.'/.htaccess'),
+            'htaccess' => file_exists(__DIR__.'/.htaccess') && file_exists(__DIR__.'/public/.htaccess'),
             'windows' => is_windows(),
         ];
 
-        $writable = is_writable(__DIR__);
+        $writable = is_writable(__DIR__) && is_writable(__DIR__.'/public');
 
         $requirements = [
             'php' => version_compare(PHP_VERSION, $minPhpVersion, '>='),
             'writable' => $writable,
             'function-symlink' => has_function('symlink'),
+            'rewrite' => isset($validInstallationUrlRewrite),
         ];
 
         $extracted = file_exists(__DIR__.'/vendor');
@@ -244,9 +216,6 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
         }
 
         if ($action === 'download') {
-            // Get hosting type from request
-            $hostingType = request_input('hosting', 'direct');
-
             // Get the latest release from GitHub
             $json = read_url('https://api.github.com/repos/Exilon-Studios/ExilonCMS/releases/latest');
             $response = json_decode($json);
@@ -287,30 +256,13 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 throw new RuntimeException('The file was not downloaded.');
             }
 
-            // Determine extraction path based on hosting type
-            $extractPath = __DIR__; // Default: extract to root
-            $redirectPath = '/install';
-
-            // Detect base URL for APP_URL
-            $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
-            $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : 'localhost';
-            $appUrl = $scheme.'://'.$host;
-
-            if ($hostingType === 'cpanel') {
-                // For cPanel, extract to exiloncms subdirectory
-                $extractPath = __DIR__.'/exiloncms';
-                if (! is_dir($extractPath)) {
-                    mkdir($extractPath, 0755, true);
-                }
-            }
-
             // Extract the zip
             $zip = new ZipArchive();
             if (($status = $zip->open($file)) !== true) {
                 throw new RuntimeException('Unable to open zip: '.$status.'.');
             }
 
-            if (! $zip->extractTo($extractPath)) {
+            if (! $zip->extractTo(__DIR__)) {
                 throw new RuntimeException('Unable to extract zip');
             }
 
@@ -320,7 +272,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             unlink($file);
 
             // Check if files are in a subdirectory
-            $dirs = glob($extractPath.'/*', GLOB_ONLYDIR);
+            $dirs = glob(__DIR__.'/*', GLOB_ONLYDIR);
             $cmsDir = null;
 
             foreach ($dirs as $dir) {
@@ -332,7 +284,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 }
             }
 
-            // Move files from subdirectory to extraction path
+            // Move files from subdirectory to root
             if ($cmsDir !== null) {
                 $iterator = new RecursiveIteratorIterator(
                     new RecursiveDirectoryIterator($cmsDir, RecursiveDirectoryIterator::SKIP_DOTS),
@@ -341,10 +293,12 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
 
                 foreach ($iterator as $item) {
                     $relativePath = $iterator->getSubPathName();
-                    $destPath = $extractPath.'/'.$relativePath;
+                    $destPath = __DIR__.'/'.$relativePath;
 
-                    // For cPanel, don't overwrite installer index.php
-                    if ($hostingType === 'cpanel' && $relativePath === 'index.php') {
+                    // Let CMS files overwrite installer files (especially .htaccess)
+                    if ($relativePath === 'index.php') {
+                        // Don't overwrite installer's index.php during extraction
+                        // (it will be deleted at the end)
                         continue;
                     }
 
@@ -381,33 +335,37 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             ];
 
             foreach ($requiredDirs as $dir) {
-                $path = $extractPath.'/'.$dir;
+                $path = __DIR__.'/'.$dir;
                 if (! is_dir($path)) {
                     mkdir($path, 0755, true);
                 }
             }
 
-            // Create minimal .env file with generated APP_KEY
-            $appKey = 'base64:'.base64_encode(random_bytes(32));
-            $envContent = "APP_NAME=\"ExilonCMS\"\n";
-            $envContent .= "APP_ENV=production\n";
-            $envContent .= "APP_KEY=".$appKey."\n";
-            $envContent .= "APP_DEBUG=false\n";
-            $envContent .= "APP_URL=".$appUrl."\n\n";
-            $envContent .= "LOG_CHANNEL=stack\n";
-            $envContent .= "LOG_LEVEL=debug\n\n";
-            $envContent .= "DB_CONNECTION=sqlite\n\n";
-            $envContent .= "BROADCAST_DRIVER=log\n";
-            $envContent .= "CACHE_DRIVER=file\n";
-            $envContent .= "FILESYSTEM_DISK=local\n";
-            $envContent .= "QUEUE_CONNECTION=sync\n";
-            $envContent .= "SESSION_DRIVER=file\n";
-            $envContent .= "SESSION_LIFETIME=120\n";
+            // Create minimal .env file
+            $envContent = <<<ENV
+APP_NAME="ExilonCMS"
+APP_ENV=production
+APP_KEY=base64:hmU1T3OuvHdi5t1wULI8Xp7geI+JIWGog9pBCNxslY8=
+APP_DEBUG=false
+APP_URL=http://localhost
 
-            file_put_contents($extractPath.'/.env', $envContent);
+LOG_CHANNEL=stack
+LOG_LEVEL=debug
+
+DB_CONNECTION=sqlite
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+FILESYSTEM_DISK=local
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+ENV;
+
+            file_put_contents(__DIR__.'/.env', $envContent);
 
             // Create SQLite database
-            $dbDir = $extractPath.'/database';
+            $dbDir = __DIR__.'/database';
             if (! is_dir($dbDir)) {
                 mkdir($dbDir, 0755, true);
             }
@@ -416,43 +374,18 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 touch($dbFile);
             }
 
-            // Create .htaccess at root to redirect to the correct public folder
-            $rootHtaccess = __DIR__.'/.htaccess';
-            $htaccessContent = "<IfModule mod_rewrite.c>\n";
-            $htaccessContent .= "    RewriteEngine On\n\n";
-
-            if ($hostingType === 'cpanel') {
-                // cPanel: CMS is in exiloncms/ subdirectory
-                $htaccessContent .= "    # Redirect all requests to exiloncms/public/\n";
-                $htaccessContent .= "    RewriteCond %{REQUEST_URI} !^/exiloncms/public/\n";
-                $htaccessContent .= "    RewriteRule ^(.*)$ /exiloncms/public/$1 [L]\n";
-            } else {
-                // Plesk/DirectAdmin: CMS is at root
-                $htaccessContent .= "    # Redirect all requests to public/\n";
-                $htaccessContent .= "    RewriteCond %{REQUEST_URI} !^/public/\n";
-                $htaccessContent .= "    RewriteRule ^(.*)$ /public/$1 [L]\n";
-            }
-
-            $htaccessContent .= "</IfModule>\n";
-            file_put_contents($rootHtaccess, $htaccessContent);
-
-            // Run composer install to install dependencies
-            if (file_exists($extractPath.'/composer.json') && !file_exists($extractPath.'/vendor/autoload.php')) {
-                $composerCmd = 'cd ' . escapeshellarg($extractPath) . ' && composer install --no-dev --no-interaction 2>&1';
-                $composerOutput = shell_exec($composerCmd);
-                // Log output for debugging if needed
-            }
-
-            // For direct extraction (Plesk, etc.), delete installer's index.php
-            if ($hostingType !== 'cpanel' && file_exists(__FILE__)) {
+            // Delete installer's index.php so CMS can take over
+            if (file_exists(__FILE__)) {
                 unlink(__FILE__);
             }
 
+            // Note: public/ and .htaccess were already overwritten by CMS extraction
+            // No need to manually delete them
+
             send_json_response([
                 'success' => true,
-                'hosting' => $hostingType,
-                'redirect' => $redirectPath,
-                'message' => 'ExilonCMS installed successfully!'
+                'redirect' => '/install',
+                'message' => 'ExilonCMS installed successfully! Redirecting...'
             ]);
         }
 
@@ -462,40 +395,6 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
     }
 }
 
-// ============================================================
-// CHECK IF CMS IS ALREADY EXTRACTED
-// If vendor/ folder exists (in root or exiloncms/), CMS is extracted
-// ============================================================
-$cmsExtracted = file_exists(__DIR__.'/vendor') || file_exists(__DIR__.'/exiloncms/vendor');
-
-if ($cmsExtracted) {
-    // CMS is already extracted, redirect to Laravel installer
-    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
-
-    // Only redirect if not already on /install
-    if ($requestPath !== '/install' && !str_starts_with($requestPath, '/install/')) {
-        // Always redirect to /install - Document Root should be configured correctly
-        header('Location: /install', true, 302);
-        exit;
-    }
-    // If already on /install, let Laravel handle it
-    // For this to work, we need to include Laravel's bootstrap
-    if (file_exists(__DIR__.'/exiloncms/vendor/autoload.php')) {
-        // CMS is in exiloncms subdirectory (cPanel)
-        require __DIR__.'/exiloncms/vendor/autoload.php';
-        $app = require_once __DIR__.'/exiloncms/bootstrap/app.php';
-        $app->handleRequest(Illuminate\Http\Request::capture());
-        exit;
-    } elseif (file_exists(__DIR__.'/vendor/autoload.php')) {
-        // CMS is at root (Plesk, DirectAdmin, etc.)
-        require __DIR__.'/vendor/autoload.php';
-        $app = require_once __DIR__.'/bootstrap/app.php';
-        $app->handleRequest(Illuminate\Http\Request::capture());
-        exit;
-    }
-}
-
-// If CMS is not extracted, show the standalone installer HTML below
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -512,6 +411,7 @@ if ($cmsExtracted) {
 
     html, body {
       height: 100%;
+      overflow: hidden;
     }
 
     body {
@@ -616,7 +516,7 @@ if ($cmsExtracted) {
       margin-top: 12px;
     }
 
-    /* Right side - content */
+    /* Right side - requirements */
     .right-side {
       flex: 0 0 550px;
       display: flex;
@@ -640,64 +540,12 @@ if ($cmsExtracted) {
       letter-spacing: -0.5px;
     }
 
-    .right-content > p {
+    .right-content p {
       color: #666666;
       font-size: 15px;
       margin: 0 0 32px 0;
     }
 
-    /* Step 1: Hosting selection */
-    .hosting-cards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .hosting-card {
-      background: #0a0a0a;
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 20px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .hosting-card:hover {
-      border-color: rgba(255,255,255,0.2);
-      background: #111;
-    }
-
-    .hosting-card.selected {
-      border-color: #6366f1;
-      background: rgba(99, 102, 241, 0.1);
-    }
-
-    .hosting-card .icon {
-      width: 32px;
-      height: 32px;
-      background: #1a1a1a;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 12px;
-    }
-
-    .hosting-card h3 {
-      font-size: 14px;
-      font-weight: 500;
-      color: #fff;
-      margin: 0 0 4px 0;
-    }
-
-    .hosting-card p {
-      font-size: 12px;
-      color: #666;
-      margin: 0;
-    }
-
-    /* Step 2: Requirements */
     .requirements {
       margin-bottom: 24px;
     }
@@ -744,7 +592,6 @@ if ($cmsExtracted) {
       color: #888888;
     }
 
-    /* Buttons */
     .button {
       width: 100%;
       padding: 12px;
@@ -771,17 +618,6 @@ if ($cmsExtracted) {
       cursor: not-allowed;
     }
 
-    .button-secondary {
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.1);
-      color: #fff;
-    }
-
-    .button-secondary:hover:not(:disabled) {
-      background: rgba(255,255,255,0.05);
-    }
-
-    /* Progress */
     .progress {
       display: none;
       margin-top: 20px;
@@ -807,9 +643,9 @@ if ($cmsExtracted) {
       text-align: center;
       font-size: 13px;
       color: #666666;
+      display: none;
     }
 
-    /* Messages */
     .error {
       background: rgba(239, 68, 68, 0.1);
       color: #ef4444;
@@ -832,34 +668,6 @@ if ($cmsExtracted) {
       border: 1px solid rgba(34, 197, 94, 0.2);
     }
 
-    .info-box {
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.2);
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 24px;
-      font-size: 13px;
-      color: #a5a6f6;
-      line-height: 1.5;
-    }
-
-    .info-box code {
-      background: rgba(0,0,0,0.3);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #c7c8ff;
-    }
-
-    /* Step visibility */
-    .step-content {
-      display: none;
-    }
-
-    .step-content.active {
-      display: block;
-    }
-
     @media (max-width: 900px) {
       .left-side {
         display: none !important;
@@ -867,9 +675,6 @@ if ($cmsExtracted) {
       .right-side {
         flex: 1 !important;
         padding: 32px 24px !important;
-      }
-      .hosting-cards {
-        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -890,199 +695,49 @@ if ($cmsExtracted) {
           </svg>
         </div>
         <h1>ExilonCMS</h1>
-        <p>CMS moderne pour serveurs de jeu</p>
+        <p>Modern CMS for gaming communities</p>
 
         <div class="steps">
-          <div class="step" id="step1-indicator"></div>
-          <div class="step inactive" id="step2-indicator"></div>
+          <div class="step"></div>
         </div>
-        <p class="step-text" id="step-text">Étape 1/2</p>
+        <p class="step-text">Installation d'ExilonCMS</p>
       </div>
     </div>
 
-    <!-- Right side - content -->
+    <!-- Right side - requirements -->
     <div class="right-side">
       <div class="right-content">
+        <h2>Prérequis système</h2>
+        <p>Vérification de la compatibilité du serveur...</p>
 
-        <!-- STEP 1: Hosting Selection -->
-        <div id="step1" class="step-content active">
-          <h2>Choisissez votre hébergement</h2>
-          <p>Sélectionnez le type de panneau de contrôle que vous utilisez</p>
-
-          <div class="hosting-cards">
-            <div class="hosting-card" data-hosting="plesk" onclick="selectHosting('plesk')">
-              <div class="icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <path d="M3 9h18" />
-                  <path d="M9 21V9" />
-                </svg>
-              </div>
-              <h3>Plesk</h3>
-              <p>Installation directe à la racine</p>
-            </div>
-
-            <div class="hosting-card" data-hosting="cpanel" onclick="selectHosting('cpanel')">
-              <div class="icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
-              </div>
-              <h3>cPanel</h3>
-              <p>Installation dans le dossier exiloncms/</p>
-            </div>
-
-            <div class="hosting-card" data-hosting="directadmin" onclick="selectHosting('directadmin')">
-              <div class="icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="3" y="3" width="18" height="18" rx="2" />
-                  <path d="M3 9h18" />
-                  <path d="M9 21V9" />
-                </svg>
-              </div>
-              <h3>DirectAdmin</h3>
-              <p>Installation directe à la racine</p>
-            </div>
-          </div>
-
-          <div class="error" id="hosting-error"></div>
-
-          <button class="button" id="hosting-next-btn" onclick="goToStep2()" disabled>
-            Continuer
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-
-          <!-- Documentation links -->
-          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1);">
-            <p style="color: #666; font-size: 13px; margin-bottom: 12px;">Autres solutions d'installation :</p>
-            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
-              <li>
-                <a href="https://docs.exiloncms.fr" target="_blank" style="color: #888; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-                  </svg>
-                  Documentation complète
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto;">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </a>
-              </li>
-              <li>
-                <a href="https://docs.exiloncms.fr/installation/vps.html" target="_blank" style="color: #888; font-size: 13px; text-decoration: none; display: flex; align-items: center; gap: 6px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                    <circle cx="12" cy="7" r="4" />
-                  </svg>
-                  Installation VPS/Dédié (CLI)
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left: auto;">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </a>
-              </li>
-            </ul>
-          </div>
+        <div class="requirements" id="requirements">
+          <!-- Requirements will be loaded here -->
         </div>
 
-        <!-- STEP 2: Requirements & Install -->
-        <div id="step2" class="step-content">
-          <h2>Prérequis système</h2>
-          <p>Vérification de la compatibilité du serveur...</p>
+        <div class="error" id="error"></div>
+        <div class="success" id="success"></div>
 
-          <div id="cpanel-info" style="display: none;" class="info-box">
-            <strong>cPanel détecté</strong><br>
-            Le CMS sera installé dans le dossier <code>exiloncms/</code>.<br>
-            Après l'installation, configurez votre <strong>Document Root</strong> vers <code>exiloncms/public</code>.
+        <div class="progress" id="progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
           </div>
-
-          <div class="requirements" id="requirements">
-            <!-- Requirements will be loaded here -->
-          </div>
-
-          <div class="error" id="error"></div>
-          <div class="success" id="success"></div>
-
-          <div class="progress" id="progress">
-            <div class="progress-bar">
-              <div class="progress-fill" id="progressFill"></div>
-            </div>
-            <div class="progress-text" id="progressText">Téléchargement en cours...</div>
-          </div>
-
-          <button class="button" id="installBtn" disabled>
-            Télécharger et Installer
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-          </button>
-
-          <button class="button button-secondary" onclick="goToStep1()" style="margin-top: 12px;">
-            Retour
-          </button>
+          <div class="progress-text" id="progressText">Téléchargement en cours...</div>
         </div>
 
+        <button class="button" id="installBtn" disabled>
+          Télécharger et Installer
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <polyline points="7 10 12 15 17 10" />
+            <line x1="12" y1="15" x2="12" y2="3" />
+          </svg>
+        </button>
       </div>
     </div>
   </div>
 
   <script>
     let data = null;
-    let selectedHosting = null;
-
-    // Hosting selection
-    function selectHosting(type) {
-      selectedHosting = type;
-
-      // Update UI
-      document.querySelectorAll('.hosting-card').forEach(card => {
-        card.classList.remove('selected');
-      });
-      document.querySelector(`[data-hosting="${type}"]`).classList.add('selected');
-
-      // Enable button
-      document.getElementById('hosting-next-btn').disabled = false;
-    }
-
-    function goToStep2() {
-      document.getElementById('step1').classList.remove('active');
-      document.getElementById('step2').classList.add('active');
-
-      // Update steps indicator
-      document.getElementById('step1-indicator').classList.add('inactive');
-      document.getElementById('step2-indicator').classList.remove('inactive');
-      document.getElementById('step-text').textContent = 'Étape 2/2';
-
-      // Show cpanel info if selected
-      if (selectedHosting === 'cpanel') {
-        document.getElementById('cpanel-info').style.display = 'block';
-      }
-
-      // Load requirements
-      loadData();
-    }
-
-    function goToStep1() {
-      document.getElementById('step2').classList.remove('active');
-      document.getElementById('step1').classList.add('active');
-
-      // Update steps indicator
-      document.getElementById('step1-indicator').classList.remove('inactive');
-      document.getElementById('step2-indicator').classList.add('inactive');
-      document.getElementById('step-text').textContent = 'Étape 1/2';
-
-      // Hide cpanel info
-      document.getElementById('cpanel-info').style.display = 'none';
-    }
 
     async function loadData() {
       try {
@@ -1114,26 +769,81 @@ if ($cmsExtracted) {
         { key: 'extension-zip', label: 'Extension Zip' },
       ];
 
-      // Only show failing requirements
-      const failingReqs = requirements.filter(req => !data.requirements[req.key]);
-
-      if (failingReqs.length === 0) {
-        // All requirements met - show simple success message
-        container.innerHTML = `
-          <div style="padding: 16px; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; color: #22c55e; text-align: center;">
-            ✓ Tous les prérequis sont satisfaits
+      container.innerHTML = requirements.map(req => {
+        const passed = data.requirements[req.key];
+        return `
+          <div class="requirement-item">
+            <div class="requirement-text">${req.label}</div>
+            <div class="requirement-icon ${passed ? 'success' : 'error'}">
+              ${passed ? '✓' : '✗'}
+            </div>
           </div>
         `;
+      }).join('');
+
+      if (data.compatible) {
         installBtn.disabled = false;
       } else {
-        // Show only failing requirements
-        container.innerHTML = failingReqs.map(req => `
-          <div class="requirement-item" style="border-color: rgba(239, 68, 68, 0.3);">
-            <div class="requirement-text" style="color: #ef4444;">✗ ${req.label}</div>
-          </div>
-        `).join('');
-        installBtn.disabled = true;
-        showError(`${failingReqs.length} prérequis ne sont pas remplis. Veuillez contacter votre hébergeur.`);
+        showError('Certains prérequis ne sont pas remplis. Veuillez contacter votre hébergeur.');
+      }
+
+      if (data.extracted) {
+        installBtn.textContent = 'Déjà installé ! Redirection...';
+        setTimeout(() => {
+          window.location.href = '/install';
+        }, 2000);
+      }
+    }
+
+    async function install() {
+      const installBtn = document.getElementById('installBtn');
+      const progress = document.getElementById('progress');
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      const errorDiv = document.getElementById('error');
+      const successDiv = document.getElementById('success');
+
+      installBtn.disabled = true;
+      progress.style.display = 'block';
+      errorDiv.style.display = 'none';
+
+      try {
+        progressText.textContent = 'Téléchargement depuis GitHub (~15 MB)...';
+        progressFill.style.width = '20%';
+
+        const response = await fetch('?execute=php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'download' })
+        });
+
+        progressFill.style.width = '60%';
+        progressText.textContent = 'Extraction des fichiers...';
+
+        const result = await response.json();
+
+        progressFill.style.width = '80%';
+        progressText.textContent = 'Configuration en cours...';
+
+        if (!response.ok) {
+          throw new Error(result.message || 'Erreur lors de l\'installation');
+        }
+
+        progressFill.style.width = '100%';
+        progressText.textContent = 'Installation terminée !';
+
+        successDiv.style.display = 'block';
+        successDiv.textContent = result.message || 'ExilonCMS a été installé avec succès !';
+
+        setTimeout(() => {
+          const redirectUrl = result.redirect || '/install';
+          window.location.href = redirectUrl;
+        }, 1500);
+
+      } catch (error) {
+        showError('Erreur lors de l\'installation: ' + error.message);
+        installBtn.disabled = false;
+        progress.style.display = 'none';
       }
     }
 
@@ -1143,70 +853,9 @@ if ($cmsExtracted) {
       errorDiv.style.display = 'block';
     }
 
-    function showSuccess(message) {
-      const successDiv = document.getElementById('success');
-      successDiv.textContent = message;
-      successDiv.style.display = 'block';
-    }
+    document.getElementById('installBtn').addEventListener('click', install);
 
-    function showProgress(show, text) {
-      const progressDiv = document.getElementById('progress');
-      const progressFill = document.getElementById('progressFill');
-      const progressText = document.getElementById('progressText');
-
-      if (show) {
-        progressDiv.style.display = 'block';
-        progressFill.style.width = '0%';
-        progressText.textContent = text;
-        progressText.style.display = 'block';
-      } else {
-        progressDiv.style.display = 'none';
-      }
-    }
-
-    document.getElementById('installBtn').addEventListener('click', async function() {
-      const installBtn = this;
-      installBtn.disabled = true;
-      showProgress(true, 'Téléchargement en cours...');
-
-      try {
-        const response = await fetch(window.location.href, {
-          method: 'POST',
-          headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ action: 'download', hosting: selectedHosting })
-        });
-
-        const result = await response.json();
-
-        if (result.message && !result.success) {
-          showError(result.message);
-          installBtn.disabled = false;
-          showProgress(false);
-          return;
-        }
-
-        // Success!
-        if (result.hosting === 'cpanel') {
-          showSuccess('Installation terminée ! Configurez le Document Root vers: exiloncms/public');
-          setTimeout(() => {
-            window.location.href = window.location.pathname + 'exiloncms/public/install';
-          }, 3000);
-        } else {
-          showSuccess('Installation terminée ! Redirection...');
-          setTimeout(() => {
-            window.location.href = '/install';
-          }, 1500);
-        }
-
-      } catch (error) {
-        showError('Erreur: ' + error.message);
-        installBtn.disabled = false;
-        showProgress(false);
-      }
-    });
+    loadData();
   </script>
 </body>
 </html>
