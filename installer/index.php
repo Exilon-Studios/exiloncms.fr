@@ -288,7 +288,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             }
 
             // Determine extraction path based on hosting type
-            $extractPath = __DIR__;
+            $extractPath = __DIR__; // Default: extract to root
             $redirectPath = '/install';
 
             // Detect base URL for APP_URL
@@ -302,8 +302,6 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 if (! is_dir($extractPath)) {
                     mkdir($extractPath, 0755, true);
                 }
-                // Note: User must configure Document Root to exiloncms/public
-                // So URLs will be https://domain.com/install (not /exiloncms/public/install)
             }
 
             // Extract the zip
@@ -437,6 +435,13 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
 
             $htaccessContent .= "</IfModule>\n";
             file_put_contents($rootHtaccess, $htaccessContent);
+
+            // Run composer install to install dependencies
+            if (file_exists($extractPath.'/composer.json') && !file_exists($extractPath.'/vendor/autoload.php')) {
+                $composerCmd = 'cd ' . escapeshellarg($extractPath) . ' && composer install --no-dev --no-interaction 2>&1';
+                $composerOutput = shell_exec($composerCmd);
+                // Log output for debugging if needed
+            }
 
             // For direct extraction (Plesk, etc.), delete installer's index.php
             if ($hostingType !== 'cpanel' && file_exists(__FILE__)) {
