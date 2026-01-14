@@ -636,6 +636,23 @@ ENV;
       margin: 0;
     }
 
+    .hosting-card a {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+    }
+
+    .hosting-card a .external-icon {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      opacity: 0.5;
+    }
+
+    .hosting-card a:hover .external-icon {
+      opacity: 0.8;
+    }
+
     /* Step 2: Requirements */
     .requirements {
       margin-bottom: 24px;
@@ -885,7 +902,12 @@ ENV;
               <p>Installation directe à la racine</p>
             </div>
 
-            <a href="https://docs.exiloncms.fr" target="_blank" class="hosting-card" style="text-decoration: none; display: block;">
+            <a href="https://docs.exiloncms.fr" target="_blank" class="hosting-card" style="text-decoration: none; display: block; position: relative;">
+              <svg class="external-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
               <div class="icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
