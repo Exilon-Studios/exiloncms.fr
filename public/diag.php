@@ -1,59 +1,70 @@
 <?php
-// Simple diagnostic file - bypass Laravel entirely
-header('Content-Type: application/json');
+// Simple diagnostic - no Laravel needed
+$basePath = dirname(__DIR__);
 
-$results = [];
+echo "<h2>ExilonCMS Diagnostic</h2>";
+echo "<style>body{font-family:sans-serif;padding:20px;background:#1a1a1a;color:#fff;} .ok{color:#22c55e;} .err{color:#ef4444;} pre{background:#2a2a2a;padding:15px;border-radius:8px;margin:10px 0;}</style>";
 
-// 1. Check if database file exists
-$dbFile = realpath(__DIR__ . '/../database/database.sqlite');
-$results['database_file'] = [
-    'exists' => file_exists($dbFile),
-    'path' => $dbFile,
-    'writable' => $dbFile ? is_writable($dbFile) : false,
-];
+// Check base path
+echo "<h3>📁 Paths</h3>";
+echo "<p>Base path: <code>" . htmlspecialchars($basePath) . "</code></p>";
+echo "<p>Current file: <code>" . htmlspecialchars(__FILE__) . "</code></p>";
 
-// 2. Try to connect to database
+// Check vendor
+echo "<h3>📦 Dependencies</h3>";
+if (file_exists($basePath . '/vendor/autoload.php')) {
+    echo "<p class='ok'>✓ vendor/autoload.php exists</p>";
+} else {
+    echo "<p class='err'>✗ vendor/autoload.php NOT FOUND</p>";
+    echo "<p><strong>Solution:</strong> <code>cd exiloncms && composer install --no-dev</code></p>";
+}
+
+// Check .env
+echo "<h3>⚙️ Config</h3>";
+if (file_exists($basePath . '/.env')) {
+    echo "<p class='ok'>✓ .env exists</p>";
+    $envContent = file_get_contents($basePath . '/.env');
+    if (strpos($envContent, 'APP_KEY=base64') !== false) {
+        echo "<p class='ok'>✓ APP_KEY is set</p>";
+    } else {
+        echo "<p class='err'>✗ APP_KEY NOT SET</p>";
+        echo "<p><strong>Solution:</strong> <code>cd exiloncms && php artisan key:generate</code></p>";
+    }
+} else {
+    echo "<p class='err'>✗ .env NOT FOUND</p>";
+    echo "<p><strong>Solution:</strong> <code>cd exiloncms && cp .env.example .env && php artisan key:generate</code></p>";
+}
+
+// Check storage
+echo "<h3>📂 Storage Permissions</h3>";
+$storageDirs = ['storage/framework', 'storage/framework/cache', 'storage/framework/sessions', 'storage/framework/views', 'storage/logs', 'bootstrap/cache'];
+foreach ($storageDirs as $dir) {
+    $fullPath = $basePath . '/' . $dir;
+    if (file_exists($fullPath)) {
+        $perms = substr(sprintf('%o', fileperms($fullPath)), -4);
+        $writable = is_writable($fullPath);
+        $status = $writable ? '✓' : '⚠';
+        echo "<p class='{$writable ? 'ok' : 'err'}'>$status $dir (perms: $perms)</p>";
+    } else {
+        echo "<p class='err'>✗ $dir NOT FOUND</p>";
+    }
+}
+
+// Test simple Laravel boot
+echo "<h3>🚀 Laravel Boot Test</h3>";
 try {
-    $pdo = new PDO('sqlite:' . __DIR__ . '/../database/database.sqlite');
-    $results['db_connection'] = 'OK';
+    if (file_exists($basePath . '/vendor/autoload.php')) {
+        require $basePath . '/vendor/autoload.php';
+        echo "<p class='ok'>✓ Composer autoload loaded</p>";
 
-    // Check settings table
-    $stmt = $pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='settings'");
-    $results['settings_table_exists'] = $stmt->fetch() !== false;
-
-    // Get installed_at setting - use 'name' column !!
-    $stmt = $pdo->query("SELECT * FROM settings WHERE name='installed_at'");
-    $installed = $stmt->fetch(PDO::FETCH_ASSOC);
-    $results['installed_at_setting'] = $installed;
-
-    // Get all settings
-    $stmt = $pdo->query("SELECT * FROM settings");
-    $results['all_settings'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-} catch (Exception $e) {
-    $results['db_error'] = $e->getMessage();
+        if (file_exists($basePath . '/bootstrap/app.php')) {
+            $app = require_once $basePath . '/bootstrap/app.php';
+            echo "<p class='ok'>✓ Laravel app boot OK</p>";
+        } else {
+            echo "<p class='err'>✗ bootstrap/app.php NOT FOUND</p>";
+        }
+    }
+} catch (Throwable $e) {
+    echo "<p class='err'>✗ ERROR: " . htmlspecialchars($e->getMessage()) . "</p>";
+    echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
 }
-
-// 3. Check files
-$files = [
-    'storage/installed.json' => realpath(__DIR__ . '/../storage/installed.json'),
-    'bootstrap/cache/installed' => realpath(__DIR__ . '/../bootstrap/cache/installed'),
-    'public/installed.json' => realpath(__DIR__ . '/installed.json'),
-];
-
-foreach ($files as $name => $path) {
-    $results[$name] = [
-        'path' => $path,
-        'exists' => $path ? file_exists($path) : false,
-        'content' => $path && file_exists($path) ? file_get_contents($path) : null,
-    ];
-}
-
-// 4. Check .env
-$envPath = realpath(__DIR__ . '/../.env');
-$results['.env'] = [
-    'exists' => file_exists($envPath),
-    'content' => file_exists($envPath) ? file_get_contents($envPath) : null,
-];
-
-echo json_encode($results, JSON_PRETTY_PRINT);
