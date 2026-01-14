@@ -418,17 +418,25 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 touch($dbFile);
             }
 
-            // For cPanel: Create .htaccess at root to redirect to exiloncms/public
+            // Create .htaccess at root to redirect to the correct public folder
+            $rootHtaccess = __DIR__.'/.htaccess';
+            $htaccessContent = "<IfModule mod_rewrite.c>\n";
+            $htaccessContent .= "    RewriteEngine On\n\n";
+
             if ($hostingType === 'cpanel') {
-                $rootHtaccess = __DIR__.'/.htaccess';
-                $htaccessContent = "<IfModule mod_rewrite.c>\n";
-                $htaccessContent .= "    RewriteEngine On\n\n";
+                // cPanel: CMS is in exiloncms/ subdirectory
                 $htaccessContent .= "    # Redirect all requests to exiloncms/public/\n";
                 $htaccessContent .= "    RewriteCond %{REQUEST_URI} !^/exiloncms/public/\n";
                 $htaccessContent .= "    RewriteRule ^(.*)$ /exiloncms/public/$1 [L]\n";
-                $htaccessContent .= "</IfModule>\n";
-                file_put_contents($rootHtaccess, $htaccessContent);
+            } else {
+                // Plesk/DirectAdmin: CMS is at root
+                $htaccessContent .= "    # Redirect all requests to public/\n";
+                $htaccessContent .= "    RewriteCond %{REQUEST_URI} !^/public/\n";
+                $htaccessContent .= "    RewriteRule ^(.*)$ /public/$1 [L]\n";
             }
+
+            $htaccessContent .= "</IfModule>\n";
+            file_put_contents($rootHtaccess, $htaccessContent);
 
             // For direct extraction (Plesk, etc.), delete installer's index.php
             if ($hostingType !== 'cpanel' && file_exists(__FILE__)) {
