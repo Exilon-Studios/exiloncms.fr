@@ -332,9 +332,18 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $zipFile = __DIR__.'/exiloncms.zip';
 
             $needDownload = true;
-            if (file_exists($zipFile)) {
+            $forceDownload = request_input('force') === 'true';
+
+            if (file_exists($zipFile) && !$forceDownload) {
                 if (filesize($zipFile) === $expectedSize) {
-                    $needDownload = false;
+                    // Verify the zip is valid
+                    $test = new ZipArchive();
+                    if ($test->open($zipFile) === true) {
+                        $test->close();
+                        $needDownload = false;
+                    } else {
+                        unlink($zipFile);
+                    }
                 } else {
                     unlink($zipFile);
                 }
@@ -352,6 +361,14 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                     unlink($zipFile);
                     throw new RuntimeException('Downloaded file size mismatch.');
                 }
+
+                // Verify the downloaded zip is valid
+                $test = new ZipArchive();
+                if ($test->open($zipFile) !== true) {
+                    unlink($zipFile);
+                    throw new RuntimeException('Downloaded zip file is corrupted.');
+                }
+                $test->close();
             }
 
             $data['downloading'] = false;
@@ -373,9 +390,42 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 throw new RuntimeException('Unable to open zip: '.$status.'.');
             }
 
-            if (! $zip->extractTo(__DIR__)) {
-                $zip->close();
-                throw new RuntimeException('Unable to extract zip');
+            // Extract files one by one to fix backslash paths
+            $fileCount = $zip->numFiles;
+            for ($i = 0; $i < $fileCount; $i++) {
+                $stat = $zip->statIndex($i);
+                $filePath = $stat['name'];
+
+                // Fix Windows backslashes in paths
+                $filePath = str_replace('\\', '/', $filePath);
+
+                // Skip files outside the target directory (security)
+                if (strpos($filePath, '../') !== false || strpos($filePath, '..\\') !== false) {
+                    continue;
+                }
+
+                $targetPath = __DIR__ . '/' . $filePath;
+
+                if (substr($filePath, -1) === '/') {
+                    // Directory
+                    if (! is_dir($targetPath)) {
+                        mkdir($targetPath, 0755, true);
+                    }
+                } else {
+                    // File
+                    $dir = dirname($targetPath);
+                    if (! is_dir($dir)) {
+                        mkdir($dir, 0755, true);
+                    }
+
+                    $content = $zip->getFromIndex($i);
+                    if ($content === false) {
+                        $zip->close();
+                        throw new RuntimeException("Failed to extract file: {$filePath}");
+                    }
+
+                    file_put_contents($targetPath, $content);
+                }
             }
 
             $zip->close();
