@@ -100,23 +100,24 @@ EOT;
 
 file_put_contents($buildDir . '/README.md', $readmeContent);
 
-// Create .htaccess for the root to redirect to installer
+// Create index.php at root to redirect to installer
+$indexPhpContent = '<?php
+// Redirect to installer
+header("Location: /installer/");
+exit;
+';
+file_put_contents($buildDir . '/index.php', $indexPhpContent);
+
+// Create .htaccess for the root
 $htaccessContent = <<<EOT
 <IfModule mod_rewrite.c>
     RewriteEngine On
-
-    # Redirect to installer
     RewriteCond %{REQUEST_URI} !^/installer/
-    RewriteRule ^(.*)$ installer/$1 [L]
+    RewriteCond %{REQUEST_URI} !^/installer$
+    RewriteRule ^(.*)$ installer/ [L]
 </IfModule>
 
-# Default index
-DirectoryIndex index.php
-
-# For servers that don't support mod_rewrite
-<IfModule !mod_rewrite.c>
-    # No URL rewriting, user needs to access /installer/ directly
-</IfModule>
+DirectoryIndex installer/index.php index.php
 EOT;
 
 file_put_contents($buildDir . '/.htaccess', $htaccessContent);
