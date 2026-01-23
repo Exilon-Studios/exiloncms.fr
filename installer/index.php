@@ -5,21 +5,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ExilonCMS - PHP Installation Issue</title>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; text-align: center; margin-top: 2rem; padding: 1rem; }
-    h1 { color: #ef4444; }
-    code { background: #f3f4f6; padding: 0.2rem 0.5rem; border-radius: 4px; }
-  </style>
+  <title>ExilonCMS</title>
 </head>
-<body>
-  <h1>ExilonCMS - PHP Installation Issue</h1>
-  <h2>PHP is not executed</h2>
-  <p>If you see this page in your browser, it means that PHP is not installed or not configured properly on your server.</p>
-  <p>On Linux with Apache2 you can try the following command: <code>apt install libapache2-mod-php</code></p>
-  <p>If you are using another setup, please refer to your web server documentation.</p>
-  <hr>
-  <p style="color: #9ca3af; font-size: 0.875rem;">This is NOT an issue related to ExilonCMS.</p>
+<body style="font-family: sans-serif; text-align: center; margin-top: 1rem">
+<h1>ExilonCMS - PHP Installation Issue</h1>
+<h2>PHP is not executed</h2>
+<p>If you see this page in your browser, it means that PHP is not installed or not configured properly on your server.</p>
+<p>On Linux with Apache2 you can try the following command: <code>apt install libapache2-mod-php</code></p>
+<p>If you are using another setup, please refer to your web server documentation.</p>
+<hr>
+<p>This is NOT an issue related to ExilonCMS.</p>
 </body>
 </html><!--
 */
@@ -194,7 +189,7 @@ function is_windows()
 
 function is_installed()
 {
-    return file_exists(__DIR__ . '/../.env') || file_exists(__DIR__ . '/../installed.json');
+    return file_exists(__DIR__ . '/.env') || file_exists(__DIR__ . '/installed.json');
 }
 
 //
@@ -205,8 +200,7 @@ $isAjax = array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest' || a
 
 if ($isAjax) {
     try {
-        $baseDir = realpath(__DIR__ . '/..');
-        $installerDir = __DIR__;
+        $baseDir = __DIR__;
 
         // Basic system info
         $data = [
@@ -216,7 +210,6 @@ if ($isAjax) {
             'phpFullVersion' => PHP_VERSION,
             'phpIniPath' => php_ini_loaded_file(),
             'path' => $baseDir,
-            'installerPath' => $installerDir,
             'windows' => is_windows(),
             'installed' => is_installed(),
         ];
@@ -224,7 +217,7 @@ if ($isAjax) {
         // Check requirements
         $requirements = [
             'php' => version_compare(PHP_VERSION, $minPhpVersion, '>='),
-            'writable' => is_writable($baseDir) && is_writable($installerDir),
+            'writable' => is_writable($baseDir),
             'function-symlink' => has_function('symlink'),
             'function-shell-exec' => has_function('shell_exec'),
             'function-exec' => has_function('exec'),
@@ -236,7 +229,7 @@ if ($isAjax) {
 
         $data['requirements'] = $requirements;
         $data['compatible'] = ! in_array(false, $requirements, true);
-        $data['downloaded'] = file_exists($installerDir . '/exiloncms.zip');
+        $data['downloaded'] = file_exists($baseDir . '/exiloncms.zip');
         $data['extracted'] = file_exists($baseDir . '/vendor');
 
         $action = request_input('action');
@@ -248,9 +241,6 @@ if ($isAjax) {
         // Handle POST actions
         switch ($action) {
             case 'check':
-                // Force recheck
-                $data['downloaded'] = file_exists($installerDir . '/exiloncms.zip');
-                $data['extracted'] = file_exists($baseDir . '/vendor');
                 send_json($data);
 
             case 'download':
@@ -284,7 +274,7 @@ if ($isAjax) {
 
                 $downloadUrl = $zipAsset['browser_download_url'];
                 $expectedSize = $zipAsset['size'];
-                $zipFile = $installerDir . '/exiloncms.zip';
+                $zipFile = $baseDir . '/exiloncms.zip';
 
                 // Download if not exists or size mismatch
                 $needDownload = true;
@@ -317,7 +307,7 @@ if ($isAjax) {
                 send_json($data);
 
             case 'extract':
-                $zipFile = $installerDir . '/exiloncms.zip';
+                $zipFile = $baseDir . '/exiloncms.zip';
 
                 if (! file_exists($zipFile)) {
                     throw new RuntimeException('CMS file not downloaded');
@@ -330,7 +320,7 @@ if ($isAjax) {
                     throw new RuntimeException("Failed to open zip archive: error code {$status}");
                 }
 
-                // Extract to parent directory
+                // Extract to current directory
                 if (! $zip->extractTo($baseDir)) {
                     $zip->close();
                     throw new RuntimeException('Failed to extract zip archive');
@@ -381,18 +371,14 @@ if ($isAjax) {
 // Serve the installer UI
 //
 
-// Redirect to installer if already installed
+// Redirect to app if already installed
 if (is_installed()) {
     // Try to redirect to the installed app
-    $scriptName = array_get($_SERVER, 'SCRIPT_NAME', '');
-    $basePath = str_replace('/installer/index.php', '', $scriptName);
-    $basePath = str_replace('\\', '/', $basePath);
-
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
     $host = array_get($_SERVER, 'HTTP_HOST', 'localhost');
-    $baseUrl = $protocol . '://' . $host . ($basePath !== '' ? $basePath : '');
+    $path = array_get($_SERVER, 'REQUEST_URI', '');
 
-    header('Location: ' . rtrim($baseUrl, '/') . '/install/complete?from_installer=true');
+    header('Location: ' . $protocol . '://' . $host . str_replace('/index.php', '', $path) . '/install/complete?from_installer=true');
     exit;
 }
 
@@ -422,11 +408,12 @@ if (is_installed()) {
   </div>
   <script>
     window.EXILONCMS_INSTALLER = {
-      apiUrl: new URL(window.location.href).pathname,
+      apiUrl: window.location.pathname + '?execute=php',
       version: '<?php echo $installerVersion; ?>',
       minPhpVersion: '<?php echo $minPhpVersion; ?>',
     };
   </script>
-  <script type="module" src="/installer/assets/index.js"></script>
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@exiloncms/installer@1.0.0/assets/index.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@exiloncms/installer@1.0.0/assets/index.css">
 </body>
 </html>

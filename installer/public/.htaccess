@@ -1,0 +1,15 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirect all requests to the installer
+    RewriteRule ^(.*)$ ../index.php [L]
+</IfModule>
+
+# For servers that don't support mod_rewrite
+<IfModule !mod_rewrite.c>
+    <Files "index.php">
+        # Allow direct access to index.php
+        Order allow,deny
+        Allow from all
+    </Files>
+</IfModule>
