@@ -8,7 +8,7 @@
   <title>ExilonCMS</title>
 </head>
 <body style="font-family: sans-serif; text-align: center; margin-top: 1rem">
-<h1>ExilonCMS - PHP Installation Issue</h1>
+<h1>ExilonCMS - PHP installation issue</h1>
 <h2>PHP is not executed</h2>
 <p>If you see this page in your browser, it means that PHP is not installed or not configured properly on your server.</p>
 <p>On Linux with Apache2 you can try the following command: <code>apt install libapache2-mod-php</code></p>
@@ -19,8 +19,6 @@
 </html><!--
 */
 
-// Mark URL rewriting as working for this installation
 $validInstallationUrlRewrite = true;
 
-// Load the main installer
-require __DIR__ . '/../index.php';
+require __DIR__.'/../index.php';

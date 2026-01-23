@@ -134,7 +134,8 @@
       "Bash(cmd:*)",
       "Bash(Select-String:*)",
       "Bash(git reset:*)",
-      "Bash(git describe:*)"
+      "Bash(git describe:*)",
+      "Bash(npm run build:installer:*)"
     ],
     "deny": [],
     "ask": []
