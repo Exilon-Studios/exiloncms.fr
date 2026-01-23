@@ -4,6 +4,7 @@ namespace ExilonCMS\Extensions\Plugin;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 
 class PluginServiceProvider extends ServiceProvider
 {
@@ -49,7 +50,7 @@ class PluginServiceProvider extends ServiceProvider
         // Load routes
         $routesFile = $plugin['path'] . '/routes/web.php';
         if (file_exists($routesFile)) {
-            $this->loadRoutesFrom($routesFile, $plugin['id']);
+            $this->loadPluginRoutesFrom($routesFile, $plugin['id']);
         }
 
         // Load views
@@ -88,7 +89,7 @@ class PluginServiceProvider extends ServiceProvider
     /**
      * Load routes from a file with plugin prefix.
      */
-    protected function loadRoutesFrom(string $path, string $pluginId): void
+    protected function loadPluginRoutesFrom(string $path, string $pluginId): void
     {
         Route::prefix('plugins/' . $pluginId)
             ->middleware(['web', 'auth'])
