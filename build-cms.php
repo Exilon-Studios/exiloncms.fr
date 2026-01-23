@@ -29,17 +29,26 @@ $exclude = [
     'vendor',
     '.git',
     '.github',
+    '.claude',
     'plugins',
     'themes',
     'storage',
     'bootstrap/cache',
     'build',
+    'build-cms.php',
+    'build-installer.php',
+    'build-installer-simple.php',
+    'build-installer-standalone.php',
+    'create-installer-zip.php',
+    'create-release.php',
     '.env',
     '.env.backup',
     '.env.production',
     '*.log',
+    '*.backup',
     'exiloncms.zip',
     'exiloncms-installer.zip',
+    'vite.installer.config.ts',
 ];
 
 // Copy files to build directory
@@ -48,13 +57,15 @@ mkdir($buildDir, 0755, true);
 
 // Use rsync or robocopy depending on OS
 if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-    // Windows
-    $excludeStr = implode(' ', array_map(fn($e) => "/xd $e", $exclude));
-    shell_exec("robocopy . $buildDir /E /NFL /NDL /NJH /NJS $excludeStr /XF composer.lock /XF package-lock.json");
+    // Windows - use robocopy with proper exclusion syntax
+    $excludeDirs = implode(' ', array_map(fn($e) => "/xd $e", array_filter($exclude, fn($e) => !str_starts_with($e, '*'))));
+    $excludeFiles = implode(' ', array_map(fn($e) => "/xf $e", array_filter($exclude, fn($e) => str_starts_with($e, '*'))));
+    $excludeFiles .= " /xf composer.lock package-lock.json .env .env.* vite.installer.config.ts *.backup";
+    shell_exec("robocopy . \"$buildDir\" /E /NFL /NDL /NJH /NJS /xd node_modules vendor .git .github .claude plugins themes storage build $excludeFiles");
 } else {
     // Unix/Linux/Mac
     $excludeStr = implode(' ', array_map(fn($e) => "--exclude=$e", $exclude));
-    shell_exec("rsync -av $excludeStr --exclude='.env*' --exclude='composer.lock' --exclude='package-lock.json' . $buildDir/");
+    shell_exec("rsync -av $excludeStr --exclude='.env*' --exclude='composer.lock' --exclude='package-lock.json' --exclude='vite.installer.config.ts' . $buildDir/");
 }
 
 // Create placeholder directories
