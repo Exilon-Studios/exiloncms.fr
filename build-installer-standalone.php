@@ -112,12 +112,18 @@ file_put_contents($buildDir . '/index.php', $indexPhpContent);
 $htaccessContent = <<<EOT
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # Redirect root to installer
+    RewriteRule ^$ /installer/ [L]
     RewriteCond %{REQUEST_URI} !^/installer/
     RewriteCond %{REQUEST_URI} !^/installer$
     RewriteRule ^(.*)$ installer/ [L]
 </IfModule>
 
-DirectoryIndex installer/index.php index.php
+DirectoryIndex index.php installer/index.php
+<Files "index.php">
+    Order allow,deny
+    Allow from all
+</Files>
 EOT;
 
 file_put_contents($buildDir . '/.htaccess', $htaccessContent);
