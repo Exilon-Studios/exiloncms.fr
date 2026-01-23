@@ -341,9 +341,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             }
 
             if ($needDownload) {
-                $data['downloading'] = true;
-                send_json_response($data);
-
+                // Download directly (this may take time, so ensure PHP timeout is high enough)
                 download_file($downloadUrl, $zipFile);
 
                 if (! file_exists($zipFile)) {
@@ -644,10 +642,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
         const data = await response.json();
         console.log('Download data:', data);
 
-        if (data.downloading) {
-          // Wait for download to complete, then call extract
-          await pollForComplete(data.version);
-        } else if (data.downloaded) {
+        if (data.downloaded) {
           await extractInstall(data.version || testData.version);
         } else {
           throw new Error(data.message || 'Download failed');
@@ -657,31 +652,6 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
         status.innerHTML = '<div class="error-message"><strong>Erreur:</strong> ' + e.message + '</div>';
         startBtn.disabled = false;
       }
-    }
-
-    async function pollForComplete(version) {
-      const status = document.getElementById('status');
-      let attempts = 0;
-      const maxAttempts = 60;
-
-      const poll = async () => {
-        attempts++;
-        const response = await fetch(finalApiUrl, {
-          method: 'GET',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-        const data = await response.json();
-
-        if (data.downloaded && !data.downloading) {
-          await extractInstall(version);
-        } else if (attempts < maxAttempts) {
-          setTimeout(poll, 1000);
-        } else {
-          throw new Error('Download timeout');
-        }
-      };
-
-      await poll();
     }
 
     async function extractInstall(version) {
