@@ -413,221 +413,400 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Installation - ExilonCMS</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      background: #000000;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Left side - branding */
+    .branding {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px;
+      background: #0a0a0a;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Subtle grid pattern */
+    .branding::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+    }
+
+    /* Subtle glow */
+    .branding::after {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%);
+      top: -200px;
+      left: -200px;
+    }
+
+    .branding-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      width: 64px;
+      height: 64px;
+      background: #111111;
+      border-radius: 14px;
+      margin-bottom: 24px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 1rem;
+      border: 1px solid rgba(255,255,255,0.1);
     }
-    .installer {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
-      max-width: 900px;
-      width: 100%;
-      margin: 1rem;
-    }
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 2rem;
-      border-radius: 16px 16px 0 0;
-      color: white;
-    }
-    .header h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
+
+    h1 {
+      font-size: 48px;
       font-weight: 600;
+      color: #ffffff;
+      margin: 0 0 12px 0;
+      letter-spacing: -1.5px;
     }
-    .header p {
-      opacity: 0.9;
-      font-size: 0.95rem;
+
+    .tagline {
+      font-size: 15px;
+      color: #666666;
+      margin: 0 0 36px 0;
+      max-width: 320px;
+      line-height: 1.5;
     }
-    .content {
-      padding: 2rem;
-    }
-    .info {
-      background: #f3f4f6;
-      border-radius: 8px;
-      padding: 1rem;
-      margin: 1rem 0;
-      font-size: 0.875rem;
-    }
-    .info-item {
+
+    /* Steps indicator */
+    .steps {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      background: white;
-      border-radius: 6px;
+      gap: 8px;
     }
-    .info-item span:first-child {
-      font-weight: 500;
-      color: #374151;
+
+    .step-indicator {
+      width: 24px;
+      height: 4px;
+      border-radius: 2px;
+      background: #ffffff;
     }
-    .ok {
-      color: #10b981;
-      font-weight: 600;
+
+    .step-indicator.inactive {
+      background: #333333;
     }
-    .error {
-      color: #ef4444;
-      font-weight: 600;
+
+    .step-text {
+      color: #666666;
+      font-size: 12px;
+      margin-top: 12px;
     }
-    .btn {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
+
+    /* Right side - installer */
+    .installer {
+      flex: 0 0 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 48px;
+      background: #000000;
+      border-left: 1px solid rgba(255,255,255,0.05);
+      overflow-y: auto;
+    }
+
+    .installer-content {
+      max-width: 300px;
+      margin: 0 auto;
       width: 100%;
-      text-align: center;
+    }
+
+    h2 {
+      font-size: 22px;
       font-weight: 500;
-      transition: opacity 0.2s;
+      color: #ffffff;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.5px;
     }
+
+    .subtitle {
+      color: #666666;
+      font-size: 13px;
+      margin: 0 0 32px 0;
+    }
+
+    /* Status items */
+    .status-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      background: #0a0a0a;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .status-item.success {
+      background: rgba(34, 197, 94, 0.08);
+      border-color: rgba(34, 197, 94, 0.15);
+    }
+
+    .status-item.error {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: rgba(239, 68, 68, 0.15);
+    }
+
+    .status-label {
+      color: #888888;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-value {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-value.ok {
+      color: #22c55e;
+    }
+
+    .status-value.fail {
+      color: #ef4444;
+    }
+
+    /* Button */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      background: #ffffff;
+      border: none;
+      border-radius: 6px;
+      color: #000000;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
     .btn:hover:not(:disabled) {
-      opacity: 0.9;
+      background: #f0f0f0;
     }
+
     .btn:disabled {
-      opacity: 0.5;
+      background: #1a1a1a;
+      color: #666666;
       cursor: not-allowed;
+      opacity: 0.6;
     }
-    #status {
-      margin-top: 1rem;
-    }
+
+    /* Loading state */
     .loading {
       text-align: center;
-      padding: 2rem;
+      padding: 20px 0;
     }
+
     .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #e5e7eb;
-      border-top-color: #667eea;
+      width: 24px;
+      height: 24px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: #ffffff;
       border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 1rem;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
     }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    .step {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.75rem;
-      background: #f9fafb;
-      border-radius: 8px;
-      margin: 0.5rem 0;
+
+    .loading-text {
+      color: #666666;
+      font-size: 13px;
     }
-    .step.done {
-      color: #10b981;
-      background: #ecfdf5;
+
+    /* Error message */
+    .error-message {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 16px;
     }
-    .step.active {
-      color: #667eea;
-      background: #eef2ff;
+
+    /* Success message */
+    .success-message {
+      text-align: center;
+      padding: 20px 0;
     }
-    .step.pending {
-      color: #9ca3af;
-    }
-    .step-icon {
-      width: 24px;
-      height: 24px;
+
+    .success-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
+      margin: 0 auto 16px;
     }
-    .error-message {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #991b1b;
-      padding: 1rem;
-      border-radius: 8px;
-      margin-top: 1rem;
+
+    .success-title {
+      color: #22c55e;
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .success-text {
+      color: #666666;
+      font-size: 13px;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .branding {
+        display: none !important;
+      }
+      .installer {
+        flex: 1 !important;
+        padding: 32px 24px !important;
+      }
+      .installer-content {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="installer">
-    <div class="header">
-      <h1>🚀 Installation d'ExilonCMS</h1>
-      <p>Cet installateur va télécharger et configurer ExilonCMS sur votre serveur.</p>
+  <!-- Left side - branding -->
+  <div class="branding">
+    <div class="branding-content">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+          <path d="M2 17l10 5 10-5" />
+          <path d="M2 12l10 5 10-5" />
+        </svg>
+      </div>
+      <h1>ExilonCMS</h1>
+      <p class="tagline">Modern CMS for gaming communities</p>
+
+      <div class="steps">
+        <div class="step-indicator" id="step1"></div>
+        <div class="step-indicator inactive" id="step2"></div>
+        <div class="step-indicator inactive" id="step3"></div>
+      </div>
+      <p class="step-text" id="stepText">Téléchargement</p>
     </div>
-    <div class="content">
-      <div class="info">
-        <h3 style="margin-bottom: 1rem; color: #374151;">Vérification des prérequis</h3>
-        <div class="info-item">
-          <span>PHP Version:</span>
-          <span class="<?php echo version_compare(PHP_VERSION, '8.2', '>=') ? 'ok' : 'error'; ?>">
+  </div>
+
+  <!-- Right side - installer -->
+  <div class="installer">
+    <div class="installer-content">
+      <h2 id="title">Installation</h2>
+      <p class="subtitle" id="subtitle">Configuration de votre site</p>
+
+      <div id="statusList">
+        <div class="status-item <?php echo version_compare(PHP_VERSION, '8.2', '>=') ? 'success' : 'error'; ?>">
+          <span class="status-label">PHP Version</span>
+          <span class="status-value <?php echo version_compare(PHP_VERSION, '8.2', '>=') ? 'ok' : 'fail'; ?>">
             <?php echo PHP_VERSION; ?>
           </span>
         </div>
-        <div class="info-item">
-          <span>Permissions:</span>
-          <span class="<?php echo is_writable(__DIR__) && is_writable(__DIR__.'/public') ? 'ok' : 'error'; ?>">
+
+        <div class="status-item <?php echo is_writable(__DIR__) && is_writable(__DIR__.'/public') ? 'success' : 'error'; ?>">
+          <span class="status-label">Permissions</span>
+          <span class="status-value <?php echo is_writable(__DIR__) && is_writable(__DIR__.'/public') ? 'ok' : 'fail'; ?>">
             <?php echo is_writable(__DIR__) && is_writable(__DIR__.'/public') ? 'OK' : 'Error'; ?>
           </span>
         </div>
+
         <?php foreach ($requiredExtensions as $ext): ?>
-        <div class="info-item">
-          <span><?php echo $ext; ?>:</span>
-          <span class="<?php echo extension_loaded($ext) ? 'ok' : 'error'; ?>">
+        <div class="status-item <?php echo extension_loaded($ext) ? 'success' : 'error'; ?>">
+          <span class="status-label"><?php echo $ext; ?></span>
+          <span class="status-value <?php echo extension_loaded($ext) ? 'ok' : 'fail'; ?>">
             <?php echo extension_loaded($ext) ? 'OK' : 'Missing'; ?>
           </span>
         </div>
         <?php endforeach; ?>
       </div>
+
       <?php if (version_compare(PHP_VERSION, '8.2', '>=') && is_writable(__DIR__) && is_writable(__DIR__.'/public') && empty(array_filter($requiredExtensions, fn($ext) => !extension_loaded($ext)))): ?>
-      <button class="btn" id="startBtn" onclick="startInstall()">Commencer l'installation</button>
+      <button class="btn" id="startBtn" onclick="startInstall()">
+        Commencer l'installation
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M5 12h14" />
+          <path d="M12 5l7 7-7 7" />
+        </svg>
+      </button>
       <?php else: ?>
-      <p style="color: #ef4444; text-align: center; font-weight: 500;">Veuillez corriger les erreurs ci-dessus avant de continuer.</p>
+      <p style="color: #ef4444; font-size: 12px; margin-top: 16px;">Veuillez corriger les erreurs ci-dessus avant de continuer.</p>
       <?php endif; ?>
+
       <div id="status"></div>
     </div>
   </div>
+
   <script>
     const apiUrl = window.location.href.includes('public')
       ? window.location.pathname.replace('/public/', '/?execute=php')
       : (window.location.pathname + (window.location.pathname.includes('?') ? '&' : '?') + 'execute=php');
-
-    // Ensure we have proper URL format
     const finalApiUrl = apiUrl.startsWith('/') ? apiUrl : '/' + apiUrl;
 
-    console.log('API URL:', finalApiUrl);
+    function updateSteps(step, text) {
+      for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById('step' + i);
+        if (el) {
+          el.classList.toggle('inactive', i > step);
+        }
+      }
+      const stepText = document.getElementById('stepText');
+      if (stepText) stepText.textContent = text;
+    }
 
     async function startInstall() {
       const startBtn = document.getElementById('startBtn');
       const status = document.getElementById('status');
+      const statusList = document.getElementById('statusList');
+      const title = document.getElementById('title');
+      const subtitle = document.getElementById('subtitle');
+
       startBtn.disabled = true;
+      statusList.style.display = 'none';
 
       try {
-        // First, test the API connection
-        console.log('Testing API connection...');
-        const testResponse = await fetch(finalApiUrl, {
-          method: 'GET',
-          headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
-
-        console.log('Test response status:', testResponse.status);
-        const testData = await testResponse.json();
-        console.log('Test data:', testData);
-
-        if (!testData.compatible) {
-          throw new Error('System requirements not met');
-        }
-
-        // Start download
-        status.innerHTML = '<div class="loading"><div class="spinner"></div><p>Téléchargement en cours...</p></div>';
+        // Download step
+        updateSteps(1, 'Téléchargement en cours...');
+        title.textContent = 'Téléchargement';
+        subtitle.textContent = 'Récupération des fichiers';
+        status.innerHTML = '<div class="loading"><div class="spinner"></div><p class="loading-text">Téléchargement depuis GitHub...</p></div>';
 
         const response = await fetch(finalApiUrl, {
           method: 'POST',
@@ -638,25 +817,28 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
           body: JSON.stringify({ action: 'download' })
         });
 
-        console.log('Download response status:', response.status);
         const data = await response.json();
-        console.log('Download data:', data);
 
         if (data.downloaded) {
-          await extractInstall(data.version || testData.version);
+          // Extract step
+          updateSteps(2, 'Extraction en cours...');
+          title.textContent = 'Extraction';
+          subtitle.textContent = 'Décompression des fichiers';
+          status.innerHTML = '<div class="loading"><div class="spinner"></div><p class="loading-text">Extraction des fichiers...</p></div>';
+          await extractInstall(data.version);
         } else {
           throw new Error(data.message || 'Download failed');
         }
       } catch (e) {
         console.error('Error:', e);
-        status.innerHTML = '<div class="error-message"><strong>Erreur:</strong> ' + e.message + '</div>';
+        status.innerHTML = '<div class="error-message">' + e.message + '</div>';
         startBtn.disabled = false;
+        statusList.style.display = 'block';
       }
     }
 
     async function extractInstall(version) {
       const status = document.getElementById('status');
-      status.innerHTML = '<div class="loading"><div class="spinner"></div><p>Extraction en cours...</p></div>';
 
       try {
         const response = await fetch(finalApiUrl, {
@@ -676,17 +858,22 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
         }
       } catch (e) {
         console.error('Extract error:', e);
-        const status = document.getElementById('status');
-        status.innerHTML = '<div class="error-message"><strong>Erreur:</strong> ' + e.message + '</div>';
+        status.innerHTML = '<div class="error-message">' + e.message + '</div>';
       }
     }
 
     async function finalizeInstall(version) {
       const status = document.getElementById('status');
-      status.innerHTML = '<div class="loading"><div class="spinner"></div><p>Configuration finale...</p></div>';
+      const title = document.getElementById('title');
+      const subtitle = document.getElementById('subtitle');
+
+      updateSteps(3, 'Installation terminée');
+      title.textContent = 'Terminé';
+      subtitle.textContent = 'Prêt à démarrer';
+      status.innerHTML = '<div class="success-message"><div class="success-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="20 6 9 17 4 12" /></svg></div><p class="success-title">Installation terminée !</p><p class="success-text">Redirection vers votre site...</p></div>';
 
       try {
-        const response = await fetch(finalApiUrl, {
+        await fetch(finalApiUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -694,17 +881,9 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
           },
           body: JSON.stringify({ action: 'install', version })
         });
-        const data = await response.json();
-
-        if (data.installed) {
-          status.innerHTML = '<div style="text-align: center;"><h2 style="color: #10b981; margin-bottom: 1rem;">✓ Installation terminée !</h2><p>Redirection vers votre site...</p></div>';
-          setTimeout(() => window.location.href = '/', 3000);
-        } else {
-          throw new Error(data.message || 'Installation failed');
-        }
+        setTimeout(() => window.location.href = '/', 3000);
       } catch (e) {
         console.error('Finalize error:', e);
-        status.innerHTML = '<div class="error-message"><strong>Erreur:</strong> ' + e.message + '</div>';
       }
     }
   </script>
