@@ -36,6 +36,10 @@ export interface PageProps<T extends Record<string, unknown> = Record<string, un
   };
   errors: Record<string, string>;
   cartCount?: number;
+  unreadNotificationsCount?: number;
+  updatesCount?: number;
+  onboardingComplete?: boolean;
+  onboardingProgress?: unknown[];
   [key: string]: unknown;
 }
 

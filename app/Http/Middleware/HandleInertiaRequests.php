@@ -10,6 +10,7 @@ use ExilonCMS\Models\NavbarElement;
 use ExilonCMS\Models\SocialLink;
 use ExilonCMS\Models\OnboardingStep;
 use ExilonCMS\Models\Notification;
+use ExilonCMS\Extensions\UpdateManager;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -137,6 +138,8 @@ class HandleInertiaRequests extends Middleware
             // Share onboarding progress for admin users
             'onboardingComplete' => $user && $user->role && $user->role->is_admin ? OnboardingStep::isComplete($user->id) : true,
             'onboardingProgress' => $user && $user->role && $user->role->is_admin ? OnboardingStep::getUserProgress($user->id) : [],
+            // Share available updates count for admin users
+            'updatesCount' => $user && $user->hasAdminAccess() ? $this->getUpdatesCount() : 0,
         ];
     }
 
@@ -202,5 +205,24 @@ class HandleInertiaRequests extends Middleware
 
             return $data;
         })->values()->toArray();
+    }
+
+    /**
+     * Get the count of available CMS updates
+     */
+    protected function getUpdatesCount(): int
+    {
+        // Check if the settings table exists
+        if (!Schema::hasTable('settings')) {
+            return 0;
+        }
+
+        try {
+            /** @var UpdateManager $updates */
+            $updates = app(UpdateManager::class);
+            return $updates->getUpdatesCount();
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 }

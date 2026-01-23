@@ -2,6 +2,7 @@
 
 namespace ExilonCMS\Extensions;
 
+use ExilonCMS\ExilonCMS;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
@@ -10,42 +11,99 @@ use Illuminate\Support\Str;
 
 /**
  * Update Manager for ExilonCMS
- * Handles checking for updates, downloading, and installing updates
+ * Handles checking for updates, downloading, and installing updates via GitHub Releases
  */
 class UpdateManager
 {
-    private string $apiUrl;
+    private string $repo;
     private string $currentVersion;
     private string $cacheKey = 'cms_updates';
     private int $cacheTtl = 3600; // 1 hour
+    private ?array $latestRelease = null;
+    private ?array $cachedUpdate = null;
 
     public function __construct()
     {
-        $this->apiUrl = config('app.update_url', 'https://api.exiloncms.fr');
-        $this->currentVersion = app()->version();
+        // Use the same repo as installer config
+        $this->repo = config('installer.repo', 'Exilon-Studios/ExilonCMS');
+        $this->currentVersion = $this->normalizeVersion(ExilonCMS::version());
     }
 
     /**
-     * Check for available updates
+     * Normalize version string (remove 'v' prefix if present)
      */
-    public function check(): array
+    private function normalizeVersion(string $version): string
     {
+        return ltrim($version, 'v');
+    }
+
+    /**
+     * Check for available updates from GitHub Releases
+     */
+    public function check(bool $forceRefresh = false): array
+    {
+        if ($forceRefresh) {
+            Cache::forget($this->cacheKey);
+        }
+
         return Cache::remember($this->cacheKey, $this->cacheTtl, function () {
             try {
-                $response = Http::timeout(10)->get($this->apiUrl . '/v1/check', [
-                    'current_version' => $this->currentVersion,
-                    'php_version' => PHP_VERSION,
-                    'laravel_version' => app()->version(),
-                ]);
+                $githubToken = env('GITHUB_TOKEN');
+                $headers = [];
+                if ($githubToken) {
+                    $headers['Authorization'] = "Bearer {$githubToken}";
+                }
 
-                if ($response->successful()) {
-                    return $response->json();
+                $response = Http::withHeaders($headers)
+                    ->timeout(10)
+                    ->get("https://api.github.com/repos/{$this->repo}/releases/latest");
+
+                if (!$response->successful()) {
+                    Log::warning('Failed to fetch releases from GitHub', [
+                        'status' => $response->status(),
+                        'body' => $response->body(),
+                    ]);
+
+                    return [
+                        'success' => false,
+                        'message' => 'Failed to check for updates',
+                        'update' => null,
+                    ];
+                }
+
+                $release = $response->json();
+                $this->latestRelease = $release;
+
+                $latestVersion = $this->normalizeVersion($release['tag_name']);
+
+                // Compare versions
+                $hasUpdate = version_compare($latestVersion, $this->currentVersion, '>');
+
+                $update = null;
+                if ($hasUpdate) {
+                    // Find the CMS zip asset
+                    $zipAsset = collect($release['assets'] ?? [])
+                        ->first(fn($asset) => str_ends_with($asset['name'], '.zip') && !str_contains($asset['name'], 'installer'));
+
+                    $update = [
+                        'version' => $latestVersion,
+                        'tag_name' => $release['tag_name'],
+                        'name' => $release['name'] ?? $release['tag_name'],
+                        'body' => $release['body'] ?? '',
+                        'published_at' => $release['published_at'],
+                        'html_url' => $release['html_url'],
+                        'download_url' => $zipAsset['browser_download_url'] ?? null,
+                        'size' => $zipAsset['size'] ?? 0,
+                        'php_version' => $this->extractPhpVersion($release['body'] ?? ''),
+                    ];
                 }
 
                 return [
-                    'success' => false,
-                    'message' => 'Failed to check for updates',
-                    'updates' => [],
+                    'success' => true,
+                    'has_update' => $hasUpdate,
+                    'current_version' => $this->currentVersion,
+                    'latest_version' => $latestVersion,
+                    'update' => $update,
                 ];
             } catch (\Exception $e) {
                 Log::error('Failed to check for updates', [
@@ -55,41 +113,94 @@ class UpdateManager
                 return [
                     'success' => false,
                     'message' => 'Unable to check for updates',
-                    'updates' => [],
+                    'update' => null,
                 ];
             }
         });
     }
 
     /**
-     * Get available updates for a specific type
+     * Extract minimum PHP version from release notes
      */
-    public function getUpdates(?string $type = null): array
+    private function extractPhpVersion(string $body): string
     {
-        $data = $this->check();
-
-        if (!$data['success']) {
-            return [];
+        if (preg_match('/PHP\s+(\d+\.\d+)/i', $body, $matches)) {
+            return $matches[1];
         }
-
-        $updates = $data['updates'] ?? [];
-
-        if ($type) {
-            return array_filter($updates, fn ($update) => $update['type'] === $type);
-        }
-
-        return $updates;
+        return '8.2';
     }
 
     /**
-     * Download an update
+     * Get the latest update (for backward compatibility)
      */
-    public function download(string $updateId, string $savePath): bool
+    public function getUpdate(bool $forceRefresh = false): ?array
+    {
+        $data = $this->check($forceRefresh);
+        return $data['success'] ? ($data['update'] ?? null) : null;
+    }
+
+    /**
+     * Check if there is an update available (for backward compatibility)
+     */
+    public function hasUpdate(bool $forceRefresh = false): bool
+    {
+        $data = $this->check($forceRefresh);
+        return $data['success'] && ($data['has_update'] ?? false);
+    }
+
+    /**
+     * Force fetch latest release from GitHub (for backward compatibility)
+     */
+    public function forceFetchGithubRelease(): array
+    {
+        return $this->check(true);
+    }
+
+    /**
+     * Check if the last version is downloaded
+     */
+    public function isLastVersionDownloaded(): bool
+    {
+        $update = $this->getUpdate();
+        if (!$update) {
+            return false;
+        }
+
+        $version = $update['version'];
+        $downloadedFile = storage_path("app/updates/exiloncms-{$version}.zip");
+
+        return File::exists($downloadedFile);
+    }
+
+    /**
+     * Download an update (for backward compatibility with UpdateController)
+     */
+    public function download(array $update): bool
+    {
+        if (empty($update['download_url'])) {
+            Log::error('No download URL found in update data');
+            return false;
+        }
+
+        $version = $update['version'];
+        $savePath = storage_path("app/updates/exiloncms-{$version}.zip");
+
+        return $this->downloadUpdateZip($update['download_url'], $savePath);
+    }
+
+    /**
+     * Download update from URL
+     */
+    protected function downloadUpdateZip(string $downloadUrl, string $savePath): bool
     {
         try {
-            $response = Http::timeout(60)->get($this->apiUrl . '/v1/download/' . $updateId);
+            $response = Http::timeout(120)->followRedirects()->get($downloadUrl);
 
             if (!$response->successful()) {
+                Log::error('Failed to download update', [
+                    'url' => $downloadUrl,
+                    'status' => $response->status(),
+                ]);
                 return false;
             }
 
@@ -101,10 +212,15 @@ class UpdateManager
 
             File::put($savePath, $response->body());
 
+            Log::info('Update downloaded successfully', [
+                'path' => $savePath,
+                'size' => filesize($savePath),
+            ]);
+
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to download update', [
-                'update_id' => $updateId,
+                'url' => $downloadUrl,
                 'error' => $e->getMessage(),
             ]);
 
@@ -142,26 +258,46 @@ class UpdateManager
     }
 
     /**
+     * Install the latest update (for backward compatibility)
+     */
+    public function install(): bool
+    {
+        $update = $this->getUpdate();
+        if (!$update) {
+            Log::error('No update available to install');
+            return false;
+        }
+
+        return $this->installUpdate($update['version']);
+    }
+
+    /**
      * Install an update
      */
-    public function install(string $updateId): bool
+    public function installUpdate(string $version): bool
     {
         try {
             // Create backup
             $backupPath = storage_path('backups/update-backup-' . date('Y-m-d-H-i-s') . '.zip');
             $this->createBackup($backupPath);
 
-            // Download update
-            $tempPath = storage_path('app/updates/temp.zip');
-            if (!$this->download($updateId, $tempPath)) {
+            // Get downloaded file path
+            $tempPath = storage_path("app/updates/exiloncms-{$version}.zip");
+
+            if (!File::exists($tempPath)) {
+                Log::error('Update file not found', ['path' => $tempPath]);
                 return false;
             }
 
             // Extract update
             $extractPath = storage_path('app/updates/extract');
             if (!$this->extract($tempPath, $extractPath)) {
+                Log::error('Failed to extract update');
                 return false;
             }
+
+            // Copy files to base path
+            $this->copyUpdateFiles($extractPath, base_path());
 
             // Run post-install scripts
             $this->runPostInstall($extractPath);
@@ -172,10 +308,15 @@ class UpdateManager
             // Clean up
             File::deleteDirectory($extractPath);
 
+            // Clear update cache
+            Cache::forget($this->cacheKey);
+
+            Log::info('Update installed successfully', ['version' => $version]);
+
             return true;
         } catch (\Exception $e) {
             Log::error('Failed to install update', [
-                'update_id' => $updateId,
+                'version' => $version,
                 'error' => $e->getMessage(),
             ]);
 
@@ -183,6 +324,40 @@ class UpdateManager
             $this->rollback($backupPath);
 
             return false;
+        }
+    }
+
+    /**
+     * Copy update files to base path
+     */
+    protected function copyUpdateFiles(string $sourcePath, string $destPath): void
+    {
+        // Find the extracted directory (usually the root of the zip)
+        $dirs = File::directories($sourcePath);
+        $actualSource = count($dirs) === 1 ? $dirs[0] : $sourcePath;
+
+        // Copy all files except storage and vendor
+        $items = File::allFiles($actualSource);
+
+        foreach ($items as $item) {
+            $relativePath = $item->getRelativePathname();
+
+            // Skip certain paths
+            if (Str::startsWith($relativePath, 'storage/') ||
+                Str::startsWith($relativePath, 'vendor/') ||
+                Str::startsWith($relativePath, 'node_modules/') ||
+                $relativePath === '.env') {
+                continue;
+            }
+
+            $destFile = $destPath . '/' . $relativePath;
+            $destDir = dirname($destFile);
+
+            if (!File::exists($destDir)) {
+                File::makeDirectory($destDir, 0755, true);
+            }
+
+            File::copy($item->getPathname(), $destFile);
         }
     }
 
@@ -195,19 +370,28 @@ class UpdateManager
             $zip = new \ZipArchive();
 
             if ($zip->open($backupPath, \ZipArchive::CREATE) === true) {
-                // Add core files
-                $files = File::files(base_path());
-                foreach ($files as $file) {
-                    if ($file->getFilename() !== 'vendor' && $file->getFilename() !== 'node_modules') {
-                        $zip->addFile($file->getPathname(), $file->getRelativePath());
+                // Add critical directories
+                $directories = ['app', 'config', 'database', 'routes', 'resources', 'public'];
+
+                foreach ($directories as $dir) {
+                    $dirPath = base_path($dir);
+                    if (File::exists($dirPath)) {
+                        $files = File::allFiles($dirPath);
+                        foreach ($files as $file) {
+                            $relativePath = $file->getRelativePathname();
+                            // Skip vendor and node_modules within subdirs
+                            if (Str::startsWith($relativePath, 'vendor/') ||
+                                Str::startsWith($relativePath, 'node_modules/')) {
+                                continue;
+                            }
+                            $zip->addFile($file->getPathname(), $relativePath);
+                        }
                     }
                 }
 
-                // Add app directory
-                $zip->addGlob(base_path('app/**/*.php'));
-
                 $zip->close();
 
+                Log::info('Backup created', ['path' => $backupPath]);
                 return true;
             }
 
@@ -234,6 +418,7 @@ class UpdateManager
                 $zip->extractTo(base_path());
                 $zip->close();
 
+                Log::info('Rollback completed', ['backup' => $backupPath]);
                 return true;
             }
 
@@ -249,13 +434,20 @@ class UpdateManager
      */
     protected function runPostInstall(string $extractPath): void
     {
-        // Run composer install if composer.json changed
-        if (File::exists($extractPath . '/composer.json')) {
-            // Copy new composer.json
-            File::copy($extractPath . '/composer.json', base_path('composer.json'));
-
+        // Check if composer.json changed
+        $newComposerJson = $extractPath . '/composer.json';
+        if (File::exists($newComposerJson)) {
             // Run composer install
-            $this->runCommand('composer install --no-interaction');
+            $this->runCommand('composer install --no-interaction --optimize-autoloader');
+        }
+
+        // Check if package.json changed
+        $newPackageJson = $extractPath . '/package.json';
+        if (File::exists($newPackageJson)) {
+            // Run npm install
+            $this->runCommand('npm install');
+            // Build assets
+            $this->runCommand('npm run build');
         }
 
         // Run migrations
@@ -271,7 +463,8 @@ class UpdateManager
      */
     protected function runCommand(string $command): void
     {
-        exec($command . ' 2>&1', $output, $returnCode);
+        $cwd = base_path();
+        exec("cd " . escapeshellarg($cwd) . " && {$command} 2>&1", $output, $returnCode);
 
         if ($returnCode !== 0) {
             Log::warning('Command failed', [
@@ -286,8 +479,6 @@ class UpdateManager
      */
     protected function clearCaches(): void
     {
-        Cache::forget($this->cacheKey);
-
         $this->runCommand('php artisan cache:clear');
         $this->runCommand('php artisan config:clear');
         $this->runCommand('php artisan route:clear');
@@ -303,19 +494,27 @@ class UpdateManager
     }
 
     /**
-     * Check if there are updates available
-     */
-    public function hasUpdates(): bool
-    {
-        $updates = $this->getUpdates();
-        return count($updates) > 0;
-    }
-
-    /**
-     * Get count of available updates
+     * Get count of available updates (for backward compatibility)
      */
     public function getUpdatesCount(): int
     {
-        return count($this->getUpdates());
+        return $this->hasUpdate() ? 1 : 0;
+    }
+
+    /**
+     * Check if there are updates available (alias for hasUpdate)
+     */
+    public function hasUpdates(): bool
+    {
+        return $this->hasUpdate();
+    }
+
+    /**
+     * Get all available updates (for backward compatibility)
+     */
+    public function getUpdates(?string $type = null): array
+    {
+        $update = $this->getUpdate();
+        return $update ? [$update] : [];
     }
 }
