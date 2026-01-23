@@ -39,4 +39,7 @@ Route::middleware([
 
     // Post-installation redirect (bypasses middleware checks)
     Route::get('/install/installed', [InstallController::class, 'installed'])->name('install.installed');
+
+    // Download latest release from GitHub
+    Route::post('/install/download', [InstallController::class, 'downloadLatestRelease'])->name('install.download');
 });

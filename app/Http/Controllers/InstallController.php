@@ -1127,4 +1127,153 @@ class InstallController extends Controller
 
         return '1.0.0';
     }
+
+    /**
+     * Download and extract the latest CMS release from GitHub.
+     * This is used by the installer to fetch the full CMS package.
+     */
+    public function downloadLatestRelease(Request $request)
+    {
+        $repo = config('installer.repo', 'Exilon-Studios/ExilonCMS');
+        $downloadUrl = config('installer.download_url', 'https://github.com');
+
+        try {
+            // Get latest release info from GitHub API
+            $response = \Http::withToken(env('GITHUB_TOKEN'))
+                ->get("https://api.github.com/repos/{$repo}/releases/latest");
+
+            if (! $response->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to fetch release info',
+                ], 500);
+            }
+
+            $release = $response->json();
+            $version = $release['tag_name'];
+            $zipAsset = collect($release['assets'])->first(fn($asset) => str_ends_with($asset['name'], '.zip'));
+
+            if (! $zipAsset) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No zip asset found in release',
+                ], 404);
+            }
+
+            $downloadUrl = $zipAsset['browser_download_url'];
+
+            // Download the zip
+            $tempPath = storage_path('app/exiloncms-temp.zip');
+            $zipResponse = \Http::timeout(300)->get($downloadUrl);
+
+            if (! $zipResponse->successful()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to download CMS package',
+                ], 500);
+            }
+
+            file_put_contents($tempPath, $zipResponse->body());
+
+            // Extract the zip
+            $extractPath = storage_path('app/extract');
+            if (! is_dir($extractPath)) {
+                mkdir($extractPath, 0755, true);
+            }
+
+            $zip = new \ZipArchive();
+            if ($zip->open($tempPath) !== TRUE) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to open zip archive',
+                ], 500);
+            }
+
+            $zip->extractTo($extractPath);
+            $zip->close();
+
+            // Move files to project root
+            $extractedDir = $extractPath . '/exiloncms-' . ltrim($version, 'v');
+            if (! is_dir($extractedDir)) {
+                // Try alternative directory name
+                $dirs = glob($extractPath . '/*', GLOB_ONLYDIR);
+                $extractedDir = $dirs[0] ?? null;
+            }
+
+            if ($extractedDir && is_dir($extractedDir)) {
+                // Copy all files except vendor and node_modules
+                $this->copyDirectory($extractedDir, base_path(), ['vendor', 'node_modules', '.git']);
+            }
+
+            // Clean up
+            unlink($tempPath);
+            $this->deleteDirectory($extractPath);
+
+            return response()->json([
+                'success' => true,
+                'version' => $version,
+                'message' => 'CMS downloaded and installed successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Copy directory recursively excluding certain paths.
+     */
+    protected function copyDirectory(string $source, string $destination, array $exclude = []): void
+    {
+        if (! is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        $dir = new \DirectoryIterator($source);
+
+        foreach ($dir as $item) {
+            if ($item->isDot()) {
+                continue;
+            }
+
+            if ($item->isDir()) {
+                $basename = $item->getBasename();
+
+                if (in_array($basename, $exclude)) {
+                    continue;
+                }
+
+                $this->copyDirectory($item->getPathname(), $destination . '/' . $basename, $exclude);
+            } else {
+                copy($item->getPathname(), $destination . '/' . $item->getBasename());
+            }
+        }
+    }
+
+    /**
+     * Delete directory recursively.
+     */
+    protected function deleteDirectory(string $dir): void
+    {
+        if (! is_dir($dir)) {
+            return;
+        }
+
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $file) {
+            if ($file->isDir()) {
+                rmdir($file->getPathname());
+            } else {
+                unlink($file->getPathname());
+            }
+        }
+
+        rmdir($dir);
+    }
 }
