@@ -133,7 +133,8 @@
       "Bash(copy:*)",
       "Bash(cmd:*)",
       "Bash(Select-String:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git describe:*)"
     ],
     "deny": [],
     "ask": []

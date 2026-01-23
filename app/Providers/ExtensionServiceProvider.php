@@ -2,6 +2,8 @@
 
 namespace ExilonCMS\Providers;
 
+use ExilonCMS\Extensions\Plugin\PluginServiceProvider;
+use ExilonCMS\Extensions\Theme\ThemeServiceProvider;
 use ExilonCMS\Models\Setting;
 use ExilonCMS\Support\SettingsRepository;
 use Exception;
@@ -15,6 +17,10 @@ class ExtensionServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(SettingsRepository::class);
+
+        // Register plugin and theme service providers
+        $this->app->register(PluginServiceProvider::class);
+        $this->app->register(ThemeServiceProvider::class);
     }
 
     /**
