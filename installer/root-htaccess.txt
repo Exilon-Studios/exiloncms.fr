@@ -1,8 +1,0 @@
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-
-    # Redirect all requests to exiloncms/public/
-    # But only if the request is not already for exiloncms/public
-    RewriteCond %{REQUEST_URI} !^/exiloncms/public/
-    RewriteRule ^(.*)$ /exiloncms/public/$1 [L]
-</IfModule>
