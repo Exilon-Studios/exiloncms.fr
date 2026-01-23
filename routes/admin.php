@@ -10,11 +10,12 @@ use ExilonCMS\Http\Controllers\Admin\LanguageController;
 use ExilonCMS\Http\Controllers\Admin\NavbarController;
 use ExilonCMS\Http\Controllers\Admin\PageAttachmentController;
 use ExilonCMS\Http\Controllers\Admin\PageController;
-use ExilonCMS\Http\Controllers\Admin\PluginController;
 use ExilonCMS\Http\Controllers\Admin\PostAttachmentController;
 use ExilonCMS\Http\Controllers\Admin\PostController;
 use ExilonCMS\Http\Controllers\Admin\RedirectController;
+use ExilonCMS\Http\Controllers\Admin\ResourceController;
 use ExilonCMS\Http\Controllers\Admin\RoleController;
+use ExilonCMS\Http\Controllers\Admin\ResourceInstallController;
 use ExilonCMS\Http\Controllers\Admin\ServerController;
 use ExilonCMS\Http\Controllers\Admin\SettingsController;
 use ExilonCMS\Http\Controllers\Admin\SocialLinkController;
@@ -23,7 +24,6 @@ use ExilonCMS\Http\Controllers\Admin\ThemeSettingsController;
 use ExilonCMS\Http\Controllers\Admin\TranslationController;
 use ExilonCMS\Http\Controllers\Admin\UpdateController;
 use ExilonCMS\Http\Controllers\Admin\UserController;
-use ExilonCMS\Http\Controllers\Admin\ShopPluginController;
 use ExilonCMS\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use ExilonCMS\Http\Controllers\Admin\NotificationManagerController;
 use ExilonCMS\Http\Controllers\Admin\CompanySettingsController;
@@ -46,6 +46,18 @@ Route::prefix('onboarding')->name('onboarding.')->group(function () {
 Route::prefix('theme-settings')->name('theme-settings.')->middleware('can:admin.settings')->group(function () {
     Route::get('/', [ThemeSettingsController::class, 'index'])->name('index');
     Route::post('/update', [ThemeSettingsController::class, 'update'])->name('update');
+});
+
+// ============================================================
+// THEME MANAGEMENT ROUTES
+// ============================================================
+Route::prefix('themes')->name('themes.')->middleware('can:admin.settings')->group(function () {
+    Route::get('/', [ThemeController::class, 'index'])->name('index');
+    Route::post('/{themeId}/activate', [ThemeController::class, 'activate'])->name('activate');
+    Route::post('/deactivate', [ThemeController::class, 'deactivate'])->name('deactivate');
+    Route::post('/{themeId}/publish', [ThemeController::class, 'publishAssets'])->name('publish');
+    Route::get('/preview/{themeId}', [ThemeController::class, 'preview'])->name('preview');
+    Route::get('/exit-preview', [ThemeController::class, 'exitPreview'])->name('exit-preview');
 });
 
 Route::prefix('settings')->name('settings.')->middleware('can:admin.settings')->group(function () {
@@ -116,31 +128,6 @@ Route::prefix('users')->name('users.')->middleware('can:admin.users')->group(fun
     Route::post('/{user}/discord/unlink', [UserController::class, 'unlinkDiscord'])->name('discord.unlink');
 });
 
-Route::prefix('themes')->name('themes.')->middleware('can:admin.themes')->group(function () {
-    Route::get('/', [ThemeController::class, 'index'])->name('index');
-    Route::post('/reload', [ThemeController::class, 'reload'])->name('reload');
-    Route::post('/change/{theme?}', [ThemeController::class, 'changeTheme'])->name('change');
-    Route::prefix('/{theme}/config')->group(function () {
-        Route::get('/', [ThemeController::class, 'edit'])->name('edit');
-        Route::post('/', [ThemeController::class, 'config'])->name('config');
-    });
-    Route::post('/{theme}/update', [ThemeController::class, 'update'])->name('update');
-    Route::post('/{themeId}/download', [ThemeController::class, 'download'])->name('download');
-    Route::delete('/{theme}', [ThemeController::class, 'delete'])->name('delete');
-});
-
-Route::prefix('plugins')->name('plugins.')->middleware('can:admin.plugins')->group(function () {
-    Route::get('/', [PluginController::class, 'index'])->name('index');
-    Route::post('/reload', [PluginController::class, 'reload'])->name('reload');
-    Route::get('/{plugin}/config', [PluginController::class, 'config'])->name('config');
-    Route::post('/{plugin}/config', [PluginController::class, 'updateConfig'])->name('config.update');
-    Route::post('/{plugin}/enable', [PluginController::class, 'enable'])->name('enable');
-    Route::post('/{plugin}/disable', [PluginController::class, 'disable'])->name('disable');
-    Route::post('/{plugin}/update', [PluginController::class, 'update'])->name('update');
-    Route::post('/{pluginId}/download', [PluginController::class, 'download'])->name('download');
-    Route::delete('/{plugin}', [PluginController::class, 'delete'])->name('delete');
-});
-
 Route::prefix('updates')->name('update.')->middleware('can:admin.update')->group(function () {
     Route::get('/', [UpdateController::class, 'index'])->name('index');
     Route::get('/version', [UpdateController::class, 'version'])->name('version');
@@ -199,10 +186,6 @@ Route::prefix('translations')->name('translations.')->middleware('can:admin.sett
     Route::delete('/{group}/{key}/{locale}', [TranslationController::class, 'destroy'])->name('destroy');
 });
 
-Route::prefix('plugins')->name('plugins.')->middleware('can:admin.plugins')->group(function () {
-    Route::get('/shop', [ShopPluginController::class, 'index'])->name('shop');
-});
-
 Route::prefix('notifications')->name('notifications.')->middleware('can:admin.users')->group(function () {
     Route::get('/', [NotificationManagerController::class, 'index'])->name('index');
     Route::get('/create', [NotificationManagerController::class, 'create'])->name('create');
@@ -222,6 +205,39 @@ Route::prefix('database')->name('database.')->middleware('can:admin.settings')->
     Route::post('/import', [DatabaseManagerController::class, 'import'])->name('import');
     Route::post('/optimize', [DatabaseManagerController::class, 'optimize'])->name('optimize');
     Route::post('/truncate', [DatabaseManagerController::class, 'truncate'])->name('truncate');
+});
+
+// ============================================================
+// RESOURCES / MARKETPLACE ADMIN ROUTES
+// ============================================================
+Route::prefix('resources')->name('resources.')->group(function () {
+    // Pending resources (moderation)
+    Route::get('/pending', [ResourceController::class, 'pending'])->name('pending')->middleware('can:admin.resources.moderate');
+    Route::post('/{resource}/approve', [ResourceController::class, 'approve'])->name('approve')->middleware('can:admin.resources.moderate');
+    Route::post('/{resource}/reject', [ResourceController::class, 'reject'])->name('reject')->middleware('can:admin.resources.moderate');
+    Route::post('/{resource}/archive', [ResourceController::class, 'archive'])->name('archive')->middleware('can:admin.resources.moderate');
+
+    // Seller management
+    Route::get('/sellers', [ResourceController::class, 'sellerRequests'])->name('sellers')->middleware('can:admin.resources.moderate');
+    Route::post('/sellers/{user}/verify', [ResourceController::class, 'verifySeller'])->name('sellers.verify')->middleware('can:admin.resources.moderate');
+    Route::post('/sellers/{user}/revoke', [ResourceController::class, 'revokeSeller'])->name('sellers.revoke')->middleware('can:admin.resources.moderate');
+    Route::delete('/sellers/{user}', [ResourceController::class, 'removeSeller'])->name('sellers.remove')->middleware('can:admin.resources.moderate');
+
+    // All resources management
+    Route::get('/', [ResourceController::class, 'index'])->name('index')->middleware('can:admin.resources.view');
+    Route::get('/{resource}', [ResourceController::class, 'show'])->name('show')->middleware('can:admin.resources.view');
+    Route::post('/{resource}/stats', [ResourceController::class, 'updateStats'])->name('stats')->middleware('can:admin.resources.edit');
+
+    // Marketplace settings
+    Route::get('/settings', [ResourceController::class, 'settings'])->name('settings')->middleware('can:admin.resources.settings');
+    Route::post('/settings', [ResourceController::class, 'updateSettings'])->name('settings.update')->middleware('can:admin.resources.settings');
+
+    // External resources installation from API
+    Route::prefix('external')->name('external.')->group(function () {
+        Route::get('/install', [ResourceInstallController::class, 'index'])->name('install')->middleware('can:admin.resources.settings');
+        Route::post('/install/{resourceId}', [ResourceInstallController::class, 'install'])->name('install.resource')->middleware('can:admin.resources.settings');
+        Route::post('/sync', [ResourceInstallController::class, 'sync'])->name('sync')->middleware('can:admin.resources.settings');
+    });
 });
 
 Route::fallback([AdminController::class, 'fallback']);

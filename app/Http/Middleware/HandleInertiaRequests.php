@@ -9,9 +9,7 @@ use Inertia\Middleware;
 use ExilonCMS\Models\NavbarElement;
 use ExilonCMS\Models\SocialLink;
 use ExilonCMS\Models\OnboardingStep;
-use ExilonCMS\Extensions\Plugin\PluginManager;
-use ExilonCMS\Extensions\Theme\ThemeManager;
-use ExilonCMS\Extensions\UpdateManager;
+use ExilonCMS\Models\Notification;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -63,11 +61,6 @@ class HandleInertiaRequests extends Middleware
                 'navbar' => [],
                 'socialLinks' => [],
                 'trans' => [],
-                'enabledPlugins' => [],
-                'pluginAdminNavItems' => [],
-                'pluginUserNavItems' => [],
-                'updatesCount' => 0,
-                'cartCount' => 0,
             ];
         }
 
@@ -98,7 +91,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'settings' => [
                 'name' => setting('name', config('app.name')),
-                'description' => setting('description'),
+                'description' => setting('description', 'ExilonCMS - Modern Content Management System'),
                 'locale' => app()->getLocale(),
                 'background' => setting('background') ? image_url(setting('background')) : null,
                 'favicon' => favicon(),
@@ -112,6 +105,14 @@ class HandleInertiaRequests extends Middleware
                     'links_spacing' => setting('navbar.links_spacing', '4rem'),
                     'style' => setting('navbar.style', 'transparent'),
                     'background' => setting('navbar.background'),
+                ],
+                // Marketplace API URL
+                'marketplaceUrl' => config('services.marketplace.url', 'https://marketplace.exiloncms.fr'),
+                // SEO defaults
+                'seo' => [
+                    'title' => setting('name', config('app.name')),
+                    'description' => setting('description', 'ExilonCMS - Modern Content Management System for game servers'),
+                    'og_image' => setting('og_image') ? image_url(setting('og_image')) : null,
                 ],
             ],
             'navbar' => $this->loadNavbarElements($user),
@@ -129,49 +130,14 @@ class HandleInertiaRequests extends Middleware
                 'pages' => trans('pages'),
                 'puck' => trans('puck'),
                 'dashboard' => trans('dashboard'),
+                'marketplace' => trans('marketplace'),
             ],
-            // Share enabled plugins for dynamic navigation
-            'enabledPlugins' => app(PluginManager::class)->findPluginsDescriptions()
-                ->filter(fn ($plugin) => $plugin->enabled)
-                ->map(fn ($plugin) => [
-                    'id' => $plugin->id,
-                    'name' => $plugin->name,
-                    'description' => $plugin->description,
-                    'version' => $plugin->version,
-                ])
-                ->values()
-                ->toArray(),
-            // Share plugin navigation items
-            'pluginAdminNavItems' => app(PluginManager::class)->getPluginAdminNavItems()->toArray(),
-            'pluginUserNavItems' => app(PluginManager::class)->getPluginUserNavItems()->toArray(),
-            // Share updates count for sidebar badge
-            'updatesCount' => $this->getUpdatesCount($user),
-            // Share cart count for authenticated users
-            'cartCount' => $user ? $this->getCartCount($user) : 0,
             // Share unread notifications count for authenticated users
             'unreadNotificationsCount' => $user ? $this->getUnreadNotificationsCount($user) : 0,
             // Share onboarding progress for admin users
             'onboardingComplete' => $user && $user->role && $user->role->is_admin ? OnboardingStep::isComplete($user->id) : true,
             'onboardingProgress' => $user && $user->role && $user->role->is_admin ? OnboardingStep::getUserProgress($user->id) : [],
         ];
-    }
-
-    /**
-     * Get the cart count for the user
-     */
-    protected function getCartCount($user): int
-    {
-        // Check if shop plugin is enabled
-        if (!class_exists(\ExilonCMS\Plugins\Shop\Models\CartItem::class)) {
-            return 0;
-        }
-
-        // Check if the shop_cart_items table exists (migrations might not have run yet)
-        if (!Schema::hasTable('shop_cart_items')) {
-            return 0;
-        }
-
-        return \ExilonCMS\Plugins\Shop\Models\CartItem::where('user_id', $user->id)->sum('quantity');
     }
 
     /**
@@ -184,38 +150,14 @@ class HandleInertiaRequests extends Middleware
             return 0;
         }
 
-        return \ExilonCMS\Models\Notification::where('user_id', $user->id)
+        return Notification::where('user_id', $user->id)
             ->whereNull('read_at')
             ->count();
     }
 
     /**
-     * Get the total count of available updates (CMS + plugins + themes)
+     * Load navbar elements from database
      */
-    protected function getUpdatesCount($user): int
-    {
-        $count = 0;
-
-        // Check CMS update
-        $updateManager = app(UpdateManager::class);
-        if ($updateManager->hasUpdate()) {
-            $count++;
-        }
-
-        // Check plugins and themes updates (only for admins)
-        // Force refresh to get latest data from marketplace
-        // Use isAdmin() instead of hasAdminAccess() because permissions might not be loaded in middleware
-        if ($user && $user->role && $user->role->is_admin) {
-            $pluginManager = app(PluginManager::class);
-            $count += $pluginManager->getPluginsToUpdate(true)->count();
-
-            $themeManager = app(ThemeManager::class);
-            $count += $themeManager->getThemesToUpdate(true)->count();
-        }
-
-        return $count;
-    }
-
     protected function loadNavbarElements($user): array
     {
         $elements = Cache::get(NavbarElement::CACHE_KEY, function () {

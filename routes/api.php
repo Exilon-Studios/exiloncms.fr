@@ -2,13 +2,22 @@
 
 use ExilonCMS\Http\Controllers\Api\AuthController;
 use ExilonCMS\Http\Controllers\Api\FeedController;
+use ExilonCMS\Http\Controllers\Api\PublicResourceController;
 use ExilonCMS\Http\Controllers\Api\PostController;
 use ExilonCMS\Http\Controllers\Api\ServerController;
 use Illuminate\Support\Facades\Route;
 
 Route::name('api.')->group(function () {
     Route::apiResource('posts', PostController::class)->only(['index', 'show']);
-    Route::apiResource('servers', ServerController::class)->only('index');
+    Route::apiResource('servers', ServerController::class)->only(['index']);
+
+    // Public resources API routes (for external installations)
+    Route::prefix('resources')->name('resources.')->group(function () {
+        Route::get('/', [PublicResourceController::class, 'index'])->name('index');
+        Route::get('/stats', [PublicResourceController::class, 'stats'])->name('stats');
+        Route::get('/tag/{tag}', [PublicResourceController::class, 'searchByTag'])->name('tag');
+        Route::get('/{id}', [PublicResourceController::class, 'show'])->name('show');
+    });
 });
 
 Route::prefix('/auth')->name('auth.')->group(function () {

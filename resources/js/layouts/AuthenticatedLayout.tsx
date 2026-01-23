@@ -19,15 +19,11 @@ import {
   IconBan,
   IconPhoto,
   IconArrowsRightLeft,
-  IconPuzzle,
-  IconPalette,
   IconDownload,
+  IconCloudDownload,
   IconList,
   IconLanguage,
   IconMenu2,
-  IconShoppingBag,
-  IconShoppingCart,
-  IconPackage,
   IconBuilding,
   IconDatabase,
   IconWebhook,
@@ -35,7 +31,7 @@ import {
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   const pageProps = usePage<PageProps>().props as any;
-  const { auth, settings, enabledPlugins, pluginAdminNavItems, pluginUserNavItems, updatesCount } = pageProps;
+  const { auth, settings, updatesCount = 0 } = pageProps;
 
   // Check if we're in admin section - hide user-facing shop links there
   const url = pageProps.url || window.location.pathname;
@@ -72,32 +68,6 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     });
   };
 
-  // Icon mapping for plugin navigation items
-  const iconMap: Record<string, React.ReactNode> = {
-    'shopping-bag': <IconShoppingBag className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'shopping-cart': <IconShoppingCart className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'package': <IconPackage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'file-text': <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'puzzle': <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'settings': <IconSettings className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'users': <IconUsers className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'shield': <IconShield className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'ban': <IconBan className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'file': <IconFile className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'photo': <IconPhoto className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'arrows-right-left': <IconArrowsRightLeft className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'palette': <IconPalette className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'download': <IconDownload className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'list': <IconList className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-    'language': <IconLanguage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-  };
-
-  // Helper function to get icon component from string name
-  const getIconComponent = (iconName?: string): React.ReactNode => {
-    if (!iconName) return <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />;
-    return iconMap[iconName] || <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />;
-  };
-
   // Primary navigation links - Sections rétractables
   const allPrimaryLinks = [
     // Dashboard
@@ -109,18 +79,6 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         <IconBrandTabler className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
-    // User Plugin Links (Shop, Orders, Invoices, etc.) - Only show in dashboard, NOT in admin
-    ...(!isAdminSection && pluginUserNavItems && pluginUserNavItems.length > 0 ? [
-      {
-        type: 'section',
-        label: trans('shop.items'),
-        children: pluginUserNavItems.map((item: any) => ({
-          label: trans(`shop.nav.${item.label}`) || item.label,
-          href: item.href,
-          icon: typeof item.icon === 'string' ? getIconComponent(item.icon) : item.icon || getIconComponent(),
-        })),
-      },
-    ] : []),
     // Users Section
     {
       type: 'section',
@@ -191,42 +149,45 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         },
       ],
     },
-    // Extensions Section
+    // Marketplace Section
     {
       type: 'section',
-      label: trans('admin.nav.extensions.heading').toUpperCase(),
+      label: trans('admin.nav.marketplace.heading').toUpperCase(),
       children: [
         {
-          label: trans('admin.nav.extensions.plugins'),
-          href: '/admin/plugins',
-          permission: 'admin.plugins',
+          label: trans('admin.nav.marketplace.packages'),
+          href: '/admin/resources',
+          permission: 'admin.resources.view',
           icon: (
-            <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+            <IconDownload className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
         },
         {
-          label: trans('admin.nav.extensions.themes'),
-          href: '/admin/themes',
-          permission: 'admin.themes',
+          label: trans('admin.nav.marketplace.pending'),
+          href: '/admin/resources/pending',
+          permission: 'admin.resources.moderate',
           icon: (
-            <IconPalette className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+            <IconArrowsRightLeft className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: trans('admin.nav.marketplace.sellers'),
+          href: '/admin/resources/sellers',
+          permission: 'admin.resources.moderate',
+          icon: (
+            <IconUserBolt className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: trans('admin.nav.resources.external_install'),
+          href: '/admin/resources/external/install',
+          permission: 'admin.resources.settings',
+          icon: (
+            <IconCloudDownload className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
         },
       ],
     },
-    // Plugins Configuration Section (Dynamic - from enabled plugins)
-    ...(enabledPlugins && Object.keys(enabledPlugins).length > 0 ? [
-      {
-        type: 'section',
-        label: 'PLUGINS',
-        children: Object.values(enabledPlugins).map((plugin: any) => ({
-          label: plugin.name,
-          href: `/admin/plugins/${plugin.id}`,
-          permission: 'admin.plugins',
-          icon: <IconPuzzle className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />,
-        })),
-      },
-    ] : []),
     // PARAMÈTRES Section - Menu déroulant principal contenant tous les paramètres
     {
       type: 'section',

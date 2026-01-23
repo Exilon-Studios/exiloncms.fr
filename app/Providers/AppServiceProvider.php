@@ -75,6 +75,11 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin.logs', fn (User $user) => $user->isAdmin());
         Gate::define('admin.update', fn (User $user) => $user->isAdmin());
         Gate::define('admin.redirects', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.resources.view', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.resources.moderate', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.resources.edit', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.resources.delete', fn (User $user) => $user->isAdmin());
+        Gate::define('admin.resources.settings', fn (User $user) => $user->isAdmin());
 
         // Notifications
         Notification::extend('alert', function ($app) {

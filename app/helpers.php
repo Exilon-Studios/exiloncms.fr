@@ -1,7 +1,5 @@
 <?php
 
-use ExilonCMS\Extensions\Plugin\PluginManager;
-use ExilonCMS\Extensions\Theme\ThemeManager;
 use ExilonCMS\Games\Game;
 use ExilonCMS\Http\Controllers\InstallController;
 use ExilonCMS\Models\SocialLink;
@@ -166,7 +164,7 @@ if (! function_exists('favicon')) {
     {
         $icon = setting('icon');
 
-        return $icon !== null ? image_url($icon) : asset('img/mccms.png');
+        return $icon !== null ? image_url($icon) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>';
     }
 }
 
@@ -178,7 +176,7 @@ if (! function_exists('site_logo')) {
     {
         $logo = setting('logo');
 
-        return $logo !== null ? image_url($logo) : asset('img/mccms.png');
+        return $logo !== null ? image_url($logo) : 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>';
     }
 }
 
@@ -208,91 +206,6 @@ if (! function_exists('social_links')) {
         return Cache::remember(SocialLink::CACHE_KEY, now()->addDay(), function () {
             return SocialLink::orderBy('position')->get();
         });
-    }
-}
-
-/*
- * Extensions helpers
- */
-
-if (! function_exists('plugins')) {
-    /**
-     * Get the plugins' manager.
-     */
-    function plugins(): PluginManager
-    {
-        return app('plugins');
-    }
-}
-
-if (! function_exists('themes')) {
-    /**
-     * Get the themes' manager.
-     */
-    function themes(): ThemeManager
-    {
-        return app('themes');
-    }
-}
-
-if (! function_exists('plugin_path')) {
-    /**
-     * Get the path to a plugin directory.
-     */
-    function plugin_path(string $path = ''): string
-    {
-        return plugins()->pluginsPath($path);
-    }
-}
-
-if (! function_exists('themes_path')) {
-    /**
-     * Get the path of the 'themes' directory.
-     */
-    function themes_path(string $path = ''): string
-    {
-        return themes()->themesPath($path);
-    }
-}
-
-if (! function_exists('theme_path')) {
-    /**
-     * Get the path of a theme. If no theme is specified the current theme
-     * is used.
-     */
-    function theme_path(string $path = '', ?string $theme = null): string
-    {
-        return themes()->path($path, $theme);
-    }
-}
-
-if (! function_exists('plugin_asset')) {
-    /**
-     * Generate an asset path for the current theme.
-     */
-    function plugin_asset(string $plugin, string $path): string
-    {
-        return asset("plugins/{$plugin}/{$path}");
-    }
-}
-
-if (! function_exists('theme_asset')) {
-    /**
-     * Generate an asset path for the current theme.
-     */
-    function theme_asset(string $path): string
-    {
-        return asset('themes/'.themes()->currentTheme().'/'.$path);
-    }
-}
-
-if (! function_exists('theme_config')) {
-    /**
-     * Generate an asset path for the current theme.
-     */
-    function theme_config(?string $key = null, mixed $default = null): mixed
-    {
-        return $key === null ? config('theme') : config('theme.'.$key, $default);
     }
 }
 
@@ -340,5 +253,75 @@ if (! function_exists('scheduler_running')) {
         $last = setting('schedule.last');
 
         return $last !== null && Carbon::parse($last)->diffInHours() < 1;
+    }
+}
+
+if (! function_exists('marketplace_sso_redirect')) {
+    /**
+     * Generate SSO token and redirect to marketplace
+     *
+     * This function creates a JWT token containing the current user's info
+     * and redirects to the marketplace for SSO login.
+     *
+     * @param  string  $marketplaceUrl  The marketplace URL (e.g., 'https://marketplace.exiloncms.fr')
+     * @param  string  $cmsSecret       The CMS instance's SSO secret key
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    function marketplace_sso_redirect(string $marketplaceUrl = null, string $cmsSecret = null)
+    {
+        $user = auth()->user();
+        if (!$user) {
+            abort(401, 'User must be authenticated to use SSO.');
+        }
+
+        // Get from settings if not provided
+        $marketplaceUrl ??= config('services.marketplace.url', 'https://marketplace.exiloncms.fr');
+        $cmsSecret ??= setting('marketplace_sso_secret');
+
+        if (!$cmsSecret) {
+            abort(500, 'Marketplace SSO secret not configured. Please set marketplace_sso_secret in settings.');
+        }
+
+        // Get current CMS URL
+        $cmsUrl = config('app.url');
+
+        // Create JWT payload
+        $payload = [
+            'email' => $user->email,
+            'name' => $user->name,
+            'cms_url' => $cmsUrl,
+            'timestamp' => time(),
+            'exp' => time() + 300, // 5 minutes expiration
+        ];
+
+        // Create JWT
+        $header = [
+            'typ' => 'JWT',
+            'alg' => 'HS256',
+        ];
+
+        $headerEncoded = base64url_encode(json_encode($header));
+        $payloadEncoded = base64url_encode(json_encode($payload));
+
+        $signature = hash_hmac('sha256', $headerEncoded . '.' . $payloadEncoded, $cmsSecret, true);
+        $signatureEncoded = base64url_encode($signature);
+
+        $token = $headerEncoded . '.' . $payloadEncoded . '.' . $signatureEncoded;
+
+        // Redirect to marketplace SSO endpoint
+        $ssoUrl = rtrim($marketplaceUrl, '/') . '/sso/login?' . http_build_query([
+            'token' => $token,
+            'cms_url' => $cmsUrl,
+        ]);
+
+        return redirect($ssoUrl);
+    }
+
+    /**
+     * Base64 URL encode
+     */
+    function base64url_encode($data)
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }

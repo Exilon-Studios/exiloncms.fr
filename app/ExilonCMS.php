@@ -2,7 +2,6 @@
 
 namespace ExilonCMS;
 
-use ExilonCMS\Extensions\Plugin\PluginManager;
 use ExilonCMS\Games\Game as GameGame;
 use ExilonCMS\Support\SettingsRepository;
 use Illuminate\Support\Str;
@@ -49,14 +48,6 @@ class ExilonCMS
         }
 
         return $settings->get($name, $default);
-    }
-
-    /**
-     * Get the plugin manager instance.
-     */
-    public static function plugin(): PluginManager
-    {
-        return app(PluginManager::class);
     }
 
     /**

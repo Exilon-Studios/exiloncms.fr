@@ -2,235 +2,110 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
-use ExilonCMS\ExilonCMS;
 use ExilonCMS\Extensions\Theme\ThemeManager;
-use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Http\Controllers\Controller;
-use ExilonCMS\Models\ActionLog;
-use ExilonCMS\Models\Image;
-use Exception;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Inertia\Inertia;
-use Throwable;
 
 class ThemeController extends Controller
 {
-    private ThemeManager $themes;
-
-    private Filesystem $files;
-
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct(Filesystem $files, ThemeManager $themes)
-    {
-        $this->files = $files;
-        $this->themes = $themes;
-    }
+    public function __construct(
+        private ThemeManager $themeManager
+    ) {}
 
     /**
-     * Display a listing of the extensions.
+     * Display all themes.
      */
     public function index()
     {
-        $themes = $this->themes->findThemesDescriptions();
-
-        $current = null;
-
-        if ($this->themes->hasTheme()) {
-            $current = $themes->pull($this->themes->currentTheme());
-        }
-
-        $currentThemeConfig = $this->themes->path('config/rules.php', $this->themes->currentTheme());
+        $themes = $this->themeManager->getAllThemes();
+        $activeTheme = $this->themeManager->getActiveTheme();
 
         return Inertia::render('Admin/Themes/Index', [
             'themes' => $themes,
-            'current' => $current,
-            'currentPath' => $this->themes->currentTheme() ?? 'default',
-            'currentHasConfig' => $this->files->isFile($currentThemeConfig),
-            'availableThemes' => $this->themes->getOnlineThemes(),
-            'themesUpdates' => $this->themes->getThemesToUpdate(),
-        ]);
-    }
-
-    public function reload()
-    {
-        $response = to_route('admin.themes.index');
-
-        try {
-            app(UpdateManager::class)->forceFetchMarketplace();
-        } catch (Exception $e) {
-            return $response->with('error', trans('messages.status.error', [
-                'error' => $e->getMessage(),
-            ]));
-        }
-
-        return $response->with('success', trans('admin.themes.reloaded'));
-    }
-
-    public function update(string $theme)
-    {
-        $description = $this->themes->findDescription($theme);
-
-        try {
-            if ($description !== null && isset($description->apiId)) {
-                $oldConfig = $this->themes->readConfig($theme);
-
-                $this->themes->delete($theme);
-
-                $this->themes->install($description->apiId);
-
-                if ($oldConfig !== null) {
-                    $newConfig = $this->themes->readConfig($theme) ?? [];
-
-                    $this->themes->updateConfig($theme, array_merge($newConfig, $oldConfig));
-                }
-
-                if ($this->themes->isLegacy($theme)) {
-                    $this->themes->changeTheme(null);
-
-                    return to_route('admin.themes.index')
-                        ->with('error', trans('admin.themes.legacy', [
-                            'version' => ExilonCMS::apiVersion(),
-                        ]));
-                }
-            }
-        } catch (Throwable $t) {
-            report($t);
-
-            return to_route('admin.themes.index')
-                ->with('error', trans('messages.status.error', [
-                    'error' => $t->getMessage(),
-                ]));
-        }
-
-        return to_route('admin.themes.index')
-            ->with('success', trans('admin.themes.installed'));
-    }
-
-    public function download(string $themeId)
-    {
-        try {
-            // If themeId is numeric, find the extension_id from marketplace
-            if (is_numeric($themeId)) {
-                $themes = app(UpdateManager::class)->getThemes(true);
-                $theme = collect($themes)->firstWhere('id', $themeId);
-
-                if (! $theme) {
-                    throw new Exception('Theme not found in marketplace');
-                }
-
-                $themeId = $theme['extension_id'];
-            }
-
-            $this->themes->install($themeId);
-        } catch (Throwable $t) {
-            return to_route('admin.themes.index')
-                ->with('error', trans('messages.status.error', [
-                    'error' => $t->getMessage(),
-                ]));
-        }
-
-        return to_route('admin.themes.index')
-            ->with('success', trans('admin.themes.installed'));
-    }
-
-    public function delete(string $theme)
-    {
-        if ($this->themes->currentTheme() === $theme) {
-            return to_route('admin.themes.index')
-                ->with('error', trans('admin.themes.delete_current'));
-        }
-
-        $this->themes->delete($theme);
-
-        return to_route('admin.themes.index')
-            ->with('success', trans('admin.themes.deleted'));
-    }
-
-    public function edit(Request $request, string $theme)
-    {
-        if ($request->isXmlHttpRequest()) {
-            return response()->json(theme_config());
-        }
-
-        $viewPath = $this->themes->path('config/config.blade.php', $theme);
-
-        if (! $this->files->exists($viewPath)) {
-            return to_route('admin.themes.index')
-                ->with('error', trans('admin.themes.no_config'));
-        }
-
-        return view()->file($viewPath, [
-            'theme' => $theme,
-            'images' => Image::all(),
+            'activeTheme' => $activeTheme,
         ]);
     }
 
     /**
-     * Update the theme settings.
-     *
-     * @throws \Illuminate\Validation\ValidationException
+     * Activate a theme.
      */
-    public function config(Request $request, string $theme)
+    public function activate(Request $request, string $themeId)
     {
-        $rulesPath = $this->themes->path('config/rules.php', $theme);
+        $request->validate([
+            'confirm' => 'required|accepted',
+        ]);
 
         try {
-            $config = $this->validate($request, $this->files->getRequire($rulesPath));
+            $result = $this->themeManager->activateTheme($themeId);
 
-            if ($request->has('append')) {
-                $currentConfig = $this->themes->readConfig($theme);
-                $config = static::appendConfig($currentConfig, $config);
+            if (!$result) {
+                return back()->with('error', 'Thème non trouvé ou incompatible.');
             }
 
-            $this->themes->updateConfig($theme, $config);
+            // Clear all caches
+            Artisan::call('cache:clear');
+            Artisan::call('config:clear');
+            Artisan::call('view:clear');
 
-            ActionLog::log('themes.configured', data: ['theme' => $theme]);
-
-            if ($request->isXmlHttpRequest()) {
-                return response()->json(['message' => 'admin.themes.config_updated']);
-            }
-
-            return to_route('admin.themes.config', $theme)
-                ->with('success', trans('admin.themes.config_updated'));
-        } catch (FileNotFoundException) {
-            return redirect()->back()->with('error', 'Invalid theme configuration.');
+            return back()->with('success', 'Thème activé avec succès !');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de l\'activation : ' . $e->getMessage());
         }
     }
 
-    public function changeTheme($theme = null)
+    /**
+     * Deactivate current theme.
+     */
+    public function deactivate()
     {
-        if ($theme !== null && $this->themes->findDescription($theme) === null) {
-            return to_route('admin.themes.index')
-                ->with('error', trans('admin.themes.invalid'));
-        }
+        $this->themeManager->deactivateTheme();
 
-        if ($theme !== null && $this->themes->isLegacy($theme)) {
-            return to_route('admin.themes.index')
-                ->with('error', trans('admin.themes.legacy', [
-                    'version' => ExilonCMS::apiVersion(),
-                ]));
-        }
+        // Clear caches
+        Artisan::call('cache:clear');
+        Artisan::call('config:clear');
+        Artisan::call('view:clear');
 
-        $this->themes->changeTheme($theme);
-
-        ActionLog::log('themes.changed', data: ['theme' => $theme ?? 'default']);
-
-        return to_route('admin.themes.index')
-            ->with('success', trans('admin.themes.updated'));
+        return back()->with('success', 'Thème désactivé. Retour au thème par défaut.');
     }
 
-    protected static function appendConfig(array $config, array $replacement)
+    /**
+     * Publish theme assets.
+     */
+    public function publishAssets(string $themeId)
     {
-        foreach ($replacement as $key => $value) {
-            $config[$key] = is_array($value)
-                ? static::appendConfig($config[$key], $value)
-                : $value;
-        }
+        try {
+            $result = $this->themeManager->publishAssets($themeId);
 
-        return $config;
+            if (!$result) {
+                return back()->with('error', 'Impossible de publier les assets du thème.');
+            }
+
+            return back()->with('success', 'Assets du thème publiés avec succès !');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Erreur lors de la publication : ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Preview a theme.
+     */
+    public function preview(Request $request, string $themeId)
+    {
+        // Store preview theme in session
+        $request->session()->put('preview_theme', $themeId);
+
+        return redirect()->route('home');
+    }
+
+    /**
+     * Exit preview mode.
+     */
+    public function exitPreview(Request $request)
+    {
+        $request->session()->forget('preview_theme');
+
+        return redirect()->route('admin.themes.index');
     }
 }

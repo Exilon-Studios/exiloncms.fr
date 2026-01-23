@@ -2,32 +2,82 @@
 
 namespace ExilonCMS\Extensions;
 
-use Illuminate\Translation\FileLoader;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Translation\FileLoader as LaravelFileLoader;
 
-class ExtensionFileLoader extends FileLoader
+/**
+ * Extended FileLoader for plugins and themes translations
+ */
+class ExtensionFileLoader extends LaravelFileLoader
 {
     /**
-     * Load a local namespaced translation group for overrides.
-     *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
+     * Create a new file loader instance.
      */
-    protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace): array
+    public function __construct(Filesystem $files, string $path)
     {
-        if ($namespace === 'theme') {
-            $namespace = themes()->currentTheme() ?? $namespace;
+        parent::__construct($files, $path);
+
+        // Add plugin and theme translation paths
+        $this->addExtensionPaths();
+    }
+
+    /**
+     * Add translation paths for extensions (plugins and themes).
+     */
+    protected function addExtensionPaths(): void
+    {
+        $hints = $this->hints;
+
+        // Add plugins translations
+        $pluginsPath = base_path('plugins');
+        if (is_dir($pluginsPath)) {
+            $plugins = glob($pluginsPath . '/*', GLOB_ONLYDIR);
+            foreach ($plugins as $pluginPath) {
+                $pluginName = basename($pluginPath);
+                $langPath = $pluginPath . '/resources/lang';
+
+                if (is_dir($langPath)) {
+                    $namespace = strtolower($pluginName);
+                    if (!isset($hints[$namespace])) {
+                        $hints[$namespace] = [];
+                    }
+                    $hints[$namespace][] = $langPath;
+                }
+            }
         }
 
-        return collect($this->paths)
-            ->reduce(function ($output, $path) use ($lines, $locale, $group, $namespace) {
-                $file = "{$path}/{$locale}/extensions/{$namespace}/{$group}.php";
+        // Add themes translations
+        $themesPath = base_path('themes');
+        if (is_dir($themesPath)) {
+            $themes = glob($themesPath . '/*', GLOB_ONLYDIR);
+            foreach ($themes as $themePath) {
+                $themeName = basename($themePath);
+                $langPath = $themePath . '/resources/lang';
 
-                if ($this->files->exists($file)) {
-                    $lines = array_replace_recursive($lines, $this->files->getRequire($file));
+                if (is_dir($langPath)) {
+                    $namespace = strtolower($themeName);
+                    if (!isset($hints[$namespace])) {
+                        $hints[$namespace] = [];
+                    }
+                    $hints[$namespace][] = $langPath;
                 }
+            }
+        }
 
-                return $lines;
-            }, parent::loadNamespaceOverrides($lines, $locale, $group, $namespace));
+        // Update hints
+        $this->hints = $hints;
+    }
+
+    /**
+     * Load a locale from a given path.
+     *
+     * @param  string  $path
+     * @param  string  $locale
+     * @param  string  $group
+     * @return array
+     */
+    protected function loadPath(string $path, string $locale, string $group): array
+    {
+        return $this->loadNamespaces([$path], $locale, $group);
     }
 }

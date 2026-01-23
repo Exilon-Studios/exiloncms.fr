@@ -30,7 +30,8 @@ class AdminController extends Controller
     public function index(Request $request)
     {
         $updates = $this->app->make(UpdateManager::class);
-        $newVersion = $updates->hasUpdate() ? $updates->getLastVersion() : null;
+        $updateList = $updates->getUpdates();
+        $newVersion = $updates->hasUpdates() ? $updateList[0] ?? null : null;
         $userCount = User::whereNull('deleted_at')->count();
 
         return inertia('Admin/Dashboard', [
@@ -47,7 +48,7 @@ class AdminController extends Controller
             ],
             'activeUsers' => $this->getActiveUsers($userCount),
             'newVersion' => $newVersion,
-            'apiAlerts' => $updates->getApiAlerts(),
+            'updatesCount' => $updates->getUpdatesCount(),
         ]);
     }
 

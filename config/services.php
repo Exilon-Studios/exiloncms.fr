@@ -53,4 +53,9 @@ return [
         'redirect' => '/user/login/callback',
     ],
 
+    'marketplace' => [
+        'url' => env('MARKETPLACE_URL', 'https://marketplace.exiloncms.fr'),
+        'sso_secret' => env('MARKETPLACE_SSO_SECRET'),
+    ],
+
 ];

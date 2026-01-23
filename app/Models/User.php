@@ -47,6 +47,14 @@ use Illuminate\Support\Str;
  * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Notification[] $unreadNotifications
  * @property \ExilonCMS\Models\Role $role
  * @property \ExilonCMS\Models\Ban|null $ban
+ * @property bool $is_seller
+ * @property \Carbon\Carbon|null $seller_verified_at
+ * @property int|null $seller_verified_by
+ * @property string|null $stripe_account_id
+ * @property string|null $paypal_email
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\Resource[] $resources
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\ResourcePurchase[] $purchases
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Models\ResourceReview[] $reviews
  */
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -73,6 +81,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name', 'email', 'password', 'money', 'role_id', 'game_id', 'avatar',
         'access_token', 'two_factor_secret', 'password_changed_at',
+        'is_seller', 'seller_verified_at', 'seller_verified_by',
+        'stripe_account_id', 'paypal_email',
     ];
 
     /**
@@ -97,6 +107,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_login_at' => 'datetime',
         'password_changed_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'is_seller' => 'boolean',
+        'seller_verified_at' => 'datetime',
     ];
 
     /**
@@ -198,6 +210,38 @@ class User extends Authenticatable implements MustVerifyEmail
     public function discordAccount()
     {
         return $this->hasOne(DiscordAccount::class);
+    }
+
+    /**
+     * Get the user's resources.
+     */
+    public function resources()
+    {
+        return $this->hasMany(Resource::class, 'author_id');
+    }
+
+    /**
+     * Get the user's resource purchases.
+     */
+    public function purchases()
+    {
+        return $this->hasMany(ResourcePurchase::class, 'buyer_id');
+    }
+
+    /**
+     * Get the user's resource reviews.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(ResourceReview::class);
+    }
+
+    /**
+     * Get the user's seller verifier.
+     */
+    public function sellerVerifier()
+    {
+        return $this->belongsTo(User::class, 'seller_verified_by');
     }
 
     /**
@@ -314,5 +358,91 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmailNotification());
+    }
+
+    /**
+     * Check if the user is a seller.
+     */
+    public function isSeller(): bool
+    {
+        return $this->is_seller;
+    }
+
+    /**
+     * Check if the user is a verified seller.
+     */
+    public function isSellerVerified(): bool
+    {
+        return $this->is_seller && $this->seller_verified_at !== null;
+    }
+
+    /**
+     * Check if the user's seller account is pending verification.
+     */
+    public function isSellerPending(): bool
+    {
+        return $this->is_seller && $this->seller_verified_at === null;
+    }
+
+    /**
+     * Mark the user as a seller.
+     */
+    public function markAsSeller(): void
+    {
+        $this->update(['is_seller' => true]);
+    }
+
+    /**
+     * Verify the user as a seller.
+     */
+    public function verifySeller(int $adminId): void
+    {
+        $this->update([
+            'seller_verified_at' => now(),
+            'seller_verified_by' => $adminId,
+        ]);
+    }
+
+    /**
+     * Revoke seller verification from the user.
+     */
+    public function revokeSellerVerification(): void
+    {
+        $this->update([
+            'seller_verified_at' => null,
+            'seller_verified_by' => null,
+        ]);
+    }
+
+    /**
+     * Remove seller status from the user.
+     */
+    public function removeSellerStatus(): void
+    {
+        $this->update([
+            'is_seller' => false,
+            'seller_verified_at' => null,
+            'seller_verified_by' => null,
+        ]);
+    }
+
+    /**
+     * Get the user's total earnings from resource sales.
+     */
+    public function getTotalEarningsAttribute(): float
+    {
+        return ResourcePurchase::whereHas('resource', function ($query) {
+            $query->where('author_id', $this->id);
+        })->completed()->sum('amount');
+    }
+
+    /**
+     * Get the user's total sales count.
+     */
+    public function getTotalSalesCountAttribute(): int
+    {
+        return ResourcePurchase::whereHas('resource', function ($query) {
+            $query->where('author_id', $this->id);
+        })->completed()->count();
     }
 }

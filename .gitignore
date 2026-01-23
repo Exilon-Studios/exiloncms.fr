@@ -23,6 +23,10 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 
+# Site-specific (keep private - only for exiloncms.fr)
+/themes/
+/plugins/
+
 # Internal docs (keep private)
 /docs/
 C:Users*

@@ -2,7 +2,6 @@
 
 namespace ExilonCMS\Http\Controllers;
 
-use ExilonCMS\Extensions\Widget\WidgetManager;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
@@ -12,16 +11,9 @@ class DashboardController extends Controller
     /**
      * Display the user dashboard.
      */
-    public function index(Request $request, WidgetManager $widgetManager): Response
+    public function index(Request $request): Response
     {
         $user = $request->user();
-
-        $allWidgets = $widgetManager->getWidgetsFromPlugins($user);
-
-        // Separate sidebar widgets from regular cards
-        $sidebarWidgets = $allWidgets->filter(fn ($widget) => ($widget['type'] ?? 'widget') === 'sidebar')->values();
-        $dashboardCards = $allWidgets->filter(fn ($widget) => ($widget['type'] ?? 'widget') === 'card')->values();
-        $dashboardWidgets = $allWidgets->filter(fn ($widget) => ($widget['type'] ?? 'widget') === 'widget')->values();
 
         return Inertia::render('Dashboard/Index', [
             'user' => [
@@ -39,12 +31,9 @@ class DashboardController extends Controller
             'settings' => [
                 'money' => setting('money', 'Points'),
             ],
-            // Get dashboard cards from plugins
-            'dashboardCards' => $dashboardCards,
-            // Get dashboard widgets from plugins
-            'dashboardWidgets' => $dashboardWidgets,
-            // Get sidebar widgets (e.g., shop card with recent orders)
-            'dashboardSidebarWidgets' => $sidebarWidgets,
+            'dashboardCards' => [],
+            'dashboardWidgets' => [],
+            'dashboardSidebarWidgets' => [],
         ]);
     }
 }

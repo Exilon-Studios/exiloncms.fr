@@ -2,354 +2,204 @@
 
 namespace ExilonCMS\Extensions\Theme;
 
-use ExilonCMS\Extensions\ExtensionManager;
-use ExilonCMS\Extensions\UpdateManager;
-use ExilonCMS\Models\Setting;
-use ExilonCMS\Support\Files;
-use ExilonCMS\Support\Optimizer;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
-use RuntimeException;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Collection;
 
-class ThemeManager extends ExtensionManager
+class ThemeManager
 {
     /**
-     * The current theme if set.
+     * Get all available themes.
      */
-    protected ?string $currentTheme = null;
-
-    /**
-     * The themes' directory.
-     */
-    protected string $themesPath;
-
-    /**
-     * The themes public directory for assets.
-     */
-    protected string $themesPublicPath;
-
-    /**
-     * Create a new ThemeManager instance.
-     */
-    public function __construct(Filesystem $files)
+    public function getAllThemes(): Collection
     {
-        parent::__construct($files);
+        $themes = collect();
+        $themePath = base_path('themes');
 
-        $this->themesPath = resource_path('themes/');
-        $this->themesPublicPath = public_path('assets/themes/');
-    }
-
-    /**
-     * Load and enable the given theme.
-     */
-    public function loadTheme(string $theme): void
-    {
-        $config = config();
-        $finder = view()->getFinder();
-
-        if ($this->currentTheme !== null) {
-            $paths = $finder->getPaths();
-            $old = $this->path('views');
-            $finder->setPaths(array_filter($paths, fn (string $path) => $path !== $old));
-
-            $paths = $config->get('view.paths');
-            $paths = array_filter($paths, fn (string $path) => $path !== $old);
-            $config->set('view.paths', array_values($paths));
+        if (!File::exists($themePath)) {
+            return $themes;
         }
 
-        $this->currentTheme = $theme;
-        $viewPath = $this->path('views');
+        $directories = File::directories($themePath);
 
-        // Add theme path to view finder
-        $finder->prependLocation($viewPath);
-        $config->prepend('view.paths', $viewPath);
+        foreach ($directories as $directory) {
+            $themeName = basename($directory);
+            $themeJson = $directory . '/theme.json';
 
-        $this->loadConfig($theme);
+            if (File::exists($themeJson)) {
+                $config = json_decode(File::get($themeJson), true);
 
-        if (is_dir($themeLangPath = $this->path('lang'))) {
-            trans()->addNamespace('theme', $themeLangPath);
-        }
-    }
-
-    public function changeTheme(?string $theme): void
-    {
-        Setting::updateSettings('theme', $theme);
-
-        if ($theme !== null) {
-            $this->createAssetsLink($theme);
-        }
-    }
-
-    public function updateConfig(string $theme, array $config): void
-    {
-        $json = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-        $this->files->put($this->path('config.json', $theme), $json);
-
-        Setting::updateSettings('themes.config.'.$theme, $config);
-    }
-
-    /**
-     * Get the path of the specified theme.
-     * If no theme is specified the current theme is used.
-     * When no theme is specified and there is no theme enabled, this
-     * will return null.
-     */
-    public function path(string $path = '', ?string $theme = null): ?string
-    {
-        if ($theme === null) {
-            if (! $this->hasTheme()) {
-                return null;
+                $themes->push([
+                    'id' => $themeName,
+                    'name' => $config['name'] ?? $themeName,
+                    'description' => $config['description'] ?? '',
+                    'version' => $config['version'] ?? '1.0.0',
+                    'author' => $config['author'] ?? '',
+                    'url' => $config['url'] ?? '',
+                    'screenshot' => $config['screenshot'] ?? null,
+                    'requires' => $config['requires'] ?? [],
+                    'supports' => $config['supports'] ?? [],
+                    'path' => $directory,
+                    'active' => $this->isActive($themeName),
+                ]);
             }
-
-            $theme = $this->currentTheme;
         }
 
-        return $this->themesPath("{$theme}/{$path}");
+        return $themes;
     }
 
     /**
-     * Get the public path of the specified theme.
+     * Get the active theme.
      */
-    public function publicPath(string $path = '', ?string $theme = null): ?string
+    public function getActiveTheme(): ?array
     {
-        if ($theme === null) {
-            if (! $this->hasTheme()) {
-                return null;
-            }
+        $activeThemeId = Cache::get('active_theme', 'default');
 
-            $theme = $this->currentTheme;
+        if ($activeThemeId === 'default') {
+            return [
+                'id' => 'default',
+                'name' => 'Default',
+                'description' => 'Theme par défaut d\'ExilonCMS',
+                'version' => app()->version(),
+                'active' => true,
+            ];
         }
 
-        return $this->themesPublicPath("{$theme}/{$path}");
+        return $this->getAllThemes()->firstWhere('id', $activeThemeId);
     }
 
     /**
-     * Get the themes path which contains the installed themes.
+     * Check if a theme is active.
      */
-    public function themesPath(string $path = ''): string
+    public function isActive(string $themeId): bool
     {
-        return $this->themesPath.$path;
+        return Cache::get('active_theme', 'default') === $themeId;
     }
 
     /**
-     * Get the themes public path which contains the assets of the installed themes.
+     * Activate a theme.
      */
-    public function themesPublicPath(string $path = ''): string
+    public function activateTheme(string $themeId): bool
     {
-        return $this->themesPublicPath.$path;
-    }
+        $theme = $this->getAllThemes()->firstWhere('id', $themeId);
 
-    /**
-     * Get an array containing the descriptions of the installed themes.
-     */
-    public function findThemesDescriptions(): Collection
-    {
-        // Ensure themes directory exists
-        if (!$this->files->exists($this->themesPath)) {
-            $this->files->makeDirectory($this->themesPath, 0755, true);
+        if (!$theme) {
+            return false;
         }
 
-        $directories = $this->files->exists($this->themesPath)
-            ? $this->files->directories($this->themesPath)
-            : [];
-
-        $themes = [];
-        $currentTheme = setting('theme');
-
-        // Get marketplace themes to add apiId
-        // Force refresh to get latest data
-        $marketplaceThemes = app(UpdateManager::class)->getThemes(true);
-
-        foreach ($directories as $dir) {
-            try {
-                $description = $this->getJson($dir.'/theme.json');
-
-                if ($description) {
-                    $themeId = $this->files->basename($dir);
-                    // Add enabled state to the description
-                    $description->enabled = ($themeId === $currentTheme);
-
-                    // Add apiId from marketplace data
-                    $marketplaceTheme = collect($marketplaceThemes)->firstWhere('extension_id', $themeId);
-                    $description->apiId = $marketplaceTheme['id'] ?? null;
-
-                    $themes[$themeId] = $description;
+        // Check requirements
+        if (!empty($theme['requires'])) {
+            foreach ($theme['requires'] as $package => $constraint) {
+                if (!class_exists($package)) {
+                    throw new \Exception("Theme requires {$package} but it's not installed.");
                 }
-            } catch (Throwable $e) {
-                // Skip invalid themes
-                continue;
             }
         }
 
-        return collect($themes);
+        // Store theme service provider
+        $provider = "Themes\\{$themeId}\\{$themeId}ServiceProvider";
+
+        // Store in config
+        Cache::forever('active_theme', $themeId);
+        Cache::forever('active_theme_provider', $provider);
+
+        // Clear cache
+        Cache::forget('theme.config');
+
+        return true;
     }
 
     /**
-     * Get the description of the given theme.
+     * Deactivate current theme (return to default).
      */
-    public function findDescription(string $theme): ?object
+    public function deactivateTheme(): void
     {
-        $path = $this->path('theme.json', $theme);
+        Cache::forever('active_theme', 'default');
+        Cache::forget('active_theme_provider');
+        Cache::forget('theme.config');
+    }
 
-        $json = $this->getJson($path);
+    /**
+     * Get theme URL.
+     */
+    public function getThemeUrl(string $themeId, string $path = ''): string
+    {
+        return asset("themes/{$themeId}/" . ltrim($path, '/'));
+    }
 
-        if ($json === null) {
-            return null;
+    /**
+     * Get theme asset path.
+     */
+    public function getThemeAsset(string $themeId, string $asset): string
+    {
+        $path = base_path("themes/{$themeId}/resources/{$asset}");
+
+        if (File::exists($path)) {
+            return $this->getThemeUrl($themeId, $asset);
         }
 
-        // The theme folder must be the theme id
-        return $theme === $json->id ? $json : null;
-    }
-
-    /**
-     * Get an array containing the installed themes names.
-     *
-     * @return string[]
-     */
-    public function findThemes(): array
-    {
-        $paths = $this->files->directories($this->themesPath);
-
-        return array_map(fn ($dir) => $this->files->basename($dir), $paths);
-    }
-
-    /**
-     * Delete the given theme.
-     */
-    public function delete(string $theme): void
-    {
-        if ($this->findDescription($theme) === null) {
-            return;
+        // Fallback to public assets if published
+        $publicPath = public_path("themes/{$themeId}/{$asset}");
+        if (File::exists($publicPath)) {
+            return asset("themes/{$themeId}/{$asset}");
         }
 
-        Setting::updateSettings('themes.config.'.$theme, null);
-
-        $this->files->deleteDirectory($this->publicPath('', $theme));
-
-        $this->files->deleteDirectory($this->path('', $theme));
-
-        Cache::forget('updates_counts');
+        return '';
     }
 
     /**
-     * Get the current theme, or null if none is active.
+     * Publish theme assets.
      */
-    public function currentTheme(): ?string
+    public function publishAssets(string $themeId): bool
     {
-        return $this->currentTheme;
+        $themePath = base_path("themes/{$themeId}/resources");
+        $publicPath = public_path("themes/{$themeId}");
+
+        if (!File::exists($themePath)) {
+            return false;
+        }
+
+        // Create public directory if it doesn't exist
+        if (!File::exists($publicPath)) {
+            File::makeDirectory($publicPath, 0755, true);
+        }
+
+        // Copy CSS
+        if (File::exists("{$themePath}/css")) {
+            File::copyDirectory("{$themePath}/css", "{$publicPath}/css");
+        }
+
+        // Copy JS
+        if (File::exists("{$themePath}/js")) {
+            File::copyDirectory("{$themePath}/js", "{$publicPath}/js");
+        }
+
+        // Copy images
+        if (File::exists("{$themePath}/images")) {
+            File::copyDirectory("{$themePath}/images", "{$publicPath}/images");
+        }
+
+        return true;
     }
 
     /**
-     * Get if there is any active theme enabled.
+     * Register theme service provider.
      */
-    public function hasTheme(): bool
+    public function registerThemeProviders(): void
     {
-        return $this->currentTheme !== null;
-    }
+        $activeTheme = $this->getActiveTheme();
 
-    public function getOnlineThemes(bool $force = false): Collection
-    {
-        $themes = app(UpdateManager::class)->getThemes($force);
+        if ($activeTheme && $activeTheme['id'] !== 'default') {
+            $provider = $activeTheme['path'] . '/src/' . $activeTheme['id'] . 'ServiceProvider.php';
 
-        $installedThemeIds = $this->findThemesDescriptions()
-            ->map(fn ($theme) => $theme->id);
+            if (File::exists($provider)) {
+                // Register the theme service provider
+                $providerClass = "Themes\\{$activeTheme['id']}\\{$activeTheme['id']}ServiceProvider";
 
-        return collect($themes)->filter(function ($theme) use ($installedThemeIds) {
-            return ! $installedThemeIds->contains($theme['extension_id']);
-        });
-    }
-
-    public function getThemesToUpdate(bool $force = false): Collection
-    {
-        $themes = app(UpdateManager::class)->getThemes($force);
-
-        return $this->findThemesDescriptions()->filter(function ($theme) use ($themes) {
-            $id = $theme->apiId ?? 0;
-
-            if ($id === 0) {
-                return false;
+                if (class_exists($providerClass)) {
+                    app()->register($providerClass);
+                }
             }
-
-            // Find the marketplace theme by ID
-            $marketplaceTheme = collect($themes)->firstWhere('id', $id);
-
-            if (! $marketplaceTheme) {
-                return false;
-            }
-
-            return version_compare($marketplaceTheme['version'], $theme->version, '>');
-        });
-    }
-
-    public function isLegacy(string $theme): bool
-    {
-        $description = $this->findDescription($theme);
-        $apiVersion = $description->mccms_api ?? $description->azuriom_api ?? null;
-
-        return ! ExtensionManager::isApiSupported($apiVersion);
-    }
-
-    public function install($themeId): void
-    {
-        $updateManager = app(UpdateManager::class);
-
-        $themes = $updateManager->getThemes(true);
-
-        // Find theme by extension_id
-        $themeInfo = collect($themes)->firstWhere('extension_id', $themeId);
-
-        if (! $themeInfo) {
-            throw new RuntimeException('Cannot find theme with id '.$themeId);
-        }
-
-        $theme = $themeInfo['extension_id'];
-
-        $themeDir = $this->path('', $theme);
-
-        if (! $this->files->isDirectory($themeDir)) {
-            $this->files->makeDirectory($themeDir);
-        }
-
-        $updateManager->download($themeInfo, 'themes/');
-        $updateManager->extract($themeInfo, $themeDir, 'themes/');
-
-        app(Optimizer::class)->clearViewCache();
-
-        $this->createAssetsLink($theme);
-    }
-
-    public function readConfig(string $theme): ?array
-    {
-        return $this->getJson($this->path('config.json', $theme), true);
-    }
-
-    protected function loadConfig(string $theme): void
-    {
-        $config = setting('themes.config.'.$theme);
-
-        if ($config === null) {
-            $config = $this->readConfig($theme);
-
-            Setting::updateSettings('themes.config.'.$theme, $config);
-        }
-
-        if ($config !== null) {
-            config()?->set('theme', $config);
-        }
-    }
-
-    protected function createAssetsLink(string $theme): void
-    {
-        if ($this->files->exists($this->publicPath('', $theme))) {
-            return;
-        }
-
-        $themeAssetsPath = $this->path('assets', $theme);
-
-        if ($this->files->exists($themeAssetsPath)) {
-            Files::relativeLink($themeAssetsPath, $this->themesPublicPath($theme));
         }
     }
 }

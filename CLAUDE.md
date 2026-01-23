@@ -16,11 +16,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Namespace:** `ExilonCMS\` (not `App\`)
 
 **High-Level Architecture:**
-- **Monorepo-style structure** with plugins and themes as self-contained modules
 - **Inertia.js** as the bridge between Laravel backend and React frontend (no API routes)
 - **Puck Editor** for visual page building with reusable React components
 - **Role-based permissions** with gates and policies for authorization
 - **Game integration** layer supporting Minecraft (Java/Bedrock), FiveM, and Steam games
+- **Marketplace integration** with marketplace.exiloncms.fr for packages and extensions
 
 ## Development Commands
 
@@ -59,21 +59,8 @@ php artisan serve --port=8000
 npm run dev
 ```
 
-### Plugin & Theme Commands
+### Game Integration Commands
 ```bash
-# Create a new plugin (with interactive options)
-php artisan plugin:create MyPlugin
-
-# Enable/disable plugins
-php artisan plugin:enable MyPlugin
-php artisan plugin:disable MyPlugin
-
-# Clear plugin cache
-php artisan plugin:clear
-
-# Create a new theme
-php artisan theme:create MyTheme
-
 # Create a new game integration
 php artisan game:create MyGame
 ```
@@ -151,6 +138,52 @@ docker exec -it exiloncms_db psql -U exiloncms -d exiloncms
 npm run build
 ```
 
+### ExilonCMS CLI (Project Scaffolding)
+
+The project includes an npm CLI tool for creating new ExilonCMS projects:
+
+```bash
+# Install globally via npm
+npm install -g exiloncms
+
+# Create a new project (interactive wizard)
+exiloncms new my-site
+
+# Development mode (from source)
+cd /path/to/ExilonCMS
+npm link
+exiloncms new my-site
+
+# Direct PHP (no npm needed)
+php bin/exiloncms new my-site
+```
+
+The CLI wizard guides through:
+- Site configuration (name, URL, language, timezone)
+- Database setup (PostgreSQL, MySQL, SQLite)
+- Admin account creation
+- Marketplace integration for packages
+- Docker configuration (optional)
+
+### Docker Setup
+
+```bash
+# Start PostgreSQL and pgAdmin
+docker-compose up -d
+
+# Container details:
+# - PostgreSQL: localhost:5432
+#   - Database: mccms_v2
+#   - User: mccms
+#   - Password: mccms_secret
+# - pgAdmin: http://localhost:5050
+#   - Email: admin@mccms.local
+#   - Password: admin
+
+# Connect to PostgreSQL directly
+docker exec -it mccms_v2_db psql -U mccms -d mccms_v2
+```
+
 ## Architecture & Key Concepts
 
 ### 1. Inertia.js Integration
@@ -199,22 +232,17 @@ Global props are shared via `app/Http/Middleware/HandleInertiaRequests.php`:
 - `settings.name`, `settings.description`, `settings.locale`, `settings.background`, `settings.favicon`
 - `settings.darkTheme`: Dark theme enabled flag
 - `settings.navbar`: Navbar configuration (links_position, links_spacing, style, background)
+- `settings.marketplaceUrl`: URL to marketplace.exiloncms.fr
 
 **Navigation:**
 - `navbar`: Array of NavbarElement objects (dynamic navbar from database)
 - `socialLinks`: Array of social media links
 
 **Translations:**
-- `trans`: Pre-loaded translation keys (auth, messages, admin, pages, puck, dashboard, shop)
-
-**Plugin Data:**
-- `enabledPlugins`: List of enabled plugins with metadata
-- `pluginAdminNavItems`: Admin navigation from plugins
-- `pluginUserNavItems`: User navigation from plugins
-- `cartCount`: Shop cart item count (if shop plugin enabled)
+- `trans`: Pre-loaded translation keys (auth, messages, admin, pages, puck, dashboard, marketplace)
 
 **Updates:**
-- `updatesCount`: Count of available CMS/plugin/theme updates (admin only)
+- `updatesCount`: Count of available CMS updates (admin only)
 
 Access in React:
 ```tsx
@@ -224,186 +252,70 @@ import { PageProps } from '@/types';
 const { auth, flash, settings, navbar, trans } = usePage<PageProps>().props;
 ```
 
-### 3. Plugin System
+### 3. Marketplace Integration
 
-Plugins live in `plugins/{plugin-name}/` directory.
+ExilonCMS integrates with **marketplace.exiloncms.fr** for packages and extensions.
 
-**Structure:**
-```
-plugins/shop/
-├── plugin.json              # Metadata & dependencies
-├── composer.json            # PSR-4 autoloading
-├── navigation.json          # Navigation items for admin/user menus
-├── src/
-│   ├── Http/Controllers/
-│   ├── Models/
-│   └── Providers/
-│       └── ShopServiceProvider.php
-├── resources/
-│   ├── js/
-│   │   └── pages/           # React pages for plugin
-│   │       └── Index.tsx
-│   └── lang/                # Translations (use namespace: plugin-id::file.key)
-│       └── fr/
-│           ├── nav.php
-│           └── messages.php
-├── database/
-│   └── migrations/
-├── Widgets/                 # Optional dashboard widgets
-└── routes/
-    ├── web.php              # Public and authenticated user routes
-    └── admin.php            # Admin panel routes (optional, can use web.php)
-```
+**Marketplace API:**
+- Base URL: Available via `settings.marketplaceUrl` (defaults to `https://marketplace.exiloncms.fr`)
+- Authentication: API tokens for secure package downloads
+- RBAC: Role-based access control for creators and users
 
-**plugin.json format:**
-```json
-{
-  "id": "shop",
-  "name": "Shop",
-  "description": "Plugin description",
-  "version": "1.0.0",
-  "author": "AuthorName",
-  "url": "https://github.com/repo",
-  "mccms_api": "0.2",
-  "providers": [
-    "ExilonCMS\\Plugins\\Shop\\Providers\\ShopServiceProvider"
-  ],
-  "requirements": {
-    "php": ">=8.2",
-    "laravel": ">=12"
-  }
-}
-```
+**Marketplace features:**
+- Browse and install packages from marketplace
+- Automatic updates for installed packages
+- Version compatibility checking
+- Secure package downloads
 
-**navigation.json format:**
-```json
-{
-  "admin": [
-    {
-      "label": "Shop",
-      "href": "/admin/shop",
-      "permission": "admin.shop",
-      "icon": "shopping-bag"
-    }
-  ],
-  "user": [
-    {
-      "label": "Shop",
-      "href": "/shop",
-      "icon": "shopping-bag"
-    }
-  ]
-}
-```
-
-**Available icon names** (Lucide/Tabler icons):
-- `shopping-bag`, `package`, `file-text`, `puzzle`, `settings`, `users`
-- `shield`, `ban`, `file`, `photo`, `arrows-right-left`, `palette`, `download`
-- `list`, `language`, `home`, `server`, `credit-card`, `wallet`
-- See `resources/js/components/admin/Sidebar.tsx` for icon mapping component
-
-**Plugin Service Provider:**
+**Configuration:**
 ```php
-namespace ExilonCMS\Plugins\Shop\Providers;
-
-use ExilonCMS\Extensions\Plugin\BasePluginServiceProvider;
-
-class ShopServiceProvider extends BasePluginServiceProvider
-{
-    public function boot()
-    {
-        $this->loadTranslations();
-        $this->loadRoutes();
-        $this->loadMigrations();
-    }
-}
+// config/services.php
+'marketplace' => [
+    'url' => env('MARKETPLACE_URL', 'https://marketplace.exiloncms.fr'),
+    'api_key' => env('MARKETPLACE_API_KEY'),
+],
 ```
 
-**Available BasePluginServiceProvider methods:**
-- `loadTranslations()` - Load translations from `resources/lang/`
-- `loadViews()` - Load Blade views from `resources/views/`
-- `loadMigrations()` - Load migrations from `database/migrations/`
-- `loadRoutes()` - Load routes from `routes/web.php`
-- `registerAdminRoutes(Closure $callback)` - Register admin routes (`/admin/*`)
-- `registerUserRoutes(Closure $callback)` - Register authenticated user routes
-
-Plugins are loaded via `app/Providers/ExtensionServiceProvider.php` and managed by `PluginManager` in `app/Extensions/Plugin/PluginManager.php`.
-
-**Plugin translations namespace:** Use `plugin-id::file.key` format (e.g., `trans('shop::nav.shop')`). Load in HandleInertiaRequests to make available in React.
-
-### 4. Theme System
-
-Themes live in `themes/{theme-name}/` directory. Themes can extend layouts and customize views. Managed by `ThemeManager` in `app/Extensions/Theme/`.
-
-### 5. Widget System
-
-Plugins can provide dashboard widgets that appear in the user dashboard. Widgets are placed in `plugins/{plugin}/Widgets/` directory.
-
-**Widget example:**
-```php
-<?php
-
-namespace ExilonCMS\Plugins\Shop\Widgets;
-
-use ExilonCMS\Extensions\Widget\BaseWidget;
-use ExilonCMS\Models\User;
-
-class ShopWidget extends BaseWidget
-{
-    public function id(): string
-    {
-        return 'shop-widget';
-    }
-
-    public function title(): string
-    {
-        return __('shop::widget.title');
-    }
-
-    public function type(): string
-    {
-        // Types: 'card', 'sidebar', 'widget'
-        return 'sidebar';
-    }
-
-    public function icon(): ?string
-    {
-        return 'shopping-bag';
-    }
-
-    public function link(): ?string
-    {
-        return '/shop';
-    }
-
-    public function props(?User $user): array
-    {
-        return [
-            'items' => [], // Widget data
-        ];
-    }
-}
+**Accessing marketplace URL in React:**
+```tsx
+const { settings } = usePage<PageProps>().props;
+const marketplaceUrl = settings.marketplaceUrl;
 ```
 
-Widget types:
-- `card`: Large card in main dashboard area
-- `sidebar`: Sidebar widget
-- `widget`: Generic widget type
+### 4. Game Integration
 
-### 6. Game Integration
-
-ExilonCMS supports multiple game servers:
-- Minecraft (Java & Bedrock editions)
-- FiveM
-- Steam games (Rust, etc.)
+ExilonCMS supports multiple game servers through a unified game integration system:
+- **Minecraft** (Java & Bedrock editions, Online/Offline modes)
+- **FiveM** (GTA V multiplayer)
+- **Steam games** (Rust, and other Steam-based games)
 
 **Game implementations:**
-- `app/Games/Game.php` - Base game abstract class
-- `app/Games/Minecraft/` - Minecraft-specific implementations (Online, Offline, Bedrock)
-- `app/Games/Steam/` - Steam-based games
-- `app/Games/FiveMGame.php` - FiveM game implementation
+- `app/Games/Game.php` - Base game abstract class with common interface
+- `app/Games/Minecraft/` - Minecraft-specific implementations:
+  - `MinecraftOnlineGame` - Online mode (Mojang auth)
+  - `MinecraftOfflineGame` - Offline mode (no auth)
+  - `MinecraftBedrockGame` - Bedrock edition
+  - `Servers/` - Server bridges (Ping, RCON, AzLink, Bedrock protocols)
+- `app/Games/Steam/` - Steam-based games:
+  - `SteamGame` - Base Steam game
+  - `RustGame` - Rust-specific implementation
+  - `FiveMGame.php` - FiveM implementation
+  - `Servers/` - Server bridges (Query, RCON, FiveM status, AzLink)
+- `app/Games/ServerBridge.php` - Abstract server bridge class
+- `app/Games/UserAttribute.php` - User attribute mapping
 
-**Server bridges:** Handle server communication (RCON, Query, Ping, AzLink) via `ServerBridge` abstract class in `app/Games/ServerBridge.php`.
+**Server communication methods:**
+- **Ping** - Basic server status query (port-based)
+- **Query** - Detailed server information (player list, etc.)
+- **RCON** - Remote console command execution
+- **AzLink** - Third-party bridge for advanced features
+
+**Creating a custom game:**
+```bash
+php artisan game:create MyGame
+```
+
+This generates a basic game class that extends `Game` and implements required methods for server communication, user authentication, and attribute mapping.
 
 ### 7. Roles & Permissions
 
@@ -440,7 +352,6 @@ const { auth } = usePage<PageProps>().props;
 - `app/Http/Controllers/` - Controllers (use Inertia)
 - `app/Http/Middleware/` - Middleware (HandleInertiaRequests is critical)
 - `app/Providers/` - Service providers
-- `app/Extensions/` - Plugin/Theme systems
 - `app/Games/` - Game server integrations
 - `app/Policies/` - Authorization policies
 - `app/helpers.php`, `app/color_helpers.php` - Helper functions
@@ -478,7 +389,6 @@ import { PageProps } from '@/types';
 // @/types/*          → resources/js/types/*
 // @/lib/*            → resources/js/lib/*
 // @/hooks/*          → resources/js/hooks/*
-// @/plugins/*        → plugins/*
 ```
 
 ### 10. Database & Models
@@ -526,10 +436,6 @@ favicon() // Get favicon URL
 
 // Theme
 dark_theme() // Check if dark theme is enabled
-
-// Plugins/Themes
-plugin_path(string $plugin, string $path = '') // Get plugin path
-theme_path(string $theme, string $path = '') // Get theme path
 ```
 
 Available globally via `app/color_helpers.php`:
@@ -584,7 +490,7 @@ export const puckConfig: Config = {
 };
 ```
 
-**Available components:** HeadingBlock, ParagraphBlock, ButtonBlock, ImageBlock, CardBlock, GridBlock.
+**Available components:** HeadingBlock, ParagraphBlock, ButtonBlock, ImageBlock, HeroBlock, NavbarBlock, FooterBlock, ContainerBlock, SpacerBlock, ThemeSettingsBlock, BlogBlock, HowItWorksBlock.
 
 ### 14. Frontend Libraries
 
@@ -612,52 +518,6 @@ The project uses several key React libraries:
 - `@measured/puck` - Drag-and-drop page builder
 - `@tanstack/react-table` - Table components
 
-## Plugin Creation Workflow
-
-When creating a plugin, follow these steps:
-
-1. **Create plugin structure:**
-   ```bash
-   php artisan plugin:create MyPlugin --author="YourName" --description="Description"
-   ```
-
-2. **Edit generated files:**
-   - `plugins/my-plugin/plugin.json` - Update metadata
-   - `plugins/my-plugin/composer.json` - PSR-4 autoloading
-   - `plugins/my-plugin/navigation.json` - Add navigation items
-
-3. **Create functionality:**
-   - Add controllers in `src/Http/Controllers/`
-   - Add routes in `routes/web.php`
-   - Add React pages in `resources/js/pages/`
-   - Add translations in `resources/lang/fr/`
-
-4. **Register in ServiceProvider:**
-   ```php
-   public function boot(): void
-   {
-       $this->loadTranslations();
-       $this->loadRoutes();
-       $this->loadMigrations();
-   }
-   ```
-
-5. **Enable plugin:**
-   ```bash
-   composer dump-autoload
-   php artisan plugin:enable MyPlugin
-   php artisan migrate  # If plugin has migrations
-   php artisan optimize:clear
-   ```
-
-6. **Add translations to HandleInertiaRequests** (if needed):
-   ```php
-   'trans' => [
-       // ...
-       'my-plugin::nav' => trans('my-plugin::nav'),
-   ],
-   ```
-
 ## Important Notes
 
 1. **Never create Blade views** - Use React + Inertia only (except root `app.blade.php`)
@@ -665,11 +525,11 @@ When creating a plugin, follow these steps:
 3. **TypeScript is strict** - Handle all edge cases, nullable types
 4. **Namespace is ExilonCMS\\** - Not App\\
 5. **Database agnostic** - Migrations must work on PostgreSQL and MySQL
-6. **Plugins are modular** - Each plugin is self-contained with its own routes, controllers, models, migrations, and React pages
-7. **No direct API calls** - Use Inertia for data flow between Laravel and React
-8. **Flash messages** - Use session flash for success/error messages, accessed via `usePage().props.flash`
-9. **Helper functions** - Available globally via `app/helpers.php` and `app/color_helpers.php` (auto-loaded in composer.json)
-10. **Tailwind CSS v3** - Uses `@tailwind` directives in `resources/css/app.css`
+6. **No direct API calls** - Use Inertia for data flow between Laravel and React
+7. **Flash messages** - Use session flash for success/error messages, accessed via `usePage().props.flash`
+8. **Helper functions** - Available globally via `app/helpers.php` and `app/color_helpers.php` (auto-loaded in composer.json)
+9. **Tailwind CSS v3** - Uses `@tailwind` directives in `resources/css/app.css`
+10. **Marketplace integration** - Packages are installed from marketplace.exiloncms.fr via API
 
 ## Common Patterns
 
@@ -776,16 +636,72 @@ docker exec -it exiloncms_db mysql -u root -p -e "SHOW TABLES;"
 - **PostgreSQL connection refused**: Ensure Docker is running (`docker-compose up -d`)
 - **Puck permission missing**: Run `php artisan db:seed --class=PuckPermissionSeeder`
 - **Composer autoload issues**: Run `composer dump-autoload`
-- **Installation state issues**: The `is_installed()` helper checks if CMS is installed. If returning false, check `installed` key in cache/settings
+- **Installation state issues**: The `is_installed()` helper checks if CMS is installed. If returning false, check `installed_at` setting in database or create one of the fallback files (`public/installed.json`, `bootstrap/cache/installed`, or `storage/installed.json`)
+
+## Middleware System
+
+Key middleware registered in `bootstrap/app.php`:
+
+**Web middleware (applied to all web routes):**
+- `RedirectIfNotInstalled` - Redirect to installer if CMS not installed
+- `CheckForMaintenanceSettings` - Check maintenance mode from database
+- `SetLocale` - Set application locale from settings
+- `HandleInertiaRequests` - Share data with Inertia (critical for all Inertia pages)
+
+**Middleware aliases:**
+- `login.socialite` - Socialite OAuth authentication
+- `captcha` - reCAPTCHA verification
+- `admin` / `admin.access` - Require admin role
+- `registration` - Check if registration is enabled
+- `puck.edit` - Check Puck editor permission
+
+## Routing Structure
+
+Routes are loaded in this order (defined in `bootstrap/app.php`):
+1. `routes/web.php` - Public and authenticated routes
+2. `routes/install.php` - Installation wizard (only when not installed)
+3. `routes/admin.php` - Admin panel routes (prefixed with `/admin`, requires auth + admin)
+4. `routes/api.php` - API routes (if needed)
+5. `routes/console.php` - Console routes
+
+## Update System
+
+ExilonCMS includes an automatic update system managed by `UpdateManager` (`app/Extensions/UpdateManager.php`):
+
+**GitHub-based updates (CMS core):**
+- Checks for new releases from configured GitHub repository
+- Downloads release assets as ZIP files
+- Creates automatic backups before updating
+- Validates update compatibility
+
+**Update process:**
+1. Check for available updates
+2. Download update ZIP file
+3. Create backup of current installation
+4. Extract new files
+5. Run migrations (if any)
+6. Clear all caches
+7. Verify installation
+
+**Commands:**
+```bash
+# No dedicated command - updates managed via admin UI at /admin/updates
+# Or manually via git pull + composer install + npm run build + migrate
+```
 
 ## Installation State
 
 ExilonCMS uses an `is_installed()` helper function (defined in `app/helpers.php`) to check if the CMS has been installed. This affects:
-- `ExtensionServiceProvider`: Skips theme loading if not installed
-- `PluginManager::cachePlugins()`: Only caches plugins if installed
+- `HandleInertiaRequests`: Returns minimal shared data if not installed
+- `RedirectIfNotInstalled` middleware: Redirects to installer if not installed
 - Various routes and middleware that may check installation state
 
-The installation state is stored in the `installed` key in the cache and can be reset during development using `Cache::forget('installed')`.
+**Installation checks (in order of priority):**
+1. Database: `settings` table, row where `name = 'installed_at'`
+2. Fallback files: `public/installed.json`, `bootstrap/cache/installed`, `storage/installed.json`
+3. `.env` flag: `EXILONCMS_INSTALLED=true`
+
+The installation state can be reset during development by deleting the `installed_at` setting from the database or removing the fallback files.
 
 ## Translation Commands
 

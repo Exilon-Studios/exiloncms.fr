@@ -11,14 +11,8 @@ class ThemeViewFinder extends FileViewFinder
     {
         [$namespace, $view] = $this->parseNamespaceSegments($name);
 
-        // If the view is from a plugin, search in the 'plugins' directory
-        if (plugins()->isEnabled($namespace)) {
-            try {
-                return $this->findInPaths("plugins.{$namespace}.{$view}", $this->paths);
-            } catch (InvalidArgumentException) {
-                // ignore, theme don't have the plugin view, just use the default view
-            }
-        }
+        // Note: Plugins system has been removed
+        // If you need to restore plugin support, add the PluginManager back
 
         try {
             // Try to find the view in the theme.

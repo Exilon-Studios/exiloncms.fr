@@ -10,6 +10,7 @@ use ExilonCMS\Http\Controllers\PostCommentController;
 use ExilonCMS\Http\Controllers\PostController;
 use ExilonCMS\Http\Controllers\PostLikeController;
 use ExilonCMS\Http\Controllers\ProfileController;
+use ExilonCMS\Http\Controllers\ResourceController;
 use ExilonCMS\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +42,13 @@ Route::middleware(['registration'])->group(function () {
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 });
+
+// ============================================================
+// MARKETPLACE SSO ROUTE
+// ============================================================
+Route::get('/marketplace/sso', function () {
+    return marketplace_sso_redirect();
+})->middleware('auth')->name('marketplace.sso');
 
 Route::prefix('user')->group(function () {
     Route::middleware('throttle:oauth')->group(function () {
@@ -131,6 +139,33 @@ Route::resource('posts.comments', PostCommentController::class)
 Route::middleware(['auth', 'puck.edit'])->prefix('edit')->name('puck.')->group(function () {
     Route::get('/', [HomeController::class, 'edit'])->name('index');
     Route::post('/save', [HomeController::class, 'saveEdit'])->name('save');
+});
+
+// Resources / Marketplace routes
+Route::prefix('resources')->name('resources.')->group(function () {
+    Route::get('/', [ResourceController::class, 'index'])->name('index');
+    Route::get('/{slug}', [ResourceController::class, 'show'])->name('show');
+    Route::get('/{slug}/download', [ResourceController::class, 'download'])->name('download');
+
+    // Authenticated routes
+    Route::middleware(['auth', 'verified'])->group(function () {
+        Route::get('/create', [ResourceController::class, 'create'])->name('create');
+        Route::post('/', [ResourceController::class, 'store'])->name('store');
+        Route::get('/{slug}/edit', [ResourceController::class, 'edit'])->name('edit');
+        Route::put('/{slug}', [ResourceController::class, 'update'])->name('update');
+        Route::delete('/{slug}', [ResourceController::class, 'destroy'])->name('destroy');
+
+        // Reviews
+        Route::post('/{slug}/reviews', [ResourceController::class, 'storeReview'])->name('reviews.store');
+        Route::put('/{slug}/reviews/{review}', [ResourceController::class, 'updateReview'])->name('reviews.update');
+        Route::delete('/{slug}/reviews/{review}', [ResourceController::class, 'destroyReview'])->name('reviews.destroy');
+
+        // My resources and purchases
+        Route::prefix('my')->name('my.')->group(function () {
+            Route::get('/resources', [ResourceController::class, 'myResources'])->name('resources');
+            Route::get('/purchases', [ResourceController::class, 'myPurchases'])->name('purchases');
+        });
+    });
 });
 
 Route::get('/{path}', [FallbackController::class, 'get'])->where('path', '.*')->name('pages.show')->fallback();

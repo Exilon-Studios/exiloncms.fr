@@ -2,9 +2,6 @@
 
 namespace ExilonCMS\Http\Controllers;
 
-use ExilonCMS\Extensions\Plugin\PluginManager;
-use ExilonCMS\Extensions\Theme\ThemeManager;
-use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Games\FiveMGame;
 use ExilonCMS\Games\Minecraft\MinecraftBedrockGame;
 use ExilonCMS\Games\Minecraft\MinecraftOnlineGame;
@@ -17,7 +14,6 @@ use Exception;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
@@ -27,14 +23,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Inertia\Response;
-use RuntimeException;
 use Throwable;
 
 class InstallController extends Controller
@@ -147,7 +141,6 @@ class InstallController extends Controller
             return $next($request);
         })->only([
             'index',
-            'showPlugins',
             'showWelcomeWeb',
             'showRequirementsWeb',
             'checkRequirementsWeb',
@@ -162,19 +155,6 @@ class InstallController extends Controller
                 ? $next($request)
                 : to_route('install.database');
         })->only(['showGame', 'showGames', 'setupGame']);
-
-        $this->games = array_merge($this->games, $this->getCommunityGames());
-    }
-
-    /**
-     * Returns games keyed with `extension_id` and not the resource id.
-     */
-    private function getCommunityGames()
-    {
-        $updateManager = app(UpdateManager::class);
-        $games = $updateManager->getGames();
-
-        return collect($games)->keyBy('extension_id')->all();
     }
 
     public function showDatabase()
@@ -476,30 +456,8 @@ class InstallController extends Controller
             return to_route('install.finish');
         }
 
-        $communityGames = $this->getCommunityGames();
-
-        if (array_key_exists($game, $communityGames)) {
-            $updateManager = app(UpdateManager::class);
-            $pluginManager = app(PluginManager::class);
-
-            $pluginDir = $pluginManager->path($game);
-
-            try {
-                $updateManager->download($communityGames[$game], 'plugins/');
-                $updateManager->extract($communityGames[$game], $pluginDir, 'plugins/');
-                $pluginManager->enable($game);
-
-                $description = $pluginManager->findDescription($game);
-
-                if ($description !== null && isset($description->installRedirectPath)) {
-                    return redirect($description->installRedirectPath);
-                }
-
-                return $this->finishInstall();
-            } catch (Throwable $t) {
-                return to_route('install.games')->with('error', $t->getMessage());
-            }
-        }
+        // Note: Community games (plugins) system has been removed
+        // Only built-in games are supported
 
         abort_if($name === null, 400, 'Expected valid name for game '.$game);
 
@@ -628,97 +586,6 @@ class InstallController extends Controller
     }
 
     /**
-     * Show plugins selection step.
-     */
-    public function showPlugins(): Response
-    {
-        return Inertia::render('Install/Plugins', [
-            'availablePlugins' => $this->getAvailablePlugins(),
-            'availableThemes' => $this->getAvailableThemes(),
-        ]);
-    }
-
-    /**
-     * Get available plugins for installation.
-     *
-     * @return array<int, array{id: string, name: string, description: string, version: string}>
-     */
-    protected function getAvailablePlugins(): array
-    {
-        try {
-            $updateManager = app(UpdateManager::class);
-            $plugins = $updateManager->getPlugins(true); // Force refresh from registry
-
-            return collect($plugins)->map(function ($plugin) {
-                return [
-                    'id' => $plugin['extension_id'] ?? $plugin['id'] ?? '',
-                    'name' => $plugin['name'] ?? 'Unknown',
-                    'description' => $plugin['description'] ?? '',
-                    'version' => $plugin['version'] ?? '1.0.0',
-                ];
-            })->toArray();
-        } catch (Throwable $e) {
-            // Fallback to local plugins if registry fails
-            $plugins = [];
-            $pluginDirs = glob(base_path('plugins/*/plugin.json'));
-
-            foreach ($pluginDirs as $pluginFile) {
-                $data = json_decode(file_get_contents($pluginFile), true);
-                if ($data && isset($data['id'], $data['name'])) {
-                    $plugins[] = [
-                        'id' => $data['id'],
-                        'name' => $data['name'],
-                        'description' => $data['description'] ?? '',
-                        'version' => $data['version'] ?? '1.0.0',
-                    ];
-                }
-            }
-
-            return $plugins;
-        }
-    }
-
-    /**
-     * Get available themes for installation.
-     *
-     * @return array<int, array{id: string, name: string, description: string, version: string}>
-     */
-    protected function getAvailableThemes(): array
-    {
-        try {
-            $updateManager = app(UpdateManager::class);
-            $themes = $updateManager->getThemes(true); // Force refresh from registry
-
-            return collect($themes)->map(function ($theme) {
-                return [
-                    'id' => $theme['extension_id'] ?? $theme['id'] ?? '',
-                    'name' => $theme['name'] ?? 'Unknown',
-                    'description' => $theme['description'] ?? '',
-                    'version' => $theme['version'] ?? '1.0.0',
-                ];
-            })->toArray();
-        } catch (Throwable $e) {
-            // Fallback to local themes if registry fails
-            $themes = [];
-            $themeDirs = glob(base_path('themes/*/theme.json'));
-
-            foreach ($themeDirs as $themeFile) {
-                $data = json_decode(file_get_contents($themeFile), true);
-                if ($data && isset($data['id'], $data['name'])) {
-                    $themes[] = [
-                        'id' => $data['id'],
-                        'name' => $data['name'],
-                        'description' => $data['description'] ?? '',
-                        'version' => $data['version'] ?? '1.0.0',
-                    ];
-                }
-            }
-
-            return $themes;
-        }
-    }
-
-    /**
      * Process installation in one step.
      */
     public function install(Request $request)
@@ -728,9 +595,6 @@ class InstallController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'selected_plugins' => ['nullable', 'array'],
-            'selected_plugins.*' => ['string'],
-            'selected_theme' => ['nullable', 'string'],
         ]);
 
         try {
@@ -776,32 +640,6 @@ class InstallController extends Controller
             foreach ($seeders as $seeder) {
                 if (class_exists($seeder)) {
                     Artisan::call('db:seed', ['--class' => $seeder, '--force' => true]);
-                }
-            }
-
-            // Enable selected plugins
-            $selectedPlugins = $validated['selected_plugins'] ?? [];
-            if (! empty($selectedPlugins)) {
-                $pluginManager = app(PluginManager::class);
-
-                foreach ($selectedPlugins as $pluginId) {
-                    try {
-                        $pluginManager->enable($pluginId);
-                        // Run plugin migrations
-                        Artisan::call('migrate', ['--force' => true]);
-                    } catch (Throwable $e) {
-                        // Continue even if plugin fails to enable
-                    }
-                }
-            }
-
-            // Set selected theme if provided
-            if (! empty($validated['selected_theme'])) {
-                $themeManager = app(ThemeManager::class);
-                try {
-                    $themeManager->setActive($validated['selected_theme']);
-                } catch (Throwable $e) {
-                    // Continue even if theme fails to set
                 }
             }
 

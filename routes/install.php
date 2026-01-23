@@ -32,8 +32,6 @@ Route::middleware([
     Route::get('/install/mode', [InstallController::class, 'showModeWeb'])->name('install.mode');
     Route::post('/install/mode', [InstallController::class, 'saveModeWeb'])->name('install.mode.save');
 
-    Route::get('/install/plugins', [InstallController::class, 'showPlugins'])->name('install.plugins');
-
     Route::get('/install/admin', [InstallController::class, 'showAdminWeb'])->name('install.admin');
     Route::post('/install/admin', [InstallController::class, 'createAdminWeb'])->name('install.admin.save');
 
