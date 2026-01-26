@@ -37,3 +37,4 @@ nul
 *.zip
 build-*.php
 create-installer*.php
+/installer/assets/

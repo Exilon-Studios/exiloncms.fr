@@ -43,7 +43,7 @@ jobs:
         run: npm ci
 
       - name: Build frontend assets
-        run: npm run build
+        run: npm run build:all
 
       - name: Create release directory
         run: |
@@ -94,10 +94,19 @@ jobs:
           zip -r ../exiloncms-${{ github.ref_name }}.zip exiloncms/
           cd ..
 
+      - name: Create installer ZIP
+        run: |
+          # Create standalone installer ZIP
+          zip -r exiloncms-installer-${{ github.ref_name }}.zip installer/
+
       - name: Generate checksums
         run: |
+          # CMS checksums
           sha256sum exiloncms-${{ github.ref_name }}.zip > exiloncms-${{ github.ref_name }}.zip.sha256
           md5sum exiloncms-${{ github.ref_name }}.zip > exiloncms-${{ github.ref_name }}.zip.md5
+          # Installer checksums
+          sha256sum exiloncms-installer-${{ github.ref_name }}.zip > exiloncms-installer-${{ github.ref_name }}.zip.sha256
+          md5sum exiloncms-installer-${{ github.ref_name }}.zip > exiloncms-installer-${{ github.ref_name }}.zip.md5
 
       - name: Get version from tag
         id: get_version
@@ -116,14 +125,20 @@ jobs:
 
           ### Installation
           ```bash
-          # Quick install (one-line)
-          curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.sh | bash -s -- my-site
+          # Option 1: Standalone installer (recommended)
+          wget https://github.com/Exilon-Studios/ExilonCMS/releases/download/${{ steps.get_version.outputs.version }}/exiloncms-installer-${{ steps.get_version.outputs.version }}.zip
+          unzip exiloncms-installer-${{ steps.get_version.outputs.version }}.zip
+  cd installer
+  php -S localhost:8000
+  # Then open http://localhost:8000 in your browser
 
-          # Or download and extract
+          # Option 2: Full CMS package (manual setup)
           wget https://github.com/Exilon-Studios/ExilonCMS/releases/download/${{ steps.get_version.outputs.version }}/exiloncms-${{ steps.get_version.outputs.version }}.zip
           unzip exiloncms-${{ steps.get_version.outputs.version }}.zip
           cd exiloncms
-          php artisan install:interactive
+          composer install
+          php artisan key:generate
+          php artisan migrate --seed
           ```
 
           ### Upgrading
@@ -133,15 +148,20 @@ jobs:
           See the full changelog at https://github.com/Exilon-Studios/ExilonCMS/blob/main/CHANGELOG.md
 
           ### Downloads
+          #### CMS Package
           - 📦 **exiloncms-${{ steps.get_version.outputs.version }}.zip** - Full CMS package
           🔐 **SHA256**: $(cat exiloncms-${{ steps.get_version.outputs.version }}.zip.sha256 | cut -d' ' -f1)
           🔑 **MD5**: $(cat exiloncms-${{ steps.get_version.outputs.version }}.zip.md5 | cut -d' ' -f1)
 
+          #### Standalone Installer
+          - 🚀 **exiloncms-installer-${{ steps.get_version.outputs.version }}.zip** - Web installer (downloads CMS automatically)
+          🔐 **SHA256**: $(cat exiloncms-installer-${{ steps.get_version.outputs.version }}.zip.sha256 | cut -d' ' -f1)
+          🔑 **MD5**: $(cat exiloncms-installer-${{ steps.get_version.outputs.version }}.zip.md5 | cut -d' ' -f1)
+
           ### Requirements
           - PHP 8.2 or higher
           - Composer 2.x
-          - Node.js 20.x or higher
-          - PostgreSQL 10+ or MySQL 8+
+          - SQLite 3.8+ (included) or PostgreSQL 10+ or MySQL 8+
           EOF
 
       - name: Create GitHub Release
@@ -154,6 +174,9 @@ jobs:
             exiloncms-${{ steps.get_version.outputs.version }}.zip
             exiloncms-${{ steps.get_version.outputs.version }}.zip.sha256
             exiloncms-${{ steps.get_version.outputs.version }}.zip.md5
+            exiloncms-installer-${{ steps.get_version.outputs.version }}.zip
+            exiloncms-installer-${{ steps.get_version.outputs.version }}.zip.sha256
+            exiloncms-installer-${{ steps.get_version.outputs.version }}.zip.md5
           draft: false
           prerelease: false
         env:
