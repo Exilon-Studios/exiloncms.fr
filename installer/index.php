@@ -441,6 +441,32 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $zip->close();
             unlink($zipFile);
 
+            // Create .env file from .env.example if it doesn't exist
+            $envFile = __DIR__ . '/.env';
+            $envExample = __DIR__ . '/.env.example';
+
+            if (! file_exists($envFile) && file_exists($envExample)) {
+                copy($envExample, $envFile);
+            }
+
+            // Generate APP_KEY using Laravel's key generator if available
+            if (file_exists($envFile) && file_exists(__DIR__ . '/artisan')) {
+                // Try to run php artisan key:generate
+                $output = [];
+                $returnCode = 0;
+                @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan key:generate --force 2>&1', $output, $returnCode);
+
+                // If artisan key:generate failed, try to generate a simple key
+                if ($returnCode !== 0 && !str_contains(file_get_contents($envFile), 'APP_KEY')) {
+                    $key = 'base64:' . base64_encode(random_bytes(32));
+                    file_put_contents($envFile, str_replace(
+                        'APP_KEY=',
+                        'APP_KEY=' . $key,
+                        file_get_contents($envFile)
+                    ));
+                }
+            }
+
             // Note: Installer files are kept for the redirect to work
             // Users can manually delete the installer files after setup
 
