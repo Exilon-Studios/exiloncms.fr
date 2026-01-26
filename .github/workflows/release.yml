@@ -60,7 +60,6 @@ jobs:
                       --exclude='.vscode' \
                       --exclude='tests' \
                       --exclude='phpunit.xml' \
-                      --exclude='.env.example' \
                       --exclude='package-lock.json' \
                       --exclude='composer.lock' \
                       --exclude='.gitignore' \
@@ -84,8 +83,10 @@ jobs:
           touch release/exiloncms/storage/framework/views/.gitkeep
           touch release/exiloncms/storage/logs/.gitkeep
 
-          # Copy .env.example to .env
-          cp release/exiloncms/.env.example release/exiloncms/.env
+          # Create .env from .env.example if it exists
+          if [ -f release/exiloncms/.env.example ]; then
+            cp release/exiloncms/.env.example release/exiloncms/.env
+          fi
 
       - name: Create release ZIP
         run: |
