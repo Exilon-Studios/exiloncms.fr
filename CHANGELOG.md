@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 2026-01-26
 
+FEATURE: Add plugin/theme update checker system with source URL tracking
+FEATURE: Updates are checked from original download URL (marketplace, GitHub, etc.)
+FEATURE: Admin notifications when updates are available
 FEATURE: Add default themes (Blog, Gaming, E-Commerce) included with CMS distribution
 FEATURE: All themes are marketplace-ready with proper versioning for API updates
 FIX: Add type checks to ThemeLoader to prevent "Cannot access offset of type Theme on array" error
