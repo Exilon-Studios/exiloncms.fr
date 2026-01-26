@@ -100,15 +100,6 @@ jobs:
           cd installer
           zip -r ../exiloncms-installer-${{ github.ref_name }}.zip .
 
-      - name: Generate checksums
-        run: |
-          # CMS checksums
-          sha256sum exiloncms-${{ github.ref_name }}.zip > exiloncms-${{ github.ref_name }}.zip.sha256
-          md5sum exiloncms-${{ github.ref_name }}.zip > exiloncms-${{ github.ref_name }}.zip.md5
-          # Installer checksums
-          sha256sum exiloncms-installer-${{ github.ref_name }}.zip > exiloncms-installer-${{ github.ref_name }}.zip.sha256
-          md5sum exiloncms-installer-${{ github.ref_name }}.zip > exiloncms-installer-${{ github.ref_name }}.zip.md5
-
       - name: Get version from tag
         id: get_version
         run: |
@@ -142,11 +133,7 @@ jobs:
           body_path: release_notes.md
           files: |
             exiloncms-${{ steps.get_version.outputs.version }}.zip
-            exiloncms-${{ steps.get_version.outputs.version }}.zip.sha256
-            exiloncms-${{ steps.get_version.outputs.version }}.zip.md5
             exiloncms-installer-${{ steps.get_version.outputs.version }}.zip
-            exiloncms-installer-${{ steps.get_version.outputs.version }}.zip.sha256
-            exiloncms-installer-${{ steps.get_version.outputs.version }}.zip.md5
           draft: false
           prerelease: false
         env:
