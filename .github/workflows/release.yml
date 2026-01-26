@@ -124,22 +124,22 @@ jobs:
           ## 🚀 ExilonCMS ${{ steps.get_version.outputs.version }}
 
           ### Installation
-          ```bash
+          \`\`\`bash
           # Option 1: Standalone installer (recommended)
-          wget https://github.com/Exilon-Studios/ExilonCMS/releases/download/${{ steps.get_version.outputs.version }}/exiloncms-installer-${{ steps.get_version.outputs.version }}.zip
-          unzip exiloncms-installer-${{ steps.get_version.outputs.version }}.zip
-  cd installer
-  php -S localhost:8000
-  # Then open http://localhost:8000 in your browser
+          wget https://github.com/Exilon-Studios/ExilonCMS/releases/download/\${{ steps.get_version.outputs.version }}/exiloncms-installer-\${{ steps.get_version.outputs.version }}.zip
+          unzip exiloncms-installer-\${{ steps.get_version.outputs.version }}.zip
+          cd installer
+          php -S localhost:8000
+          # Then open http://localhost:8000 in your browser
 
           # Option 2: Full CMS package (manual setup)
-          wget https://github.com/Exilon-Studios/ExilonCMS/releases/download/${{ steps.get_version.outputs.version }}/exiloncms-${{ steps.get_version.outputs.version }}.zip
-          unzip exiloncms-${{ steps.get_version.outputs.version }}.zip
+          wget https://github.com/Exilon-Studios/ExilonCMS/releases/download/\${{ steps.get_version.outputs.version }}/exiloncms-\${{ steps.get_version.outputs.version }}.zip
+          unzip exiloncms-\${{ steps.get_version.outputs.version }}.zip
           cd exiloncms
           composer install
           php artisan key:generate
           php artisan migrate --seed
-          ```
+          \`\`\`
 
           ### Upgrading
           If you're already running ExilonCMS, use the built-in update system in the admin panel at `/admin/updates`.
