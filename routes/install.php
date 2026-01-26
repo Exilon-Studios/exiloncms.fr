@@ -5,7 +5,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 // ============================================================
-// INSTALLATION ROUTES (CSRF DISABLED)
+// INSTALLATION WIZARD ROUTES (CSRF DISABLED)
 // ============================================================
 Route::middleware([
     \ExilonCMS\Http\Middleware\EncryptCookies::class,
@@ -15,30 +15,27 @@ Route::middleware([
 ])->withoutMiddleware([VerifyCsrfToken::class])->group(function () {
 
     // ============================================================
-    // Simple one-page installer
+    // Installation Wizard (after standalone installer extracts CMS)
     // ============================================================
-    Route::get('/install', [InstallController::class, 'showRequirementsWeb'])->name('install.index');
-    Route::post('/install', [InstallController::class, 'install'])->name('install.submit');
+    Route::get('/wizard', [InstallController::class, 'showRequirementsWeb'])->name('install.index');
+    Route::post('/wizard', [InstallController::class, 'install'])->name('install.submit');
 
-    // ============================================================
-    // Multi-step web installer
-    // ============================================================
-    Route::get('/install/requirements', [InstallController::class, 'showRequirementsWeb'])->name('install.requirements');
-    Route::post('/install/requirements', [InstallController::class, 'checkRequirementsWeb'])->name('install.requirements.check');
+    Route::get('/wizard/requirements', [InstallController::class, 'showRequirementsWeb'])->name('install.requirements');
+    Route::post('/wizard/requirements', [InstallController::class, 'checkRequirementsWeb'])->name('install.requirements.check');
 
-    Route::get('/install/database', [InstallController::class, 'showDatabaseWeb'])->name('install.database');
-    Route::post('/install/database', [InstallController::class, 'configureDatabaseWeb'])->name('install.database.save');
+    Route::get('/wizard/database', [InstallController::class, 'showDatabaseWeb'])->name('install.database');
+    Route::post('/wizard/database', [InstallController::class, 'configureDatabaseWeb'])->name('install.database.save');
 
-    Route::get('/install/mode', [InstallController::class, 'showModeWeb'])->name('install.mode');
-    Route::post('/install/mode', [InstallController::class, 'saveModeWeb'])->name('install.mode.save');
+    Route::get('/wizard/mode', [InstallController::class, 'showModeWeb'])->name('install.mode');
+    Route::post('/wizard/mode', [InstallController::class, 'saveModeWeb'])->name('install.mode.save');
 
-    Route::get('/install/admin', [InstallController::class, 'showAdminWeb'])->name('install.admin');
-    Route::post('/install/admin', [InstallController::class, 'createAdminWeb'])->name('install.admin.save');
+    Route::get('/wizard/admin', [InstallController::class, 'showAdminWeb'])->name('install.admin');
+    Route::post('/wizard/admin', [InstallController::class, 'createAdminWeb'])->name('install.admin.save');
 
-    Route::get('/install/complete', [InstallController::class, 'showCompleteWeb'])->name('install.complete');
+    Route::get('/wizard/complete', [InstallController::class, 'showCompleteWeb'])->name('install.complete');
 
     // Post-installation redirect (bypasses middleware checks)
-    Route::get('/install/installed', [InstallController::class, 'installed'])->name('install.installed');
+    Route::get('/wizard/installed', [InstallController::class, 'installed'])->name('install.installed');
 
     // Download latest release from GitHub
     Route::post('/install/download', [InstallController::class, 'downloadLatestRelease'])->name('install.download');

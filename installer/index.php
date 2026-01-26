@@ -404,6 +404,16 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                     continue;
                 }
 
+                // Remove 'exiloncms/' prefix to extract at root level
+                if (strpos($filePath, 'exiloncms/') === 0) {
+                    $filePath = substr($filePath, strlen('exiloncms/'));
+                }
+
+                // Skip if empty path (root directory)
+                if ($filePath === '' || $filePath === 'exiloncms') {
+                    continue;
+                }
+
                 $targetPath = __DIR__ . '/' . $filePath;
 
                 if (substr($filePath, -1) === '/') {
@@ -923,7 +933,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
       status.innerHTML = '<div class="success-message"><div class="success-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="20 6 9 17 4 12" /></svg></div><p class="success-title">Fichiers téléchargés !</p><p class="success-text">Redirection vers la configuration...</p></div>';
 
       // Redirect to CMS installation wizard
-      setTimeout(() => window.location.href = '/install', 2000);
+      setTimeout(() => window.location.href = '/wizard', 2000);
     }
   </script>
 </body>
