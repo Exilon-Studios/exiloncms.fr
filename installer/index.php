@@ -435,23 +435,6 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             send_json_response($data);
         }
 
-        if ($action === 'install') {
-            $envFile = __DIR__.'/.env';
-            $envExample = __DIR__.'/.env.example';
-
-            if (! file_exists($envFile) && file_exists($envExample)) {
-                copy($envExample, $envFile);
-            }
-
-            file_put_contents(__DIR__.'/installed.json', json_encode([
-                'installed_at' => date('Y-m-d H:i:s'),
-                'version' => request_input('version', 'unknown'),
-            ]));
-
-            $data['installed'] = true;
-            send_json_response($data);
-        }
-
         send_json_response('Unexpected action: '.$action, 403);
     } catch (Throwable $t) {
         send_json_response(['message' => $t->getMessage()], 500);
@@ -917,24 +900,13 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
       const title = document.getElementById('title');
       const subtitle = document.getElementById('subtitle');
 
-      updateSteps(3, 'Installation terminée');
-      title.textContent = 'Terminé';
-      subtitle.textContent = 'Prêt à démarrer';
-      status.innerHTML = '<div class="success-message"><div class="success-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="20 6 9 17 4 12" /></svg></div><p class="success-title">Installation terminée !</p><p class="success-text">Redirection vers votre site...</p></div>';
+      updateSteps(3, 'Extraction terminée');
+      title.textContent = 'Prêt';
+      subtitle.textContent = 'Configuration requise';
+      status.innerHTML = '<div class="success-message"><div class="success-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><polyline points="20 6 9 17 4 12" /></svg></div><p class="success-title">Fichiers extraits !</p><p class="success-text">Redirection vers la configuration...</p></div>';
 
-      try {
-        await fetch(finalApiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: JSON.stringify({ action: 'install', version })
-        });
-        setTimeout(() => window.location.href = '/', 3000);
-      } catch (e) {
-        console.error('Finalize error:', e);
-      }
+      // Redirect to the CMS installation wizard
+      setTimeout(() => window.location.href = '/install', 2000);
     }
   </script>
 </body>
