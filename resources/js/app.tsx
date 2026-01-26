@@ -9,7 +9,7 @@ import '../css/app.css';
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { route as ziggyRoute } from '../../vendor/tightenco/ziggy';
+import { route as ziggyRoute } from 'ziggy-js';
 import { ModalProvider } from '@/lib/modalManager';
 import { ModalDialog } from '@/components/ui/modal-dialog';
 import { ThemeProvider } from '@/contexts/ThemeContext';
