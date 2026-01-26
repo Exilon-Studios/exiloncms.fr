@@ -416,8 +416,9 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             // If .env.example will be extracted, wait for it. Otherwise create from template.
             if (! file_exists($envExample)) {
                 // Create a minimal .env file before extraction
+                // IMPORTANT: Use file sessions, not database sessions, to avoid chicken-and-egg problem
                 $key = 'base64:' . base64_encode(random_bytes(32));
-                file_put_contents($envFile, "APP_KEY=$key\nAPP_DEBUG=true\nAPP_URL=http://localhost\nDB_CONNECTION=sqlite\nDB_DATABASE=database/database.sqlite\n");
+                file_put_contents($envFile, "APP_KEY=$key\nAPP_DEBUG=true\nAPP_URL=http://localhost\nDB_CONNECTION=sqlite\nDB_DATABASE=database/database.sqlite\nSESSION_DRIVER=file\n");
             }
 
             $zip = new ZipArchive();
@@ -481,11 +482,28 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             // Now that files are extracted, ensure .env is properly set up
             if (! file_exists($envFile) && file_exists($envExample)) {
                 copy($envExample, $envFile);
+                // Add SESSION_DRIVER=file to avoid chicken-and-egg with database sessions
+                file_put_contents($envFile, "\nSESSION_DRIVER=file\n", FILE_APPEND);
             }
 
-            // Generate APP_KEY if not set
+            // Generate APP_KEY if not set and ensure file sessions
             if (file_exists($envFile)) {
                 $envContent = file_get_contents($envFile);
+
+                // Ensure we use file sessions (database sessions require migrations first)
+                if (!str_contains($envContent, 'SESSION_DRIVER=')) {
+                    $envContent .= "\nSESSION_DRIVER=file\n";
+                    file_put_contents($envFile, $envContent);
+                } else {
+                    $envContent = preg_replace('/^SESSION_DRIVER=.*$/m', 'SESSION_DRIVER=file', $envContent, -1, $count);
+                    if ($count > 0) {
+                        file_put_contents($envFile, $envContent);
+                    }
+                }
+
+                // Re-read after potentially modifying
+                $envContent = file_get_contents($envFile);
+
                 // Check if APP_KEY is missing or empty
                 if (!str_contains($envContent, 'APP_KEY=') || preg_match('/^APP_KEY=$/m', $envContent)) {
                     $key = 'base64:' . base64_encode(random_bytes(32));
