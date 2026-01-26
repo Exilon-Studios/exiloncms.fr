@@ -441,6 +441,24 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $zip->close();
             unlink($zipFile);
 
+            // Remove installer files after successful extraction
+            $installerFiles = [
+                __DIR__ . '/index.php',
+                __DIR__ . '/README.md',
+                __DIR__ . '/.htaccess',
+                __DIR__ . '/public/index.php',
+                __DIR__ . '/public/.htaccess',
+            ];
+
+            foreach ($installerFiles as $file) {
+                if (file_exists($file)) {
+                    @unlink($file);
+                }
+            }
+
+            // Try to remove empty directories
+            @rmdir(__DIR__ . '/public');
+
             $data['extracted'] = true;
             send_json_response($data);
         }
