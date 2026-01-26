@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 2026-01-26
 
+FIX: Fix composer autoload error during package:discover - ThemeLoader now lazy-loads in boot() phase instead of register()
+FIX: Fix missing Payment model import in shop plugin PaymentManager
 FIX: Fix JavaScript "Cannot access before initialization" error in Requirements component
 FEATURE: Add plugin/theme update checker system with source URL tracking
 FEATURE: Updates are checked from original download URL (marketplace, GitHub, etc.)

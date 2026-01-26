@@ -7,22 +7,25 @@ use Illuminate\Support\Facades\View;
 
 class ThemeServiceProvider extends ServiceProvider
 {
-    protected ThemeLoader $loader;
+    protected ?ThemeLoader $loader = null;
 
     public function register(): void
     {
         $this->app->singleton(ThemeLoader::class, function () {
             return new ThemeLoader();
         });
-
-        $this->loader = $this->app->make(ThemeLoader::class);
-
-        // Alias for backward compatibility
-        $this->app->alias(ThemeLoader::class, 'theme.loader');
     }
 
     public function boot(): void
     {
+        // Skip theme registration during package discovery when cache isn't available
+        if ($this->app->runningInConsole() && isset($_SERVER['argv']) && in_array('package:discover', $_SERVER['argv'])) {
+            return;
+        }
+
+        // Lazy load the loader in boot() phase, not register()
+        $this->loader = $this->app->make(ThemeLoader::class);
+
         $this->registerActiveTheme();
         $this->registerThemePaths();
     }

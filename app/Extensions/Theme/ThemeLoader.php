@@ -102,13 +102,13 @@ class ThemeLoader
             ];
         }
 
-        $theme = $this->themes[$activeThemeId] ?? null;
-
-        // Type check: ensure we return an array, not an object
-        if ($theme !== null && is_array($theme)) {
-            return $theme;
+        // Check file-based themes first
+        if (isset($this->themes[$activeThemeId]) && is_array($this->themes[$activeThemeId])) {
+            return $this->themes[$activeThemeId];
         }
 
+        // If not found in file-based themes, return null
+        // Don't mix with database themes to avoid type conflicts
         return null;
     }
 
