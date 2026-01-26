@@ -1,0 +1,38 @@
+{
+  "id": "translations",
+  "name": "Translations",
+  "version": "1.0.0",
+  "description": "Real-time translation management with marketplace sync",
+  "author": "ExilonCMS",
+  "url": "https://exiloncms.fr",
+  "namespace": "ExilonCMS\\Plugins\\Translations",
+  "service_provider": "ExilonCMS\\Plugins\\Translations\\TranslationsServiceProvider",
+  "dependencies": {
+    "exiloncms": ">=1.0.0"
+  },
+  "permissions": [
+    "translations.manage",
+    "translations.sync",
+    "translations.import",
+    "translations.export"
+  ],
+  "settings": {
+    "auto_sync": {
+      "type": "boolean",
+      "default": true,
+      "label": "Auto-sync with marketplace"
+    },
+    "sync_interval": {
+      "type": "integer",
+      "default": 3600,
+      "label": "Sync interval (seconds)",
+      "min": 60,
+      "max": 86400
+    },
+    "fallback_locale": {
+      "type": "string",
+      "default": "en",
+      "label": "Fallback locale"
+    }
+  }
+}

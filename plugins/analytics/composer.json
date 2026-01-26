@@ -1,0 +1,15 @@
+{
+    "name": "exiloncms/analytics",
+    "description": "Analytics plugin for ExilonCMS",
+    "type": "project",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ExilonCMS\\Plugins\\Analytics\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

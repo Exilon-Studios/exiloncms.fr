@@ -1,0 +1,15 @@
+{
+    "name": "exiloncms/blog",
+    "description": "Blog plugin for ExilonCMS",
+    "type": "project",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ExilonCMS\\Plugins\\Blog\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

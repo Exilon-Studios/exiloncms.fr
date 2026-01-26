@@ -1,0 +1,15 @@
+{
+    "name": "exiloncms/notifications",
+    "description": "Notifications plugin for ExilonCMS",
+    "type": "project",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ExilonCMS\\Plugins\\Notifications\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

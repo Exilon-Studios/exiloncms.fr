@@ -24,8 +24,8 @@ Homestead.yaml
 Thumbs.db
 
 # Site-specific (keep private - only for exiloncms.fr)
-/themes/
-/plugins/
+# /themes/  - REMOVED: Default themes are now included in CMS
+# /plugins/ - REMOVED: Default plugins are now included in CMS
 
 # Internal docs (keep private)
 /docs/

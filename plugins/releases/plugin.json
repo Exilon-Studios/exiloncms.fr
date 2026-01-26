@@ -1,0 +1,22 @@
+{
+  "name": "releases",
+  "version": "1.0.0",
+  "description": "Release notes and changelog management plugin",
+  "author": "ExilonStudios",
+  "license": "MIT",
+  "type": "plugin",
+  "namespace": "ExilonCMS\\Plugins\\Releases",
+  "service_provider": "ExilonCMS\\Plugins\\Releases\\ReleasesServiceProvider",
+  "autoload": {
+    "psr-4": {
+      "ExilonCMS\\Plugins\\Releases\\": "src/"
+    }
+  },
+  "extras": {
+    "laravel": {
+      "providers": [
+        "ExilonCMS\\Plugins\\Releases\\ReleasesServiceProvider"
+      ]
+    }
+  }
+}

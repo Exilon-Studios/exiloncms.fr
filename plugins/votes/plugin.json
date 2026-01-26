@@ -1,0 +1,28 @@
+{
+  "id": "votes",
+  "name": "Votes & Rewards",
+  "version": "1.0.0",
+  "description": "Voting system with automatic rewards (money, items, roles, commands)",
+  "author": "ExilonCMS",
+  "namespace": "ExilonCMS\\Plugins\\Votes",
+  "service_provider": "ExilonCMS\\Plugins\\Votes\\VotesServiceProvider",
+  "dependencies": {
+    "exiloncms": ">=1.0.0"
+  },
+  "permissions": [
+    "votes.manage",
+    "votes.rewards.manage"
+  ],
+  "settings": {
+    "vote_cooldown": {
+      "type": "integer",
+      "default": 24,
+      "label": "Vote cooldown (hours)"
+    },
+    "auto_reward": {
+      "type": "boolean",
+      "default": true,
+      "label": "Automatically give rewards"
+    }
+  }
+}

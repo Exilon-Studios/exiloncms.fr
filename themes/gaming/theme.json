@@ -1,0 +1,20 @@
+{
+  "id": "gaming",
+  "name": "Gaming Theme",
+  "description": "Thème gaming dynamique avec design sombre et accents néon",
+  "version": "1.0.0",
+  "author": "ExilonStudios",
+  "url": "https://exiloncms.fr",
+  "screenshot": "https://exiloncms.fr/assets/themes/gaming/screenshot.png",
+  "requires": {
+    "exiloncms": ">=1.0.0"
+  },
+  "supports": {
+    "color": true,
+    "logo": true,
+    "favicon": true,
+    "navbar": true,
+    "footer": true,
+    "dark_mode": true
+  }
+}

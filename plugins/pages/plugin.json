@@ -1,0 +1,26 @@
+{
+  "id": "pages",
+  "name": "Pages",
+  "version": "1.0.0",
+  "description": "Static page management with rich text editor",
+  "author": "ExilonCMS",
+  "url": "https://exiloncms.fr",
+  "namespace": "ExilonCMS\\Plugins\\Pages",
+  "service_provider": "ExilonCMS\\Plugins\\Pages\\PagesServiceProvider",
+  "dependencies": {
+    "exiloncms": ">=1.0.0"
+  },
+  "permissions": [
+    "pages.create",
+    "pages.edit",
+    "pages.delete",
+    "pages.publish"
+  ],
+  "settings": {
+    "allow_public_access": {
+      "type": "boolean",
+      "default": true,
+      "label": "Allow public access to pages"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "description": "Modern documentation plugin with animated sidebar",
+  "author": "ExilonStudios",
+  "license": "MIT",
+  "type": "plugin",
+  "namespace": "ExilonCMS\\Plugins\\Docs",
+  "service_provider": "ExilonCMS\\Plugins\\Docs\\DocsServiceProvider",
+  "autoload": {
+    "psr-4": {
+      "ExilonCMS\\Plugins\\Docs\\": "src/"
+    }
+  },
+  "extras": {
+    "laravel": {
+      "providers": [
+        "ExilonCMS\\Plugins\\Docs\\DocsServiceProvider"
+      ]
+    }
+  }
+}
