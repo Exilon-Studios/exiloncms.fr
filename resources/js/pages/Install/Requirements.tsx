@@ -26,11 +26,13 @@ export default function Requirements({ requirements: initialRequirements }: Prop
   const [checking, setChecking] = useState(!initialRequirements);
   const [canContinue, setCanContinue] = useState(false);
 
+  // Calculate allOk before using it in useEffect
+  const allOk = requirements.every(r => r.status === 'success');
+
   useEffect(() => {
     if (!initialRequirements) {
       checkRequirements();
     } else {
-      const allOk = requirements.every(r => r.status === 'success');
       setCanContinue(allOk);
     }
   }, []);
@@ -52,8 +54,8 @@ export default function Requirements({ requirements: initialRequirements }: Prop
         onSuccess: (page: any) => {
           const checkedRequirements = page.props.requirements as Requirement[];
           setRequirements(checkedRequirements);
-          const allOk = checkedRequirements.every((r: Requirement) => r.status === 'success');
-          setCanContinue(allOk);
+          const allReqsOk = checkedRequirements.every((r: Requirement) => r.status === 'success');
+          setCanContinue(allReqsOk);
         },
       });
     } catch (error) {
@@ -63,7 +65,6 @@ export default function Requirements({ requirements: initialRequirements }: Prop
     }
   };
 
-  const allOk = requirements.every(r => r.status === 'success');
   const hasErrors = requirements.some(r => r.status === 'error');
   const failedRequirements = requirements.filter(r => r.status === 'error');
 
