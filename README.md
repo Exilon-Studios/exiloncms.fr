@@ -4,8 +4,8 @@
 
 **A modern CMS for game servers**
 
-[![Latest Release](https://img.shields.io/github/v/release/Exilon-Studios/ExilonCMS)](https://github.com/Exilon-Studios/ExilonCMS/releases)
-[![License](https://img.shields.io/github/license/Exilon-Studios/ExilonCMS)](LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/Exilon-Studios/exiloncms.fr)](https://github.com/Exilon-Studios/exiloncms.fr/releases)
+[![License](https://img.shields.io/github/license/Exilon-Studios/exiloncms.fr)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)](https://php.net)
 [![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
 
@@ -19,110 +19,69 @@ A powerful, modern content management system designed specifically for game serv
 
 - 🎮 **Multi-game Support** - Minecraft (Java/Bedrock), FiveM, Rust, and more
 - 🚀 **Modern Tech Stack** - Laravel 12, React 19, Inertia.js v2, TypeScript, Tailwind CSS v4
-- 🎨 **Visual Page Builder** - Drag-and-drop editor with Puck
+- 🎨 **Theme System** - Fully customizable with template-based theming
 - 🔐 **Role-based Access** - Complete permission system
 - 🌍 **Multi-language** - Built-in translation system (FR/EN)
 - 🔌 **Plugin System** - Extensible architecture
-- 🎭 **Theme System** - Fully customizable
 - 🔄 **Auto-updates** - GitHub-based updates with automatic backups
+- 🛒 **Integrated Shop** - Built-in e-commerce for game server items
 
 ---
 
 ## 📋 Requirements
 
 - **PHP**: 8.2 or higher
-- **Composer**: 2.x
-- **Node.js**: 20.x or higher
-- **Database**: PostgreSQL 10+ or MySQL 8+
+- **Database**: SQLite 3.8+ (included), PostgreSQL 10+, or MySQL 8+
 - **Web Server**: Apache, Nginx, or Laravel Valet
+- **Extensions**: curl, fileinfo, json, mbstring, openssl, pdo, zip, bcmath
 
 ---
 
-## 🚀 Quick Installation
+## 🚀 Installation
 
-### ⚡ One-Line Install (Fastest)
+### Option 1: Standalone Web Installer (Recommended)
 
-**Linux / macOS:**
-```bash
-curl -sSL https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.sh | bash -s -- my-site
-```
-
-**Windows (PowerShell):**
-```powershell
-irm https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS/main/scripts/install.ps1 | iex
-```
-
-This will download the installer and guide you through the interactive setup wizard.
-
----
-
-### Option 1: Using the ExilonCMS CLI (Recommended)
-
-The easiest way to create a new ExilonCMS project is using our CLI tool:
+The easiest way to install ExilonCMS with an interactive web interface:
 
 ```bash
-# Install globally via npm
-npm install -g exiloncms
+# Download the installer
+wget https://github.com/Exilon-Studios/exiloncms.fr/releases/latest/download/exiloncms-installer.zip
 
-# Create a new project (interactive wizard)
-exiloncms new my-site
+# Extract it
+unzip exiloncms-installer.zip
 
-# The CLI will guide you through:
-# ✅ Site configuration (name, URL, language, timezone)
-# ✅ Database setup (PostgreSQL, MySQL, SQLite)
-# ✅ Admin account creation
-# ✅ Theme & plugin selection from marketplace
-# ✅ Docker configuration (optional)
+# Start the PHP server
+php -S localhost:8000
+
+# Open http://localhost:8000 in your browser
+# The installer will:
+# ✅ Download the latest CMS automatically
+# ✅ Guide you through database setup
+# ✅ Create your admin account
+# ✅ Configure your site settings
 ```
 
-**Development mode** (from source):
-```bash
-cd /path/to/ExilonCMS
-npm link
-exiloncms new my-site
-```
+### Option 2: Manual Installation
 
-**Direct PHP** (no npm needed):
-```bash
-php bin/exiloncms new my-site
-```
-
-### Option 2: Via Composer
+Download the full CMS package and set it up manually:
 
 ```bash
-# Create a new project
-composer create-project exilon-studios/exiloncms your-site-name
+# Download from GitHub Releases
+wget https://github.com/Exilon-Studios/exiloncms.fr/releases/latest/download/exiloncms.zip
 
-cd your-site-name
+# Extract
+unzip exiloncms.zip
+cd exiloncms
 
-# Run interactive installer
-php artisan install:interactive
-```
-
-### Option 3: Manual Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Exilon-Studios/ExilonCMS.git your-site-name
-cd your-site-name
-
-# Install PHP dependencies
+# Install dependencies
 composer install
-
-# Install frontend dependencies
-npm install
-
-# Build frontend
-npm run build
 
 # Configure environment
 cp .env.example .env
 php artisan key:generate
 
-# Edit .env and set database credentials
-# DB_DATABASE=exiloncms
-# DB_USERNAME=your_username
-# DB_PASSWORD=your_password
+# Edit .env and set your database (SQLite by default)
+# DB_DATABASE=database/database.sqlite
 
 # Run migrations
 php artisan migrate --seed
@@ -132,8 +91,6 @@ php artisan user:create --admin --name="Admin" --email="admin@example.com" --pas
 
 # Start development server
 php artisan serve
-# In another terminal:
-npm run dev
 ```
 
 Visit `http://localhost:8000` to access your site.
@@ -143,12 +100,15 @@ Visit `http://localhost:8000` to access your site.
 ## 🎯 Development
 
 ```bash
-# Start Laravel server
-php artisan serve
+# Start all services (Laravel + Queue + Vite)
+composer dev
 
-# Start Vite dev server (in another terminal)
-npm run dev
+# Or start individually:
+php artisan serve      # Laravel backend
+npm run dev            # Vite frontend (with HMR)
+```
 
+```bash
 # Run tests
 composer test
 
@@ -161,26 +121,44 @@ php artisan optimize:clear
 
 ---
 
-## 📦 Creating Plugins
+## 📦 Plugins
+
+ExilonCMS comes with several built-in plugins:
+
+- **Analytics** - Website analytics and statistics
+- **Blog** - News and blog system
+- **Docs** - Documentation system
+- **Legal** - Legal pages (privacy, terms)
+- **Notifications** - User notifications
+- **Pages** - Custom pages
+- **Releases** - Release notes and changelogs
+- **Shop** - E-commerce for game items
+- **Translations** - Translation management
+- **Votes** - Voting system for game servers
 
 ```bash
-# Create a new plugin
-php artisan plugin:create MyPlugin
-
-# Enable a plugin
-php artisan plugin:enable MyPlugin
-
-# Disable a plugin
-php artisan plugin:disable MyPlugin
+# Plugin management (coming soon)
+php artisan plugin:list
+php artisan plugin:enable <plugin>
+php artisan plugin:disable <plugin>
 ```
 
 ---
 
-## 🎨 Creating Themes
+## 🎨 Themes
+
+ExilonCMS uses a theme-based system for full customization:
 
 ```bash
-# Create a new theme
+# Create a new theme (coming soon)
 php artisan theme:create MyTheme
+
+# Themes are located in:
+resources/themes/
+└── my-theme/
+    ├── views/           # Blade templates
+    ├── css/             # Theme styles
+    └── config.json      # Theme configuration
 ```
 
 ---
@@ -190,16 +168,15 @@ php artisan theme:create MyTheme
 ExilonCMS supports automatic updates via GitHub:
 
 1. Go to `/admin/updates` in your admin panel
-2. Check for updates
+2. Check for available updates
 3. Download the update (automatic backup created)
-4. Install the update
+4. Install and apply
 
 Or manually:
 
 ```bash
 git pull origin main
 composer install
-npm install
 npm run build
 php artisan migrate --force
 php artisan optimize:clear
@@ -209,7 +186,7 @@ php artisan optimize:clear
 
 ## 📚 Documentation
 
-Full documentation is available at: [https://github.com/Exilon-Studios/ExilonCMS/wiki](https://github.com/Exilon-Studios/ExilonCMS/wiki)
+Full documentation is available at: [https://exiloncms.fr/docs](https://exiloncms.fr/docs)
 
 ---
 
@@ -218,17 +195,16 @@ Full documentation is available at: [https://github.com/Exilon-Studios/ExilonCMS
 ### Backend
 - **Framework**: Laravel 12
 - **Language**: PHP 8.2+
-- **Database**: PostgreSQL / MySQL
-- **Queue**: Redis (optional)
+- **Database**: SQLite / PostgreSQL / MySQL
 
 ### Frontend
 - **Framework**: React 19
-- **Language**: TypeScript
+- **Language**: TypeScript (strict mode)
 - **Routing**: Inertia.js v2
 - **Styling**: Tailwind CSS v4
 - **UI Components**: shadcn/ui
-- **Editor**: Puck (Visual page builder)
 - **Rich Text**: Tiptap
+- **Forms**: React Hook Form + Zod
 
 ---
 
@@ -246,7 +222,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-ExilonCMS is open-sourced software licensed under the [MIT license](LICENSE).
+ExilonCMS is open-sourced software licensed under the [GPL-3.0-or-later](LICENSE).
 
 ---
 
@@ -255,7 +231,6 @@ ExilonCMS is open-sourced software licensed under the [MIT license](LICENSE).
 - [Laravel](https://laravel.com) - The PHP Framework For Web Artisans
 - [React](https://react.dev) - The library for web and native user interfaces
 - [Inertia.js](https://inertiajs.com) - Build single-page apps without building an API
-- [Puck](https://measured.co/puck) - The visual drag-and-drop page builder for React
 - [shadcn/ui](https://ui.shadcn.com) - Beautifully designed components
 - [Tailwind CSS](https://tailwindcss.com) - A utility-first CSS framework
 
@@ -265,6 +240,6 @@ ExilonCMS is open-sourced software licensed under the [MIT license](LICENSE).
 
 **Built with ❤️ by Exilon Studios**
 
-[Website](https://exilonstudios.com) • [Documentation](https://github.com/Exilon-Studios/ExilonCMS/wiki) • [Support](https://github.com/Exilon-Studios/ExilonCMS/issues)
+[Website](https://exiloncms.fr) • [Documentation](https://exiloncms.fr/docs) • [Support](https://github.com/Exilon-Studios/exiloncms.fr/issues)
 
 </div>
