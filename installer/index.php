@@ -387,6 +387,32 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $envFile = __DIR__ . '/.env';
             $envExample = __DIR__ . '/.env.example';
 
+            // Create database directory and file BEFORE extraction
+            $dbDir = __DIR__ . '/database';
+            if (! is_dir($dbDir)) {
+                mkdir($dbDir, 0755, true);
+            }
+            $dbFile = __DIR__ . '/database/database.sqlite';
+            if (! file_exists($dbFile)) {
+                touch($dbFile);
+                chmod($dbFile, 0644);
+            }
+
+            // Create storage directories required by Laravel
+            $storageDirs = [
+                __DIR__ . '/storage/framework',
+                __DIR__ . '/storage/framework/cache',
+                __DIR__ . '/storage/framework/sessions',
+                __DIR__ . '/storage/framework/views',
+                __DIR__ . '/storage/logs',
+                __DIR__ . '/bootstrap/cache',
+            ];
+            foreach ($storageDirs as $dir) {
+                if (! is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+            }
+
             // If .env.example will be extracted, wait for it. Otherwise create from template.
             if (! file_exists($envExample)) {
                 // Create a minimal .env file before extraction
@@ -470,21 +496,10 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                     file_put_contents($envFile, $envContent);
                 }
 
-                // Create SQLite database and run migrations
-                if (str_contains($envContent, 'DB_DATABASE=database/database.sqlite')) {
-                    $dbDir = __DIR__ . '/database';
-                    if (! is_dir($dbDir)) {
-                        mkdir($dbDir, 0755, true);
-                    }
-                    $dbFile = __DIR__ . '/database/database.sqlite';
-                    if (! file_exists($dbFile)) {
-                        touch($dbFile);
-                    }
-
-                    // Run migrations and seeders
-                    @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan migrate --force 2>&1', $migrateOutput, $migrateReturnCode);
-                    @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan db:seed --force 2>&1', $seedOutput, $seedReturnCode);
-                }
+                // Run migrations and seeders after extraction
+                // (database file was already created before extraction)
+                @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan migrate --force 2>&1', $migrateOutput, $migrateReturnCode);
+                @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan db:seed --force 2>&1', $seedOutput, $seedReturnCode);
             }
 
             $data['extracted'] = true;
