@@ -89,7 +89,6 @@ export interface Page {
   enabled?: boolean;
   is_enabled?: boolean;
   roles?: number[];
-  puck_data?: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }
@@ -246,14 +245,19 @@ export interface FilterState {
 }
 
 // ============================================
-// PUCK EDITOR TYPES
+// THEME TYPES
 // ============================================
 
-export interface PuckPage {
+export interface Theme {
   id: number;
-  title: string;
+  name: string;
   slug: string;
-  puck_data: Record<string, unknown> | null;
-  use_puck: boolean;
-  enabled: boolean;
+  description: string;
+  version: string;
+  author: string;
+  thumbnail: string | null;
+  is_active: boolean;
+  is_enabled: boolean;
+  type: 'gaming' | 'blog' | 'ecommerce';
+  type_label: string;
 }

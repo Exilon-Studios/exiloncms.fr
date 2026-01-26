@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Policies;
 
-use ExilonCMS\Models\Post;
 use ExilonCMS\Models\User;
+use ExilonCMS\Plugins\Blog\Models\Post;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PostPolicy

@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Policies;
 
-use ExilonCMS\Models\Page;
 use ExilonCMS\Models\User;
+use ExilonCMS\Plugins\Pages\Models\Page;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PagePolicy
@@ -11,7 +11,7 @@ class PagePolicy
     use HandlesAuthorization;
 
     /**
-     * Determine whether the user can view the post.
+     * Determine whether the user can view the page.
      */
     public function view(?User $user, Page $page): bool
     {

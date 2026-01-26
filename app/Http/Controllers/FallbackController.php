@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Http\Controllers;
 
-use ExilonCMS\Models\Page;
 use ExilonCMS\Models\Redirect;
+use ExilonCMS\Plugins\Pages\Models\Page;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Inertia\Inertia;
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace ShopPlugin\Payment;
+namespace ExilonCMS\Plugins\Shop\Payment;
 
+use ExilonCMS\Plugins\Shop\Models\Gateway;
+use ExilonCMS\Plugins\Shop\Payment\PaymentMethod;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Manager;
-use ShopPlugin\Models\Gateway;
 
 class PaymentManager
 {
@@ -19,9 +19,7 @@ class PaymentManager
     public function __construct()
     {
         $this->paymentMethods = collect([
-            'tebex' => \ShopPlugin\Payment\Method\TebexMethod::class,
-            'paypal' => \ShopPlugin\Payment\Method\PayPalMethod::class,
-            'stripe' => \ShopPlugin\Payment\Method\StripeMethod::class,
+            'tebex' => \ExilonCMS\Plugins\Shop\Payment\Method\TebexMethod::class,
         ]);
     }
 
@@ -44,7 +42,7 @@ class PaymentManager
             return null;
         }
 
-        return app($class, $gateway ? ['gateway' => $gateway] : []);
+        return new $class($gateway);
     }
 
     /**
@@ -92,7 +90,7 @@ class PaymentManager
     /**
      * Create a payment for a cart.
      */
-    public function createPayment(\ShopPlugin\Cart\Cart $cart, string $gatewayType): Payment
+    public function createPayment($cart, string $gatewayType): Payment
     {
         $gateway = $this->getGateway($gatewayType);
 

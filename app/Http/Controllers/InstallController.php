@@ -642,11 +642,10 @@ class InstallController extends Controller
                 ]
             );
 
-            // Run additional seeders (company, landing, puck) but NOT AdminUserSeeder
+            // Run additional seeders (company, landing) but NOT AdminUserSeeder
             $seeders = [
                 \Database\Seeders\CompanySettingsSeeder::class,
                 \Database\Seeders\LandingSettingsSeeder::class,
-                \Database\Seeders\PuckPermissionSeeder::class,
             ];
 
             foreach ($seeders as $seeder) {

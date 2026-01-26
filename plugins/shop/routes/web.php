@@ -1,24 +1,35 @@
 <?php
 
+use ExilonCMS\Plugins\Shop\Models\Category;
+use ExilonCMS\Plugins\Shop\Models\Item;
 use Illuminate\Support\Facades\Route;
-use ShopPlugin\Http\Controllers\ShopController;
-use ShopPlugin\Http\Controllers\CartController;
 
-// Shop routes
-Route::get('/', [ShopController::class, 'index'])->name('shop.index');
-Route::get('/category/{category}', [ShopController::class, 'category'])->name('shop.category');
-Route::get('/item/{item}', [ShopController::class, 'show'])->name('shop.show');
+// Shop home - show all categories
+Route::get('/', function () {
+    $categories = Category::active()->ordered()->with('items')->get();
 
-// Cart routes
-Route::prefix('cart')->name('cart.')->group(function () {
-    Route::get('/', [CartController::class, 'index'])->name('index');
-    Route::post('/add/{item}', [CartController::class, 'add'])->name('add');
-    Route::post('/remove/{itemId}', [CartController::class, 'remove'])->name('remove');
-    Route::post('/clear', [CartController::class, 'clear'])->name('clear');
-});
+    return inertia('Shop/Index', [
+        'categories' => $categories,
+    ]);
+})->name('shop.index');
 
-// Order routes
-Route::prefix('orders')->name('orders.')->middleware('auth')->group(function () {
-    Route::get('/', [ShopController::class, 'orders'])->name('index');
-    Route::get('/{order}', [ShopController::class, 'order'])->name('show');
-});
+// Show category
+Route::get('/category/{slug}', function ($slug) {
+    $category = Category::where('slug', $slug)->active()->firstOrFail();
+
+    $items = $category->items()->active()->ordered()->paginate(12);
+
+    return inertia('Shop/Category', [
+        'category' => $category,
+        'items' => $items,
+    ]);
+})->name('shop.category');
+
+// Show item
+Route::get('/item/{id}', function ($id) {
+    $item = Item::active()->with('category')->findOrFail($id);
+
+    return inertia('Shop/Item', [
+        'item' => $item,
+    ]);
+})->name('shop.item');

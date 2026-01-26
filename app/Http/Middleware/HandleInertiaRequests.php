@@ -10,6 +10,7 @@ use ExilonCMS\Models\NavbarElement;
 use ExilonCMS\Models\SocialLink;
 use ExilonCMS\Models\OnboardingStep;
 use ExilonCMS\Models\Notification;
+use ExilonCMS\Models\Theme;
 use ExilonCMS\Extensions\UpdateManager;
 
 class HandleInertiaRequests extends Middleware
@@ -115,6 +116,8 @@ class HandleInertiaRequests extends Middleware
                     'description' => setting('description', 'ExilonCMS - Modern Content Management System for game servers'),
                     'og_image' => setting('og_image') ? image_url(setting('og_image')) : null,
                 ],
+                // Active theme
+                'activeTheme' => Schema::hasTable('themes') ? Theme::getActive()?->slug : null,
             ],
             'navbar' => $this->loadNavbarElements($user),
             'socialLinks' => SocialLink::orderBy('position')->get()->map(fn($link) => [
@@ -129,7 +132,6 @@ class HandleInertiaRequests extends Middleware
                 'messages' => trans('messages'),
                 'admin' => trans('admin'),
                 'pages' => trans('pages'),
-                'puck' => trans('puck'),
                 'dashboard' => trans('dashboard'),
                 'marketplace' => trans('marketplace'),
             ],

@@ -1,6 +1,7 @@
 <?php
 
 use ExilonCMS\Http\Controllers\Api\AuthController;
+use ExilonCMS\Http\Controllers\Api\ExilonLinkController;
 use ExilonCMS\Http\Controllers\Api\FeedController;
 use ExilonCMS\Http\Controllers\Api\PublicResourceController;
 use ExilonCMS\Http\Controllers\Api\PostController;
@@ -26,6 +27,36 @@ Route::prefix('/auth')->name('auth.')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
 
+/*
+|--------------------------------------------------------------------------
+| ExilonLink API Routes (v1)
+|--------------------------------------------------------------------------
+| These routes handle communication between the CMS and ExilonLink server plugins.
+| Authentication is done via API key in X-ExilonLink-Key header.
+*/
+Route::prefix('v1/exilonlink')->group(function () {
+    // Server information (requires API key)
+    Route::get('/server', [ExilonLinkController::class, 'server']);
+
+    // Player information
+    Route::get('/players', [ExilonLinkController::class, 'players']);
+    Route::get('/players/{uuid}', [ExilonLinkController::class, 'player']);
+    Route::post('/players/{uuid}/command', [ExilonLinkController::class, 'playerCommand']);
+
+    // Server commands
+    Route::post('/command', [ExilonLinkController::class, 'command']);
+
+    // Sync player data from server
+    Route::post('/sync', [ExilonLinkController::class, 'sync']);
+
+    // Get pending command queue
+    Route::post('/queue', [ExilonLinkController::class, 'queue']);
+
+    // Register a new server (first setup)
+    Route::post('/register', [ExilonLinkController::class, 'register']);
+});
+
+// Legacy AzLink routes (deprecated - use v1/exilonlink instead)
 Route::prefix('/azlink')->middleware('server.token')->group(function () {
     Route::get('/', [ServerController::class, 'status'])->name('azlink');
     Route::post('/', [ServerController::class, 'fetch']);

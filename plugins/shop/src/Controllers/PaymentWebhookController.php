@@ -1,85 +1,39 @@
 <?php
 
-namespace ShopPlugin\Controllers;
+namespace ExilonCMS\Plugins\Shop\Controllers;
 
-use ExilonCMS\Http\Controllers\Controller;
-use ShopPlugin\Models\Payment;
-use ShopPlugin\Payment\PaymentManager;
+use ExilonCMS\Plugins\Shop\Models\Payment;
+use ExilonCMS\Plugins\Shop\Payment\PaymentManager;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
-class PaymentWebhookController extends Controller
+class PaymentWebhookController
 {
-    private PaymentManager $paymentManager;
+    public function __construct(
+        private PaymentManager $paymentManager
+    ) {}
 
-    public function __construct(PaymentManager $paymentManager)
+    public function handleTebex(Request $request, ?string $paymentId)
     {
-        $this->paymentManager = $paymentManager;
-    }
+        $gateway = $this->paymentManager->getGateway('tebex');
 
-    /**
-     * Handle webhook notification from payment gateway.
-     */
-    public function handle(Request $request, string $gateway)
-    {
-        Log::info('Payment webhook received', [
-            'gateway' => $gateway,
-            'payload' => $request->all(),
-        ]);
-
-        // Get payment method
-        $paymentMethod = $this->paymentManager->getPaymentMethod($gateway);
-
-        if (! $paymentMethod) {
-            Log::error('Unknown payment gateway', ['gateway' => $gateway]);
-            return response()->json(['error' => 'Unknown gateway'], 404);
+        if (!$gateway) {
+            abort(404, 'Tebex gateway not configured');
         }
 
-        // Get payment ID from request (varies by gateway)
-        $paymentId = $request->input('payment_id')
-            ?? $request->input('custom_id')
-            ?? $request->input('transaction_id')
-            ?? null;
+        $paymentMethod = $this->paymentManager->getPaymentMethod('tebex', $gateway);
 
-        try {
-            return $paymentMethod->handleNotification($request, $paymentId);
-        } catch (\Exception $e) {
-            Log::error('Payment webhook error', [
-                'gateway' => $gateway,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return response()->json(['error' => 'Processing error'], 500);
-        }
+        return $paymentMethod->handleNotification($request, $paymentId);
     }
 
-    /**
-     * Handle successful payment redirect.
-     */
-    public function success(Request $request, Payment $payment)
+    public function handlePayPal(Request $request, ?string $paymentId)
     {
-        // The payment should already be processed by the webhook
-        // This is just a redirect for the user
-        return redirect()->route('shop.orders.show', $payment->order_id)
-            ->with('success', 'Paiement réussi ! Votre commande est en cours de traitement.');
+        // TODO: Implement PayPal webhook handling
+        return response()->json(['status' => 'not_implemented'], 501);
     }
 
-    /**
-     * Handle cancelled payment redirect.
-     */
-    public function cancel(Request $request, Payment $payment)
+    public function handleStripe(Request $request, ?string $paymentId)
     {
-        return redirect()->route('shop.checkout')
-            ->with('info', 'Paiement annulé. Vous pouvez réessayer quand vous voulez.');
-    }
-
-    /**
-     * Handle failed payment redirect.
-     */
-    public function failure(Request $request, Payment $payment)
-    {
-        return redirect()->route('shop.checkout')
-            ->with('error', 'Le paiement a échoué. Veuillez réessayer ou contacter le support.');
+        // TODO: Implement Stripe webhook handling
+        return response()->json(['status' => 'not_implemented'], 501);
     }
 }

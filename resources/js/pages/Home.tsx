@@ -1,13 +1,6 @@
 import { Head } from '@inertiajs/react';
-import PuckLayout from '@/layouts/PuckLayout';
-import { Render } from '@measured/puck';
-import '@measured/puck/puck.css';
-import { puckConfig } from '@/puck/config';
-import { Post } from '@/types';
+import PublicLayout from '@/layouts/PublicLayout';
 import { trans } from '@/lib/i18n';
-import styles from './Home.module.css';
-import { Link, usePage } from '@inertiajs/react';
-import { PageProps } from '@/types';
 import HeroWithSocial from '@/components/HeroWithSocial';
 
 interface Server {
@@ -28,77 +21,32 @@ interface LandingSettings {
 interface Props {
   message?: string;
   siteName?: string;
-  posts: Post[];
   server?: Server;
   servers: Server[];
   landingSettings: LandingSettings;
 }
 
-export default function Home({ message, siteName, posts, server, servers, landingSettings }: Props) {
-  // Check if puck_data exists and is valid
-  let puckData = null;
-  const hasPuckData = landingSettings?.puck_data;
-
-  if (hasPuckData) {
-    try {
-      puckData = typeof landingSettings.puck_data === 'string'
-        ? JSON.parse(landingSettings.puck_data)
-        : landingSettings.puck_data;
-
-      // Inject posts into BlogBlock components
-      if (puckData?.content) {
-        puckData.content = puckData.content.map((item: any) => {
-          if (item.type === 'BlogBlock') {
-            return {
-              ...item,
-              props: {
-                ...item.props,
-                posts: posts,
-              }
-            };
-          }
-          return item;
-        });
-      }
-    } catch (e) {
-      console.error('Failed to parse puck_data:', e);
-      puckData = null;
-    }
-  }
-
-  // Check if we have valid Puck content
-  const hasPuckContent = puckData && puckData.content && puckData.content.length > 0;
-
+export default function Home({ message, siteName, server, servers, landingSettings }: Props) {
   return (
-    <PuckLayout>
+    <PublicLayout>
       <Head title={trans('messages.pages.title')} />
 
-      {hasPuckContent ? (
-        <div className={styles.root}>
-          <Render config={puckConfig} data={puckData} />
-        </div>
-      ) : (
-        <>
-          {/*
-            Gaming Landing Page with Social Links
+      {/*
+        Gaming Landing Page with Social Links
 
-            This is the default landing page when no Puck content is set.
-            Features:
-            - Vertical social links on the left
-            - Gaming-style grid background
-            - Server status display
-            - Auth-aware CTAs
-            - Fully responsive
-
-            Customize in: Admin → Pages
-          */}
-          <HeroWithSocial
-            siteName={siteName}
-            servers={servers}
-            showCustomizationNote={true}
-          />
-        </>
-      )}
-    </PuckLayout>
+        This is the default landing page.
+        Features:
+        - Vertical social links on the left
+        - Gaming-style grid background
+        - Server status display
+        - Auth-aware CTAs
+        - Fully responsive
+      */}
+      <HeroWithSocial
+        siteName={siteName}
+        servers={servers}
+        showCustomizationNote={false}
+      />
+    </PublicLayout>
   );
 }

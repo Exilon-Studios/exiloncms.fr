@@ -1,11 +1,11 @@
 <?php
 
-namespace ShopPlugin\Payment\Method;
+namespace ExilonCMS\Plugins\Shop\Payment;
 
+use ExilonCMS\Plugins\Shop\Models\Gateway;
+use ExilonCMS\Plugins\Shop\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
-use ShopPlugin\Models\Payment;
-use ShopPlugin\Payment\PaymentMethod;
 
 /**
  * Tebex (formerly Buycraft) payment gateway.
@@ -64,19 +64,12 @@ class TebexMethod extends PaymentMethod
 
         $type = $request->input('type');
 
-        switch ($type) {
-            case 'payment':
-                return $this->handlePayment($request);
-
-            case 'payment.reversed':
-                return $this->handleRefund($request);
-
-            case 'payment.chargeback':
-                return $this->handleChargeback($request);
-
-            default:
-                return response()->json(['status' => 'unknown'], 200);
-        }
+        return match ($type) {
+            'payment' => $this->handlePayment($request),
+            'payment.reversed' => $this->handleRefund($request),
+            'payment.chargeback' => $this->handleChargeback($request),
+            default => response()->json(['status' => 'unknown'], 200),
+        };
     }
 
     /**
@@ -282,14 +275,14 @@ class TebexMethod extends PaymentMethod
         $synced = 0;
 
         foreach ($packages as $package) {
-            \ShopPlugin\Models\Item::updateOrCreate(
+            Item::updateOrCreate(
                 ['tebex_id' => $package['id']],
                 [
                     'name' => $package['name'],
                     'description' => $package['description'] ?? '',
                     'price' => $package['price'],
                     'image' => $package['image'] ?? null,
-                    'category_id' => null, // To be set manually
+                    'category_id' => null,
                     'tebex_package_id' => $package['id'],
                 ]
             );

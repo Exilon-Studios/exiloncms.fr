@@ -1,9 +1,9 @@
 <?php
 
-namespace ShopPlugin\Models;
+namespace ExilonCMS\Plugins\Shop\Models;
 
-use ExilonCMS\Models\Model;
 use ExilonCMS\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -123,88 +123,5 @@ class Payment extends Model
     public function isFailed(): bool
     {
         return $this->status === self::STATUS_FAILED;
-    }
-
-    /**
-     * Deliver items to the user.
-     * This will execute server commands via ExilonLink.
-     */
-    public function deliver(): void
-    {
-        // Create order
-        $order = Order::create([
-            'user_id' => $this->user_id,
-            'payment_id' => $this->id,
-            'total' => $this->price,
-            'status' => 'completed',
-        ]);
-
-        // Process each payment item
-        foreach ($this->items as $paymentItem) {
-            // Create order item
-            OrderItem::create([
-                'order_id' => $order->id,
-                'item_id' => $paymentItem->item_id,
-                'quantity' => $paymentItem->quantity,
-                'price' => $paymentItem->price,
-            ]);
-
-            // Deliver item to user via server bridge
-            $this->deliverItem($paymentItem);
-        }
-
-        // Deduct user money if payment was made with virtual currency
-        if ($this->gateway_type === 'azuriom') {
-            $this->user->decrement('money', $this->price);
-        }
-    }
-
-    /**
-     * Deliver a single item to the user.
-     * This will send commands to the game server via ExilonLink.
-     */
-    protected function deliverItem(PaymentItem $paymentItem): void
-    {
-        $item = $paymentItem->item;
-        $user = $this->user;
-
-        // Execute server commands if configured
-        if ($item->commands) {
-            $server = $this->getServerBridge();
-
-            if ($server) {
-                foreach ($item->commands as $command) {
-                    // Replace placeholders
-                    $command = str_replace(
-                        ['{player}', '{uuid}', '{id}', '{quantity}'],
-                        [$user->name, $user->game_id, $user->id, $paymentItem->quantity],
-                        $command
-                    );
-
-                    $server->sendCommand($command);
-                }
-            }
-        }
-
-        // Add items to user inventory if applicable
-        if ($item->type === 'item' && $item->give_item) {
-            // Add to user's inventory
-            // This depends on your game implementation
-        }
-    }
-
-    /**
-     * Get the server bridge for command execution.
-     */
-    protected function getServerBridge()
-    {
-        // Get the active server from settings
-        $serverId = setting('exilonlink_server_id');
-
-        if (! $serverId) {
-            return null;
-        }
-
-        return \ShopPlugin\Services\ServerBridgeFactory::create($serverId);
     }
 }

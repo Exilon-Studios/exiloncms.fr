@@ -354,7 +354,6 @@ return [
             'deleted' => 'Page deleted',
             'delete_failed' => 'Failed to delete',
         ],
-        'puck_editor' => 'Puck',
     ],
 
     // ==================== POSTS ====================
@@ -923,20 +922,6 @@ return [
             'already_installed' => 'Already installed',
             'install' => 'Install',
         ],
-    ],
-
-    // ==================== PUCK EDITOR ====================
-    'puck' => [
-        'title' => 'Page Editor',
-        'view' => 'View page',
-        'save' => 'Save',
-        'saving' => 'Saving...',
-        'discard' => 'Discard',
-        'unsaved' => 'Unsaved changes',
-        'discarded' => 'Changes discarded',
-        'desktop' => 'Desktop',
-        'tablet' => 'Tablet',
-        'mobile' => 'Mobile',
     ],
 
     // ==================== COMPANY SETTINGS ====================

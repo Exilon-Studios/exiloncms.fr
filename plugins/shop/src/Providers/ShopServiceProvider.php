@@ -1,6 +1,6 @@
 <?php
 
-namespace ShopPlugin\Providers;
+namespace ExilonCMS\Plugins\Shop\Providers;
 
 use ExilonCMS\Extensions\Plugin\BasePluginServiceProvider;
 use Illuminate\Support\Facades\Route;
@@ -30,7 +30,7 @@ class ShopServiceProvider extends BasePluginServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton(\ShopPlugin\Payment\PaymentManager::class);
+        $this->app->singleton(\ExilonCMS\Plugins\Shop\Payment\PaymentManager::class);
     }
 
     /**
@@ -92,11 +92,9 @@ class ShopServiceProvider extends BasePluginServiceProvider
      */
     protected function registerPaymentManager(): void
     {
-        $paymentManager = $this->app->make(\ShopPlugin\Payment\PaymentManager::class);
+        $paymentManager = $this->app->make(\ExilonCMS\Plugins\Shop\Payment\PaymentManager::class);
 
         // Register built-in payment methods
-        $paymentManager->registerPaymentMethod('tebex', \ShopPlugin\Payment\Method\TebexMethod::class);
-        $paymentManager->registerPaymentMethod('paypal', \ShopPlugin\Payment\Method\PayPalMethod::class);
-        $paymentManager->registerPaymentMethod('stripe', \ShopPlugin\Payment\Method\StripeMethod::class);
+        $paymentManager->registerPaymentMethod('tebex', \ExilonCMS\Plugins\Shop\Payment\Method\TebexMethod::class);
     }
 }

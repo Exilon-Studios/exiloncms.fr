@@ -27,12 +27,6 @@ class HomeController extends Controller
         // Get landing page settings
         $landingSettings = LandingSetting::getAllGrouped();
 
-        // Add puck_data if exists
-        $puckData = LandingSetting::where('key', 'puck_data')->first();
-        if ($puckData) {
-            $landingSettings['puck_data'] = $puckData->value;
-        }
-
         return Inertia::render('Home', [
             'message' => setting('home_message'),
             'siteName' => setting('name', 'ExilonCMS'),
@@ -62,63 +56,6 @@ class HomeController extends Controller
                 'maxPlayers' => $s->getMaxPlayers(),
                 'playersPercents' => $s->getPlayersPercents(),
             ]),
-        ]);
-    }
-
-    /**
-     * Show the Puck editor for the landing page.
-     */
-    public function edit()
-    {
-        $landingSettings = LandingSetting::getAllGrouped();
-
-        // Get puck data if exists
-        $puckData = LandingSetting::where('key', 'puck_data')->first()?->value;
-
-        // Decode JSON if it's a string, otherwise use as-is
-        $initialData = null;
-        if ($puckData) {
-            if (is_string($puckData)) {
-                $initialData = json_decode($puckData, true);
-            } elseif (is_array($puckData)) {
-                $initialData = $puckData;
-            }
-        }
-
-        return Inertia::render('PuckEdit', [
-            'landingSettings' => $landingSettings,
-            'initialData' => $initialData,
-            'locale' => app()->getLocale(),
-        ]);
-    }
-
-    /**
-     * Save the landing page settings.
-     */
-    public function saveEdit(Request $request)
-    {
-        \Log::info('Puck save request received', ['data' => $request->all()]);
-
-        $data = $request->validate([
-            'puck_data' => ['required', 'string'],
-        ]);
-
-        \Log::info('Puck data validated', ['puck_data' => $data['puck_data']]);
-
-        // Save puck data
-        LandingSetting::updateOrCreate(
-            ['key' => 'puck_data'],
-            [
-                'value' => $data['puck_data'],
-                'type' => 'json',
-            ]
-        );
-
-        \Log::info('Puck data saved successfully');
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Landing page updated successfully'
         ]);
     }
 }

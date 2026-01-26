@@ -135,7 +135,12 @@
       "Bash(Select-String:*)",
       "Bash(git reset:*)",
       "Bash(git describe:*)",
-      "Bash(npm run build:installer:*)"
+      "Bash(npm run build:installer:*)",
+      "Bash(node:*)",
+      "Bash(grep:*)",
+      "Bash(ren:*)",
+      "Bash(gh repo edit:*)",
+      "Bash(gh run:*)"
     ],
     "deny": [],
     "ask": []

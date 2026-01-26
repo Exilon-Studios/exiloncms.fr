@@ -1,10 +1,16 @@
 <?php
 
-namespace ShopPlugin\Payment;
+namespace ExilonCMS\Plugins\Shop\Payment;
 
+use ExilonCMS\Models\User;
+use ExilonCMS\Plugins\Shop\Models\Gateway;
+use ExilonCMS\Plugins\Shop\Models\Item;
+use ExilonCMS\Plugins\Shop\Models\Order;
+use ExilonCMS\Plugins\Shop\Models\OrderItem;
+use ExilonCMS\Plugins\Shop\Models\Payment;
+use ExilonCMS\Plugins\Shop\Models\PaymentItem;
 use Illuminate\Http\Request;
-use ShopPlugin\Models\Gateway;
-use ShopPlugin\Models\Payment;
+use Illuminate\Support\Facades\DB;
 
 abstract class PaymentMethod
 {
@@ -35,7 +41,7 @@ abstract class PaymentMethod
      * Start a new payment with this method.
      * Should return a response (redirect, view, etc.) to initiate the payment.
      *
-     * @param \ShopPlugin\Cart\Cart $cart The shopping cart
+     * @param mixed $cart The shopping cart
      * @param float $amount The payment amount
      * @param string $currency ISO 4217 currency code
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
@@ -110,8 +116,8 @@ abstract class PaymentMethod
             'completed_at' => now(),
         ]);
 
-        // Deliver items to user
-        $payment->deliver();
+        // Create order and deliver items
+        $this->createOrderAndDeliver($payment);
 
         return response()->json(['status' => 'success']);
     }
@@ -150,5 +156,92 @@ abstract class PaymentMethod
     protected function verifySignature(Request $request): bool
     {
         return true; // Override in specific payment methods
+    }
+
+    /**
+     * Create order and deliver items to user.
+     */
+    protected function createOrderAndDeliver(Payment $payment): void
+    {
+        // Create order
+        $order = Order::create([
+            'user_id' => $payment->user_id,
+            'payment_id' => $payment->id,
+            'total' => $payment->price,
+            'status' => 'completed',
+        ]);
+
+        // Process each payment item
+        foreach ($payment->items as $paymentItem) {
+            // Create order item
+            OrderItem::create([
+                'order_id' => $order->id,
+                'item_id' => $paymentItem->item_id,
+                'quantity' => $paymentItem->quantity,
+                'price' => $paymentItem->price,
+            ]);
+
+            // Deliver item to user
+            $this->deliverItem($paymentItem, $payment->user);
+        }
+    }
+
+    /**
+     * Deliver a single item to the user.
+     */
+    protected function deliverItem(PaymentItem $paymentItem, User $user): void
+    {
+        $item = $paymentItem->item;
+
+        // Execute delivery based on item type
+        match ($item->type) {
+            Item::TYPE_CURRENCY => $user->increment('money', $item->price),
+            Item::TYPE_RANK => $this->giveRole($user, $item),
+            Item::TYPE_COMMAND => $this->executeCommands($user, $item, $paymentItem->quantity),
+            default => null,
+        };
+    }
+
+    /**
+     * Give role to user.
+     */
+    protected function giveRole(User $user, Item $item): void
+    {
+        if (!$item->role_id) {
+            return;
+        }
+
+        // Check if user already has this role
+        $existing = DB::table('role_user')
+            ->where('user_id', $user->id)
+            ->where('role_id', $item->role_id)
+            ->first();
+
+        if (!$existing) {
+            DB::table('role_user')->insert([
+                'user_id' => $user->id,
+                'role_id' => $item->role_id,
+            ]);
+        }
+    }
+
+    /**
+     * Execute server commands for item delivery.
+     */
+    protected function executeCommands(User $user, Item $item, int $quantity): void
+    {
+        if (!$item->commands) {
+            return;
+        }
+
+        // TODO: Implement server command execution via ExilonLink or RCON
+        // foreach ($item->commands as $command) {
+        //     $command = str_replace(
+        //         ['{player}', '{uuid}', '{id}', '{quantity}'],
+        //         [$user->name, $user->uuid, $user->id, $quantity],
+        //         $command
+        //     );
+        //     // Execute command
+        // }
     }
 }

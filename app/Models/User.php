@@ -237,6 +237,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * Get the user's vote rewards.
+     */
+    public function voteRewards()
+    {
+        return $this->belongsToMany(\ExilonCMS\Plugins\Votes\Models\VoteReward::class, 'user_vote_rewards')
+            ->withPivot('vote_id', 'received_at')
+            ->withTimestamps();
+    }
+
+    /**
      * Get the user's seller verifier.
      */
     public function sellerVerifier()

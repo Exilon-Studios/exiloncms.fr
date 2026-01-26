@@ -12,6 +12,7 @@
   "scripts": {
     "build": "vite build",
     "build:installer": "vite build --config vite.installer.config.ts",
+    "build:all": "npm run build && npm run build:installer",
     "dev": "vite"
   },
   "devDependencies": {

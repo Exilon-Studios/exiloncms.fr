@@ -1,9 +1,9 @@
 <?php
 
-namespace ShopPlugin\Models;
+namespace ExilonCMS\Plugins\Shop\Models;
 
-use ExilonCMS\Models\Model;
 use ExilonCMS\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 

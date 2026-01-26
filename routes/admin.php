@@ -8,10 +8,7 @@ use ExilonCMS\Http\Controllers\Admin\ImageController;
 use ExilonCMS\Http\Controllers\Admin\IntegrationsController;
 use ExilonCMS\Http\Controllers\Admin\LanguageController;
 use ExilonCMS\Http\Controllers\Admin\NavbarController;
-use ExilonCMS\Http\Controllers\Admin\PageAttachmentController;
-use ExilonCMS\Http\Controllers\Admin\PageController;
-use ExilonCMS\Http\Controllers\Admin\PostAttachmentController;
-use ExilonCMS\Http\Controllers\Admin\PostController;
+// Core Page and Post controllers removed - replaced by plugins
 use ExilonCMS\Http\Controllers\Admin\RedirectController;
 use ExilonCMS\Http\Controllers\Admin\ResourceController;
 use ExilonCMS\Http\Controllers\Admin\RoleController;
@@ -21,14 +18,16 @@ use ExilonCMS\Http\Controllers\Admin\SettingsController;
 use ExilonCMS\Http\Controllers\Admin\SocialLinkController;
 use ExilonCMS\Http\Controllers\Admin\ThemeController;
 use ExilonCMS\Http\Controllers\Admin\ThemeSettingsController;
-use ExilonCMS\Http\Controllers\Admin\TranslationController;
+// Translation controller removed - replaced by Translations plugin
 use ExilonCMS\Http\Controllers\Admin\UpdateController;
 use ExilonCMS\Http\Controllers\Admin\UserController;
 use ExilonCMS\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use ExilonCMS\Http\Controllers\Admin\NotificationManagerController;
 use ExilonCMS\Http\Controllers\Admin\CompanySettingsController;
-use ExilonCMS\Http\Controllers\Admin\LegalPageController;
+// LegalPage controller removed - replaced by Legal plugin
 use ExilonCMS\Http\Controllers\Admin\OnboardingController;
+use ExilonCMS\Http\Controllers\Admin\PluginManagerController;
+use ExilonCMS\Http\Controllers\Admin\MarketplaceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AdminController::class, 'index'])->name('dashboard');
@@ -55,9 +54,31 @@ Route::prefix('themes')->name('themes.')->middleware('can:admin.settings')->grou
     Route::get('/', [ThemeController::class, 'index'])->name('index');
     Route::post('/{themeId}/activate', [ThemeController::class, 'activate'])->name('activate');
     Route::post('/deactivate', [ThemeController::class, 'deactivate'])->name('deactivate');
+    Route::post('/{themeId}/toggle', [ThemeController::class, 'toggleEnabled'])->name('toggle');
     Route::post('/{themeId}/publish', [ThemeController::class, 'publishAssets'])->name('publish');
     Route::get('/preview/{themeId}', [ThemeController::class, 'preview'])->name('preview');
     Route::get('/exit-preview', [ThemeController::class, 'exitPreview'])->name('exit-preview');
+});
+
+// ============================================================
+// PLUGIN MANAGER ROUTES (WordPress-style)
+// ============================================================
+Route::prefix('plugins')->name('plugins.')->middleware('can:admin.settings')->group(function () {
+    Route::get('/', [PluginManagerController::class, 'index'])->name('index');
+    Route::post('/upload', [PluginManagerController::class, 'upload'])->name('upload');
+    Route::post('/{plugin}/toggle', [PluginManagerController::class, 'toggle'])->name('toggle');
+    Route::delete('/{plugin}', [PluginManagerController::class, 'delete'])->name('delete');
+});
+
+// ============================================================
+// MARKETPLACE SSO INTEGRATION
+// ============================================================
+Route::prefix('marketplace')->name('marketplace.')->middleware('can:admin.settings')->group(function () {
+    Route::get('/', [MarketplaceController::class, 'index'])->name('index');
+    Route::post('/connect', [MarketplaceController::class, 'connect'])->name('connect');
+    Route::post('/disconnect', [MarketplaceController::class, 'disconnect'])->name('disconnect');
+    Route::get('/install/{itemId}', [MarketplaceController::class, 'install'])->name('install');
+    Route::post('/sync', [MarketplaceController::class, 'sync'])->name('sync');
 });
 
 Route::prefix('settings')->name('settings.')->middleware('can:admin.settings')->group(function () {
@@ -72,20 +93,7 @@ Route::prefix('settings')->name('settings.')->middleware('can:admin.settings')->
     Route::post('/company/update', [CompanySettingsController::class, 'update'])->name('company.update');
     Route::get('/company/api', [CompanySettingsController::class, 'api'])->name('company.api');
 
-    // Legal pages routes
-    Route::prefix('legal')->name('legal.')->group(function () {
-        Route::get('/terms', [LegalPageController::class, 'terms'])->name('terms');
-        Route::post('/terms/update', [LegalPageController::class, 'updateTerms'])->name('terms.update');
-
-        Route::get('/privacy', [LegalPageController::class, 'privacy'])->name('privacy');
-        Route::post('/privacy/update', [LegalPageController::class, 'updatePrivacy'])->name('privacy.update');
-
-        Route::get('/cookies', [LegalPageController::class, 'cookies'])->name('cookies');
-        Route::post('/cookies/update', [LegalPageController::class, 'updateCookies'])->name('cookies.update');
-
-        Route::get('/refund', [LegalPageController::class, 'refund'])->name('refund');
-        Route::post('/refund/update', [LegalPageController::class, 'updateRefund'])->name('refund.update');
-    });
+    // Legal pages routes removed - replaced by Legal plugin
 
     Route::get('/security', [SettingsController::class, 'security'])->name('security');
     Route::post('/security/update', [SettingsController::class, 'updateSecurity'])->name('security.update');
@@ -152,17 +160,11 @@ Route::post('/roles/settings', [RoleController::class, 'updateSettings'])->name(
 Route::resource('bans', BanController::class)->only('index')->middleware('can:admin.users');
 Route::resource('users.bans', BanController::class)->only(['store', 'destroy'])->middleware('can:admin.users');
 
-Route::resource('pages', PageController::class)->except('show')->middleware('can:admin.pages');
-Route::get('pages/{page}/puck-editor', [PageController::class, 'puckEditor'])->name('pages.puck-editor')->middleware('can:admin.pages.puck-edit');
-Route::resource('posts', PostController::class)->except('show')->middleware('can:admin.posts');
+// Pages and Posts routes removed - replaced by Pages and Blog plugins
 Route::resource('images', ImageController::class)->except('show')->middleware('can:admin.images');
 Route::resource('redirects', RedirectController::class)->except('show')->middleware('can:admin.redirects');
 
-Route::resource('pages.attachments', PageAttachmentController::class)->only('store');
-Route::resource('posts.attachments', PostAttachmentController::class)->only('store');
-Route::post('pages/attachments/{pendingId}', [PageAttachmentController::class, 'pending'])->name('pages.attachments.pending');
-Route::post('posts/attachments/{pendingId}', [PostAttachmentController::class, 'pending'])->name('posts.attachments.pending');
-
+// Page and Post attachment routes removed - replaced by plugins
 Route::resource('servers', ServerController::class)->except('show');
 Route::post('/servers/{server}/verify/azlink', [ServerController::class, 'verifyAzLink'])->name('servers.verify-azlink');
 Route::post('/servers/default', [ServerController::class, 'changeDefault'])->name('servers.change-default');
@@ -179,12 +181,7 @@ Route::prefix('languages')->name('languages.')->middleware('can:admin.settings')
     Route::post('/{locale}/update', [LanguageController::class, 'update'])->name('update');
 });
 
-Route::prefix('translations')->name('translations.')->middleware('can:admin.settings')->group(function () {
-    Route::get('/', [TranslationController::class, 'index'])->name('index');
-    Route::post('/', [TranslationController::class, 'store'])->name('store');
-    Route::post('/import', [TranslationController::class, 'import'])->name('import');
-    Route::delete('/{group}/{key}/{locale}', [TranslationController::class, 'destroy'])->name('destroy');
-});
+// Translations routes removed - replaced by Translations plugin
 
 Route::prefix('notifications')->name('notifications.')->middleware('can:admin.users')->group(function () {
     Route::get('/', [NotificationManagerController::class, 'index'])->name('index');

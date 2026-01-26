@@ -5,6 +5,6 @@
     "description": "Système de boutique pour ExilonCMS - Permet aux utilisateurs d'acheter des items avec leur monnaie virtuelle",
     "author": "ExilonCMS",
     "url": "https://exiloncms.fr",
-    "namespace": "ShopPlugin",
-    "service_provider": "ShopPlugin\\Providers\\ShopServiceProvider"
+    "namespace": "ExilonCMS\\Plugins\\Shop",
+    "service_provider": "ExilonCMS\\Plugins\\Shop\\Providers\\ShopServiceProvider"
 }

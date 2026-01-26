@@ -415,9 +415,6 @@ return array (
           'installed' => 'Mises à jour installées',
         ),
       ),
-      'puck' => array (
-        'title' => 'Éditeur de page',
-      ),
       'marketplace' => array (
         'title' => 'Marketplace',
         'description' => 'Parcourir et installer des packages depuis marketplace.exiloncms.fr',

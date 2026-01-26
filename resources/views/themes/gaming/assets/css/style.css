@@ -1,0 +1,133 @@
+/**
+ * Gaming Theme - Dark Aesthetics
+ * Perfect for gaming websites and game server communities
+ */
+
+:root {
+  --gaming-primary: #8b5cf6;
+  --gaming-primary-hover: #7c3aed;
+  --gaming-secondary: #06b6d4;
+  --gaming-accent: #f43f5e;
+  --gaming-bg-dark: #0f172a;
+  --gaming-bg-card: #1e293b;
+  --gaming-bg-hover: #334155;
+  --gaming-text-primary: #f1f5f9;
+  --gaming-text-secondary: #94a3b8;
+  --gaming-border: #334155;
+  --gaming-gradient: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 100%);
+}
+
+.gaming-theme {
+  background-color: var(--gaming-bg-dark);
+  color: var(--gaming-text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.gaming-theme .hero-section {
+  background: var(--gaming-gradient);
+  padding: 4rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.gaming-theme .hero-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+  animation: pulse 15s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.gaming-theme .card {
+  background-color: var(--gaming-bg-card);
+  border: 1px solid var(--gaming-border);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.gaming-theme .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border-color: var(--gaming-primary);
+}
+
+.gaming-theme .btn-primary {
+  background: var(--gaming-gradient);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.gaming-theme .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(139, 92, 246, 0.6);
+}
+
+.gaming-theme .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.gaming-theme .stat-card {
+  background: linear-gradient(135deg, var(--gaming-bg-card) 0%, var(--gaming-bg-hover) 100%);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--gaming-border);
+  text-align: center;
+}
+
+.gaming-theme .stat-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: var(--gaming-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gaming-theme .nav-gaming {
+  background-color: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--gaming-border);
+}
+
+.gaming-theme .footer {
+  background-color: var(--gaming-bg-card);
+  border-top: 1px solid var(--gaming-border);
+  padding: 3rem 2rem;
+  margin-top: 4rem;
+}
+
+/* Gaming Server Status */
+.gaming-theme .server-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--gaming-bg-card);
+  border-radius: 2rem;
+  border: 1px solid var(--gaming-border);
+}
+
+.gaming-theme .status-online {
+  color: #22c55e;
+}
+
+.gaming-theme .status-offline {
+  color: #ef4444;
+}

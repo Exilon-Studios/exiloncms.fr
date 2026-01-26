@@ -242,8 +242,8 @@ class OnboardingController extends Controller
 
     protected function saveFirstPage(Request $request): void
     {
-        // This is just a marker - the user will create pages in the Puck editor
-        // We mark this step as done if they click "Create Page Later" or "Go to Editor"
+        // This is just a marker - the user will create pages in the admin
+        // We mark this step as done if they click "Create Page Later"
     }
 
     // ============================================================

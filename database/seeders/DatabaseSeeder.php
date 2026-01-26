@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             CompanySettingsSeeder::class,
             LandingSettingsSeeder::class,
             MarketplaceSettingsSeeder::class,
-            PuckPermissionSeeder::class,
+            ThemeSeeder::class,
         ];
 
         // Only add ShopSeeder if the plugin is available

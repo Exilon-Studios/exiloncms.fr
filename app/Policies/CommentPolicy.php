@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Policies;
 
-use ExilonCMS\Models\Comment;
 use ExilonCMS\Models\User;
+use ExilonCMS\Plugins\Blog\Models\Comment;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommentPolicy
@@ -23,6 +23,6 @@ class CommentPolicy
      */
     public function delete(User $user, Comment $comment): bool
     {
-        return $user->is($comment->author) || $user->can('comments.delete.other');
+        return $user->is($comment->user) || $user->can('comments.delete.other');
     }
 }

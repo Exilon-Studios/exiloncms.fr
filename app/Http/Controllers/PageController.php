@@ -2,7 +2,7 @@
 
 namespace ExilonCMS\Http\Controllers;
 
-use ExilonCMS\Models\Page;
+use ExilonCMS\Plugins\Pages\Models\Page;
 use Inertia\Inertia;
 
 class PageController extends Controller

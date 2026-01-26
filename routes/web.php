@@ -135,12 +135,6 @@ Route::prefix('news')->name('posts.')->group(function () {
 Route::resource('posts.comments', PostCommentController::class)
     ->middleware(['auth', 'verified'])->only(['store', 'destroy']);
 
-// Puck Editor routes
-Route::middleware(['auth', 'puck.edit'])->prefix('edit')->name('puck.')->group(function () {
-    Route::get('/', [HomeController::class, 'edit'])->name('index');
-    Route::post('/save', [HomeController::class, 'saveEdit'])->name('save');
-});
-
 // Resources / Marketplace routes
 Route::prefix('resources')->name('resources.')->group(function () {
     Route::get('/', [ResourceController::class, 'index'])->name('index');

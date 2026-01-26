@@ -1,8 +1,8 @@
 <?php
 
-namespace ShopPlugin\Models;
+namespace ExilonCMS\Plugins\Shop\Models;
 
-use ExilonCMS\Models\Model;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
