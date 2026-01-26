@@ -4,6 +4,7 @@ namespace ExilonCMS\Providers;
 
 use ExilonCMS\Games\FallbackGame;
 use ExilonCMS\Games\FiveMGame;
+use ExilonCMS\Games\HytaleGame;
 use ExilonCMS\Games\Minecraft\MinecraftBedrockGame;
 use ExilonCMS\Games\Minecraft\MinecraftOfflineGame;
 use ExilonCMS\Games\Minecraft\MinecraftOnlineGame;
@@ -42,6 +43,7 @@ class GameServiceProvider extends ServiceProvider
             'tf2' => SteamGame::forName('tf2', 'Team Fortress 2'),
             'unturned' => SteamGame::forName('unturned', 'Unturned'),
             '7dtd' => SteamGame::forName('7dtd', '7 Days to Die', true),
+            'hytale' => HytaleGame::class,
         ]);
     }
 

@@ -32,4 +32,9 @@ return [
         'id' => 'XUID',
         'commands' => 'You can use <code>{name}</code> for the player username and <code>{xuid}</code> for the player XUID',
     ],
+
+    'hytale' => [
+        'id' => 'UUID',
+        'commands' => 'You can use <code>{name}</code> for the player username and <code>{uuid}</code> for the player UUID',
+    ],
 ];

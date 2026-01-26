@@ -3,6 +3,7 @@
 namespace ExilonCMS\Http\Controllers;
 
 use ExilonCMS\Games\FiveMGame;
+use ExilonCMS\Games\HytaleGame;
 use ExilonCMS\Games\Minecraft\MinecraftBedrockGame;
 use ExilonCMS\Games\Minecraft\MinecraftOnlineGame;
 use ExilonCMS\Games\Steam\SteamGame;
@@ -62,6 +63,10 @@ class InstallController extends Controller
         'mc-bedrock' => [
             'name' => 'Minecraft: Bedrock Edition',
             'logo' => 'assets/img/games/minecraft.svg',
+        ],
+        'hytale' => [
+            'name' => 'Hytale (Early Access)',
+            'logo' => 'assets/img/games/hytale.png',
         ],
         'gmod' => [
             'name' => 'Garry\'s mod',
@@ -252,10 +257,10 @@ class InstallController extends Controller
             ]);
         }
 
-        if ($game === 'mc-bedrock') {
+        if ($game === 'mc-bedrock' || $game === 'hytale') {
             return view('install.games.minecraft', [
                 'game' => $game,
-                'gameName' => 'Minecraft: Bedrock Edition',
+                'gameName' => $this->games[$game]['name'],
                 'locales' => self::getAvailableLocales(),
             ]);
         }
@@ -289,8 +294,8 @@ class InstallController extends Controller
                 return $this->setupSteamGame($request, $game);
             }
 
-            if ($game === 'minecraft' || $game === 'mc-bedrock') {
-                return $this->setupMinecraftGame($request, $game);
+            if ($game === 'minecraft' || $game === 'mc-bedrock' || $game === 'hytale') {
+                return $this->setupMinecraftOrHytale($request, $game);
             }
 
             if ($game === 'fivem-cfx') {
@@ -350,13 +355,13 @@ class InstallController extends Controller
     }
 
     /**
-     * Install ExilonCMS for Minecraft (with register or Microsoft OAuth).
+     * Install ExilonCMS for Minecraft (with register or Microsoft OAuth) or Hytale.
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function setupMinecraftGame(Request $request, string $game)
+    protected function setupMinecraftOrHytale(Request $request, string $game)
     {
-        if ($game !== 'mc-bedrock') {
+        if ($game !== 'mc-bedrock' && $game !== 'hytale') {
             $game = $request->input('oauth') ? 'mc-online' : 'mc-offline';
         }
 
@@ -368,6 +373,7 @@ class InstallController extends Controller
         ]);
 
         $name = $request->input('name');
+        $gameId = null;
 
         if ($game === 'mc-online') {
             $gameId = Str::remove('-', $request->input('uuid', ''));
@@ -383,6 +389,12 @@ class InstallController extends Controller
 
             if ($name === null) {
                 throw ValidationException::withMessages(['xuid' => 'Invalid Xbox XUID.']);
+            }
+        } elseif ($game === 'hytale') {
+            $response = Http::get(HytaleGame::PLAYER_LOOKUP.$request->input('name'));
+
+            if (! $response->successful() || ! ($gameId = $response->json('data.player.id'))) {
+                throw ValidationException::withMessages(['name' => 'You must enter a valid Hytale username.']);
             }
         }
 
@@ -473,7 +485,7 @@ class InstallController extends Controller
 
         $user->markEmailAsVerified();
 
-        if ($game !== 'mc-offline') {
+        if ($game !== 'mc-offline' && $game !== 'hytale') {
             Setting::updateSettings('register', false);
         }
 
