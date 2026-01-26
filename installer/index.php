@@ -465,6 +465,26 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                         file_get_contents($envFile)
                     ));
                 }
+
+                // Run migrations for SQLite (default database)
+                $envContent = file_get_contents($envFile);
+                if (str_contains($envContent, 'DB_DATABASE=database/database.sqlite')) {
+                    // Create SQLite database directory and file if they don't exist
+                    $dbDir = __DIR__ . '/database';
+                    if (! is_dir($dbDir)) {
+                        mkdir($dbDir, 0755, true);
+                    }
+                    $dbFile = __DIR__ . '/database/database.sqlite';
+                    if (! file_exists($dbFile)) {
+                        touch($dbFile);
+                    }
+
+                    // Run migrations
+                    @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan migrate --force 2>&1', $migrateOutput, $migrateReturnCode);
+
+                    // Run seeders
+                    @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan db:seed --force 2>&1', $seedOutput, $seedReturnCode);
+                }
             }
 
             // Note: Installer files are kept for the redirect to work
