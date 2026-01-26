@@ -120,38 +120,17 @@ jobs:
       - name: Generate release notes
         id: release_notes
         run: |
-          # Read checksums into variables
-          CMS_SHA256=$(cat exiloncms-${{ steps.get_version.outputs.version }}.zip.sha256 | cut -d' ' -f1)
-          CMS_MD5=$(cat exiloncms-${{ steps.get_version.outputs.version }}.zip.md5 | cut -d' ' -f1)
-          INSTALLER_SHA256=$(cat exiloncms-installer-${{ steps.get_version.outputs.version }}.zip.sha256 | cut -d' ' -f1)
-          INSTALLER_MD5=$(cat exiloncms-installer-${{ steps.get_version.outputs.version }}.zip.md5 | cut -d' ' -f1)
-
           cat > release_notes.md << EOF
           ## 🚀 ExilonCMS ${{ steps.get_version.outputs.version }}
 
-          See [installation documentation](https://exiloncms.fr/docs/installation) for setup instructions.
+          📖 [Installation Documentation](https://exiloncms.fr/docs/installation) | 📝 [Changelog](https://github.com/Exilon-Studios/ExilonCMS/blob/main/CHANGELOG.md)
+
+          ### Quick Start
+          - **Standalone Installer**: Download \`exiloncms-installer-${{ steps.get_version.outputs.version }}.zip\` below, extract, and run \`php -S localhost:8000\` in the installer directory
+          - **Full Package**: Download \`exiloncms-${{ steps.get_version.outputs.version }}.zip\` below and follow the manual setup guide
 
           ### Upgrading
           If you're already running ExilonCMS, use the built-in update system in the admin panel at \`/admin/updates\`.
-
-          ### What's Changed
-          See the full changelog at https://github.com/Exilon-Studios/ExilonCMS/blob/main/CHANGELOG.md
-
-          ### Downloads
-
-          #### CMS Package
-          - 📦 **exiloncms-${{ steps.get_version.outputs.version }}.zip** - Full CMS package
-          - 🔐 **SHA256**: \`$CMS_SHA256\`
-          - 🔑 **MD5**: \`$CMS_MD5\`
-
-          #### Standalone Installer
-          - 🚀 **exiloncms-installer-${{ steps.get_version.outputs.version }}.zip** - Web installer (downloads CMS automatically)
-          - 🔐 **SHA256**: \`$INSTALLER_SHA256\`
-          - 🔑 **MD5**: \`$INSTALLER_MD5\`
-
-          ### Requirements
-          - PHP 8.2 or higher
-          - SQLite 3.8+ (included) or PostgreSQL 10+ or MySQL 8+
           EOF
 
       - name: Create GitHub Release
