@@ -991,7 +991,47 @@ class InstallController extends Controller
      */
     public function showCompleteWeb(): Response
     {
+        // Clean up installer files after successful installation
+        $this->cleanupInstallerFiles();
+
         return Inertia::render('Install/Complete');
+    }
+
+    /**
+     * Remove standalone installer files after CMS installation.
+     * Only removes files that belong to the standalone installer.
+     */
+    protected function cleanupInstallerFiles(): void
+    {
+        $basePath = base_path();
+
+        // Check if index.php is the installer (not the CMS)
+        $indexPath = $basePath . '/index.php';
+        if (file_exists($indexPath)) {
+            $content = file_get_contents($indexPath);
+            // Check for installer-specific marker
+            if (str_contains($content, 'ExilonCMS installer') || str_contains($content, 'installerVersion')) {
+                // This is the standalone installer, safe to remove
+                @unlink($indexPath);
+
+                // Remove other installer files
+                $installerFiles = [
+                    $basePath . '/.htaccess',
+                    $basePath . '/README.md',
+                    $basePath . '/public/index.php',
+                    $basePath . '/public/.htaccess',
+                ];
+
+                foreach ($installerFiles as $file) {
+                    if (file_exists($file)) {
+                        @unlink($file);
+                    }
+                }
+
+                // Try to remove public directory if empty
+                @rmdir($basePath . '/public');
+            }
+        }
     }
 
     /**
