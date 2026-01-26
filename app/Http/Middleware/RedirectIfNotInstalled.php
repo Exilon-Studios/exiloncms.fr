@@ -14,6 +14,8 @@ class RedirectIfNotInstalled
     protected array $except = [
         'install',
         'install/*',
+        'wizard',
+        'wizard/*',
     ];
 
     /**
