@@ -383,6 +383,17 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 throw new RuntimeException('CMS file not downloaded.');
             }
 
+            // === IMPORTANT: Create .env FIRST, before extracting CMS files ===
+            $envFile = __DIR__ . '/.env';
+            $envExample = __DIR__ . '/.env.example';
+
+            // If .env.example will be extracted, wait for it. Otherwise create from template.
+            if (! file_exists($envExample)) {
+                // Create a minimal .env file before extraction
+                $key = 'base64:' . base64_encode(random_bytes(32));
+                file_put_contents($envFile, "APP_KEY=$key\nAPP_DEBUG=true\nAPP_URL=http://localhost\nDB_CONNECTION=sqlite\nDB_DATABASE=database/database.sqlite\n");
+            }
+
             $zip = new ZipArchive();
             $status = $zip->open($zipFile);
 
@@ -441,35 +452,26 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $zip->close();
             unlink($zipFile);
 
-            // Create .env file from .env.example if it doesn't exist
-            $envFile = __DIR__ . '/.env';
-            $envExample = __DIR__ . '/.env.example';
-
+            // Now that files are extracted, ensure .env is properly set up
             if (! file_exists($envFile) && file_exists($envExample)) {
                 copy($envExample, $envFile);
             }
 
-            // Generate APP_KEY using Laravel's key generator if available
-            if (file_exists($envFile) && file_exists(__DIR__ . '/artisan')) {
-                // Try to run php artisan key:generate
-                $output = [];
-                $returnCode = 0;
-                @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan key:generate --force 2>&1', $output, $returnCode);
-
-                // If artisan key:generate failed, try to generate a simple key
-                if ($returnCode !== 0 && !str_contains(file_get_contents($envFile), 'APP_KEY')) {
+            // Generate APP_KEY if not set
+            if (file_exists($envFile)) {
+                $envContent = file_get_contents($envFile);
+                // Check if APP_KEY is missing or empty
+                if (!str_contains($envContent, 'APP_KEY=') || preg_match('/^APP_KEY=$/m', $envContent)) {
                     $key = 'base64:' . base64_encode(random_bytes(32));
-                    file_put_contents($envFile, str_replace(
-                        'APP_KEY=',
-                        'APP_KEY=' . $key,
-                        file_get_contents($envFile)
-                    ));
+                    $envContent = preg_replace('/^APP_KEY=.*$/m', 'APP_KEY=' . $key, $envContent, -1, $count);
+                    if ($count === 0) {
+                        $envContent .= "\nAPP_KEY=$key\n";
+                    }
+                    file_put_contents($envFile, $envContent);
                 }
 
-                // Run migrations for SQLite (default database)
-                $envContent = file_get_contents($envFile);
+                // Create SQLite database and run migrations
                 if (str_contains($envContent, 'DB_DATABASE=database/database.sqlite')) {
-                    // Create SQLite database directory and file if they don't exist
                     $dbDir = __DIR__ . '/database';
                     if (! is_dir($dbDir)) {
                         mkdir($dbDir, 0755, true);
@@ -479,16 +481,11 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                         touch($dbFile);
                     }
 
-                    // Run migrations
+                    // Run migrations and seeders
                     @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan migrate --force 2>&1', $migrateOutput, $migrateReturnCode);
-
-                    // Run seeders
                     @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan db:seed --force 2>&1', $seedOutput, $seedReturnCode);
                 }
             }
-
-            // Note: Installer files are kept for the redirect to work
-            // Users can manually delete the installer files after setup
 
             $data['extracted'] = true;
             send_json_response($data);
