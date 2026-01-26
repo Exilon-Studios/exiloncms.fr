@@ -2,11 +2,11 @@
 
 namespace ExilonCMS\Providers;
 
+use Exception;
 use ExilonCMS\Extensions\Plugin\PluginServiceProvider;
 use ExilonCMS\Extensions\Theme\ThemeServiceProvider;
 use ExilonCMS\Models\Setting;
 use ExilonCMS\Support\SettingsRepository;
-use Exception;
 use Illuminate\Support\ServiceProvider;
 
 class ExtensionServiceProvider extends ServiceProvider

@@ -36,7 +36,6 @@ class ExilonCMS
      *
      * @param  string|null  $name  Setting name (null to get all settings)
      * @param  mixed  $default  Default value if setting doesn't exist
-     * @return mixed
      */
     public static function setting(?string $name = null, mixed $default = null): mixed
     {

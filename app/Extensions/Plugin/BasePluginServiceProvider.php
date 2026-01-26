@@ -2,9 +2,9 @@
 
 namespace ExilonCMS\Extensions\Plugin;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 
 abstract class BasePluginServiceProvider extends ServiceProvider
 {
@@ -34,7 +34,7 @@ abstract class BasePluginServiceProvider extends ServiceProvider
      */
     protected function registerRoutes(): void
     {
-        $routesFile = $this->pluginPath . '/routes/web.php';
+        $routesFile = $this->pluginPath.'/routes/web.php';
 
         if (File::exists($routesFile)) {
             Route::middleware(['web', 'auth'])
@@ -47,7 +47,7 @@ abstract class BasePluginServiceProvider extends ServiceProvider
      */
     protected function registerViews(): void
     {
-        $viewsPath = $this->pluginPath . '/resources/views';
+        $viewsPath = $this->pluginPath.'/resources/views';
 
         if (File::exists($viewsPath)) {
             $this->loadViewsFrom($viewsPath, $this->pluginId);
@@ -59,7 +59,7 @@ abstract class BasePluginServiceProvider extends ServiceProvider
      */
     protected function registerTranslations(): void
     {
-        $langPath = $this->pluginPath . '/resources/lang';
+        $langPath = $this->pluginPath.'/resources/lang';
 
         if (File::exists($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->pluginId);
@@ -71,7 +71,7 @@ abstract class BasePluginServiceProvider extends ServiceProvider
      */
     protected function registerMigrations(): void
     {
-        $migrationsPath = $this->pluginPath . '/database/migrations';
+        $migrationsPath = $this->pluginPath.'/database/migrations';
 
         if (File::exists($migrationsPath) && $this->app->runningInConsole()) {
             $this->loadMigrationsFrom($migrationsPath);

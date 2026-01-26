@@ -113,7 +113,7 @@ class TranslationController extends Controller
         $tempPath = $file->getRealPath();
         $translations = include $tempPath;
 
-        if (!is_array($translations)) {
+        if (! is_array($translations)) {
             return back()->with('error', 'Invalid translation file format.');
         }
 
@@ -147,7 +147,7 @@ class TranslationController extends Controller
             ->get()
             ->groupBy('group');
 
-        $filename = "translations-{$locale}-" . now()->format('Y-m-d') . '.json';
+        $filename = "translations-{$locale}-".now()->format('Y-m-d').'.json';
 
         return response()->streamDownload(function () use ($translations) {
             echo json_encode($translations->map(fn ($group) => $group->pluck('value', 'key')), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
@@ -158,17 +158,17 @@ class TranslationController extends Controller
     {
         $apiKey = setting('marketplace_api_key');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             return back()->with('error', 'Please connect to marketplace first.');
         }
 
         try {
             $response = Http::withToken($apiKey)
-                ->get(config('services.marketplace.url') . '/api/v1/translations/sync', [
+                ->get(config('services.marketplace.url').'/api/v1/translations/sync', [
                     'site_locale' => app()->getLocale(),
                 ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return back()->with('error', 'Failed to sync with marketplace.');
             }
 
@@ -190,7 +190,7 @@ class TranslationController extends Controller
             return back()->with('success', "Synced {$synced} translations from marketplace.");
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Sync failed: ' . $e->getMessage());
+            return back()->with('error', 'Sync failed: '.$e->getMessage());
         }
     }
 
@@ -199,7 +199,7 @@ class TranslationController extends Controller
         $locale = $request->input('locale', app()->getLocale());
         $langPath = resource_path("lang/{$locale}");
 
-        if (!is_dir($langPath)) {
+        if (! is_dir($langPath)) {
             return back()->with('error', 'Locale directory not found.');
         }
 
@@ -210,7 +210,7 @@ class TranslationController extends Controller
             $group = $file->getFilenameWithoutExtension();
             $translations = include $file->getRealPath();
 
-            if (!is_array($translations)) {
+            if (! is_array($translations)) {
                 continue;
             }
 

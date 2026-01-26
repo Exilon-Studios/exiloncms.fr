@@ -2,7 +2,6 @@
 
 namespace ExilonCMS\Plugins\Shop\Controllers;
 
-use ExilonCMS\Plugins\Shop\Models\Payment;
 use ExilonCMS\Plugins\Shop\Payment\PaymentManager;
 use Illuminate\Http\Request;
 
@@ -16,7 +15,7 @@ class PaymentWebhookController
     {
         $gateway = $this->paymentManager->getGateway('tebex');
 
-        if (!$gateway) {
+        if (! $gateway) {
             abort(404, 'Tebex gateway not configured');
         }
 

@@ -4,7 +4,6 @@ namespace ExilonCMS\Console\Commands;
 
 use ExilonCMS\Models\PluginInstalled;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class PluginUninstallCommand extends Command
 {
@@ -20,39 +19,44 @@ class PluginUninstallCommand extends Command
 
         $plugin = PluginInstalled::where('name', $pluginName)->first();
 
-        if (!$plugin) {
+        if (! $plugin) {
             $this->error("Plugin '{$pluginName}' is not installed.");
+
             return self::FAILURE;
         }
 
         $this->info("Uninstalling plugin: {$pluginName}");
         $this->newLine();
 
-        if (!$this->option('force') && !$this->confirm("Are you sure you want to uninstall '{$pluginName}'?")) {
+        if (! $this->option('force') && ! $this->confirm("Are you sure you want to uninstall '{$pluginName}'?")) {
             $this->info('Operation cancelled.');
+
             return self::SUCCESS;
         }
 
         try {
             // Disable the plugin
-            $this->task("Disabling plugin", function () use ($plugin) {
+            $this->task('Disabling plugin', function () use ($plugin) {
                 $plugin->disable();
+
                 return true;
             });
 
             // Optionally clean up database
             if ($this->option('cleanup')) {
-                $this->task("Removing from database", function () use ($plugin) {
+                $this->task('Removing from database', function () use ($plugin) {
                     $plugin->delete();
+
                     return true;
                 });
 
                 $pluginPath = $plugin->getPluginPath();
 
                 if (is_dir($pluginPath)) {
-                    $this->task("Removing plugin files", function () use ($pluginPath) {
+                    $this->task('Removing plugin files', function () use ($pluginPath) {
                         // Recursively delete plugin directory
                         $this->deleteDirectory($pluginPath);
+
                         return true;
                     });
                 }
@@ -66,6 +70,7 @@ class PluginUninstallCommand extends Command
             return self::SUCCESS;
         } catch (\Exception $e) {
             $this->error("Failed to uninstall plugin: {$e->getMessage()}");
+
             return self::FAILURE;
         }
     }
@@ -75,7 +80,7 @@ class PluginUninstallCommand extends Command
         $files = array_diff(scandir($dir), ['.', '..']);
 
         foreach ($files as $file) {
-            $path = $dir . '/' . $file;
+            $path = $dir.'/'.$file;
 
             if (is_dir($path)) {
                 $this->deleteDirectory($path);

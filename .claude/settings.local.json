@@ -145,7 +145,8 @@
       "Bash(Get-ChildItem:*)",
       "Bash(ForEach-Object { php -l $_FullName })",
       "Bash([:*)",
-      "Bash(do gh:*)"
+      "Bash(do gh:*)",
+      "Bash(./vendor/bin/pint:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Games\Steam\Servers;
 
-use ExilonCMS\Games\ServerBridge;
 use Exception;
+use ExilonCMS\Games\ServerBridge;
 use xPaw\SourceQuery\SourceQuery;
 
 class Query extends ServerBridge
@@ -51,7 +51,7 @@ class Query extends ServerBridge
         $portKey = $rcon ? 'rcon-port' : 'query-port';
         $port = $this->server->data[$portKey] ?? ($this->server->port ?? self::DEFAULT_PORT);
 
-        $query = new SourceQuery();
+        $query = new SourceQuery;
 
         $timeout = $rcon ? self::COMMANDS_TIMEOUT : self::TIMEOUT;
 

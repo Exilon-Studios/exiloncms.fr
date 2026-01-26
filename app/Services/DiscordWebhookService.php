@@ -16,15 +16,15 @@ class DiscordWebhookService
     /**
      * Send a message to a Discord webhook.
      *
-     * @param string $webhookUrl The Discord webhook URL
-     * @param string $content The message content
-     * @param string|null $title Optional embed title
-     * @param string|null $description Optional embed description
-     * @param int|null $color Optional embed color (decimal)
-     * @param array|null $fields Optional embed fields
-     * @param string|null $authorName Optional author name
-     * @param string|null $authorIcon Optional author icon URL
-     * @param string|null $thumbnail Optional thumbnail URL
+     * @param  string  $webhookUrl  The Discord webhook URL
+     * @param  string  $content  The message content
+     * @param  string|null  $title  Optional embed title
+     * @param  string|null  $description  Optional embed description
+     * @param  int|null  $color  Optional embed color (decimal)
+     * @param  array|null  $fields  Optional embed fields
+     * @param  string|null  $authorName  Optional author name
+     * @param  string|null  $authorIcon  Optional author icon URL
+     * @param  string|null  $thumbnail  Optional thumbnail URL
      * @return bool True if successful, false otherwise
      */
     public function send(
@@ -62,7 +62,7 @@ class DiscordWebhookService
                 $embed['color'] = $color;
             }
 
-            if ($fields && !empty($fields)) {
+            if ($fields && ! empty($fields)) {
                 $embed['fields'] = $fields;
             }
 
@@ -186,18 +186,18 @@ class DiscordWebhookService
             ],
             [
                 'name' => 'Total',
-                'value' => number_format($total, 2) . ' €',
+                'value' => number_format($total, 2).' €',
                 'inline' => true,
             ],
         ];
 
-        if (!empty($items)) {
+        if (! empty($items)) {
             $itemsList = collect($items)->take(3)->map(function ($item) {
                 return "- {$item['name']} x{$item['quantity']}";
             })->implode("\n");
 
             if (count($items) > 3) {
-                $itemsList .= "\n... et " . (count($items) - 3) . " autres";
+                $itemsList .= "\n... et ".(count($items) - 3).' autres';
             }
 
             $fields[] = [
@@ -210,7 +210,7 @@ class DiscordWebhookService
         return $this->sendNotification(
             webhookUrl: $webhookUrl,
             title: '🛒 Nouvelle commande',
-            description: "Une nouvelle commande a été passée sur la boutique.",
+            description: 'Une nouvelle commande a été passée sur la boutique.',
             level: 'success',
             fields: $fields
         );
@@ -265,7 +265,7 @@ class DiscordWebhookService
 
         return $this->sendNotification(
             webhookUrl: $webhookUrl,
-            title: '🚨 ' . $title,
+            title: '🚨 '.$title,
             description: $description,
             level: 'danger',
             fields: empty($fields) ? null : $fields

@@ -2,18 +2,16 @@
 
 namespace Database\Seeders;
 
+use ExilonCMS\Models\Ban;
+use ExilonCMS\Models\Notification;
 use ExilonCMS\Models\Page;
 use ExilonCMS\Models\Post;
 use ExilonCMS\Models\User;
-use ExilonCMS\Models\Ban;
-use ExilonCMS\Models\Notification;
-use ExilonCMS\Plugins\Shop\Models\PromoCode;
+use ExilonCMS\Plugins\Shop\Models\Item;
 use ExilonCMS\Plugins\Shop\Models\Order;
 use ExilonCMS\Plugins\Shop\Models\OrderItem;
-use ExilonCMS\Plugins\Shop\Models\Category;
-use ExilonCMS\Plugins\Shop\Models\Item;
+use ExilonCMS\Plugins\Shop\Models\PromoCode;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class TestDataSeeder extends Seeder
 {
@@ -59,7 +57,9 @@ class TestDataSeeder extends Seeder
     protected function seedPosts(): void
     {
         $adminId = User::where('email', 'admin@exilonstudios.com')->first()?->id;
-        if (!$adminId) return;
+        if (! $adminId) {
+            return;
+        }
 
         $posts = [
             [
@@ -102,7 +102,7 @@ class TestDataSeeder extends Seeder
 
         foreach ($posts as $postData) {
             $existing = Post::where('slug', $postData['slug'])->first();
-            if (!$existing) {
+            if (! $existing) {
                 Post::create($postData);
             }
         }
@@ -138,7 +138,7 @@ class TestDataSeeder extends Seeder
 
         foreach ($pages as $pageData) {
             $existing = Page::where('slug', $pageData['slug'])->first();
-            if (!$existing) {
+            if (! $existing) {
                 Page::create($pageData);
             }
         }
@@ -208,7 +208,7 @@ class TestDataSeeder extends Seeder
 
         foreach ($promoCodes as $promoData) {
             $existing = PromoCode::where('code', $promoData['code'])->first();
-            if (!$existing) {
+            if (! $existing) {
                 PromoCode::create($promoData);
             }
         }
@@ -218,7 +218,9 @@ class TestDataSeeder extends Seeder
 
     protected function seedBans(?User $admin): void
     {
-        if (!$admin) return;
+        if (! $admin) {
+            return;
+        }
 
         $bans = [
             [
@@ -244,12 +246,12 @@ class TestDataSeeder extends Seeder
             if ($existingCount === 0) {
                 // Create a dummy banned user
                 $bannedUser = User::firstOrCreate(
-                    ['email' => 'banned_' . strtolower(str_replace(' ', '_', $banData['reason'])) . '@test.com'],
+                    ['email' => 'banned_'.strtolower(str_replace(' ', '_', $banData['reason'])).'@test.com'],
                     [
-                        'name' => 'BannedUser_' . rand(1000, 9999),
+                        'name' => 'BannedUser_'.rand(1000, 9999),
                         'password' => bcrypt('password'),
                         'role_id' => $defaultRole?->id,
-                        'game_id' => 'BannedPlayer' . rand(100, 999),
+                        'game_id' => 'BannedPlayer'.rand(100, 999),
                     ]
                 );
 
@@ -266,7 +268,9 @@ class TestDataSeeder extends Seeder
 
     protected function seedNotifications(?User $admin, ?User $client): void
     {
-        if (!$admin || !$client) return;
+        if (! $admin || ! $client) {
+            return;
+        }
 
         $notifications = [
             [
@@ -293,7 +297,7 @@ class TestDataSeeder extends Seeder
             $existing = Notification::where('content', $notifData['content'])
                 ->where('user_id', $notifData['user_id'])
                 ->first();
-            if (!$existing) {
+            if (! $existing) {
                 Notification::create($notifData);
             }
         }
@@ -303,14 +307,17 @@ class TestDataSeeder extends Seeder
 
     protected function seedOrders(?User $client): void
     {
-        if (!$client) return;
+        if (! $client) {
+            return;
+        }
 
         // Get shop items
         $item1 = Item::where('slug', 'ender-pearl')->first();
         $item2 = Item::where('slug', 'starter-pack')->first();
 
-        if (!$item1 || !$item2) {
+        if (! $item1 || ! $item2) {
             $this->command->warn('Shop items not found. Skipping order seeding.');
+
             return;
         }
 

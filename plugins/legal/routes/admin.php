@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use ExilonCMS\Plugins\Legal\Http\Controllers\Admin\LegalPageController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'can:legal.manage'])->group(function () {
     Route::get('/', [LegalPageController::class, 'index'])->name('index');

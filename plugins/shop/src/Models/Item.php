@@ -4,7 +4,6 @@ namespace ExilonCMS\Plugins\Shop\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -37,9 +36,13 @@ class Item extends Model
      * Item types.
      */
     public const TYPE_ITEM = 'item';
+
     public const TYPE_RANK = 'rank';
+
     public const TYPE_CURRENCY = 'currency';
+
     public const TYPE_COMMAND = 'command';
+
     public const TYPE_CUSTOM = 'custom';
 
     /**

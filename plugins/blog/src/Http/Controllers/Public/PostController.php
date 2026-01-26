@@ -23,7 +23,7 @@ class PostController extends Controller
 
     public function show(Post $post)
     {
-        if (!$post->isPublished()) {
+        if (! $post->isPublished()) {
             abort(404);
         }
 

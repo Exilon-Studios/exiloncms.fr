@@ -6,8 +6,8 @@ use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Http\Requests\NavbarElementRequest;
 use ExilonCMS\Models\NavbarElement;
 use ExilonCMS\Models\Role;
-use ExilonCMS\Plugins\Pages\Models\Page;
 use ExilonCMS\Plugins\Blog\Models\Post;
+use ExilonCMS\Plugins\Pages\Models\Page;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

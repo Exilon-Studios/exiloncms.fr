@@ -33,6 +33,6 @@ class PendingAttachment extends Model
     {
         $type = Relation::getMorphedModel($this->pending_type) ?? $this->pending_type;
 
-        return (new $type())->getAttachmentsPath().'/'.$path;
+        return (new $type)->getAttachmentsPath().'/'.$path;
     }
 }

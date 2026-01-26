@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Plugins\Votes\Models;
 
-use ExilonCMS\Models\User;
 use ExilonCMS\Models\Role;
+use ExilonCMS\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -20,8 +20,11 @@ use Illuminate\Database\Eloquent\Model;
 class VoteReward extends Model
 {
     const REWARD_MONEY = 'money';
+
     const REWARD_ITEMS = 'items';
+
     const REWARD_ROLE = 'role';
+
     const REWARD_COMMAND = 'command';
 
     protected $fillable = [
@@ -63,6 +66,7 @@ class VoteReward extends Model
             case self::REWARD_MONEY:
                 $amount = (int) $this->reward_amount * $multiplier;
                 $user->increment('money', $amount);
+
                 return true;
 
             case self::REWARD_ITEMS:
@@ -71,6 +75,7 @@ class VoteReward extends Model
 
             case self::REWARD_ROLE:
                 $user->update(['role_id' => $this->reward_amount]);
+
                 return true;
 
             case self::REWARD_COMMAND:

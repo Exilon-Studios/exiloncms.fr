@@ -2,14 +2,14 @@
 
 namespace ExilonCMS\Support\Discord;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
+use DateTimeInterface;
 use ExilonCMS\Support\Discord\Embeds\EmbedAuthor;
 use ExilonCMS\Support\Discord\Embeds\EmbedField;
 use ExilonCMS\Support\Discord\Embeds\EmbedFooter;
 use ExilonCMS\Support\Discord\Embeds\EmbedImage;
 use ExilonCMS\Support\Discord\Embeds\EmbedThumbnail;
-use Carbon\Carbon;
-use Carbon\CarbonInterface;
-use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -41,7 +41,7 @@ class Embed implements Arrayable
      */
     public static function create(): self
     {
-        return new self();
+        return new self;
     }
 
     /**

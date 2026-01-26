@@ -6,18 +6,19 @@ use ExilonCMS\Models\User;
 use ExilonCMS\Plugins\Notifications\Models\NotificationChannel;
 use ExilonCMS\Plugins\Notifications\Models\NotificationLog;
 use ExilonCMS\Plugins\Notifications\Models\NotificationTemplate;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Http;
 
 class NotificationService
 {
-    public function send(User|null $user, string $type, array $data = []): bool
+    public function send(?User $user, string $type, array $data = []): bool
     {
         $template = NotificationTemplate::bySlug($type)->enabled()->first();
 
-        if (!$template) {
+        if (! $template) {
             Log::warning("Notification template not found: {$type}");
+
             return false;
         }
 
@@ -29,7 +30,7 @@ class NotificationService
 
         foreach ($channels as $channel) {
             $result = $this->sendViaChannel($user, $channel, $template, $data);
-            if (!$result) {
+            if (! $result) {
                 $success = false;
             }
         }
@@ -72,7 +73,7 @@ class NotificationService
     }
 
     protected function sendViaChannel(
-        User|null $user,
+        ?User $user,
         NotificationChannel $channel,
         NotificationTemplate $template,
         array $data = []
@@ -98,25 +99,28 @@ class NotificationService
 
             if ($result) {
                 $log->markAsSent();
+
                 return true;
             } else {
                 $log->markAsFailed('Failed to send notification');
+
                 return false;
             }
         } catch (\Exception $e) {
             $log->markAsFailed($e->getMessage());
             Log::error("Failed to send notification: {$e->getMessage()}");
+
             return false;
         }
     }
 
     protected function sendEmail(
-        User|null $user,
+        ?User $user,
         NotificationChannel $channel,
         NotificationTemplate $template,
         array $data
     ): bool {
-        if (!$user || !$user->email) {
+        if (! $user || ! $user->email) {
             return false;
         }
 
@@ -129,17 +133,18 @@ class NotificationService
             return true;
         } catch (\Exception $e) {
             Log::error("Failed to send email: {$e->getMessage()}");
+
             return false;
         }
     }
 
     protected function sendSms(
-        User|null $user,
+        ?User $user,
         NotificationChannel $channel,
         NotificationTemplate $template,
         array $data
     ): bool {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -155,12 +160,12 @@ class NotificationService
     }
 
     protected function sendPush(
-        User|null $user,
+        ?User $user,
         NotificationChannel $channel,
         NotificationTemplate $template,
         array $data
     ): bool {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -169,14 +174,14 @@ class NotificationService
     }
 
     protected function sendWebhook(
-        User|null $user,
+        ?User $user,
         NotificationChannel $channel,
         NotificationTemplate $template,
         array $data
     ): bool {
         $url = $channel->config['url'] ?? null;
 
-        if (!$url) {
+        if (! $url) {
             return false;
         }
 
@@ -192,6 +197,7 @@ class NotificationService
             return true;
         } catch (\Exception $e) {
             Log::error("Failed to send webhook: {$e->getMessage()}");
+
             return false;
         }
     }

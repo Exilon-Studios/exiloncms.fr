@@ -78,7 +78,7 @@ class IntegrationsController extends Controller
         $success = $discord->sendNotification(
             webhookUrl: $webhookUrl,
             title: '🧪 Test de webhook',
-            description: "Ceci est un message de test depuis **" . setting('name', 'ExilonCMS') . "**.\n\nSi vous voyez ce message, votre webhook est correctement configuré !",
+            description: 'Ceci est un message de test depuis **'.setting('name', 'ExilonCMS')."**.\n\nSi vous voyez ce message, votre webhook est correctement configuré !",
             level: 'info'
         );
 
@@ -113,6 +113,7 @@ class IntegrationsController extends Controller
         foreach ($this->getAvailableEvents() as $event => $label) {
             $events[$event] = (bool) setting("webhooks.discord.events.{$event}", false);
         }
+
         return $events;
     }
 }

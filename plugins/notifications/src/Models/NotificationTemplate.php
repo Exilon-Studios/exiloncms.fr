@@ -18,7 +18,9 @@ use Illuminate\Database\Eloquent\Model;
 class NotificationTemplate extends Model
 {
     const TYPE_EMAIL = 'email';
+
     const TYPE_SMS = 'sms';
+
     const TYPE_PUSH = 'push';
 
     protected $fillable = [
@@ -54,9 +56,9 @@ class NotificationTemplate extends Model
         $content = $this->content;
 
         foreach ($data as $key => $value) {
-            $content = str_replace('{' . $key . '}', $value, $content);
+            $content = str_replace('{'.$key.'}', $value, $content);
             if ($this->subject) {
-                $this->subject = str_replace('{' . $key . '}', $value, $this->subject);
+                $this->subject = str_replace('{'.$key.'}', $value, $this->subject);
             }
         }
 

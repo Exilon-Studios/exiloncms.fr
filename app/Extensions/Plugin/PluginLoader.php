@@ -30,7 +30,7 @@ class PluginLoader
         $pluginDirs = File::directories($pluginsPath);
 
         foreach ($pluginDirs as $pluginDir) {
-            $pluginJson = $pluginDir . '/plugin.json';
+            $pluginJson = $pluginDir.'/plugin.json';
 
             if (! File::exists($pluginJson)) {
                 continue;
@@ -101,11 +101,13 @@ class PluginLoader
 
         if (! class_exists($providerClass)) {
             Log::warning("Service provider not found for plugin {$plugin['id']}: {$providerClass}");
+
             return;
         }
 
         if (! is_subclass_of($providerClass, ServiceProvider::class)) {
             Log::warning("Service provider for plugin {$plugin['id']} must extend ServiceProvider");
+
             return;
         }
 
@@ -124,7 +126,7 @@ class PluginLoader
         $routes = [];
 
         foreach ($this->plugins as $plugin) {
-            $routesFile = $plugin['path'] . '/routes/web.php';
+            $routesFile = $plugin['path'].'/routes/web.php';
 
             if (File::exists($routesFile)) {
                 $routes[$plugin['id']] = $routesFile;
@@ -144,7 +146,7 @@ class PluginLoader
         $paths = [];
 
         foreach ($this->plugins as $plugin) {
-            $migrationsPath = $plugin['path'] . '/database/migrations';
+            $migrationsPath = $plugin['path'].'/database/migrations';
 
             if (File::exists($migrationsPath)) {
                 $paths[$plugin['id']] = $migrationsPath;
@@ -164,7 +166,7 @@ class PluginLoader
         $paths = [];
 
         foreach ($this->plugins as $plugin) {
-            $viewsPath = $plugin['path'] . '/resources/views';
+            $viewsPath = $plugin['path'].'/resources/views';
 
             if (File::exists($viewsPath)) {
                 $paths[$plugin['id']] = $viewsPath;
@@ -184,7 +186,7 @@ class PluginLoader
         $paths = [];
 
         foreach ($this->plugins as $plugin) {
-            $langPath = $plugin['path'] . '/resources/lang';
+            $langPath = $plugin['path'].'/resources/lang';
 
             if (File::exists($langPath)) {
                 $paths[$plugin['id']] = $langPath;

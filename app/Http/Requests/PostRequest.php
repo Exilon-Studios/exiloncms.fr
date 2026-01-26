@@ -32,7 +32,7 @@ class PostRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'max:150'],
             'description' => ['required', 'string', 'max:255'],
-            'slug' => ['required', 'string', 'max:100', new Slug(), Rule::unique('posts')->ignore($post, 'slug')],
+            'slug' => ['required', 'string', 'max:100', new Slug, Rule::unique('posts')->ignore($post, 'slug')],
             'content' => ['required', 'string'],
             'published_at' => ['required', 'date'],
             'is_pinned' => ['filled', 'boolean'],

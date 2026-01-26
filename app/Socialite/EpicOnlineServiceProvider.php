@@ -77,7 +77,7 @@ class EpicOnlineServiceProvider extends AbstractProvider implements ProviderInte
 
     protected function mapUserToObject(array $user): User
     {
-        return (new User())->setRaw($user)->map([
+        return (new User)->setRaw($user)->map([
             'id' => $user['accountId'],
             'nickname' => $user['displayName'],
         ]);

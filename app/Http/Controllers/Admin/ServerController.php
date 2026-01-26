@@ -2,11 +2,11 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
+use Exception;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Http\Requests\ServerRequest;
 use ExilonCMS\Models\Server;
 use ExilonCMS\Models\Setting;
-use Exception;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;

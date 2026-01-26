@@ -1,10 +1,10 @@
 <?php
 
+use Carbon\Carbon;
 use ExilonCMS\Games\Game;
 use ExilonCMS\Http\Controllers\InstallController;
 use ExilonCMS\Models\SocialLink;
 use ExilonCMS\Support\SettingsRepository;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Lang;
@@ -33,7 +33,7 @@ if (! function_exists('is_installed')) {
         try {
             // IMPORTANT: settings table uses 'name' column, NOT 'key' !!
             $installed = DB::table('settings')->where('name', 'installed_at')->first();
-            if ($installed && !empty($installed->value)) {
+            if ($installed && ! empty($installed->value)) {
                 return true;  // Installed!
             }
         } catch (\Exception $e) {
@@ -70,6 +70,7 @@ if (! function_exists('is_installed')) {
         // ===== LAST RESORT: Check if settings table exists =====
         try {
             $schemaManager = app('db.connection')->getSchemaBuilder();
+
             return $schemaManager->hasTable('settings');
         } catch (\Exception $e) {
             return false;
@@ -264,13 +265,13 @@ if (! function_exists('marketplace_sso_redirect')) {
      * and redirects to the marketplace for SSO login.
      *
      * @param  string  $marketplaceUrl  The marketplace URL (e.g., 'https://marketplace.exiloncms.fr')
-     * @param  string  $cmsSecret       The CMS instance's SSO secret key
+     * @param  string  $cmsSecret  The CMS instance's SSO secret key
      * @return \Illuminate\Http\RedirectResponse
      */
-    function marketplace_sso_redirect(string $marketplaceUrl = null, string $cmsSecret = null)
+    function marketplace_sso_redirect(?string $marketplaceUrl = null, ?string $cmsSecret = null)
     {
         $user = auth()->user();
-        if (!$user) {
+        if (! $user) {
             abort(401, 'User must be authenticated to use SSO.');
         }
 
@@ -278,7 +279,7 @@ if (! function_exists('marketplace_sso_redirect')) {
         $marketplaceUrl ??= config('services.marketplace.url', 'https://marketplace.exiloncms.fr');
         $cmsSecret ??= setting('marketplace_sso_secret');
 
-        if (!$cmsSecret) {
+        if (! $cmsSecret) {
             abort(500, 'Marketplace SSO secret not configured. Please set marketplace_sso_secret in settings.');
         }
 
@@ -303,13 +304,13 @@ if (! function_exists('marketplace_sso_redirect')) {
         $headerEncoded = base64url_encode(json_encode($header));
         $payloadEncoded = base64url_encode(json_encode($payload));
 
-        $signature = hash_hmac('sha256', $headerEncoded . '.' . $payloadEncoded, $cmsSecret, true);
+        $signature = hash_hmac('sha256', $headerEncoded.'.'.$payloadEncoded, $cmsSecret, true);
         $signatureEncoded = base64url_encode($signature);
 
-        $token = $headerEncoded . '.' . $payloadEncoded . '.' . $signatureEncoded;
+        $token = $headerEncoded.'.'.$payloadEncoded.'.'.$signatureEncoded;
 
         // Redirect to marketplace SSO endpoint
-        $ssoUrl = rtrim($marketplaceUrl, '/') . '/sso/login?' . http_build_query([
+        $ssoUrl = rtrim($marketplaceUrl, '/').'/sso/login?'.http_build_query([
             'token' => $token,
             'cms_url' => $cmsUrl,
         ]);

@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Extensions\Theme;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class ThemeServiceProvider extends ServiceProvider
 {
@@ -12,7 +12,7 @@ class ThemeServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(ThemeLoader::class, function () {
-            return new ThemeLoader();
+            return new ThemeLoader;
         });
     }
 
@@ -38,7 +38,7 @@ class ThemeServiceProvider extends ServiceProvider
         $activeTheme = $this->loader->getActiveTheme();
 
         // Type check: ensure we have an array with id key
-        if (! $activeTheme || !is_array($activeTheme) || !isset($activeTheme['id']) || $activeTheme['id'] === 'default') {
+        if (! $activeTheme || ! is_array($activeTheme) || ! isset($activeTheme['id']) || $activeTheme['id'] === 'default') {
             return;
         }
 
@@ -50,14 +50,14 @@ class ThemeServiceProvider extends ServiceProvider
         }
 
         // Add theme views to view finder
-        $viewsPath = ($activeTheme['path'] ?? '') . '/resources/views';
+        $viewsPath = ($activeTheme['path'] ?? '').'/resources/views';
 
         if (isset($activeTheme['path']) && is_dir($viewsPath)) {
             View::addLocation($viewsPath);
         }
 
         // Load theme translations
-        $langPath = ($activeTheme['path'] ?? '') . '/resources/lang';
+        $langPath = ($activeTheme['path'] ?? '').'/resources/lang';
 
         if (isset($activeTheme['path']) && is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, 'theme');
@@ -74,11 +74,11 @@ class ThemeServiceProvider extends ServiceProvider
 
         foreach ($themes as $theme) {
             // Type check: ensure theme is an array with required keys
-            if (!is_array($theme) || !isset($theme['id'], $theme['path'])) {
+            if (! is_array($theme) || ! isset($theme['id'], $theme['path'])) {
                 continue;
             }
 
-            $viewsPath = $theme['path'] . '/resources/views';
+            $viewsPath = $theme['path'].'/resources/views';
 
             if (is_dir($viewsPath)) {
                 View::addNamespace($theme['id'], $viewsPath);

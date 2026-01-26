@@ -7,13 +7,12 @@ use ExilonCMS\Plugins\Analytics\Models\AnalyticsEvent;
 use ExilonCMS\Plugins\Analytics\Models\PageView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Log;
 
 class TrackingController extends Controller
 {
     public function track(Request $request)
     {
-        if (!Config::get('analytics.tracking_enabled')) {
+        if (! Config::get('analytics.tracking_enabled')) {
             return response()->json(['status' => 'disabled']);
         }
 
@@ -26,7 +25,7 @@ class TrackingController extends Controller
         ]);
 
         // Skip tracking for admin users if disabled
-        if ($request->user()?->isAdmin() && !Config::get('analytics.track_admin_users')) {
+        if ($request->user()?->isAdmin() && ! Config::get('analytics.track_admin_users')) {
             return response()->json(['status' => 'skipped', 'reason' => 'admin_user']);
         }
 
@@ -76,7 +75,7 @@ class TrackingController extends Controller
         }
 
         // Record unique visitor (simplified - should use cookie/first visit detection)
-        if (!$request->session()->has('analytics_tracked')) {
+        if (! $request->session()->has('analytics_tracked')) {
             PageView::recordUniqueVisitor($validated['page_url']);
             $request->session()->put('analytics_tracked', true);
         }

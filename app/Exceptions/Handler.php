@@ -46,7 +46,7 @@ class Handler extends ExceptionHandler
 
             if (view()->exists($view = "errors::{$e->getStatusCode()}")) {
                 return response()->view($view, [
-                    'errors' => new ViewErrorBag(),
+                    'errors' => new ViewErrorBag,
                     'exception' => $e,
                 ], $e->getStatusCode(), $e->getHeaders());
             }
@@ -61,7 +61,7 @@ class Handler extends ExceptionHandler
     {
         try {
             return response()->view('errors::fallback', [
-                'errors' => new ViewErrorBag(),
+                'errors' => new ViewErrorBag,
                 'exception' => $e,
                 'code' => $e->getStatusCode(),
             ], $e->getStatusCode(), $e->getHeaders());

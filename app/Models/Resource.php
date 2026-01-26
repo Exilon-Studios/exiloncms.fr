@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -378,7 +377,7 @@ class Resource extends Model
         }
 
         return $this->hasPurchased($user) &&
-            !$this->reviews()->where('user_id', $user->id)->exists();
+            ! $this->reviews()->where('user_id', $user->id)->exists();
     }
 
     /**
@@ -455,7 +454,7 @@ class Resource extends Model
             return 'Gratuit';
         }
 
-        return number_format($this->price, 2, ',', ' ') . ' ' . $this->currency;
+        return number_format($this->price, 2, ',', ' ').' '.$this->currency;
     }
 
     /**

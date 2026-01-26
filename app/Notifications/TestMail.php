@@ -12,7 +12,7 @@ class TestMail extends Notification
      */
     public function toMail(): MailMessage
     {
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(trans('mail.test.subject', ['name' => site_name()]))
             ->line(trans('mail.test.content', ['name' => site_name()]));
     }

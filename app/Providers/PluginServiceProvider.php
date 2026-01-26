@@ -13,7 +13,7 @@ class PluginServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(PluginLoader::class, function ($app) {
-            return new PluginLoader();
+            return new PluginLoader;
         });
     }
 
@@ -38,14 +38,14 @@ class PluginServiceProvider extends ServiceProvider
     {
         $pluginsPath = base_path('plugins');
 
-        if (!is_dir($pluginsPath)) {
+        if (! is_dir($pluginsPath)) {
             return;
         }
 
-        $pluginDirectories = glob($pluginsPath . '/*', GLOB_ONLYDIR);
+        $pluginDirectories = glob($pluginsPath.'/*', GLOB_ONLYDIR);
 
         foreach ($pluginDirectories as $pluginPath) {
-            $migrationsPath = $pluginPath . '/database/migrations';
+            $migrationsPath = $pluginPath.'/database/migrations';
 
             if (is_dir($migrationsPath)) {
                 $this->loadPluginMigrationsFrom($migrationsPath);
@@ -63,9 +63,8 @@ class PluginServiceProvider extends ServiceProvider
         ], 'plugins-migrations');
 
         // Also load migrations for Laravel to discover them
-        foreach (glob($path . '/*.php') as $migrationFile) {
+        foreach (glob($path.'/*.php') as $migrationFile) {
             require_once $migrationFile;
         }
     }
-
 }

@@ -2,9 +2,8 @@
 
 namespace ExilonCMS\Extensions\Plugin;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 
 class PluginServiceProvider extends ServiceProvider
 {
@@ -13,7 +12,7 @@ class PluginServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(PluginLoader::class, function () {
-            return new PluginLoader();
+            return new PluginLoader;
         });
 
         $this->loader = $this->app->make(PluginLoader::class);
@@ -48,25 +47,25 @@ class PluginServiceProvider extends ServiceProvider
         }
 
         // Load routes
-        $routesFile = $plugin['path'] . '/routes/web.php';
+        $routesFile = $plugin['path'].'/routes/web.php';
         if (file_exists($routesFile)) {
             $this->loadPluginRoutesFrom($routesFile, $plugin['id']);
         }
 
         // Load views
-        $viewsPath = $plugin['path'] . '/resources/views';
+        $viewsPath = $plugin['path'].'/resources/views';
         if (is_dir($viewsPath)) {
             $this->loadViewsFrom($viewsPath, $plugin['id']);
         }
 
         // Load translations
-        $langPath = $plugin['path'] . '/resources/lang';
+        $langPath = $plugin['path'].'/resources/lang';
         if (is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, $plugin['id']);
         }
 
         // Load migrations
-        $migrationsPath = $plugin['path'] . '/database/migrations';
+        $migrationsPath = $plugin['path'].'/database/migrations';
         if (is_dir($migrationsPath) && $this->app->runningInConsole()) {
             $this->loadMigrationsFrom($migrationsPath);
         }
@@ -91,7 +90,7 @@ class PluginServiceProvider extends ServiceProvider
      */
     protected function loadPluginRoutesFrom(string $path, string $pluginId): void
     {
-        Route::prefix('plugins/' . $pluginId)
+        Route::prefix('plugins/'.$pluginId)
             ->middleware(['web', 'auth'])
             ->group($path);
     }

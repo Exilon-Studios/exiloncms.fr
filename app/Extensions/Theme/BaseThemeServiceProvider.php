@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Extensions\Theme;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\ServiceProvider;
 
 abstract class BaseThemeServiceProvider extends ServiceProvider
 {
@@ -32,7 +32,7 @@ abstract class BaseThemeServiceProvider extends ServiceProvider
      */
     protected function registerViews(): void
     {
-        $viewsPath = $this->themePath . '/resources/views';
+        $viewsPath = $this->themePath.'/resources/views';
 
         if (File::exists($viewsPath)) {
             $this->loadViewsFrom($viewsPath, $this->themeId);
@@ -44,7 +44,7 @@ abstract class BaseThemeServiceProvider extends ServiceProvider
      */
     protected function registerTranslations(): void
     {
-        $langPath = $this->themePath . '/resources/lang';
+        $langPath = $this->themePath.'/resources/lang';
 
         if (File::exists($langPath)) {
             $this->loadTranslationsFrom($langPath, $this->themeId);
@@ -56,7 +56,7 @@ abstract class BaseThemeServiceProvider extends ServiceProvider
      */
     protected function registerConfig(): void
     {
-        $configPath = $this->themePath . '/config';
+        $configPath = $this->themePath.'/config';
 
         if (File::exists($configPath)) {
             $configFiles = File::files($configPath);

@@ -2,9 +2,9 @@
 
 namespace ExilonCMS\Http\Middleware;
 
+use Closure;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
 use Illuminate\Http\Request;
-use Closure;
 
 class VerifyCsrfToken extends Middleware
 {

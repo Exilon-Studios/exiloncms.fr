@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use ExilonCMS\Plugins\Analytics\Http\Controllers\TrackingController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('web')->group(function () {
     Route::post('/api/analytics/track', [TrackingController::class, 'track'])->name('analytics.track');

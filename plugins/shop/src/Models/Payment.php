@@ -5,7 +5,6 @@ namespace ExilonCMS\Plugins\Shop\Models;
 use ExilonCMS\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
@@ -40,9 +39,13 @@ class Payment extends Model
      * Payment statuses.
      */
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_COMPLETED = 'completed';
+
     public const STATUS_FAILED = 'failed';
+
     public const STATUS_REFUNDED = 'refunded';
+
     public const STATUS_CHARGEBACK = 'chargeback';
 
     /**

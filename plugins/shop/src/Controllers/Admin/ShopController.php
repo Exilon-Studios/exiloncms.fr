@@ -6,7 +6,6 @@ use ExilonCMS\Plugins\Shop\Models\Category;
 use ExilonCMS\Plugins\Shop\Models\Gateway;
 use ExilonCMS\Plugins\Shop\Models\Item;
 use ExilonCMS\Plugins\Shop\Models\Order;
-use ExilonCMS\Plugins\Shop\Payment\PaymentManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;

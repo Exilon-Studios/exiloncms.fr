@@ -2,9 +2,9 @@
 
 namespace ExilonCMS\Games\Steam\Servers;
 
+use Exception;
 use ExilonCMS\Games\Steam\Servers\Protocol\RustRcon as RconClient;
 use ExilonCMS\Models\User;
-use Exception;
 use Illuminate\Support\Arr;
 
 class RustRcon extends Query

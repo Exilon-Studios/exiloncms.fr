@@ -1,27 +1,27 @@
 <?php
 
-return array (
-      'title' => 'Tableau de bord',
-      'description' => 'Bon retour ! Voici ce qui se passe sur votre serveur.',
-      'welcome' => 'Bienvenue, {name} !',
-      'welcome_subtitle' => 'Voici un aperçu de votre compte',
-      'balance' => 'Solde',
-      'account_age' => 'Ancienneté du compte',
-      'role' => 'Rôle',
-      'status' => 'Statut',
-      'active' => 'Actif',
-      'see_more' => 'En voir plus',
-      'my_account' => 'Mon Compte',
-      'my_profile' => 'Mon Profil',
-      'manage_info' => 'Gérer mes informations',
-      'notifications' => 'Notifications',
-      'view_notifications' => 'Voir mes notifications',
-      'visit_shop' => 'Visiter la boutique',
-      'buy_items' => 'Acheter des articles',
-      'no_widgets' => 'Aucun widget disponible pour le moment.',
-      'no_widgets_hint' => 'Les plugins peuvent ajouter des widgets personnalisables à cet espace.',
-      'refresh_stats' => 'Actualiser les statistiques',
-      'stats' => array (
+return [
+    'title' => 'Tableau de bord',
+    'description' => 'Bon retour ! Voici ce qui se passe sur votre serveur.',
+    'welcome' => 'Bienvenue, {name} !',
+    'welcome_subtitle' => 'Voici un aperçu de votre compte',
+    'balance' => 'Solde',
+    'account_age' => 'Ancienneté du compte',
+    'role' => 'Rôle',
+    'status' => 'Statut',
+    'active' => 'Actif',
+    'see_more' => 'En voir plus',
+    'my_account' => 'Mon Compte',
+    'my_profile' => 'Mon Profil',
+    'manage_info' => 'Gérer mes informations',
+    'notifications' => 'Notifications',
+    'view_notifications' => 'Voir mes notifications',
+    'visit_shop' => 'Visiter la boutique',
+    'buy_items' => 'Acheter des articles',
+    'no_widgets' => 'Aucun widget disponible pour le moment.',
+    'no_widgets_hint' => 'Les plugins peuvent ajouter des widgets personnalisables à cet espace.',
+    'refresh_stats' => 'Actualiser les statistiques',
+    'stats' => [
         'total_users' => 'Utilisateurs totaux',
         'change_from_last_month' => 'changement par rapport au mois dernier',
         'revenue' => 'Revenus',
@@ -30,15 +30,15 @@ return array (
         'active_servers' => 'Serveurs actifs',
         'all_systems_operational' => 'Tous les systèmes sont opérationnels',
         'orders' => 'Commandes',
-      ),
-      'recent_orders' => array (
+    ],
+    'recent_orders' => [
         'title' => 'Commandes récentes',
         'description' => 'Derniers achats de votre boutique',
         'no_orders' => 'Aucune commande récente',
-      ),
-      'server_status' => array (
+    ],
+    'server_status' => [
         'title' => 'Statut du serveur',
         'description' => 'Surveillance en temps réel du serveur',
         'all_online' => 'Tous les serveurs sont en ligne',
-      ),
-    );
+    ],
+];

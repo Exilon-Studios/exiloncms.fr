@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http as HttpClient;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use ZipArchive;
@@ -85,7 +84,7 @@ class ResourceInstallController extends Controller
             // Fetch resource details from external API
             $response = HttpClient::timeout(30)->get("{$marketplaceUrl}/api/resources/{$resourceId}");
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return back()->with('error', 'Resource not found on external server.');
             }
 
@@ -93,15 +92,15 @@ class ResourceInstallController extends Controller
 
             // Download the resource
             $downloadUrl = $resource['download_url'];
-            $tempPath = storage_path('app/temp/' . Str::random(40) . '.zip');
+            $tempPath = storage_path('app/temp/'.Str::random(40).'.zip');
 
-            if (!File::exists(dirname($tempPath))) {
+            if (! File::exists(dirname($tempPath))) {
                 File::makeDirectory(dirname($tempPath), 0755, true);
             }
 
             $fileResponse = HttpClient::timeout(60)->get($downloadUrl);
 
-            if (!$fileResponse->successful()) {
+            if (! $fileResponse->successful()) {
                 return back()->with('error', 'Failed to download resource.');
             }
 
@@ -112,13 +111,14 @@ class ResourceInstallController extends Controller
                 ? base_path('themes/temp')
                 : base_path('plugins/temp');
 
-            if (!File::exists($extractPath)) {
+            if (! File::exists($extractPath)) {
                 File::makeDirectory($extractPath, 0755, true);
             }
 
-            $zip = new ZipArchive();
+            $zip = new ZipArchive;
             if ($zip->open($tempPath) !== true) {
                 File::delete($tempPath);
+
                 return back()->with('error', 'Failed to extract resource.');
             }
 
@@ -146,7 +146,7 @@ class ResourceInstallController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Failed to install resource: ' . $e->getMessage());
+            return back()->with('error', 'Failed to install resource: '.$e->getMessage());
         }
     }
 
@@ -163,12 +163,12 @@ class ResourceInstallController extends Controller
 
         $themeDir = $directories[0];
         $themeSlug = basename($themeDir);
-        $targetPath = base_path('themes/' . $themeSlug);
+        $targetPath = base_path('themes/'.$themeSlug);
 
         // Move theme to themes directory
         if (File::exists($targetPath)) {
             // Backup existing theme
-            File::moveDirectory($targetPath, storage_path('backups/themes/' . $themeSlug . '_' . time()));
+            File::moveDirectory($targetPath, storage_path('backups/themes/'.$themeSlug.'_'.time()));
         }
 
         File::moveDirectory($themeDir, $targetPath);
@@ -195,7 +195,7 @@ class ResourceInstallController extends Controller
 
     /**
      * Install a plugin from external source.
-    */
+     */
     protected function installPlugin(string $extractPath, array $resource): void
     {
         // Plugins have been removed from ExilonCMS
@@ -227,7 +227,7 @@ class ResourceInstallController extends Controller
                 'per_page' => 100,
             ]);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return back()->with('error', 'Failed to sync with external server.');
             }
 
@@ -259,7 +259,7 @@ class ResourceInstallController extends Controller
                 'error' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'Failed to sync: ' . $e->getMessage());
+            return back()->with('error', 'Failed to sync: '.$e->getMessage());
         }
     }
 }

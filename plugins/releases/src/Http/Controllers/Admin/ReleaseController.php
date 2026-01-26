@@ -5,7 +5,6 @@ namespace ExilonCMS\Plugins\Releases\Http\Controllers\Admin;
 use ExilonCMS\Plugins\Releases\Models\Release;
 use ExilonCMS\Plugins\Releases\Models\ReleaseChange;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ReleaseController
@@ -50,7 +49,7 @@ class ReleaseController
         ]);
 
         // Create changes
-        if (!empty($validated['changes'])) {
+        if (! empty($validated['changes'])) {
             foreach ($validated['changes'] as $index => $change) {
                 ReleaseChange::create([
                     'release_id' => $release->id,
@@ -106,7 +105,7 @@ class ReleaseController
         $release->update($validated);
 
         // Sync changes
-        if (!empty($validated['changes'])) {
+        if (! empty($validated['changes'])) {
             // Delete removed changes
             $changeIds = array_filter(array_column($validated['changes'], 'id'));
             ReleaseChange::where('release_id', $release->id())

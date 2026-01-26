@@ -97,7 +97,7 @@ class UpdateChecker
             'current_version' => $plugin->version,
         ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return null;
         }
 
@@ -119,6 +119,7 @@ class UpdateChecker
         }
 
         $plugin->update(['checked_at' => now()]);
+
         return null;
     }
 
@@ -133,7 +134,7 @@ class UpdateChecker
             'current_version' => $theme->version,
         ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return null;
         }
 
@@ -155,6 +156,7 @@ class UpdateChecker
         }
 
         $theme->update(['checked_at' => now()]);
+
         return null;
     }
 

@@ -5,8 +5,8 @@ namespace ExilonCMS\Http\Controllers\Admin;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\Setting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
 class MarketplaceController extends Controller
@@ -44,14 +44,14 @@ class MarketplaceController extends Controller
         // Verify API key with marketplace
         try {
             $response = Http::timeout(10)->post(
-                config('services.marketplace.url') . '/api/v1/sso/verify',
+                config('services.marketplace.url').'/api/v1/sso/verify',
                 [
                     'api_key' => $request->api_key,
                     'site_url' => config('app.url'),
                 ]
             );
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return back()->with('error', 'Invalid API key. Please check and try again.');
             }
 
@@ -82,7 +82,7 @@ class MarketplaceController extends Controller
             return back()->with('success', 'Successfully connected to marketplace!');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Connection failed: ' . $e->getMessage());
+            return back()->with('error', 'Connection failed: '.$e->getMessage());
         }
     }
 
@@ -96,7 +96,7 @@ class MarketplaceController extends Controller
 
     public function install(Request $request, string $itemId)
     {
-        if (!$this->isConnected()) {
+        if (! $this->isConnected()) {
             return back()->with('error', 'Please connect to marketplace first.');
         }
 
@@ -105,9 +105,9 @@ class MarketplaceController extends Controller
 
             // Get download URL from marketplace
             $response = Http::timeout(30)->withToken($apiKey)
-                ->get(config('services.marketplace.url') . "/api/v1/items/{$itemId}/download");
+                ->get(config('services.marketplace.url')."/api/v1/items/{$itemId}/download");
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 return back()->with('error', 'Failed to get download URL.');
             }
 
@@ -117,14 +117,14 @@ class MarketplaceController extends Controller
             $type = $data['type'];
 
             // Download file
-            $tempPath = storage_path('app/temp/' . $pluginId . '.zip');
+            $tempPath = storage_path('app/temp/'.$pluginId.'.zip');
             file_put_contents($tempPath, file_get_contents($downloadUrl));
 
             // Redirect to plugin manager upload
             return response()->download($tempPath);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Installation failed: ' . $e->getMessage());
+            return back()->with('error', 'Installation failed: '.$e->getMessage());
         }
     }
 
@@ -138,20 +138,20 @@ class MarketplaceController extends Controller
 
     protected function isConnected(): bool
     {
-        return !empty(setting('marketplace_api_key'));
+        return ! empty(setting('marketplace_api_key'));
     }
 
     protected function fetchFromMarketplace(string $endpoint, array $params = [])
     {
         $apiKey = setting('marketplace_api_key');
 
-        if (!$apiKey) {
+        if (! $apiKey) {
             return ['data' => [], 'meta' => []];
         }
 
         try {
             $response = Http::timeout(10)->withToken($apiKey)
-                ->get(config('services.marketplace.url') . $endpoint, $params);
+                ->get(config('services.marketplace.url').$endpoint, $params);
 
             return $response->json();
         } catch (\Exception $e) {

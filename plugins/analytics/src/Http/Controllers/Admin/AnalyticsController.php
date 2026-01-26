@@ -37,9 +37,9 @@ class AnalyticsController extends Controller
 
         // Page views over time
         $pageViewsOverTime = AnalyticsEvent::select([
-                DB::raw('DATE(created_at) as date'),
-                DB::raw('COUNT(*) as count')
-            ])
+            DB::raw('DATE(created_at) as date'),
+            DB::raw('COUNT(*) as count'),
+        ])
             ->where('event_type', 'page_view')
             ->where('created_at', '>=', $startDate)
             ->groupBy('date')
@@ -173,7 +173,7 @@ class AnalyticsController extends Controller
     protected function calculateAvgSessionDuration($startDate): float
     {
         // Calculate average time between first and last event per session
-        $sessionDurations = DB::select("
+        $sessionDurations = DB::select('
             SELECT
                 session_id,
                 MIN(created_at) as first_event,
@@ -183,7 +183,7 @@ class AnalyticsController extends Controller
             WHERE created_at >= ?
             GROUP BY session_id
             HAVING duration > 0
-        ", [$startDate]);
+        ', [$startDate]);
 
         if (empty($sessionDurations)) {
             return 0;
@@ -200,10 +200,10 @@ class AnalyticsController extends Controller
         if (preg_match('/Firefox/i', $userAgent)) {
             return 'Firefox';
         }
-        if (preg_match('/Chrome/i', $userAgent) && !preg_match('/Edg/i', $userAgent)) {
+        if (preg_match('/Chrome/i', $userAgent) && ! preg_match('/Edg/i', $userAgent)) {
             return 'Chrome';
         }
-        if (preg_match('/Safari/i', $userAgent) && !preg_match('/Chrome/i', $userAgent)) {
+        if (preg_match('/Safari/i', $userAgent) && ! preg_match('/Chrome/i', $userAgent)) {
             return 'Safari';
         }
         if (preg_match('/Edg/i', $userAgent)) {

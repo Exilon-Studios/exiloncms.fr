@@ -61,7 +61,7 @@ class Vote extends Model
         return $query->where('is_verified', false);
     }
 
-    public function canVoteAgain(int $cooldownHours = null): bool
+    public function canVoteAgain(?int $cooldownHours = null): bool
     {
         $cooldownHours = $cooldownHours ?? config('votes.cooldown', 24);
 
@@ -71,7 +71,7 @@ class Vote extends Model
             ->latest()
             ->first();
 
-        if (!$lastVote) {
+        if (! $lastVote) {
             return true;
         }
 

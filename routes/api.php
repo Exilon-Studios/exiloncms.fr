@@ -3,8 +3,8 @@
 use ExilonCMS\Http\Controllers\Api\AuthController;
 use ExilonCMS\Http\Controllers\Api\ExilonLinkController;
 use ExilonCMS\Http\Controllers\Api\FeedController;
-use ExilonCMS\Http\Controllers\Api\PublicResourceController;
 use ExilonCMS\Http\Controllers\Api\PostController;
+use ExilonCMS\Http\Controllers\Api\PublicResourceController;
 use ExilonCMS\Http\Controllers\Api\ServerController;
 use Illuminate\Support\Facades\Route;
 

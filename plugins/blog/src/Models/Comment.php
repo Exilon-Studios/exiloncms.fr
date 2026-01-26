@@ -28,8 +28,11 @@ class Comment extends Model
      * Comment statuses.
      */
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_APPROVED = 'approved';
+
     public const STATUS_SPAM = 'spam';
+
     public const STATUS_TRASH = 'trash';
 
     /**

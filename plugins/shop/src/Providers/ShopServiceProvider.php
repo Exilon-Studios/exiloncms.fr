@@ -3,14 +3,14 @@
 namespace ExilonCMS\Plugins\Shop\Providers;
 
 use ExilonCMS\Extensions\Plugin\BasePluginServiceProvider;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
 
 class ShopServiceProvider extends BasePluginServiceProvider
 {
     protected string $pluginId = 'shop';
 
-    protected string $pluginPath = __DIR__ . '/../../';
+    protected string $pluginPath = __DIR__.'/../../';
 
     /**
      * Bootstrap any application services.
@@ -39,7 +39,7 @@ class ShopServiceProvider extends BasePluginServiceProvider
     protected function loadPluginRoutes(): void
     {
         // Public web routes
-        $webRoutesFile = $this->pluginPath . '/routes/web.php';
+        $webRoutesFile = $this->pluginPath.'/routes/web.php';
         if (File::exists($webRoutesFile)) {
             Route::middleware(['web', 'auth'])
                 ->prefix('shop')
@@ -47,7 +47,7 @@ class ShopServiceProvider extends BasePluginServiceProvider
         }
 
         // Admin routes
-        $adminRoutesFile = $this->pluginPath . '/routes/admin.php';
+        $adminRoutesFile = $this->pluginPath.'/routes/admin.php';
         if (File::exists($adminRoutesFile)) {
             Route::middleware(['web', 'auth', 'can:admin.access'])
                 ->prefix('admin')
@@ -55,7 +55,7 @@ class ShopServiceProvider extends BasePluginServiceProvider
         }
 
         // Payment webhook routes (no auth required)
-        $webhookRoutesFile = $this->pluginPath . '/routes/webhook.php';
+        $webhookRoutesFile = $this->pluginPath.'/routes/webhook.php';
         if (File::exists($webhookRoutesFile)) {
             Route::middleware(['web'])
                 ->prefix('shop/webhook')
@@ -68,7 +68,7 @@ class ShopServiceProvider extends BasePluginServiceProvider
      */
     protected function loadPluginMigrations(): void
     {
-        $migrationsPath = $this->pluginPath . '/database/migrations';
+        $migrationsPath = $this->pluginPath.'/database/migrations';
 
         if (File::exists($migrationsPath) && $this->app->runningInConsole()) {
             $this->loadMigrationsFrom($migrationsPath);
@@ -80,7 +80,7 @@ class ShopServiceProvider extends BasePluginServiceProvider
      */
     protected function loadPluginViews(): void
     {
-        $viewsPath = $this->pluginPath . '/resources/views';
+        $viewsPath = $this->pluginPath.'/resources/views';
 
         if (File::exists($viewsPath)) {
             $this->loadViewsFrom($viewsPath, 'shop');

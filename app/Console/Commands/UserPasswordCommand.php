@@ -36,6 +36,7 @@ class UserPasswordCommand extends Command
 
         if (! $user) {
             $this->error("User with email {$email} not found.");
+
             return 1;
         }
 

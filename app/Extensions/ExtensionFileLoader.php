@@ -31,14 +31,14 @@ class ExtensionFileLoader extends LaravelFileLoader
         // Add plugins translations
         $pluginsPath = base_path('plugins');
         if (is_dir($pluginsPath)) {
-            $plugins = glob($pluginsPath . '/*', GLOB_ONLYDIR);
+            $plugins = glob($pluginsPath.'/*', GLOB_ONLYDIR);
             foreach ($plugins as $pluginPath) {
                 $pluginName = basename($pluginPath);
-                $langPath = $pluginPath . '/resources/lang';
+                $langPath = $pluginPath.'/resources/lang';
 
                 if (is_dir($langPath)) {
                     $namespace = strtolower($pluginName);
-                    if (!isset($hints[$namespace])) {
+                    if (! isset($hints[$namespace])) {
                         $hints[$namespace] = [];
                     }
                     $hints[$namespace][] = $langPath;
@@ -49,14 +49,14 @@ class ExtensionFileLoader extends LaravelFileLoader
         // Add themes translations
         $themesPath = base_path('themes');
         if (is_dir($themesPath)) {
-            $themes = glob($themesPath . '/*', GLOB_ONLYDIR);
+            $themes = glob($themesPath.'/*', GLOB_ONLYDIR);
             foreach ($themes as $themePath) {
                 $themeName = basename($themePath);
-                $langPath = $themePath . '/resources/lang';
+                $langPath = $themePath.'/resources/lang';
 
                 if (is_dir($langPath)) {
                     $namespace = strtolower($themeName);
-                    if (!isset($hints[$namespace])) {
+                    if (! isset($hints[$namespace])) {
                         $hints[$namespace] = [];
                     }
                     $hints[$namespace][] = $langPath;
@@ -70,11 +70,6 @@ class ExtensionFileLoader extends LaravelFileLoader
 
     /**
      * Load a locale from a given path.
-     *
-     * @param  string  $path
-     * @param  string  $locale
-     * @param  string  $group
-     * @return array
      */
     protected function loadPath(string $path, string $locale, string $group): array
     {

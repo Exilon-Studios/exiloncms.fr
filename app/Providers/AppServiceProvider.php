@@ -4,9 +4,9 @@ namespace ExilonCMS\Providers;
 
 use ExilonCMS\Extensions\ExtensionFileLoader;
 use ExilonCMS\Models\User;
-use ExilonCMS\Plugins\Pages\Models\Page;
-use ExilonCMS\Plugins\Blog\Models\Post;
 use ExilonCMS\Notifications\AlertNotificationChannel;
+use ExilonCMS\Plugins\Blog\Models\Post;
+use ExilonCMS\Plugins\Pages\Models\Page;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\Paginator;
@@ -83,7 +83,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Notifications
         Notification::extend('alert', function ($app) {
-            return new AlertNotificationChannel();
+            return new AlertNotificationChannel;
         });
     }
 }

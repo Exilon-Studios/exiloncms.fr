@@ -16,10 +16,15 @@ use Illuminate\Support\Str;
 class UpdateManager
 {
     private string $repo;
+
     private string $currentVersion;
+
     private string $cacheKey = 'cms_updates';
+
     private int $cacheTtl = 3600; // 1 hour
+
     private ?array $latestRelease = null;
+
     private ?array $cachedUpdate = null;
 
     public function __construct()
@@ -58,7 +63,7 @@ class UpdateManager
                     ->timeout(10)
                     ->get("https://api.github.com/repos/{$this->repo}/releases/latest");
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     Log::warning('Failed to fetch releases from GitHub', [
                         'status' => $response->status(),
                         'body' => $response->body(),
@@ -83,7 +88,7 @@ class UpdateManager
                 if ($hasUpdate) {
                     // Find the CMS zip asset
                     $zipAsset = collect($release['assets'] ?? [])
-                        ->first(fn($asset) => str_ends_with($asset['name'], '.zip') && !str_contains($asset['name'], 'installer'));
+                        ->first(fn ($asset) => str_ends_with($asset['name'], '.zip') && ! str_contains($asset['name'], 'installer'));
 
                     $update = [
                         'version' => $latestVersion,
@@ -127,6 +132,7 @@ class UpdateManager
         if (preg_match('/PHP\s+(\d+\.\d+)/i', $body, $matches)) {
             return $matches[1];
         }
+
         return '8.2';
     }
 
@@ -136,6 +142,7 @@ class UpdateManager
     public function getUpdate(bool $forceRefresh = false): ?array
     {
         $data = $this->check($forceRefresh);
+
         return $data['success'] ? ($data['update'] ?? null) : null;
     }
 
@@ -145,6 +152,7 @@ class UpdateManager
     public function hasUpdate(bool $forceRefresh = false): bool
     {
         $data = $this->check($forceRefresh);
+
         return $data['success'] && ($data['has_update'] ?? false);
     }
 
@@ -162,7 +170,7 @@ class UpdateManager
     public function isLastVersionDownloaded(): bool
     {
         $update = $this->getUpdate();
-        if (!$update) {
+        if (! $update) {
             return false;
         }
 
@@ -179,6 +187,7 @@ class UpdateManager
     {
         if (empty($update['download_url'])) {
             Log::error('No download URL found in update data');
+
             return false;
         }
 
@@ -196,17 +205,18 @@ class UpdateManager
         try {
             $response = Http::timeout(120)->followRedirects()->get($downloadUrl);
 
-            if (!$response->successful()) {
+            if (! $response->successful()) {
                 Log::error('Failed to download update', [
                     'url' => $downloadUrl,
                     'status' => $response->status(),
                 ]);
+
                 return false;
             }
 
             // Ensure directory exists
             $directory = dirname($savePath);
-            if (!File::exists($directory)) {
+            if (! File::exists($directory)) {
                 File::makeDirectory($directory, 0755, true);
             }
 
@@ -234,7 +244,7 @@ class UpdateManager
     public function extract(string $zipPath, string $extractTo): bool
     {
         try {
-            $zip = new \ZipArchive();
+            $zip = new \ZipArchive;
 
             if ($zip->open($zipPath) === true) {
                 $zip->extractTo($extractTo);
@@ -263,8 +273,9 @@ class UpdateManager
     public function install(): bool
     {
         $update = $this->getUpdate();
-        if (!$update) {
+        if (! $update) {
             Log::error('No update available to install');
+
             return false;
         }
 
@@ -278,21 +289,23 @@ class UpdateManager
     {
         try {
             // Create backup
-            $backupPath = storage_path('backups/update-backup-' . date('Y-m-d-H-i-s') . '.zip');
+            $backupPath = storage_path('backups/update-backup-'.date('Y-m-d-H-i-s').'.zip');
             $this->createBackup($backupPath);
 
             // Get downloaded file path
             $tempPath = storage_path("app/updates/exiloncms-{$version}.zip");
 
-            if (!File::exists($tempPath)) {
+            if (! File::exists($tempPath)) {
                 Log::error('Update file not found', ['path' => $tempPath]);
+
                 return false;
             }
 
             // Extract update
             $extractPath = storage_path('app/updates/extract');
-            if (!$this->extract($tempPath, $extractPath)) {
+            if (! $this->extract($tempPath, $extractPath)) {
                 Log::error('Failed to extract update');
+
                 return false;
             }
 
@@ -350,10 +363,10 @@ class UpdateManager
                 continue;
             }
 
-            $destFile = $destPath . '/' . $relativePath;
+            $destFile = $destPath.'/'.$relativePath;
             $destDir = dirname($destFile);
 
-            if (!File::exists($destDir)) {
+            if (! File::exists($destDir)) {
                 File::makeDirectory($destDir, 0755, true);
             }
 
@@ -367,7 +380,7 @@ class UpdateManager
     protected function createBackup(string $backupPath): bool
     {
         try {
-            $zip = new \ZipArchive();
+            $zip = new \ZipArchive;
 
             if ($zip->open($backupPath, \ZipArchive::CREATE) === true) {
                 // Add critical directories
@@ -392,12 +405,14 @@ class UpdateManager
                 $zip->close();
 
                 Log::info('Backup created', ['path' => $backupPath]);
+
                 return true;
             }
 
             return false;
         } catch (\Exception $e) {
             Log::error('Failed to create backup', ['error' => $e->getMessage()]);
+
             return false;
         }
     }
@@ -408,23 +423,25 @@ class UpdateManager
     protected function rollback(string $backupPath): bool
     {
         try {
-            if (!File::exists($backupPath)) {
+            if (! File::exists($backupPath)) {
                 return false;
             }
 
-            $zip = new \ZipArchive();
+            $zip = new \ZipArchive;
 
             if ($zip->open($backupPath) === true) {
                 $zip->extractTo(base_path());
                 $zip->close();
 
                 Log::info('Rollback completed', ['backup' => $backupPath]);
+
                 return true;
             }
 
             return false;
         } catch (\Exception $e) {
             Log::error('Failed to rollback', ['error' => $e->getMessage()]);
+
             return false;
         }
     }
@@ -435,14 +452,14 @@ class UpdateManager
     protected function runPostInstall(string $extractPath): void
     {
         // Check if composer.json changed
-        $newComposerJson = $extractPath . '/composer.json';
+        $newComposerJson = $extractPath.'/composer.json';
         if (File::exists($newComposerJson)) {
             // Run composer install
             $this->runCommand('composer install --no-interaction --optimize-autoloader');
         }
 
         // Check if package.json changed
-        $newPackageJson = $extractPath . '/package.json';
+        $newPackageJson = $extractPath.'/package.json';
         if (File::exists($newPackageJson)) {
             // Run npm install
             $this->runCommand('npm install');
@@ -464,7 +481,7 @@ class UpdateManager
     protected function runCommand(string $command): void
     {
         $cwd = base_path();
-        exec("cd " . escapeshellarg($cwd) . " && {$command} 2>&1", $output, $returnCode);
+        exec('cd '.escapeshellarg($cwd)." && {$command} 2>&1", $output, $returnCode);
 
         if ($returnCode !== 0) {
             Log::warning('Command failed', [
@@ -515,6 +532,7 @@ class UpdateManager
     public function getUpdates(?string $type = null): array
     {
         $update = $this->getUpdate();
+
         return $update ? [$update] : [];
     }
 }

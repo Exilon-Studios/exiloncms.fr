@@ -7,8 +7,6 @@ use ExilonCMS\Models\Resource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 class PublicResourceController extends Controller
 {
@@ -72,7 +70,7 @@ class PublicResourceController extends Controller
                 ->first();
         });
 
-        if (!$resource) {
+        if (! $resource) {
             return response()->json([
                 'success' => false,
                 'message' => 'Resource not found',

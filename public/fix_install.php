@@ -1,13 +1,13 @@
 <?php
+
 /**
  * Quick Fix Script - Creates .env and database for cPanel installations
  * Run this after the installer fails to set up basic files
  */
-
 $root = dirname(__DIR__);
 
 // 1. Create .env file
-$envContent = <<<ENV
+$envContent = <<<'ENV'
 APP_NAME="ExilonCMS"
 APP_ENV=production
 APP_KEY=base64:hmU1T3OuvHdi5t1wULI8Xp7geI+JIWGog9pBCNxslY8=
@@ -29,24 +29,24 @@ ENV;
 
 $envPath = $root.'/.env';
 if (file_put_contents($envPath, $envContent)) {
-    $success[] = "Created .env file";
+    $success[] = 'Created .env file';
 } else {
-    $errors[] = "Failed to create .env file";
+    $errors[] = 'Failed to create .env file';
 }
 
 // 2. Create database directory and file
 $dbDir = $root.'/database';
 if (! is_dir($dbDir)) {
     mkdir($dbDir, 0755, true);
-    $success[] = "Created database directory";
+    $success[] = 'Created database directory';
 }
 
 $dbFile = $dbDir.'/database.sqlite';
 if (! file_exists($dbFile)) {
     touch($dbFile);
-    $success[] = "Created database.sqlite file";
+    $success[] = 'Created database.sqlite file';
 } else {
-    $success[] = "database.sqlite already exists";
+    $success[] = 'database.sqlite already exists';
 }
 
 // 3. Create storage directories
@@ -65,7 +65,7 @@ foreach ($dirs as $dir) {
         mkdir($path, 0755, true);
     }
 }
-$success[] = "Verified storage directories";
+$success[] = 'Verified storage directories';
 
 // 4. Check index.php
 $indexPath = $root.'/index.php';
@@ -77,12 +77,12 @@ if (file_exists($indexPath)) {
         $content = str_replace("__DIR__.'/../bootstrap/", "__DIR__.'/bootstrap/", $content);
         $content = str_replace("__DIR__.'/../storage/", "__DIR__.'/storage/", $content);
         file_put_contents($indexPath, $content);
-        $success[] = "Fixed paths in index.php";
+        $success[] = 'Fixed paths in index.php';
     } else {
-        $success[] = "index.php paths already correct";
+        $success[] = 'index.php paths already correct';
     }
 } else {
-    $errors[] = "index.php not found!";
+    $errors[] = 'index.php not found!';
 }
 
 // Output result

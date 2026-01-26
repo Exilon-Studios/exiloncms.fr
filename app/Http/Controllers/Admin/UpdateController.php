@@ -2,11 +2,11 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
+use Exception;
 use ExilonCMS\ExilonCMS;
 use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\ActionLog;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Inertia\Inertia;
@@ -98,7 +98,7 @@ class UpdateController extends Controller
 
             ActionLog::log(
                 'cms.update',
-                'CMS updated to version ' . ExilonCMS::version(),
+                'CMS updated to version '.ExilonCMS::version(),
                 'update'
             );
 

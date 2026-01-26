@@ -1,5 +1,5 @@
 <?php
 
-return array (
-      'title' => 'Accueil',
-    );
+return [
+    'title' => 'Accueil',
+];

@@ -1,7 +1,7 @@
 <?php
 
-use ExilonCMS\Plugins\Blog\Http\Controllers\Public\PostController as PublicPostController;
 use ExilonCMS\Plugins\Blog\Http\Controllers\Public\CategoryController as PublicCategoryController;
+use ExilonCMS\Plugins\Blog\Http\Controllers\Public\PostController as PublicPostController;
 use ExilonCMS\Plugins\Blog\Http\Controllers\Public\TagController as PublicTagController;
 use Illuminate\Support\Facades\Route;
 

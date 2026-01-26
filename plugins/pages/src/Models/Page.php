@@ -2,9 +2,9 @@
 
 namespace ExilonCMS\Plugins\Pages\Models;
 
-use ExilonCMS\Models\User;
 use ExilonCMS\Models\Traits\Attachable;
 use ExilonCMS\Models\Traits\Loggable;
+use ExilonCMS\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**

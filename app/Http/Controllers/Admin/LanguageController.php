@@ -67,7 +67,7 @@ class LanguageController extends Controller
                 if (is_array($content)) {
                     // Create empty template with same structure
                     $emptyContent = $this->createEmptyTemplate($content);
-                    $fileContent = "<?php\n\nreturn " . $this->varExport($emptyContent) . ";\n";
+                    $fileContent = "<?php\n\nreturn ".$this->varExport($emptyContent).";\n";
                     File::put("{$langPath}/{$filename}.php", $fileContent);
                 }
             }
@@ -102,7 +102,7 @@ class LanguageController extends Controller
     {
         $langPath = resource_path("lang/{$locale}");
 
-        if (!File::exists($langPath)) {
+        if (! File::exists($langPath)) {
             return redirect()->route('admin.languages.index')
                 ->with('error', "Language '{$locale}' not found.");
         }
@@ -135,7 +135,7 @@ class LanguageController extends Controller
     {
         $langPath = resource_path("lang/{$locale}");
 
-        if (!File::exists($langPath)) {
+        if (! File::exists($langPath)) {
             return back()->with('error', "Language '{$locale}' not found.");
         }
 
@@ -149,7 +149,7 @@ class LanguageController extends Controller
                 $unflattened = $this->unflattenArray($keys);
 
                 // Write the file with proper PHP array formatting
-                $content = "<?php\n\nreturn " . $this->varExport($unflattened) . ";\n";
+                $content = "<?php\n\nreturn ".$this->varExport($unflattened).";\n";
                 File::put($filePath, $content);
             }
         }
@@ -193,7 +193,7 @@ class LanguageController extends Controller
                 if ($i === count($keys) - 1) {
                     $current[$k] = $value;
                 } else {
-                    if (!isset($current[$k]) || !is_array($current[$k])) {
+                    if (! isset($current[$k]) || ! is_array($current[$k])) {
                         $current[$k] = [];
                     }
                     $current = &$current[$k];
@@ -213,7 +213,7 @@ class LanguageController extends Controller
         $indentStr = str_repeat('    ', $indent + 1);
 
         foreach ($array as $key => $value) {
-            $output .= $indentStr . var_export($key, true) . ' => ';
+            $output .= $indentStr.var_export($key, true).' => ';
 
             if (is_array($value)) {
                 $output .= $this->varExport($value, $indent + 1);
@@ -224,7 +224,7 @@ class LanguageController extends Controller
             $output .= ",\n";
         }
 
-        $output .= str_repeat('    ', $indent) . ']';
+        $output .= str_repeat('    ', $indent).']';
 
         return $output;
     }

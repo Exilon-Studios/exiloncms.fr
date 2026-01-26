@@ -2,13 +2,13 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
+use Exception;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Http\Requests\RoleRequest;
 use ExilonCMS\Models\Permission;
 use ExilonCMS\Models\Role;
 use ExilonCMS\Models\Setting;
 use ExilonCMS\Support\Discord\LinkedRoles;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;

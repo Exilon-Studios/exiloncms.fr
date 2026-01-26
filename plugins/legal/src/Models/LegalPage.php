@@ -18,8 +18,11 @@ use Illuminate\Database\Eloquent\Model;
 class LegalPage extends Model
 {
     const TYPE_PRIVACY = 'privacy';
+
     const TYPE_TERMS = 'terms';
+
     const TYPE_COOKIES = 'cookies';
+
     const TYPE_REFUND = 'refund';
 
     protected $fillable = [

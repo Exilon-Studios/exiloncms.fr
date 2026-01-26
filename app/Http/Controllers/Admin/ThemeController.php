@@ -53,7 +53,7 @@ class ThemeController extends Controller
         try {
             $theme = Theme::findOrFail($themeId);
 
-            if (!$theme->is_enabled) {
+            if (! $theme->is_enabled) {
                 return back()->with('error', 'This theme is disabled and cannot be activated.');
             }
 
@@ -66,7 +66,7 @@ class ThemeController extends Controller
 
             return back()->with('success', 'Theme activated successfully!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error activating theme: ' . $e->getMessage());
+            return back()->with('error', 'Error activating theme: '.$e->getMessage());
         }
     }
 
@@ -89,7 +89,7 @@ class ThemeController extends Controller
 
             return back()->with('success', 'Theme deactivated. Default theme restored.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error deactivating theme: ' . $e->getMessage());
+            return back()->with('error', 'Error deactivating theme: '.$e->getMessage());
         }
     }
 
@@ -101,10 +101,10 @@ class ThemeController extends Controller
         try {
             $theme = Theme::findOrFail($themeId);
 
-            $theme->update(['is_enabled' => !$theme->is_enabled]);
+            $theme->update(['is_enabled' => ! $theme->is_enabled]);
 
             // If disabling the active theme, deactivate it first
-            if (!$theme->is_enabled && $theme->is_active) {
+            if (! $theme->is_enabled && $theme->is_active) {
                 $theme->deactivate();
             }
 
@@ -112,7 +112,7 @@ class ThemeController extends Controller
 
             return back()->with('success', $theme->is_enabled ? 'Theme enabled.' : 'Theme disabled.');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error updating theme: ' . $e->getMessage());
+            return back()->with('error', 'Error updating theme: '.$e->getMessage());
         }
     }
 
@@ -129,19 +129,19 @@ class ThemeController extends Controller
             $publicPath = public_path("themes/{$theme->slug}");
 
             if (is_dir($themePath)) {
-                if (!is_dir(public_path('themes'))) {
+                if (! is_dir(public_path('themes'))) {
                     mkdir(public_path('themes'), 0755, true);
                 }
 
                 // Symlink or copy assets
-                if (!file_exists($publicPath)) {
+                if (! file_exists($publicPath)) {
                     symlink($themePath, $publicPath);
                 }
             }
 
             return back()->with('success', 'Theme assets published successfully!');
         } catch (\Exception $e) {
-            return back()->with('error', 'Error publishing assets: ' . $e->getMessage());
+            return back()->with('error', 'Error publishing assets: '.$e->getMessage());
         }
     }
 

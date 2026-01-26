@@ -124,7 +124,7 @@ class UserController extends Controller
         $validated = $request->validated();
 
         // Ne mettre à jour le password que s'il est présent dans la requête
-        if (!$request->filled('password')) {
+        if (! $request->filled('password')) {
             unset($validated['password']);
         }
 

@@ -80,7 +80,7 @@ class ResourcePurchase extends Model
     {
         static::creating(function (self $purchase) {
             if ($purchase->transaction_id === null) {
-                $purchase->transaction_id = 'RES_' . strtoupper(Str::random(16));
+                $purchase->transaction_id = 'RES_'.strtoupper(Str::random(16));
             }
         });
 
@@ -162,7 +162,7 @@ class ResourcePurchase extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return number_format($this->amount, 2, ',', ' ') . ' ' . $this->currency;
+        return number_format($this->amount, 2, ',', ' ').' '.$this->currency;
     }
 
     /**

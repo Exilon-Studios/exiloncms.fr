@@ -3,9 +3,9 @@
 namespace ExilonCMS\Plugins\Votes\Http\Controllers\Public;
 
 use ExilonCMS\Http\Controllers\Controller;
+use ExilonCMS\Models\User;
 use ExilonCMS\Plugins\Votes\Models\Vote;
 use ExilonCMS\Plugins\Votes\Models\VoteSite;
-use ExilonCMS\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -32,7 +32,7 @@ class VoteController extends Controller
 
     public function store(Request $request, VoteSite $site)
     {
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return back()->with('error', 'You must be logged in to vote.');
         }
 
@@ -47,6 +47,7 @@ class VoteController extends Controller
 
         if ($lastVote) {
             $nextVoteAt = $lastVote->created_at->addHours(config('votes.cooldown', 24));
+
             return back()->with('error', "You can vote again in {$nextVoteAt->diffForHumans()}.");
         }
 
@@ -71,12 +72,12 @@ class VoteController extends Controller
         ]);
 
         // Verify vote with external site
-        $response = Http::timeout(10)->get($site->url . '/api/ping', [
+        $response = Http::timeout(10)->get($site->url.'/api/ping', [
             'key' => $site->vote_key,
             'username' => $validated['username'],
         ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             return redirect()
                 ->route('votes.index')
                 ->with('error', 'Failed to verify vote with the voting site.');
@@ -84,7 +85,7 @@ class VoteController extends Controller
 
         $data = $response->json();
 
-        if (!$data['voted']) {
+        if (! $data['voted']) {
             return redirect()
                 ->route('votes.index')
                 ->with('error', 'Vote not found or already processed.');
@@ -93,7 +94,7 @@ class VoteController extends Controller
         // Find user by username
         $user = User::where('name', $validated['username'])->first();
 
-        if (!$user) {
+        if (! $user) {
             return redirect()
                 ->route('votes.index')
                 ->with('error', 'User not found.');
@@ -106,7 +107,7 @@ class VoteController extends Controller
             ->latest()
             ->first();
 
-        if (!$vote) {
+        if (! $vote) {
             return redirect()
                 ->route('votes.index')
                 ->with('error', 'No pending vote found.');
@@ -140,7 +141,7 @@ class VoteController extends Controller
                 ->where('vote_reward_id', $reward->id)
                 ->exists();
 
-            if (!$alreadyReceived) {
+            if (! $alreadyReceived) {
                 $reward->processReward($user);
                 $user->voteRewards()->attach($reward->id, [
                     'received_at' => now(),

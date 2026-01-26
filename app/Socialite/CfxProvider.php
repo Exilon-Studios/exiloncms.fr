@@ -61,7 +61,7 @@ class CfxProvider extends BaseCfxProvider
      */
     protected function mapUserToObject(array $user): User
     {
-        return (new User())->setRaw($user)->map([
+        return (new User)->setRaw($user)->map([
             'id' => $user['id'],
             'nickname' => $user['username'],
             'email' => $user['email'],

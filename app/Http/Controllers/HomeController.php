@@ -2,11 +2,10 @@
 
 namespace ExilonCMS\Http\Controllers;
 
+use ExilonCMS\Models\LandingSetting;
 use ExilonCMS\Models\Post;
 use ExilonCMS\Models\Server;
-use ExilonCMS\Models\LandingSetting;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -44,7 +43,7 @@ class HomeController extends Controller
                 'maxPlayers' => $server->getMaxPlayers(),
                 'playersPercents' => $server->getPlayersPercents(),
             ] : null,
-            'servers' => $servers->map(fn($s) => [
+            'servers' => $servers->map(fn ($s) => [
                 'id' => $s->id,
                 'name' => $s->name,
                 'address' => $s->address,

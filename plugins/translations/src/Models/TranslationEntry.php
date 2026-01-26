@@ -71,7 +71,7 @@ class TranslationEntry extends Model
         $path = $this->getLanguageFilePath();
         $dir = dirname($path);
 
-        if (!is_dir($dir)) {
+        if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
 
@@ -80,7 +80,7 @@ class TranslationEntry extends Model
             ->pluck('value', 'key')
             ->toArray();
 
-        $content = "<?php\n\nreturn " . var_export($translations, true) . ";\n";
+        $content = "<?php\n\nreturn ".var_export($translations, true).";\n";
 
         return file_put_contents($path, $content) !== false;
     }

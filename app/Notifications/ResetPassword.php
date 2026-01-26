@@ -16,7 +16,7 @@ class ResetPassword extends Notification
     {
         $expire = config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(trans('auth.mail.reset.subject'))
             ->line(trans('auth.mail.reset.line1'))
             ->action(trans('auth.mail.reset.action'), $url)

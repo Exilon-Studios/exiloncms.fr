@@ -53,7 +53,7 @@ class TagController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:blog_tags,slug,' . $tag->id,
+            'slug' => 'nullable|string|max:255|unique:blog_tags,slug,'.$tag->id,
             'color' => 'nullable|string|max:7',
         ]);
 

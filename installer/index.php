@@ -66,7 +66,6 @@ function parse_php_version()
  * @param  array  $array
  * @param  int|string  $key
  * @param  mixed  $default
- *
  * @return mixed
  */
 function array_get($array, $key, $default = null)
@@ -107,7 +106,6 @@ $requestContent = null;
  *
  * @param  string  $key
  * @param  mixed  $default
- *
  * @return null|string
  */
 function request_input($key, $default = null)
@@ -161,7 +159,6 @@ function send_json_response($data = null, $status = 200)
  *
  * @param  string  $url
  * @param  null|array  $curlOptions
- *
  * @return string
  */
 function read_url($url, $curlOptions = null)
@@ -207,7 +204,6 @@ function read_url($url, $curlOptions = null)
  *
  * @param  string  $url
  * @param  string  $path
- *
  * @return string
  */
 function download_file($url, $path)
@@ -219,7 +215,6 @@ function download_file($url, $path)
  * Determines if a function exists and is not disabled.
  *
  * @param  string  $function
- *
  * @return bool
  */
 function has_function($function)
@@ -334,10 +329,10 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $needDownload = true;
             $forceDownload = request_input('force') === 'true';
 
-            if (file_exists($zipFile) && !$forceDownload) {
+            if (file_exists($zipFile) && ! $forceDownload) {
                 if (filesize($zipFile) === $expectedSize) {
                     // Verify the zip is valid
-                    $test = new ZipArchive();
+                    $test = new ZipArchive;
                     if ($test->open($zipFile) === true) {
                         $test->close();
                         $needDownload = false;
@@ -363,7 +358,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 }
 
                 // Verify the downloaded zip is valid
-                $test = new ZipArchive();
+                $test = new ZipArchive;
                 if ($test->open($zipFile) !== true) {
                     unlink($zipFile);
                     throw new RuntimeException('Downloaded zip file is corrupted.');
@@ -384,15 +379,15 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             }
 
             // === IMPORTANT: Create .env FIRST, before extracting CMS files ===
-            $envFile = __DIR__ . '/.env';
-            $envExample = __DIR__ . '/.env.example';
+            $envFile = __DIR__.'/.env';
+            $envExample = __DIR__.'/.env.example';
 
             // Create database directory and file BEFORE extraction
-            $dbDir = __DIR__ . '/database';
+            $dbDir = __DIR__.'/database';
             if (! is_dir($dbDir)) {
                 mkdir($dbDir, 0755, true);
             }
-            $dbFile = __DIR__ . '/database/database.sqlite';
+            $dbFile = __DIR__.'/database/database.sqlite';
             if (! file_exists($dbFile)) {
                 touch($dbFile);
                 chmod($dbFile, 0644);
@@ -400,12 +395,12 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
 
             // Create storage directories required by Laravel
             $storageDirs = [
-                __DIR__ . '/storage/framework',
-                __DIR__ . '/storage/framework/cache',
-                __DIR__ . '/storage/framework/sessions',
-                __DIR__ . '/storage/framework/views',
-                __DIR__ . '/storage/logs',
-                __DIR__ . '/bootstrap/cache',
+                __DIR__.'/storage/framework',
+                __DIR__.'/storage/framework/cache',
+                __DIR__.'/storage/framework/sessions',
+                __DIR__.'/storage/framework/views',
+                __DIR__.'/storage/logs',
+                __DIR__.'/bootstrap/cache',
             ];
             foreach ($storageDirs as $dir) {
                 if (! is_dir($dir)) {
@@ -417,11 +412,11 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             if (! file_exists($envExample)) {
                 // Create a minimal .env file before extraction
                 // IMPORTANT: Use file sessions, not database sessions, to avoid chicken-and-egg problem
-                $key = 'base64:' . base64_encode(random_bytes(32));
+                $key = 'base64:'.base64_encode(random_bytes(32));
                 file_put_contents($envFile, "APP_KEY=$key\nAPP_DEBUG=true\nAPP_URL=http://localhost\nDB_CONNECTION=sqlite\nDB_DATABASE=database/database.sqlite\nSESSION_DRIVER=file\n");
             }
 
-            $zip = new ZipArchive();
+            $zip = new ZipArchive;
             $status = $zip->open($zipFile);
 
             if ($status !== true) {
@@ -452,7 +447,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                     continue;
                 }
 
-                $targetPath = __DIR__ . '/' . $filePath;
+                $targetPath = __DIR__.'/'.$filePath;
 
                 if (substr($filePath, -1) === '/') {
                     // Directory
@@ -491,7 +486,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 $envContent = file_get_contents($envFile);
 
                 // Ensure we use file sessions (database sessions require migrations first)
-                if (!str_contains($envContent, 'SESSION_DRIVER=')) {
+                if (! str_contains($envContent, 'SESSION_DRIVER=')) {
                     $envContent .= "\nSESSION_DRIVER=file\n";
                     file_put_contents($envFile, $envContent);
                 } else {
@@ -505,9 +500,9 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 $envContent = file_get_contents($envFile);
 
                 // Check if APP_KEY is missing or empty
-                if (!str_contains($envContent, 'APP_KEY=') || preg_match('/^APP_KEY=$/m', $envContent)) {
-                    $key = 'base64:' . base64_encode(random_bytes(32));
-                    $envContent = preg_replace('/^APP_KEY=.*$/m', 'APP_KEY=' . $key, $envContent, -1, $count);
+                if (! str_contains($envContent, 'APP_KEY=') || preg_match('/^APP_KEY=$/m', $envContent)) {
+                    $key = 'base64:'.base64_encode(random_bytes(32));
+                    $envContent = preg_replace('/^APP_KEY=.*$/m', 'APP_KEY='.$key, $envContent, -1, $count);
                     if ($count === 0) {
                         $envContent .= "\nAPP_KEY=$key\n";
                     }
@@ -516,8 +511,8 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
 
                 // Run migrations and seeders after extraction
                 // (database file was already created before extraction)
-                @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan migrate --force 2>&1', $migrateOutput, $migrateReturnCode);
-                @exec('cd ' . escapeshellarg(__DIR__) . ' && php artisan db:seed --force 2>&1', $seedOutput, $seedReturnCode);
+                @exec('cd '.escapeshellarg(__DIR__).' && php artisan migrate --force 2>&1', $migrateOutput, $migrateReturnCode);
+                @exec('cd '.escapeshellarg(__DIR__).' && php artisan db:seed --force 2>&1', $seedOutput, $seedReturnCode);
             }
 
             $data['extracted'] = true;
@@ -887,17 +882,17 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
           </span>
         </div>
 
-        <?php foreach ($requiredExtensions as $ext): ?>
+        <?php foreach ($requiredExtensions as $ext) { ?>
         <div class="status-item <?php echo extension_loaded($ext) ? 'success' : 'error'; ?>">
           <span class="status-label"><?php echo $ext; ?></span>
           <span class="status-value <?php echo extension_loaded($ext) ? 'ok' : 'fail'; ?>">
             <?php echo extension_loaded($ext) ? 'OK' : 'Missing'; ?>
           </span>
         </div>
-        <?php endforeach; ?>
+        <?php } ?>
       </div>
 
-      <?php if (version_compare(PHP_VERSION, '8.2', '>=') && is_writable(__DIR__) && is_writable(__DIR__.'/public') && empty(array_filter($requiredExtensions, fn($ext) => !extension_loaded($ext)))): ?>
+      <?php if (version_compare(PHP_VERSION, '8.2', '>=') && is_writable(__DIR__) && is_writable(__DIR__.'/public') && empty(array_filter($requiredExtensions, fn ($ext) => ! extension_loaded($ext)))) { ?>
       <button class="btn" id="startBtn" onclick="startInstall()">
         Commencer l'installation
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -905,9 +900,9 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
           <path d="M12 5l7 7-7 7" />
         </svg>
       </button>
-      <?php else: ?>
+      <?php } else { ?>
       <p style="color: #ef4444; font-size: 12px; margin-top: 16px;">Veuillez corriger les erreurs ci-dessus avant de continuer.</p>
-      <?php endif; ?>
+      <?php } ?>
 
       <div id="status"></div>
     </div>

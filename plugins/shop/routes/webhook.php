@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use ExilonCMS\Plugins\Shop\Controllers\PaymentWebhookController;
+use Illuminate\Support\Facades\Route;
 
 // Payment webhook endpoints for each gateway
 Route::post('/tebex/{paymentId?}', [PaymentWebhookController::class, 'handleTebex'])->name('shop.webhook.tebex');

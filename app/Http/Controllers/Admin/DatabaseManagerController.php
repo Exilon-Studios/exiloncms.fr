@@ -6,9 +6,7 @@ use ExilonCMS\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
-use ZipArchive;
 
 class DatabaseManagerController extends Controller
 {
@@ -68,6 +66,7 @@ class DatabaseManagerController extends Controller
 
         if (file_exists($dbPath)) {
             $size = filesize($dbPath);
+
             return $this->formatBytes($size);
         }
 
@@ -83,6 +82,7 @@ class DatabaseManagerController extends Controller
             $size = (int) $size;
             $base = log($size) / log(1024);
             $suffixes = ['B', 'KB', 'MB', 'GB', 'TB'];
+
             return round(pow(1024, $base - floor($base)), $precision).' '.$suffixes[floor($base)];
         }
 
@@ -219,8 +219,8 @@ class DatabaseManagerController extends Controller
         $tables = DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
 
         $sql = "-- ExilonCMS Database Export\n";
-        $sql .= "-- Generated: ".date('Y-m-d H:i:s')."\n";
-        $sql .= "-- Database: ".config('database.connections.sqlite.database')."\n\n";
+        $sql .= '-- Generated: '.date('Y-m-d H:i:s')."\n";
+        $sql .= '-- Database: '.config('database.connections.sqlite.database')."\n\n";
 
         foreach ($tables as $table) {
             $tableName = $table->name;
@@ -237,6 +237,7 @@ class DatabaseManagerController extends Controller
 
             if ($rows->isEmpty()) {
                 $sql .= "\n";
+
                 continue;
             }
 
@@ -256,7 +257,7 @@ class DatabaseManagerController extends Controller
                     }
                 }
 
-                $sql .= "INSERT INTO `{$tableName}` (`".implode('`, `', $columns)."`) VALUES (".implode(', ', $values).");\n";
+                $sql .= "INSERT INTO `{$tableName}` (`".implode('`, `', $columns).'`) VALUES ('.implode(', ', $values).");\n";
             }
 
             $sql .= "\n";
@@ -320,6 +321,7 @@ class DatabaseManagerController extends Controller
             return back()->with('success', 'SQL file imported successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()->withErrors(['import' => 'Failed to import SQL file: '.$e->getMessage()]);
         }
     }
@@ -368,6 +370,7 @@ class DatabaseManagerController extends Controller
             return back()->with('success', 'All tables truncated successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
+
             return back()->withErrors(['truncate' => 'Failed to truncate tables: '.$e->getMessage()]);
         }
     }

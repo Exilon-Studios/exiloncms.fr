@@ -3,15 +3,15 @@
 namespace ExilonCMS\Plugins\Notifications;
 
 use ExilonCMS\Models\Permission;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 
 class NotificationsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->app->singleton('notification', function () {
-            return new \ExilonCMS\Plugins\Notifications\Services\NotificationService();
+            return new \ExilonCMS\Plugins\Notifications\Services\NotificationService;
         });
     }
 

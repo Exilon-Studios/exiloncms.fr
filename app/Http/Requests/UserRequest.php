@@ -20,7 +20,7 @@ class UserRequest extends FormRequest
 
         return [
             'name' => [
-                'required', 'string', 'max:25', new Username(), Rule::unique('users')->ignore($user, 'name'),
+                'required', 'string', 'max:25', new Username, Rule::unique('users')->ignore($user, 'name'),
             ],
             'email' => [
                 'sometimes', 'nullable', 'email', 'max:50', Rule::unique('users')->ignore($user, 'email'),

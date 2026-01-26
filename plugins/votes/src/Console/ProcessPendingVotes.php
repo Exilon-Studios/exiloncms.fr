@@ -2,10 +2,10 @@
 
 namespace ExilonCMS\Plugins\Votes\Console;
 
+use ExilonCMS\Models\User;
 use ExilonCMS\Plugins\Notifications\Services\NotificationService;
 use ExilonCMS\Plugins\Votes\Models\Vote;
 use ExilonCMS\Plugins\Votes\Models\VoteReward;
-use ExilonCMS\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,6 +41,7 @@ class ProcessPendingVotes extends Command
 
             if ($pendingVotes->isEmpty()) {
                 $this->info('No pending votes to process.');
+
                 return self::SUCCESS;
             }
 
@@ -88,24 +89,26 @@ class ProcessPendingVotes extends Command
     {
         $user = User::find($vote->user_id);
 
-        if (!$user) {
+        if (! $user) {
             $vote->update([
                 'status' => 'failed',
                 'processed_at' => now(),
                 'error_message' => 'User not found',
             ]);
+
             return;
         }
 
         // Check if user can vote (not already voted in the last 24 hours)
         $canVote = $this->canUserVote($user, $vote->site_id);
 
-        if (!$canVote) {
+        if (! $canVote) {
             $vote->update([
                 'status' => 'failed',
                 'processed_at' => now(),
                 'error_message' => 'User already voted in the last 24 hours',
             ]);
+
             return;
         }
 
@@ -159,7 +162,7 @@ class ProcessPendingVotes extends Command
             ->where('processed_at', '>=', now()->subHours(24))
             ->first();
 
-        return !$lastVote;
+        return ! $lastVote;
     }
 
     /**
@@ -179,7 +182,7 @@ class ProcessPendingVotes extends Command
 
             case 'role':
                 // Add role to user
-                if (!DB::table('role_user')->where('user_id', $user->id)->where('role_id', $reward->role_id)->exists()) {
+                if (! DB::table('role_user')->where('user_id', $user->id)->where('role_id', $reward->role_id)->exists()) {
                     DB::table('role_user')->insert([
                         'user_id' => $user->id,
                         'role_id' => $reward->role_id,

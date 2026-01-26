@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use ExilonCMS\Plugins\Shop\Controllers\Admin\ShopController;
+use Illuminate\Support\Facades\Route;
 
 // Shop management
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');

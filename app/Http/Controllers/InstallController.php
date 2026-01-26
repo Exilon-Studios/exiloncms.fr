@@ -2,6 +2,7 @@
 
 namespace ExilonCMS\Http\Controllers;
 
+use Exception;
 use ExilonCMS\Games\FiveMGame;
 use ExilonCMS\Games\HytaleGame;
 use ExilonCMS\Games\Minecraft\MinecraftBedrockGame;
@@ -11,24 +12,23 @@ use ExilonCMS\Models\Role;
 use ExilonCMS\Models\Setting;
 use ExilonCMS\Models\User;
 use ExilonCMS\Support\EnvEditor;
-use Exception;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Client\HttpClientException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
 
@@ -442,7 +442,7 @@ class InstallController extends Controller
         $name = $request->input('name');
 
         try {
-            $id = (new FiveMGame())->getUserUniqueId($name);
+            $id = (new FiveMGame)->getUserUniqueId($name);
 
             return $this->setupMCCMS($request, 'fivem-cfx', $name, $id);
         } catch (HttpClientException) {
@@ -589,6 +589,7 @@ class InstallController extends Controller
             if ($user) {
                 Auth::login($user);
                 session()->forget('install_user_id');
+
                 return \Inertia\Inertia::location(url('/'));
             }
         }
@@ -1006,7 +1007,7 @@ class InstallController extends Controller
         $basePath = base_path();
 
         // Check if index.php is the installer (not the CMS)
-        $indexPath = $basePath . '/index.php';
+        $indexPath = $basePath.'/index.php';
         if (file_exists($indexPath)) {
             $content = file_get_contents($indexPath);
             // Check for installer-specific marker
@@ -1016,10 +1017,10 @@ class InstallController extends Controller
 
                 // Remove other installer files
                 $installerFiles = [
-                    $basePath . '/.htaccess',
-                    $basePath . '/README.md',
-                    $basePath . '/public/index.php',
-                    $basePath . '/public/.htaccess',
+                    $basePath.'/.htaccess',
+                    $basePath.'/README.md',
+                    $basePath.'/public/index.php',
+                    $basePath.'/public/.htaccess',
                 ];
 
                 foreach ($installerFiles as $file) {
@@ -1029,7 +1030,7 @@ class InstallController extends Controller
                 }
 
                 // Try to remove public directory if empty
-                @rmdir($basePath . '/public');
+                @rmdir($basePath.'/public');
             }
         }
     }
@@ -1104,8 +1105,8 @@ class InstallController extends Controller
 
             for ($i = 0; $i < count($lines); $i++) {
                 // Check if this line contains the key (not commented)
-                if (preg_match('/^' . preg_quote($key) . '=/', $lines[$i])) {
-                    $lines[$i] = $key . '=' . $value;
+                if (preg_match('/^'.preg_quote($key).'=/', $lines[$i])) {
+                    $lines[$i] = $key.'='.$value;
                     $found = true;
                     $updatedKeys[] = $key;
                     break;
@@ -1114,7 +1115,7 @@ class InstallController extends Controller
 
             // If key not found, add it at the end
             if (! $found) {
-                $lines[] = $key . '=' . $value;
+                $lines[] = $key.'='.$value;
             }
         }
 
@@ -1173,6 +1174,7 @@ class InstallController extends Controller
 
         if (file_exists($versionFile)) {
             $versionData = json_decode(file_get_contents($versionFile), true);
+
             return $versionData['version'] ?? '1.0.0';
         }
 
@@ -1202,7 +1204,7 @@ class InstallController extends Controller
 
             $release = $response->json();
             $version = $release['tag_name'];
-            $zipAsset = collect($release['assets'])->first(fn($asset) => str_ends_with($asset['name'], '.zip'));
+            $zipAsset = collect($release['assets'])->first(fn ($asset) => str_ends_with($asset['name'], '.zip'));
 
             if (! $zipAsset) {
                 return response()->json([
@@ -1232,8 +1234,8 @@ class InstallController extends Controller
                 mkdir($extractPath, 0755, true);
             }
 
-            $zip = new \ZipArchive();
-            if ($zip->open($tempPath) !== TRUE) {
+            $zip = new \ZipArchive;
+            if ($zip->open($tempPath) !== true) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Failed to open zip archive',
@@ -1244,10 +1246,10 @@ class InstallController extends Controller
             $zip->close();
 
             // Move files to project root
-            $extractedDir = $extractPath . '/exiloncms-' . ltrim($version, 'v');
+            $extractedDir = $extractPath.'/exiloncms-'.ltrim($version, 'v');
             if (! is_dir($extractedDir)) {
                 // Try alternative directory name
-                $dirs = glob($extractPath . '/*', GLOB_ONLYDIR);
+                $dirs = glob($extractPath.'/*', GLOB_ONLYDIR);
                 $extractedDir = $dirs[0] ?? null;
             }
 
@@ -1268,7 +1270,7 @@ class InstallController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
+                'message' => 'Error: '.$e->getMessage(),
             ], 500);
         }
     }
@@ -1296,9 +1298,9 @@ class InstallController extends Controller
                     continue;
                 }
 
-                $this->copyDirectory($item->getPathname(), $destination . '/' . $basename, $exclude);
+                $this->copyDirectory($item->getPathname(), $destination.'/'.$basename, $exclude);
             } else {
-                copy($item->getPathname(), $destination . '/' . $item->getBasename());
+                copy($item->getPathname(), $destination.'/'.$item->getBasename());
             }
         }
     }

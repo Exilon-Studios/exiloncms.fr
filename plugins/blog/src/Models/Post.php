@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Plugins\Blog\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use ExilonCMS\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,13 +37,16 @@ class Post extends Model
      * Post statuses.
      */
     public const STATUS_DRAFT = 'draft';
+
     public const STATUS_PUBLISHED = 'published';
+
     public const STATUS_SCHEDULED = 'scheduled';
 
     /**
      * Post types.
      */
     public const TYPE_POST = 'post';
+
     public const TYPE_PAGE = 'page';
 
     /**

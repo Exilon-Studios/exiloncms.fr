@@ -16,8 +16,11 @@ use Illuminate\Database\Eloquent\Model;
 class NotificationChannel extends Model
 {
     const TYPE_EMAIL = 'email';
+
     const TYPE_SMS = 'sms';
+
     const TYPE_PUSH = 'push';
+
     const TYPE_WEBHOOK = 'webhook';
 
     protected $fillable = [

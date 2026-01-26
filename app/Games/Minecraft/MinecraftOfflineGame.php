@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Games\Minecraft;
 
-use ExilonCMS\Models\User;
 use Closure;
+use ExilonCMS\Models\User;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Generator\NameGeneratorInterface;
 use Ramsey\Uuid\Uuid;
@@ -30,7 +30,7 @@ class MinecraftOfflineGame extends AbstractMinecraftGame
 
     public function getUserUniqueId(string $name): ?string
     {
-        $factory = new UuidFactory();
+        $factory = new UuidFactory;
         $factory->setNameGenerator(new class implements NameGeneratorInterface
         {
             public function generate(UuidInterface $ns, string $name, string $hashAlgorithm): string

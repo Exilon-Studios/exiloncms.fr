@@ -75,7 +75,7 @@ class VoteSiteController extends Controller
 
     public function toggle(VoteSite $site)
     {
-        $site->update(['is_enabled' => !$site->is_enabled]);
+        $site->update(['is_enabled' => ! $site->is_enabled]);
 
         return back()->with('success', 'Vote site status updated.');
     }

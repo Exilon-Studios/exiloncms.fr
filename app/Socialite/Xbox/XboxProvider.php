@@ -50,7 +50,7 @@ class XboxProvider extends AbstractProvider
     {
         $data = Arr::pluck(Arr::get($user, 'settings'), 'value', 'id');
 
-        return (new User())->setRaw($user)->map([
+        return (new User)->setRaw($user)->map([
             'id' => Arr::get($user, 'id'), // XUID
             'nickname' => Arr::get($data, 'Gamertag'),
             'avatar' => Arr::get($data, 'PublicGamerpic'),

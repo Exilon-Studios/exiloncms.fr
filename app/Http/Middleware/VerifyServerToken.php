@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Http\Middleware;
 
-use ExilonCMS\Models\Server;
 use Closure;
+use ExilonCMS\Models\Server;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 

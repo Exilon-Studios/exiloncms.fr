@@ -4,7 +4,6 @@ namespace ExilonCMS\Plugins\Blog\Http\Controllers\Public;
 
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Plugins\Blog\Models\Tag;
-use ExilonCMS\Plugins\Blog\Models\Post;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

@@ -86,7 +86,7 @@ class RegisterController extends Controller
     protected function validator(array $data): \Illuminate\Contracts\Validation\Validator
     {
         return \Illuminate\Support\Facades\Validator::make($data, [
-            'name' => ['required', 'string', 'max:25', 'unique:users', new Username(), new GameAuth()],
+            'name' => ['required', 'string', 'max:25', 'unique:users', new Username, new GameAuth],
             'email' => ['required', 'string', 'email', 'max:50', 'unique:users'],
             'password' => ['required', 'confirmed', Password::default()],
             'conditions' => [setting('conditions', false) ? 'accepted' : 'nullable'],

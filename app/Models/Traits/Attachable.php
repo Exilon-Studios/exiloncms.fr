@@ -49,7 +49,7 @@ trait Attachable
     {
         $attachment = new PendingAttachment([
             'pending_id' => $pendingId,
-            'pending_type' => (new self())->getAttachmentsType(),
+            'pending_type' => (new self)->getAttachmentsType(),
         ]);
 
         return $attachment->storeImage($file, true);
@@ -103,7 +103,7 @@ trait Attachable
 
     public function getAttachmentsType(): string
     {
-        return (new self())->getMorphClass();
+        return (new self)->getMorphClass();
     }
 
     public function getAttachmentsPath(): string

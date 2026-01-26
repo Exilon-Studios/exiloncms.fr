@@ -3,9 +3,8 @@
 namespace ExilonCMS\Services;
 
 use ExilonCMS\Models\Notification;
-use ExilonCMS\Models\Setting;
-use ExilonCMS\Models\User;
 use ExilonCMS\Models\Role;
+use ExilonCMS\Models\User;
 
 /**
  * Central notification service
@@ -41,17 +40,17 @@ class NotificationService
     /**
      * Send a notification to admins.
      *
-     * @param string $content Notification content
-     * @param string $level Notification level (info, success, warning, danger)
-     * @param string|null $link Optional link
-     * @param int|null $authorId Optional author ID
+     * @param  string  $content  Notification content
+     * @param  string  $level  Notification level (info, success, warning, danger)
+     * @param  string|null  $link  Optional link
+     * @param  int|null  $authorId  Optional author ID
      * @return int Number of admins notified
      */
     public function notifyAdmins(string $content, string $level = 'info', ?string $link = null, ?int $authorId = null): int
     {
         $adminRole = Role::where('is_admin', true)->first();
 
-        if (!$adminRole) {
+        if (! $adminRole) {
             return 0;
         }
 
@@ -84,7 +83,7 @@ class NotificationService
         $this->notifyAdmins(
             content: "Nouvel utilisateur : **{$user->name}** ({$user->email})",
             level: 'info',
-            link: '/admin/users/' . $user->id
+            link: '/admin/users/'.$user->id
         );
 
         // Send Discord webhook if enabled
@@ -110,7 +109,7 @@ class NotificationService
         $this->notifyAdmins(
             content: "Nouvelle commande #{$orderId} de **{$userName}** d'un montant de **{$total}€**",
             level: 'success',
-            link: '/admin/shop/orders/' . $orderId
+            link: '/admin/shop/orders/'.$orderId
         );
 
         // Send Discord webhook if enabled
@@ -193,7 +192,7 @@ class NotificationService
         $this->notifyAdmins(
             content: $content,
             level: 'danger',
-            link: $userId ? '/admin/users/' . $userId : null
+            link: $userId ? '/admin/users/'.$userId : null
         );
 
         // Send Discord webhook if enabled

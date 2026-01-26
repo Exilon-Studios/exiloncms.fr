@@ -17,7 +17,7 @@ class UserDelete extends Notification
             'id' => $notifiable->getKey(),
         ]);
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(trans('mail.delete.subject'))
             ->line(trans('mail.delete.line1'))
             ->action(trans('mail.delete.action'), $url)

@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\File;
 class FindMissingTranslations extends Command
 {
     protected $signature = 'translations:missing {--add : Automatically add missing keys to translation files}';
+
     protected $description = 'Find translation keys used in code but missing from translation files';
 
     private array $langFiles = [];
+
     private array $missingKeys = [];
 
     public function handle()
@@ -28,18 +30,18 @@ class FindMissingTranslations extends Command
         // Find all translation keys used in code
         $usedKeys = $this->findUsedTranslationKeys();
 
-        $this->info("Found " . count($usedKeys) . " translation keys in code");
-        $this->info("Loaded " . count(array_keys($this->langFiles)) . " translation files");
+        $this->info('Found '.count($usedKeys).' translation keys in code');
+        $this->info('Loaded '.count(array_keys($this->langFiles)).' translation files');
         $this->newLine();
 
         // Find missing keys
         foreach ($usedKeys as $key) {
-            if (!$this->keyExists($key)) {
+            if (! $this->keyExists($key)) {
                 $this->missingKeys[] = $key;
             }
         }
 
-        $this->warn("Found " . count($this->missingKeys) . " missing translation keys!");
+        $this->warn('Found '.count($this->missingKeys).' missing translation keys!');
 
         if (count($this->missingKeys) > 0) {
             $this->newLine();
@@ -50,7 +52,7 @@ class FindMissingTranslations extends Command
 
             foreach ($groups as $file => $keys) {
                 $this->newLine();
-                $this->info("File: $file (" . count($keys) . " keys)");
+                $this->info("File: $file (".count($keys).' keys)');
                 foreach ($keys as $key) {
                     $this->line("  - $key");
                 }
@@ -73,15 +75,17 @@ class FindMissingTranslations extends Command
 
     private function loadTranslationFiles(string $path, bool $isPlugin = false)
     {
-        if (!is_dir($path)) return;
+        if (! is_dir($path)) {
+            return;
+        }
 
-        $files = File::glob($path . '/*.php');
+        $files = File::glob($path.'/*.php');
         foreach ($files as $file) {
             $fileName = basename($file, '.php');
             $translations = include $file;
 
             if ($isPlugin) {
-                $fileName = 'shop::' . $fileName;
+                $fileName = 'shop::'.$fileName;
             }
 
             $this->langFiles[$fileName] = $translations;
@@ -94,18 +98,18 @@ class FindMissingTranslations extends Command
         $file = $parts[0];
 
         // Check if file exists
-        if (!isset($this->langFiles[$file])) {
+        if (! isset($this->langFiles[$file])) {
             // Try with shop:: prefix
-            if (!isset($this->langFiles['shop::' . $file])) {
+            if (! isset($this->langFiles['shop::'.$file])) {
                 return false;
             }
-            $file = 'shop::' . $file;
+            $file = 'shop::'.$file;
         }
 
         // Navigate through nested array
         $current = $this->langFiles[$file];
         for ($i = 1; $i < count($parts); $i++) {
-            if (!is_array($current) || !isset($current[$parts[$i]])) {
+            if (! is_array($current) || ! isset($current[$parts[$i]])) {
                 return false;
             }
             $current = $current[$parts[$i]];
@@ -132,7 +136,9 @@ class FindMissingTranslations extends Command
         );
 
         foreach ($files as $file) {
-            if (!file_exists($file)) continue;
+            if (! file_exists($file)) {
+                continue;
+            }
 
             $content = file_get_contents($file);
             foreach ($patterns as $pattern) {
@@ -155,7 +161,7 @@ class FindMissingTranslations extends Command
             $parts = explode('.', $key);
             $file = $parts[0];
 
-            if (!isset($groups[$file])) {
+            if (! isset($groups[$file])) {
                 $groups[$file] = [];
             }
 
@@ -175,13 +181,14 @@ class FindMissingTranslations extends Command
             $fileName = $isPlugin ? str_replace('shop::', '', $file) : $file;
 
             if ($isPlugin) {
-                $filePath = base_path('plugins/shop/resources/lang/fr/' . $fileName . '.php');
+                $filePath = base_path('plugins/shop/resources/lang/fr/'.$fileName.'.php');
             } else {
-                $filePath = resource_path('lang/fr/' . $fileName . '.php');
+                $filePath = resource_path('lang/fr/'.$fileName.'.php');
             }
 
-            if (!file_exists($filePath)) {
+            if (! file_exists($filePath)) {
                 $this->warn("  File not found: $filePath");
+
                 continue;
             }
 
@@ -199,14 +206,14 @@ class FindMissingTranslations extends Command
                 $path = [];
                 foreach ($parts as $part) {
                     $path[] = $part;
-                    if (!isset($current[$part])) {
+                    if (! isset($current[$part])) {
                         $current[$part] = '';
-                        $this->line("  Added: " . implode('.', $path));
-                    } elseif (!is_array($current[$part])) {
+                        $this->line('  Added: '.implode('.', $path));
+                    } elseif (! is_array($current[$part])) {
                         // Key exists but is not an array - skip
                         break;
                     }
-                    if (!is_array($current[$part])) {
+                    if (! is_array($current[$part])) {
                         $current[$part] = [];
                     }
                     $current = &$current[$part];
@@ -234,11 +241,11 @@ class FindMissingTranslations extends Command
 
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $output .= $padding . "'" . $key . "' => array (\n";
+                $output .= $padding."'".$key."' => array (\n";
                 $output .= $this->arrayToCode($value, $indent + 1);
-                $output .= $padding . "),\n";
+                $output .= $padding."),\n";
             } else {
-                $output .= $padding . "'" . $key . "' => '" . addslashes($value ?? '') . "',\n";
+                $output .= $padding."'".$key."' => '".addslashes($value ?? '')."',\n";
             }
         }
 

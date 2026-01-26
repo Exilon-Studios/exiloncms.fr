@@ -2,9 +2,9 @@
 
 namespace ExilonCMS\Extensions\Theme;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Collection;
 
 class ThemeManager
 {
@@ -16,7 +16,7 @@ class ThemeManager
         $themes = collect();
         $themePath = base_path('themes');
 
-        if (!File::exists($themePath)) {
+        if (! File::exists($themePath)) {
             return $themes;
         }
 
@@ -24,7 +24,7 @@ class ThemeManager
 
         foreach ($directories as $directory) {
             $themeName = basename($directory);
-            $themeJson = $directory . '/theme.json';
+            $themeJson = $directory.'/theme.json';
 
             if (File::exists($themeJson)) {
                 $config = json_decode(File::get($themeJson), true);
@@ -83,14 +83,14 @@ class ThemeManager
     {
         $theme = $this->getAllThemes()->firstWhere('id', $themeId);
 
-        if (!$theme) {
+        if (! $theme) {
             return false;
         }
 
         // Check requirements
-        if (!empty($theme['requires'])) {
+        if (! empty($theme['requires'])) {
             foreach ($theme['requires'] as $package => $constraint) {
-                if (!class_exists($package)) {
+                if (! class_exists($package)) {
                     throw new \Exception("Theme requires {$package} but it's not installed.");
                 }
             }
@@ -124,7 +124,7 @@ class ThemeManager
      */
     public function getThemeUrl(string $themeId, string $path = ''): string
     {
-        return asset("themes/{$themeId}/" . ltrim($path, '/'));
+        return asset("themes/{$themeId}/".ltrim($path, '/'));
     }
 
     /**
@@ -155,12 +155,12 @@ class ThemeManager
         $themePath = base_path("themes/{$themeId}/resources");
         $publicPath = public_path("themes/{$themeId}");
 
-        if (!File::exists($themePath)) {
+        if (! File::exists($themePath)) {
             return false;
         }
 
         // Create public directory if it doesn't exist
-        if (!File::exists($publicPath)) {
+        if (! File::exists($publicPath)) {
             File::makeDirectory($publicPath, 0755, true);
         }
 
@@ -190,7 +190,7 @@ class ThemeManager
         $activeTheme = $this->getActiveTheme();
 
         if ($activeTheme && $activeTheme['id'] !== 'default') {
-            $provider = $activeTheme['path'] . '/src/' . $activeTheme['id'] . 'ServiceProvider.php';
+            $provider = $activeTheme['path'].'/src/'.$activeTheme['id'].'ServiceProvider.php';
 
             if (File::exists($provider)) {
                 // Register the theme service provider

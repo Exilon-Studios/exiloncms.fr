@@ -3,8 +3,8 @@
 namespace ExilonCMS\Plugins\Votes\Http\Controllers\Admin;
 
 use ExilonCMS\Http\Controllers\Controller;
-use ExilonCMS\Plugins\Votes\Models\VoteReward;
 use ExilonCMS\Models\Role;
+use ExilonCMS\Plugins\Votes\Models\VoteReward;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -83,7 +83,7 @@ class VoteRewardController extends Controller
 
     public function toggle(VoteReward $reward)
     {
-        $reward->update(['is_active' => !$reward->is_active]);
+        $reward->update(['is_active' => ! $reward->is_active]);
 
         return back()->with('success', 'Vote reward status updated.');
     }

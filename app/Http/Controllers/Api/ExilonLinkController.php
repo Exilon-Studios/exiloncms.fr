@@ -2,13 +2,12 @@
 
 namespace ExilonCMS\Http\Controllers\Api;
 
-use ExilonCMS\Models\User;
-use ExilonCMS\Models\Server;
 use ExilonCMS\Models\ActionLog;
-use Illuminate\Http\Request;
+use ExilonCMS\Models\Server;
+use ExilonCMS\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 
 class ExilonLinkController
 {

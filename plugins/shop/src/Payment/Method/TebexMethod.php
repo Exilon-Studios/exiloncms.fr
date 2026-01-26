@@ -14,12 +14,14 @@ use Illuminate\Support\Facades\Http;
 class TebexMethod extends PaymentMethod
 {
     protected string $id = 'tebex';
+
     protected string $name = 'Tebex';
 
     /**
      * Tebex API endpoints.
      */
     private const API_BASE = 'https://plugin.tebex.io';
+
     private const CHECKOUT_URL = 'https://checkout.tebex.io';
 
     /**
@@ -122,7 +124,7 @@ class TebexMethod extends PaymentMethod
         // Create basket via API
         $response = Http::withHeaders([
             'X-Tebex-Secret' => $serverKey,
-        ])->post(self::API_BASE . '/basket', [
+        ])->post(self::API_BASE.'/basket', [
             'complete_url' => route('shop.payments.success', $payment->id),
             'cancel_url' => route('shop.payments.cancel', $payment->id),
             'username' => auth()->user()->name,
@@ -141,7 +143,7 @@ class TebexMethod extends PaymentMethod
             'transaction_id' => $basket['id'],
         ]);
 
-        return self::CHECKOUT_URL . '/basket/' . $basket['id'];
+        return self::CHECKOUT_URL.'/basket/'.$basket['id'];
     }
 
     /**
@@ -233,7 +235,7 @@ class TebexMethod extends PaymentMethod
 
         $response = Http::withHeaders([
             'X-Tebex-Secret' => $serverKey,
-        ])->get(self::API_BASE . "/basket/{$basketId}");
+        ])->get(self::API_BASE."/basket/{$basketId}");
 
         return $response->successful() ? $response->json() : null;
     }
@@ -247,7 +249,7 @@ class TebexMethod extends PaymentMethod
 
         $response = Http::withHeaders([
             'X-Tebex-Secret' => $serverKey,
-        ])->get(self::API_BASE . '/server');
+        ])->get(self::API_BASE.'/server');
 
         return $response->successful() ? $response->json() : null;
     }
@@ -261,7 +263,7 @@ class TebexMethod extends PaymentMethod
 
         $response = Http::withHeaders([
             'X-Tebex-Secret' => $serverKey,
-        ])->get(self::API_BASE . '/server/packages');
+        ])->get(self::API_BASE.'/server/packages');
 
         return $response->successful() ? $response->json('data', []) : [];
     }

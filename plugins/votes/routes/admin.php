@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use ExilonCMS\Plugins\Votes\Http\Controllers\Admin\VoteSiteController;
 use ExilonCMS\Plugins\Votes\Http\Controllers\Admin\VoteRewardController;
+use ExilonCMS\Plugins\Votes\Http\Controllers\Admin\VoteSiteController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'can:votes.manage'])->group(function () {
     // Vote Sites

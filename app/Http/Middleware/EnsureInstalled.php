@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Http\Middleware;
 
-use ExilonCMS\Http\Controllers\InstallController;
 use Closure;
+use ExilonCMS\Http\Controllers\InstallController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;

@@ -16,7 +16,6 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -136,7 +135,7 @@ class ProfileController extends Controller
 
         $validated = $this->validate($request, [
             'name' => [
-                'required', 'max:25', new Username(),
+                'required', 'max:25', new Username,
                 Rule::unique('users', 'name')->ignore($request->user()),
             ],
         ]);
@@ -187,7 +186,7 @@ class ProfileController extends Controller
             ]);
         }
 
-        $google2fa = new Google2FA();
+        $google2fa = new Google2FA;
         $secret = $request->session()->get('2fa.secret', $google2fa->generateSecretKey());
         $qrCodeUrl = $google2fa->getQRCodeUrl(site_name(), $request->user()->email, $secret);
 
@@ -230,7 +229,7 @@ class ProfileController extends Controller
         $code = Str::remove(' ', $request->input('code'));
         $secret = $request->session()->get('2fa.secret');
 
-        if (! $secret || ! (new Google2FA())->verifyKey($secret, $code)) {
+        if (! $secret || ! (new Google2FA)->verifyKey($secret, $code)) {
             throw ValidationException::withMessages(['code' => trans('auth.2fa.invalid')]);
         }
 
@@ -336,7 +335,7 @@ class ProfileController extends Controller
 
     public function sendDelete(Request $request)
     {
-        $request->user()->notify(new UserDelete());
+        $request->user()->notify(new UserDelete);
 
         return to_route('profile.index')
             ->with('success', trans('messages.profile.delete.sent'));

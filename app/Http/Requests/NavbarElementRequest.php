@@ -4,8 +4,8 @@ namespace ExilonCMS\Http\Requests;
 
 use ExilonCMS\Http\Requests\Traits\ConvertCheckbox;
 use ExilonCMS\Models\NavbarElement;
-use ExilonCMS\Plugins\Pages\Models\Page;
 use ExilonCMS\Plugins\Blog\Models\Post;
+use ExilonCMS\Plugins\Pages\Models\Page;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 

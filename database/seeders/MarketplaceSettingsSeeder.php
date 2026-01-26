@@ -37,7 +37,7 @@ class MarketplaceSettingsSeeder extends Seeder
         }
 
         $this->command->info('Marketplace settings seeded successfully!');
-        $this->command->warn('SSO Secret: ' . $settings['marketplace_sso_secret']);
+        $this->command->warn('SSO Secret: '.$settings['marketplace_sso_secret']);
         $this->command->warn('Register this secret on the marketplace at /sso/register');
     }
 }

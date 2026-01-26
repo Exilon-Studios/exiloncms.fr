@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         // Only create pages table if it doesn't exist
-        if (!Schema::hasTable('pages')) {
+        if (! Schema::hasTable('pages')) {
             Schema::create('pages', function (Blueprint $table) {
                 $table->id();
                 $table->string('title');
@@ -26,7 +26,7 @@ return new class extends Migration
         }
 
         // Only create page_roles table if it doesn't exist
-        if (!Schema::hasTable('page_roles')) {
+        if (! Schema::hasTable('page_roles')) {
             Schema::create('page_roles', function (Blueprint $table) {
                 $table->id();
                 $table->foreignId('page_id')->constrained('pages')->onDelete('cascade');

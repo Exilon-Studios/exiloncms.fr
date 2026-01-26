@@ -24,7 +24,9 @@ use Illuminate\Database\Eloquent\Model;
 class NotificationLog extends Model
 {
     const STATUS_PENDING = 'pending';
+
     const STATUS_SENT = 'sent';
+
     const STATUS_FAILED = 'failed';
 
     protected $fillable = [

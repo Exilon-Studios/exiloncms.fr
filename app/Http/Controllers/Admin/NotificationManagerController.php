@@ -2,12 +2,12 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
-use Inertia\Inertia;
 use ExilonCMS\Http\Controllers\Controller;
-use ExilonCMS\Models\User;
 use ExilonCMS\Models\Notification;
+use ExilonCMS\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 
 class NotificationManagerController extends Controller
 {

@@ -2,11 +2,11 @@
 
 namespace ExilonCMS\Http\Controllers\Auth;
 
+use Exception;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\ActionLog;
 use ExilonCMS\Models\User;
 use ExilonCMS\Providers\RouteServiceProvider;
-use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
@@ -393,7 +393,7 @@ class LoginController extends Controller
 
         // Try to get intended URL, otherwise fall back to previous URL or home
         $intended = $request->session()->get('url.intended');
-        if (!$intended) {
+        if (! $intended) {
             $intended = $request->input('return_url') ?: url()->previous();
         }
 

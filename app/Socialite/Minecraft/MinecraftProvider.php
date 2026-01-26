@@ -29,7 +29,7 @@ class MinecraftProvider extends XboxProvider
 
     protected function mapUserToObject(array $user): User
     {
-        return (new User())->setRaw($user)->map([
+        return (new User)->setRaw($user)->map([
             'id' => Arr::get($user, 'id'),
             'nickname' => Arr::get($user, 'name'),
         ]);

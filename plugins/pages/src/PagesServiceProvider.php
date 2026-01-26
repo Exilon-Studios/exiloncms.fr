@@ -3,8 +3,8 @@
 namespace ExilonCMS\Plugins\Pages;
 
 use ExilonCMS\Models\Permission;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 
 class PagesServiceProvider extends ServiceProvider
 {

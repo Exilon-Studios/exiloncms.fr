@@ -12,7 +12,7 @@ class LinkedRoles
 
     public static function clearRole(DiscordAccount $user)
     {
-        static::linkRole($user, (new Role())->forceFill([
+        static::linkRole($user, (new Role)->forceFill([
             'id' => 0,
             'power' => 0,
         ]));

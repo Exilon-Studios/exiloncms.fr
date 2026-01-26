@@ -24,7 +24,7 @@ abstract class PaymentMethod
      */
     public function __construct(?Gateway $gateway = null)
     {
-        $this->gateway = $gateway ?? new Gateway();
+        $this->gateway = $gateway ?? new Gateway;
     }
 
     /**
@@ -41,9 +41,9 @@ abstract class PaymentMethod
      * Start a new payment with this method.
      * Should return a response (redirect, view, etc.) to initiate the payment.
      *
-     * @param mixed $cart The shopping cart
-     * @param float $amount The payment amount
-     * @param string $currency ISO 4217 currency code
+     * @param  mixed  $cart  The shopping cart
+     * @param  float  $amount  The payment amount
+     * @param  string  $currency  ISO 4217 currency code
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     abstract public function startPayment($cart, float $amount, string $currency);
@@ -51,8 +51,8 @@ abstract class PaymentMethod
     /**
      * Handle a payment notification from the payment gateway.
      *
-     * @param \Illuminate\Http\Request $request The webhook request
-     * @param string|null $paymentId The payment ID from the gateway
+     * @param  \Illuminate\Http\Request  $request  The webhook request
+     * @param  string|null  $paymentId  The payment ID from the gateway
      * @return \Illuminate\Http\Response
      */
     abstract public function handleNotification(Request $request, ?string $paymentId);
@@ -207,7 +207,7 @@ abstract class PaymentMethod
      */
     protected function giveRole(User $user, Item $item): void
     {
-        if (!$item->role_id) {
+        if (! $item->role_id) {
             return;
         }
 
@@ -217,7 +217,7 @@ abstract class PaymentMethod
             ->where('role_id', $item->role_id)
             ->first();
 
-        if (!$existing) {
+        if (! $existing) {
             DB::table('role_user')->insert([
                 'user_id' => $user->id,
                 'role_id' => $item->role_id,
@@ -230,7 +230,7 @@ abstract class PaymentMethod
      */
     protected function executeCommands(User $user, Item $item, int $quantity): void
     {
-        if (!$item->commands) {
+        if (! $item->commands) {
             return;
         }
 

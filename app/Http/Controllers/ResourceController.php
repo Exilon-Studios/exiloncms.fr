@@ -130,8 +130,8 @@ class ResourceController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:500',
             'content' => 'nullable|string',
-            'type' => 'required|in:' . implode(',', Resource::TYPES),
-            'pricing_type' => 'required|in:' . implode(',', Resource::PRICING_TYPES),
+            'type' => 'required|in:'.implode(',', Resource::TYPES),
+            'pricing_type' => 'required|in:'.implode(',', Resource::PRICING_TYPES),
             'price' => 'required_if:pricing_type,paid|numeric|min:0|max:9999.99',
             'currency' => 'required_if:pricing_type,paid|string|size:3',
             'version' => 'required|string|max:20',
@@ -148,7 +148,7 @@ class ResourceController extends Controller
         $user = $request->user();
 
         // Ensure user is a seller
-        if (!$user->isSeller()) {
+        if (! $user->isSeller()) {
             $user->markAsSeller();
         }
 
@@ -200,8 +200,8 @@ class ResourceController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:500',
             'content' => 'nullable|string',
-            'type' => 'required|in:' . implode(',', Resource::TYPES),
-            'pricing_type' => 'required|in:' . implode(',', Resource::PRICING_TYPES),
+            'type' => 'required|in:'.implode(',', Resource::TYPES),
+            'pricing_type' => 'required|in:'.implode(',', Resource::PRICING_TYPES),
             'price' => 'required_if:pricing_type,paid|numeric|min:0|max:9999.99',
             'currency' => 'required_if:pricing_type,paid|string|size:3',
             'version' => 'required|string|max:20',
@@ -285,11 +285,11 @@ class ResourceController extends Controller
         $user = Auth::user();
 
         // Check if user can download
-        if (!$resource->isPublished()) {
+        if (! $resource->isPublished()) {
             abort(404);
         }
 
-        if (!$resource->hasPurchased($user)) {
+        if (! $resource->hasPurchased($user)) {
             return redirect()->route('resources.show', $resource->slug)
                 ->with('error', 'You need to purchase this resource to download it.');
         }

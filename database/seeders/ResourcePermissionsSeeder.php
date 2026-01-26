@@ -61,6 +61,6 @@ class ResourcePermissionsSeeder extends Seeder
         }
 
         $this->command->info('Resource permissions seeded successfully.');
-        $this->command->info('Registered permissions: ' . implode(', ', array_keys($resourcePermissions)));
+        $this->command->info('Registered permissions: '.implode(', ', array_keys($resourcePermissions)));
     }
 }

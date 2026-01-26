@@ -2,6 +2,8 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
+use DateTimeZone;
+use Exception;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\ActionLog;
 use ExilonCMS\Models\Image;
@@ -9,8 +11,6 @@ use ExilonCMS\Models\Setting;
 use ExilonCMS\Notifications\TestMail;
 use ExilonCMS\Support\Files;
 use ExilonCMS\Support\Optimizer;
-use DateTimeZone;
-use Exception;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Hashing\HashManager;
@@ -665,7 +665,7 @@ class SettingsController extends Controller
         }
 
         try {
-            $request->user()->notify(new TestMail());
+            $request->user()->notify(new TestMail);
         } catch (Exception $e) {
             return response()->json([
                 'message' => trans('messages.status.error', [
@@ -738,7 +738,7 @@ class SettingsController extends Controller
     protected function getAvailableLocales()
     {
         return $this->getAvailableLocaleCodes()->mapWithKeys(fn (string $code) => [
-            $code => match($code) {
+            $code => match ($code) {
                 'fr' => 'Français',
                 'en' => 'English',
                 'es' => 'Español',

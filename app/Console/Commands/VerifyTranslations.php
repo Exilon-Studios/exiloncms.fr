@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\File;
 class VerifyTranslations extends Command
 {
     protected $signature = 'translations:verify {--detailed : Show detailed usage information}';
+
     protected $description = 'Comprehensive verification of translation usage with detailed reporting';
 
     public function handle()
@@ -32,7 +33,7 @@ class VerifyTranslations extends Command
         $sharedPluginFiles = ['nav', 'widget', 'shop'];  // shop.php is loaded as 'shop' => trans('shop')
 
         // Get keys that are shared via HandleInertiaRequests (automatically used)
-        $sharedKeys = array_filter($allKeys, function($key) use ($sharedNamespaces, $sharedPluginFiles) {
+        $sharedKeys = array_filter($allKeys, function ($key) use ($sharedNamespaces, $sharedPluginFiles) {
             $parts = explode('.', $key);
 
             // Check regular namespaces (admin, auth, etc.)
@@ -56,15 +57,15 @@ class VerifyTranslations extends Command
             $usageMap[$key][] = 'HandleInertiaRequests (shared globally)';
         }
 
-        $this->info("Total translation keys defined: " . count($allKeys));
-        $this->info("Keys shared via HandleInertiaRequests: " . count($sharedKeys));
-        $this->info("Keys with verified usage: " . count($usageMap));
+        $this->info('Total translation keys defined: '.count($allKeys));
+        $this->info('Keys shared via HandleInertiaRequests: '.count($sharedKeys));
+        $this->info('Keys with verified usage: '.count($usageMap));
         $this->newLine();
 
         // Find unused keys
         $unusedKeys = array_diff($allKeys, array_keys($usageMap));
 
-        $this->warn("Keys without verified usage: " . count($unusedKeys));
+        $this->warn('Keys without verified usage: '.count($unusedKeys));
         $this->newLine();
 
         if ($this->option('detailed') && count($unusedKeys) > 0) {
@@ -75,7 +76,7 @@ class VerifyTranslations extends Command
             $groups = $this->groupKeysByFile($unusedKeys);
 
             foreach ($groups as $file => $keys) {
-                $this->info("File: $file (" . count($keys) . " keys)");
+                $this->info("File: $file (".count($keys).' keys)');
                 foreach ($keys as $key) {
                     $this->line("  - $key");
                 }
@@ -85,11 +86,11 @@ class VerifyTranslations extends Command
 
         // Summary
         $this->info('=== Summary ===');
-        $this->line("Total keys: " . count($allKeys));
-        $this->line("Shared via HandleInertiaRequests (including plugins): " . count($sharedKeys));
-        $this->line("Direct usage in code: " . (count($usageMap) - count($sharedKeys)));
-        $this->line("Total verified in use: " . count($usageMap));
-        $this->line("Potentially unused: " . count($unusedKeys));
+        $this->line('Total keys: '.count($allKeys));
+        $this->line('Shared via HandleInertiaRequests (including plugins): '.count($sharedKeys));
+        $this->line('Direct usage in code: '.(count($usageMap) - count($sharedKeys)));
+        $this->line('Total verified in use: '.count($usageMap));
+        $this->line('Potentially unused: '.count($unusedKeys));
         $this->newLine();
 
         if (count($unusedKeys) > 0) {
@@ -127,10 +128,12 @@ class VerifyTranslations extends Command
 
         $files = $this->getAllSearchableFiles();
 
-        $this->line("Scanning " . count($files) . " files...");
+        $this->line('Scanning '.count($files).' files...');
 
         foreach ($files as $file) {
-            if (!file_exists($file)) continue;
+            if (! file_exists($file)) {
+                continue;
+            }
 
             $content = file_get_contents($file);
 
@@ -142,12 +145,12 @@ class VerifyTranslations extends Command
                         // Normalize the key
                         $normalizedKey = $this->normalizeKey($key);
 
-                        if (!isset($usageMap[$normalizedKey])) {
+                        if (! isset($usageMap[$normalizedKey])) {
                             $usageMap[$normalizedKey] = [];
                         }
 
-                        $relativePath = str_replace(base_path() . '/', '', $file);
-                        if (!in_array($relativePath, $usageMap[$normalizedKey])) {
+                        $relativePath = str_replace(base_path().'/', '', $file);
+                        if (! in_array($relativePath, $usageMap[$normalizedKey])) {
                             $usageMap[$normalizedKey][] = $relativePath;
                         }
                     }
@@ -164,6 +167,7 @@ class VerifyTranslations extends Command
         $key = preg_replace('/\{[^}]+\}/', '*', $key);
         // Remove :attribute placeholders
         $key = preg_replace('/:[a-z_]+/i', '*', $key);
+
         return $key;
     }
 
@@ -190,9 +194,11 @@ class VerifyTranslations extends Command
         $keys = [];
 
         foreach ($paths as $path) {
-            if (!is_dir($path)) continue;
+            if (! is_dir($path)) {
+                continue;
+            }
 
-            $files = File::glob($path . '/*.php');
+            $files = File::glob($path.'/*.php');
             foreach ($files as $file) {
                 $translations = include $file;
                 $flatKeys = $this->flattenArray($translations, basename($file, '.php'));
@@ -208,7 +214,7 @@ class VerifyTranslations extends Command
         $result = [];
 
         foreach ($array as $key => $value) {
-            $newKey = $prefix ? $prefix . '.' . $key : $key;
+            $newKey = $prefix ? $prefix.'.'.$key : $key;
 
             if (is_array($value)) {
                 $result = array_merge($result, $this->flattenArray($value, $newKey));
@@ -228,7 +234,7 @@ class VerifyTranslations extends Command
             $parts = explode('.', $key);
             $file = $parts[0];
 
-            if (!isset($groups[$file])) {
+            if (! isset($groups[$file])) {
                 $groups[$file] = [];
             }
 

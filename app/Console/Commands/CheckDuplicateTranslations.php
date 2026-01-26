@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\File;
 class CheckDuplicateTranslations extends Command
 {
     protected $signature = 'translations:duplicates {--values : Check for duplicate values too}';
+
     protected $description = 'Check for duplicate translation keys and values';
 
     public function handle()
@@ -22,9 +23,11 @@ class CheckDuplicateTranslations extends Command
         $issues = [];
 
         foreach ($paths as $path) {
-            if (!is_dir($path)) continue;
+            if (! is_dir($path)) {
+                continue;
+            }
 
-            $files = File::glob($path . '/*.php');
+            $files = File::glob($path.'/*.php');
             foreach ($files as $file) {
                 $translations = include $file;
                 $fileName = basename($file, '.php');
@@ -51,7 +54,7 @@ class CheckDuplicateTranslations extends Command
                 $this->info('✓ No duplicate translation values found!');
             }
         } else {
-            $this->warn('Found ' . count($issues) . ' issue(s):');
+            $this->warn('Found '.count($issues).' issue(s):');
             $this->newLine();
 
             foreach ($issues as $file => $problems) {
@@ -71,7 +74,7 @@ class CheckDuplicateTranslations extends Command
         $duplicates = [];
         $keys = [];
 
-        $this->traverseArray($array, '', function($key, $value, $path) use (&$keys, &$duplicates) {
+        $this->traverseArray($array, '', function ($key, $value, $path) use (&$keys, &$duplicates) {
             if (isset($keys[$path])) {
                 $duplicates[] = "Duplicate key: {$path}";
             } else {
@@ -87,15 +90,19 @@ class CheckDuplicateTranslations extends Command
         $duplicates = [];
         $valueMap = [];
 
-        $this->traverseArray($array, '', function($key, $value, $path) use (&$valueMap, &$duplicates) {
-            if (!is_string($value)) return;
+        $this->traverseArray($array, '', function ($key, $value, $path) use (&$valueMap, &$duplicates) {
+            if (! is_string($value)) {
+                return;
+            }
 
             $normalizedValue = trim(strtolower($value));
-            if (strlen($normalizedValue) < 3) return; // Skip very short strings
+            if (strlen($normalizedValue) < 3) {
+                return;
+            } // Skip very short strings
 
             if (isset($valueMap[$normalizedValue])) {
                 $existing = $valueMap[$normalizedValue];
-                if (!isset($duplicates[$normalizedValue])) {
+                if (! isset($duplicates[$normalizedValue])) {
                     $duplicates[$normalizedValue] = [];
                 }
                 $duplicates[$normalizedValue][] = $existing;
@@ -110,7 +117,7 @@ class CheckDuplicateTranslations extends Command
         foreach ($duplicates as $value => $paths) {
             $uniquePaths = array_unique($paths);
             if (count($uniquePaths) > 1) {
-                $result[] = "\"{$value}\" used in: " . implode(', ', $uniquePaths);
+                $result[] = "\"{$value}\" used in: ".implode(', ', $uniquePaths);
             }
         }
 
@@ -120,7 +127,7 @@ class CheckDuplicateTranslations extends Command
     private function traverseArray(array $array, string $prefix, callable $callback)
     {
         foreach ($array as $key => $value) {
-            $path = $prefix ? $prefix . '.' . $key : $key;
+            $path = $prefix ? $prefix.'.'.$key : $key;
 
             if (is_array($value)) {
                 $this->traverseArray($value, $path, $callback);

@@ -4,7 +4,6 @@ namespace ExilonCMS\Plugins\Shop\Payment;
 
 use ExilonCMS\Plugins\Shop\Models\Gateway;
 use ExilonCMS\Plugins\Shop\Models\Payment;
-use ExilonCMS\Plugins\Shop\Payment\PaymentMethod;
 use Illuminate\Support\Collection;
 
 class PaymentManager

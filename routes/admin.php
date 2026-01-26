@@ -3,31 +3,30 @@
 use ExilonCMS\Http\Controllers\Admin\ActionLogController;
 use ExilonCMS\Http\Controllers\Admin\AdminController;
 use ExilonCMS\Http\Controllers\Admin\BanController;
+use ExilonCMS\Http\Controllers\Admin\CompanySettingsController;
 use ExilonCMS\Http\Controllers\Admin\DatabaseManagerController;
 use ExilonCMS\Http\Controllers\Admin\ImageController;
 use ExilonCMS\Http\Controllers\Admin\IntegrationsController;
 use ExilonCMS\Http\Controllers\Admin\LanguageController;
-use ExilonCMS\Http\Controllers\Admin\NavbarController;
 // Core Page and Post controllers removed - replaced by plugins
+use ExilonCMS\Http\Controllers\Admin\MarketplaceController;
+use ExilonCMS\Http\Controllers\Admin\NavbarController;
+use ExilonCMS\Http\Controllers\Admin\NotificationManagerController;
+use ExilonCMS\Http\Controllers\Admin\OnboardingController;
+use ExilonCMS\Http\Controllers\Admin\PluginManagerController;
 use ExilonCMS\Http\Controllers\Admin\RedirectController;
 use ExilonCMS\Http\Controllers\Admin\ResourceController;
-use ExilonCMS\Http\Controllers\Admin\RoleController;
 use ExilonCMS\Http\Controllers\Admin\ResourceInstallController;
+use ExilonCMS\Http\Controllers\Admin\RoleController;
+// Translation controller removed - replaced by Translations plugin
 use ExilonCMS\Http\Controllers\Admin\ServerController;
 use ExilonCMS\Http\Controllers\Admin\SettingsController;
 use ExilonCMS\Http\Controllers\Admin\SocialLinkController;
 use ExilonCMS\Http\Controllers\Admin\ThemeController;
+// LegalPage controller removed - replaced by Legal plugin
 use ExilonCMS\Http\Controllers\Admin\ThemeSettingsController;
-// Translation controller removed - replaced by Translations plugin
 use ExilonCMS\Http\Controllers\Admin\UpdateController;
 use ExilonCMS\Http\Controllers\Admin\UserController;
-use ExilonCMS\Http\Controllers\Admin\NotificationController as AdminNotificationController;
-use ExilonCMS\Http\Controllers\Admin\NotificationManagerController;
-use ExilonCMS\Http\Controllers\Admin\CompanySettingsController;
-// LegalPage controller removed - replaced by Legal plugin
-use ExilonCMS\Http\Controllers\Admin\OnboardingController;
-use ExilonCMS\Http\Controllers\Admin\PluginManagerController;
-use ExilonCMS\Http\Controllers\Admin\MarketplaceController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [AdminController::class, 'index'])->name('dashboard');

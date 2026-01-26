@@ -23,6 +23,6 @@ class Files
         }
 
         // Symfony Filesystem has better symlink support than the Laravel one
-        (new Filesystem())->remove($link);
+        (new Filesystem)->remove($link);
     }
 }

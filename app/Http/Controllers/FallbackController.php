@@ -26,7 +26,7 @@ class FallbackController extends Controller
         $page = Page::enabled()->where('slug', $path)->first();
 
         if ($page === null) {
-            throw (new ModelNotFoundException())->setModel(Page::class);
+            throw (new ModelNotFoundException)->setModel(Page::class);
         }
 
         $this->authorize('view', $page);

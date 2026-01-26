@@ -5,11 +5,11 @@ namespace ExilonCMS\Services;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\ServiceProvider;
 
 class PluginLoader
 {
     protected string $pluginsPath;
+
     protected array $plugins = [];
 
     public function __construct()
@@ -22,7 +22,7 @@ class PluginLoader
      */
     public function loadPlugins(): void
     {
-        if (!File::exists($this->pluginsPath)) {
+        if (! File::exists($this->pluginsPath)) {
             return;
         }
 
@@ -38,24 +38,25 @@ class PluginLoader
      */
     protected function loadPlugin(string $pluginPath): void
     {
-        $pluginJsonPath = $pluginPath . '/plugin.json';
+        $pluginJsonPath = $pluginPath.'/plugin.json';
 
-        if (!File::exists($pluginJsonPath)) {
+        if (! File::exists($pluginJsonPath)) {
             return;
         }
 
         try {
             $pluginConfig = json_decode(File::get($pluginJsonPath), true);
 
-            if (!isset($pluginConfig['service_provider'])) {
+            if (! isset($pluginConfig['service_provider'])) {
                 Log::warning("Plugin at {$pluginPath} does not have a service_provider defined");
+
                 return;
             }
 
             $providerClass = $pluginConfig['service_provider'];
 
             // Check if provider class exists
-            if (!class_exists($providerClass)) {
+            if (! class_exists($providerClass)) {
                 // Try to autoload the plugin
                 $this->autoloadPlugin($pluginPath, $pluginConfig);
             }
@@ -68,7 +69,7 @@ class PluginLoader
                 Log::info("Loaded plugin: {$pluginConfig['name']}");
             }
         } catch (\Exception $e) {
-            Log::error("Failed to load plugin at {$pluginPath}: " . $e->getMessage());
+            Log::error("Failed to load plugin at {$pluginPath}: ".$e->getMessage());
         }
     }
 
@@ -78,7 +79,7 @@ class PluginLoader
     protected function autoloadPlugin(string $pluginPath, array $pluginConfig): void
     {
         // Load any PHP files in the plugin
-        $srcPath = $pluginPath . '/src';
+        $srcPath = $pluginPath.'/src';
 
         if (File::exists($srcPath)) {
             // Recursively load all PHP files
@@ -139,15 +140,15 @@ class PluginLoader
      */
     protected function runPluginMigrations(string $pluginPath): void
     {
-        $migrationsPath = $pluginPath . '/database/migrations';
+        $migrationsPath = $pluginPath.'/database/migrations';
 
-        if (!File::exists($migrationsPath)) {
+        if (! File::exists($migrationsPath)) {
             return;
         }
 
-        $pluginJsonPath = $pluginPath . '/plugin.json';
+        $pluginJsonPath = $pluginPath.'/plugin.json';
 
-        if (!File::exists($pluginJsonPath)) {
+        if (! File::exists($pluginJsonPath)) {
             return;
         }
 
@@ -196,12 +197,12 @@ class PluginLoader
      */
     protected function publishPluginAssets(string $pluginPath): void
     {
-        $assetsPath = $pluginPath . '/resources/assets';
+        $assetsPath = $pluginPath.'/resources/assets';
 
         if (File::exists($assetsPath)) {
-            $publicPath = public_path('vendor/plugins/' . basename($pluginPath));
+            $publicPath = public_path('vendor/plugins/'.basename($pluginPath));
 
-            if (!File::exists($publicPath)) {
+            if (! File::exists($publicPath)) {
                 File::makeDirectory($publicPath, 0755, true);
             }
 
@@ -226,7 +227,7 @@ class PluginLoader
         $pluginDirectories = File::directories($this->pluginsPath);
 
         foreach ($pluginDirectories as $pluginPath) {
-            $pluginJsonPath = $pluginPath . '/plugin.json';
+            $pluginJsonPath = $pluginPath.'/plugin.json';
 
             if (File::exists($pluginJsonPath)) {
                 $pluginConfig = json_decode(File::get($pluginJsonPath), true);

@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Games\Steam\Servers;
 
-use ExilonCMS\Games\ServerBridge;
 use Exception;
+use ExilonCMS\Games\ServerBridge;
 use Illuminate\Support\Facades\Http;
 
 class FiveMStatus extends ServerBridge

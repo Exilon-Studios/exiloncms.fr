@@ -5,7 +5,6 @@ namespace ExilonCMS\Http\Controllers\Auth;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 

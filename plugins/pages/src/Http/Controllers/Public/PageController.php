@@ -20,13 +20,13 @@ class PageController extends Controller
         if ($page->roles->isNotEmpty()) {
             $user = $request->user();
 
-            if (!$user) {
+            if (! $user) {
                 return redirect()->route('login')->with('warning', 'Please log in to view this page.');
             }
 
             $hasAccess = $page->roles->contains($user->role_id);
 
-            if (!$hasAccess) {
+            if (! $hasAccess) {
                 abort(403, 'You do not have permission to view this page.');
             }
         }

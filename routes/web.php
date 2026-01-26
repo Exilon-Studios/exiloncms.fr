@@ -12,7 +12,6 @@ use ExilonCMS\Http\Controllers\PostLikeController;
 use ExilonCMS\Http\Controllers\ProfileController;
 use ExilonCMS\Http\Controllers\ResourceController;
 use ExilonCMS\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // ============================================================
@@ -34,6 +33,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 // Authentication Routes (Inertia)
 use ExilonCMS\Http\Controllers\Auth\RegisterController;
+
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

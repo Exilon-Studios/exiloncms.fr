@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 class CheckUpdates extends Command
 {
     protected $signature = 'updates:check {--notify : Send notifications if updates found}';
+
     protected $description = 'Check for updates to installed plugins and themes';
 
     public function __construct(
@@ -26,6 +27,7 @@ class CheckUpdates extends Command
 
         if ($totalUpdates === 0) {
             $this->info('No updates available.');
+
             return self::SUCCESS;
         }
 

@@ -19,7 +19,7 @@ class QrCodeRenderer
         $qrCode = Encoder::encode($content, ErrorCorrectionLevel::L());
         $width = $qrCode->getMatrix()->getWidth() + (2 * $margin);
         $style = new RendererStyle($width * round($size / $width), $margin);
-        $renderer = new ImageRenderer($style, new SvgImageBackEnd());
+        $renderer = new ImageRenderer($style, new SvgImageBackEnd);
 
         return Str::after($renderer->render($qrCode), '?>');
     }

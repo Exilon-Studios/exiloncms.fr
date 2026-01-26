@@ -2,16 +2,16 @@
 
 namespace ExilonCMS\Http\Middleware;
 
+use ExilonCMS\Extensions\UpdateManager;
+use ExilonCMS\Models\NavbarElement;
+use ExilonCMS\Models\Notification;
+use ExilonCMS\Models\OnboardingStep;
+use ExilonCMS\Models\SocialLink;
+use ExilonCMS\Models\Theme;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Middleware;
-use ExilonCMS\Models\NavbarElement;
-use ExilonCMS\Models\SocialLink;
-use ExilonCMS\Models\OnboardingStep;
-use ExilonCMS\Models\Notification;
-use ExilonCMS\Models\Theme;
-use ExilonCMS\Extensions\UpdateManager;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -120,7 +120,7 @@ class HandleInertiaRequests extends Middleware
                 'activeTheme' => Schema::hasTable('themes') ? Theme::getActive()?->slug : null,
             ],
             'navbar' => $this->loadNavbarElements($user),
-            'socialLinks' => SocialLink::orderBy('position')->get()->map(fn($link) => [
+            'socialLinks' => SocialLink::orderBy('position')->get()->map(fn ($link) => [
                 'title' => $link->title,
                 'value' => $link->value,
                 'icon' => $link->icon,
@@ -151,7 +151,7 @@ class HandleInertiaRequests extends Middleware
     protected function getUnreadNotificationsCount($user): int
     {
         // Check if the notifications table exists
-        if (!Schema::hasTable('notifications')) {
+        if (! Schema::hasTable('notifications')) {
             return 0;
         }
 
@@ -192,7 +192,7 @@ class HandleInertiaRequests extends Middleware
             if ($element->isDropdown()) {
                 $data['elements'] = $filteredElements
                     ->where('parent_id', $element->id)
-                    ->map(fn($child) => [
+                    ->map(fn ($child) => [
                         'id' => $child->id,
                         'name' => $child->raw_name,
                         'type' => $child->type,
@@ -215,13 +215,14 @@ class HandleInertiaRequests extends Middleware
     protected function getUpdatesCount(): int
     {
         // Check if the settings table exists
-        if (!Schema::hasTable('settings')) {
+        if (! Schema::hasTable('settings')) {
             return 0;
         }
 
         try {
             /** @var UpdateManager $updates */
             $updates = app(UpdateManager::class);
+
             return $updates->getUpdatesCount();
         } catch (\Exception $e) {
             return 0;

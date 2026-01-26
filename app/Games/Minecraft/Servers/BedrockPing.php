@@ -2,10 +2,10 @@
 
 namespace ExilonCMS\Games\Minecraft\Servers;
 
+use Exception;
 use ExilonCMS\Games\Minecraft\Servers\Protocol\MinecraftBedrockPing;
 use ExilonCMS\Games\ServerBridge;
 use ExilonCMS\Models\User;
-use Exception;
 use Illuminate\Support\Arr;
 use RuntimeException;
 

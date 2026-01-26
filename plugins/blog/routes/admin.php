@@ -1,9 +1,9 @@
 <?php
 
-use ExilonCMS\Plugins\Blog\Http\Controllers\Admin\PostController;
 use ExilonCMS\Plugins\Blog\Http\Controllers\Admin\CategoryController;
-use ExilonCMS\Plugins\Blog\Http\Controllers\Admin\TagController;
 use ExilonCMS\Plugins\Blog\Http\Controllers\Admin\CommentController;
+use ExilonCMS\Plugins\Blog\Http\Controllers\Admin\PostController;
+use ExilonCMS\Plugins\Blog\Http\Controllers\Admin\TagController;
 use Illuminate\Support\Facades\Route;
 
 // Admin blog routes

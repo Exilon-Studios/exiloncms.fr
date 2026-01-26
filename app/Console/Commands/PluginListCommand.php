@@ -16,8 +16,9 @@ class PluginListCommand extends Command
     {
         $pluginsPath = base_path('plugins');
 
-        if (!File::exists($pluginsPath)) {
+        if (! File::exists($pluginsPath)) {
             $this->warn('No plugins directory found.');
+
             return self::SUCCESS;
         }
 
@@ -25,6 +26,7 @@ class PluginListCommand extends Command
 
         if (empty($pluginDirectories)) {
             $this->warn('No plugins found.');
+
             return self::SUCCESS;
         }
 
@@ -34,15 +36,16 @@ class PluginListCommand extends Command
         $tableData = [];
 
         foreach ($pluginDirectories as $pluginPath) {
-            $pluginJsonPath = $pluginPath . '/plugin.json';
+            $pluginJsonPath = $pluginPath.'/plugin.json';
 
-            if (!File::exists($pluginJsonPath)) {
+            if (! File::exists($pluginJsonPath)) {
                 $tableData[] = [
                     basename($pluginPath),
                     '<fg=red>No plugin.json</fg>',
                     '-',
                     '-',
                 ];
+
                 continue;
             }
 

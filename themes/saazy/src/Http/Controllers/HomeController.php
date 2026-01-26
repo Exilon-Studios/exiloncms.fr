@@ -2,10 +2,10 @@
 
 namespace Themes\Saazy\Http\Controllers;
 
-use Inertia\Inertia;
-use Illuminate\Http\Request;
 use ExilonCMS\Models\Post;
 use ExilonCMS\Models\Server;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class HomeController extends Controller
 {

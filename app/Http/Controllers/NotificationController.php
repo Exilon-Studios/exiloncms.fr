@@ -3,8 +3,8 @@
 namespace ExilonCMS\Http\Controllers;
 
 use ExilonCMS\Models\Notification;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {

@@ -4,7 +4,6 @@ namespace ExilonCMS\Extensions\Theme;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
 
 class ThemeLoader
 {
@@ -30,7 +29,7 @@ class ThemeLoader
         $themeDirs = File::directories($themesPath);
 
         foreach ($themeDirs as $themeDir) {
-            $themeJson = $themeDir . '/theme.json';
+            $themeJson = $themeDir.'/theme.json';
 
             if (! File::exists($themeJson)) {
                 continue;
@@ -166,7 +165,7 @@ class ThemeLoader
      */
     public function getThemeUrl(string $themeId, string $path = ''): string
     {
-        return asset("themes/{$themeId}/" . ltrim($path, '/'));
+        return asset("themes/{$themeId}/".ltrim($path, '/'));
     }
 
     /**
@@ -234,7 +233,7 @@ class ThemeLoader
         $paths = [];
 
         foreach ($this->themes as $theme) {
-            $viewsPath = $theme['path'] . '/resources/views';
+            $viewsPath = $theme['path'].'/resources/views';
 
             if (File::exists($viewsPath)) {
                 $paths[$theme['id']] = $viewsPath;
@@ -254,7 +253,7 @@ class ThemeLoader
         $paths = [];
 
         foreach ($this->themes as $theme) {
-            $langPath = $theme['path'] . '/resources/lang';
+            $langPath = $theme['path'].'/resources/lang';
 
             if (File::exists($langPath)) {
                 $paths[$theme['id']] = $langPath;

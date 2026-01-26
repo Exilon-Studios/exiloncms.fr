@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use ExilonCMS\Plugins\Notifications\Http\Controllers\Admin\NotificationController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'can:notifications.manage'])->group(function () {
     Route::get('/', [NotificationController::class, 'index'])->name('index');

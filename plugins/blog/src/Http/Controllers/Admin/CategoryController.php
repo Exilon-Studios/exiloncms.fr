@@ -62,7 +62,7 @@ class CategoryController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:blog_categories,slug,' . $category->id,
+            'slug' => 'nullable|string|max:255|unique:blog_categories,slug,'.$category->id,
             'description' => 'nullable|string',
             'color' => 'nullable|string|max:7',
             'icon' => 'nullable|string|max:255',

@@ -75,7 +75,7 @@ class DiscordProvider extends AbstractProvider implements ProviderInterface
             ? '#'.Str::padLeft($user['discriminator'], 4, '0')
             : '';
 
-        return (new User())->setRaw($user)->map([
+        return (new User)->setRaw($user)->map([
             'id' => $user['id'],
             'nickname' => $user['username'].$discriminator,
             'name' => $user['username'],

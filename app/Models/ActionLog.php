@@ -201,7 +201,7 @@ class ActionLog extends Model
 
     public static function registerLogModel(string $class, string $transPrefix): void
     {
-        $table = str_replace('_', '-', (new $class())->getTable());
+        $table = str_replace('_', '-', (new $class)->getTable());
 
         self::$actions[$table.'.created'] = [
             'icon' => 'plus-lg',

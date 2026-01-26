@@ -2,9 +2,9 @@
 
 namespace ExilonCMS\Games\Minecraft\Servers;
 
+use Exception;
 use ExilonCMS\Games\ServerBridge;
 use ExilonCMS\Models\User;
-use Exception;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Http;

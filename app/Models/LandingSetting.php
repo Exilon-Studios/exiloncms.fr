@@ -61,7 +61,7 @@ class LandingSetting extends Model
             $lastKey = array_pop($keys);
 
             foreach ($keys as $key) {
-                if (!isset($current[$key]) || !is_array($current[$key])) {
+                if (! isset($current[$key]) || ! is_array($current[$key])) {
                     $current[$key] = [];
                 }
                 $current = &$current[$key];

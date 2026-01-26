@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use ExilonCMS\Plugins\Pages\Http\Controllers\Admin\PageController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'can:pages.manage'])->group(function () {
     Route::get('/', [PageController::class, 'index'])->name('index');

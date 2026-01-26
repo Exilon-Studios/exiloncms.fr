@@ -150,7 +150,7 @@ class OnboardingStep extends Model
             ->toArray();
 
         foreach ($allSteps as $step) {
-            if (!in_array($step['key'], $completedKeys)) {
+            if (! in_array($step['key'], $completedKeys)) {
                 return $step;
             }
         }

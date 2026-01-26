@@ -46,7 +46,7 @@ class VerifyCaptcha
 
     protected function verifyReCaptcha(Request $request, string $secretKey): bool
     {
-        $reCaptcha = new ReCaptcha($secretKey, new CurlPost());
+        $reCaptcha = new ReCaptcha($secretKey, new CurlPost);
 
         $response = $reCaptcha->verify($request->input('g-recaptcha-response'), $request->ip());
 

@@ -4,13 +4,11 @@ namespace ExilonCMS\Http\Controllers\Admin;
 
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\OnboardingStep;
-use ExilonCMS\Models\Setting;
 use ExilonCMS\Models\Server;
-use ExilonCMS\Models\NavbarElement;
+use ExilonCMS\Models\Setting;
 use ExilonCMS\Models\SocialLink;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -28,7 +26,7 @@ class OnboardingController extends Controller
         $completion = OnboardingStep::getCompletionPercentage($user->id);
 
         // Find current step index
-        $currentStepIndex = collect($allSteps)->search(fn($step) => $step['key'] === $currentStep) ?? 0;
+        $currentStepIndex = collect($allSteps)->search(fn ($step) => $step['key'] === $currentStep) ?? 0;
 
         // Get existing data for the current step
         $existingData = $this->getStepData($currentStep);
@@ -224,7 +222,7 @@ class OnboardingController extends Controller
         // Save social links
         if ($request->has('social_links')) {
             foreach ($request->input('social_links') as $index => $link) {
-                if (!empty($link['url']) && !empty($link['title'])) {
+                if (! empty($link['url']) && ! empty($link['title'])) {
                     SocialLink::updateOrCreate(
                         ['id' => $link['id'] ?? null],
                         [
@@ -253,7 +251,7 @@ class OnboardingController extends Controller
     protected function getNextStepKey(string $currentStep): ?string
     {
         $allSteps = OnboardingStep::getAllSteps();
-        $currentIndex = collect($allSteps)->search(fn($step) => $step['key'] === $currentStep);
+        $currentIndex = collect($allSteps)->search(fn ($step) => $step['key'] === $currentStep);
 
         if ($currentIndex === false || $currentIndex === count($allSteps) - 1) {
             return null; // Last step or not found

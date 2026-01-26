@@ -6,7 +6,6 @@ use ExilonCMS\Extensions\UpdateManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -14,10 +13,13 @@ use Symfony\Component\Process\Process;
 class InstallCommand extends Command
 {
     protected $signature = 'install:interactive';
+
     protected $description = 'Interactive installation wizard for ExilonCMS';
 
     protected array $config = [];
+
     protected array $marketplaceData = [];
+
     protected UpdateManager $updates;
 
     public function __construct(UpdateManager $updates)
@@ -47,6 +49,7 @@ class InstallCommand extends Command
         // Confirm
         if (! $this->confirm('Continue with installation?', true)) {
             $this->info('Installation cancelled.');
+
             return Command::SUCCESS;
         }
 
@@ -58,9 +61,9 @@ class InstallCommand extends Command
 
     protected function displayHeader(): void
     {
-        $this->line("\n" . str_repeat('=', 60));
+        $this->line("\n".str_repeat('=', 60));
         $this->line('<fg=green;options=bold>   ExilonCMS Installation Wizard   </>');
-        $this->line(str_repeat('=', 60) . "\n");
+        $this->line(str_repeat('=', 60)."\n");
         $this->line('Welcome to the ExilonCMS interactive installation!');
         $this->line('This wizard will guide you through the setup process.\n');
     }
@@ -83,7 +86,7 @@ class InstallCommand extends Command
                 $this->marketplaceData = $this->getDefaultMarketplaceData();
             }
         } catch (\Exception $e) {
-            $this->warn('Marketplace fetch failed: ' . $e->getMessage());
+            $this->warn('Marketplace fetch failed: '.$e->getMessage());
             $this->marketplaceData = $this->getDefaultMarketplaceData();
         }
     }
@@ -260,9 +263,9 @@ class InstallCommand extends Command
 
     protected function displaySummary(): void
     {
-        $this->line("\n" . str_repeat('=', 60));
+        $this->line("\n".str_repeat('=', 60));
         $this->line('<fg=blue;options=bold>📋 Installation Summary</>');
-        $this->line(str_repeat('=', 60) . "\n");
+        $this->line(str_repeat('=', 60)."\n");
 
         $table = new Table($this->output);
 
@@ -274,7 +277,7 @@ class InstallCommand extends Command
             ['Database', $this->config['db_connection'] ?? 'sqlite'],
             ['Cache', $this->config['cache_driver']],
             ['Session', $this->config['session_driver']],
-            ['Admin', $this->config['admin_name'] . ' (' . $this->config['admin_email'] . ')'],
+            ['Admin', $this->config['admin_name'].' ('.$this->config['admin_email'].')'],
         ];
 
         if (! empty($this->config['selected_theme'])) {
@@ -360,26 +363,26 @@ class InstallCommand extends Command
 
         // Update with user config
         $replacements = [
-            'APP_NAME=' => 'APP_NAME=' . $this->config['app_name'],
-            'APP_URL=' => 'APP_URL=' . $this->config['app_url'],
-            'APP_LOCALE=' => 'APP_LOCALE=' . $this->config['locale'],
-            'APP_TIMEZONE=' => 'APP_TIMEZONE=' . $this->config['timezone'],
+            'APP_NAME=' => 'APP_NAME='.$this->config['app_name'],
+            'APP_URL=' => 'APP_URL='.$this->config['app_url'],
+            'APP_LOCALE=' => 'APP_LOCALE='.$this->config['locale'],
+            'APP_TIMEZONE=' => 'APP_TIMEZONE='.$this->config['timezone'],
         ];
 
         if ($this->config['db_connection'] === 'sqlite') {
             $replacements['DB_CONNECTION='] = 'DB_CONNECTION=sqlite';
-            $replacements['DB_DATABASE='] = 'DB_DATABASE=' . $this->config['db_path'];
+            $replacements['DB_DATABASE='] = 'DB_DATABASE='.$this->config['db_path'];
         } else {
-            $replacements['DB_CONNECTION='] = 'DB_CONNECTION=' . $this->config['db_connection'];
-            $replacements['DB_HOST='] = 'DB_HOST=' . $this->config['db_host'];
-            $replacements['DB_PORT='] = 'DB_PORT=' . $this->config['db_port'];
-            $replacements['DB_DATABASE='] = 'DB_DATABASE=' . $this->config['db_database'];
-            $replacements['DB_USERNAME='] = 'DB_USERNAME=' . $this->config['db_username'];
-            $replacements['DB_PASSWORD='] = 'DB_PASSWORD=' . $this->config['db_password'];
+            $replacements['DB_CONNECTION='] = 'DB_CONNECTION='.$this->config['db_connection'];
+            $replacements['DB_HOST='] = 'DB_HOST='.$this->config['db_host'];
+            $replacements['DB_PORT='] = 'DB_PORT='.$this->config['db_port'];
+            $replacements['DB_DATABASE='] = 'DB_DATABASE='.$this->config['db_database'];
+            $replacements['DB_USERNAME='] = 'DB_USERNAME='.$this->config['db_username'];
+            $replacements['DB_PASSWORD='] = 'DB_PASSWORD='.$this->config['db_password'];
         }
 
-        $replacements['CACHE_DRIVER='] = 'CACHE_DRIVER=' . $this->config['cache_driver'];
-        $replacements['SESSION_DRIVER='] = 'SESSION_DRIVER=' . $this->config['session_driver'];
+        $replacements['CACHE_DRIVER='] = 'CACHE_DRIVER='.$this->config['cache_driver'];
+        $replacements['SESSION_DRIVER='] = 'SESSION_DRIVER='.$this->config['session_driver'];
 
         $envContent = str_replace(array_keys($replacements), array_values($replacements), $envContent);
 
@@ -411,7 +414,7 @@ class InstallCommand extends Command
             $redisConfig .= "REDIS_PASSWORD={$this->config['redis_password']}\n";
         }
 
-        return $envContent . $redisConfig;
+        return $envContent.$redisConfig;
     }
 
     protected function createDockerFiles(): void
@@ -432,13 +435,13 @@ class InstallCommand extends Command
         $redisEnv = '';
 
         if ($this->config['cache_driver'] === 'redis' || $this->config['session_driver'] === 'redis') {
-            $redisService = "
+            $redisService = '
   redis:
     image: redis:7-alpine
     ports:
-      - \"6379:6379\"
+      - "6379:6379"
     volumes:
-      - redis_data:/data";
+      - redis_data:/data';
             $redisDepends = 'redis';
             $redisEnv = 'REDIS_HOST=redis
       REDIS_PORT=6379';
@@ -526,28 +529,28 @@ YAML;
 
     protected function generateDockerfile(): string
     {
-        return <<<DOCKERFILE
+        return <<<'DOCKERFILE'
 FROM php:8.2-fpm
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \\
-    git \\
-    curl \\
-    libpng-dev \\
-    libonig-dev \\
-    libjpeg-dev \\
-    libfreetype6-dev \\
-    libzip-dev \\
-    zip \\
-    unzip \\
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
+    libzip-dev \
+    zip \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype \\
-    && docker-php-ext-install -j$(nproc) \\
-    gd \\
-    zip \\
-    pdo_pgsql \\
+RUN docker-php-ext-configure gd --with-freetype \
+    && docker-php-ext-install -j$(nproc) \
+    gd \
+    zip \
+    pdo_pgsql \
     pdo_mysql
 
 # Install Composer
@@ -565,7 +568,7 @@ RUN npm install
 RUN npm run build
 
 # Set permissions
-RUN chown -R www-data:www-data storage bootstrap/cache \\
+RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 # Expose port
@@ -626,6 +629,7 @@ DOCKERFILE;
 
             if (! $response->successful()) {
                 $this->warn("  Failed to download {$type} {$id}. HTTP {$response->status()}");
+
                 return null;
             }
 
@@ -635,6 +639,7 @@ DOCKERFILE;
 
             if (! $downloadUrl) {
                 $this->warn("  No download URL found for {$type} {$id}");
+
                 return null;
             }
 
@@ -643,6 +648,7 @@ DOCKERFILE;
 
             if (! $zipResponse->successful()) {
                 $this->warn("  Failed to download ZIP file. HTTP {$zipResponse->status()}");
+
                 return null;
             }
 
@@ -650,7 +656,7 @@ DOCKERFILE;
             $tempDir = storage_path('app/temp');
             File::ensureDirectoryExists($tempDir);
 
-            $zipPath = $tempDir . '/' . $id . '.zip';
+            $zipPath = $tempDir.'/'.$id.'.zip';
             File::put($zipPath, $zipResponse->body());
 
             $this->info("  <fg=green>Downloaded to: {$zipPath}</>");
@@ -659,6 +665,7 @@ DOCKERFILE;
 
         } catch (\Exception $e) {
             $this->warn("  Error downloading {$type} {$id}: {$e->getMessage()}");
+
             return null;
         }
     }
@@ -672,22 +679,24 @@ DOCKERFILE;
 
         if (! $zipPath) {
             $this->warn("  Skipping theme {$themeId} due to download failure");
+
             return;
         }
 
         try {
-            $this->info("  Extracting theme...");
+            $this->info('  Extracting theme...');
 
             // Create themes directory
             $themesDir = base_path('themes');
             File::ensureDirectoryExists($themesDir);
 
             // Extract ZIP
-            $zip = new \ZipArchive();
+            $zip = new \ZipArchive;
             $openResult = $zip->open($zipPath);
 
             if ($openResult !== true) {
                 $this->error("  Failed to open ZIP archive: {$openResult}");
+
                 return;
             }
 
@@ -713,22 +722,24 @@ DOCKERFILE;
 
         if (! $zipPath) {
             $this->warn("  Skipping plugin {$pluginId} due to download failure");
+
             return;
         }
 
         try {
-            $this->info("  Extracting plugin...");
+            $this->info('  Extracting plugin...');
 
             // Create plugins directory
             $pluginsDir = base_path('plugins');
             File::ensureDirectoryExists($pluginsDir);
 
             // Extract ZIP
-            $zip = new \ZipArchive();
+            $zip = new \ZipArchive;
             $openResult = $zip->open($zipPath);
 
             if ($openResult !== true) {
                 $this->error("  Failed to open ZIP archive: {$openResult}");
+
                 return;
             }
 
@@ -736,11 +747,11 @@ DOCKERFILE;
             $zip->close();
 
             // Run plugin migrations if they exist
-            $pluginPath = $pluginsDir . '/' . $pluginId;
-            $migrationPath = $pluginPath . '/database/migrations';
+            $pluginPath = $pluginsDir.'/'.$pluginId;
+            $migrationPath = $pluginPath.'/database/migrations';
 
             if (File::exists($migrationPath)) {
-                $this->info("  Running plugin migrations...");
+                $this->info('  Running plugin migrations...');
                 $this->executeCommand('php artisan migrate --force');
             }
 
@@ -774,13 +785,13 @@ DOCKERFILE;
             $this->line('   <fg=cyan>php artisan serve</>');
             $this->line('');
             $this->line('2. Access your site at:');
-            $this->line("   <fg=cyan>http://localhost:8000</>");
+            $this->line('   <fg=cyan>http://localhost:8000</>');
         }
 
         $this->line('');
         $this->line('Admin Login:');
         $this->line("   Email: <fg=cyan>{$this->config['admin_email']}</>");
-        $this->line("   Password: <fg=cyan>[your password]</>");
+        $this->line('   Password: <fg=cyan>[your password]</>');
         $this->line('');
         $this->line('For more information, visit: <fg=cyan>https://github.com/Exilon-Studios/ExilonCMS</>');
     }
@@ -792,7 +803,7 @@ DOCKERFILE;
         $process = Process::fromShellCommandline($command);
         $process->setTty(Process::isTtySupported());
         $process->run(function ($type, $buffer) {
-            $this->line('  ' . trim($buffer));
+            $this->line('  '.trim($buffer));
         });
 
         if (! $process->isSuccessful()) {
@@ -810,7 +821,7 @@ DOCKERFILE;
         });
 
         if (! $process->isSuccessful()) {
-            throw new \RuntimeException('Process failed: ' . $process->getErrorOutput());
+            throw new \RuntimeException('Process failed: '.$process->getErrorOutput());
         }
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use ExilonCMS\Plugins\Votes\Http\Controllers\Public\VoteController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware(['web', 'auth'])->group(function () {
     Route::prefix('votes')->name('votes.')->group(function () {

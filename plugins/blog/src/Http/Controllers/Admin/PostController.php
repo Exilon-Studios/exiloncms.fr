@@ -3,12 +3,10 @@
 namespace ExilonCMS\Plugins\Blog\Http\Controllers\Admin;
 
 use ExilonCMS\Http\Controllers\Controller;
-use ExilonCMS\Plugins\Blog\Models\Post;
 use ExilonCMS\Plugins\Blog\Models\Category;
+use ExilonCMS\Plugins\Blog\Models\Post;
 use ExilonCMS\Plugins\Blog\Models\Tag;
-use ExilonCMS\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -59,7 +57,7 @@ class PostController extends Controller
 
         $post = Post::create($validated);
 
-        if (!empty($validated['tags'])) {
+        if (! empty($validated['tags'])) {
             $post->tags()->sync($validated['tags']);
         }
 
@@ -82,7 +80,7 @@ class PostController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:blog_posts,slug,' . $post->id,
+            'slug' => 'nullable|string|max:255|unique:blog_posts,slug,'.$post->id,
             'content' => 'required|string',
             'excerpt' => 'nullable|string',
             'featured_image' => 'nullable|string',

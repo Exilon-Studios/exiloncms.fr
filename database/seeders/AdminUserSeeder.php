@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use ExilonCMS\Models\User;
-use ExilonCMS\Models\Role;
 use ExilonCMS\Models\Permission;
+use ExilonCMS\Models\Role;
+use ExilonCMS\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;

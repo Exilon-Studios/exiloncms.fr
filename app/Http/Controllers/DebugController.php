@@ -20,6 +20,7 @@ class DebugController extends Controller
             $status['checks'][] = ['name' => 'Database Connection', 'status' => 'OK', 'details' => 'Connected'];
         } catch (\Exception $e) {
             $status['checks'][] = ['name' => 'Database Connection', 'status' => 'FAIL', 'error' => $e->getMessage()];
+
             return response()->json($status);
         }
 
@@ -28,6 +29,7 @@ class DebugController extends Controller
             $status['checks'][] = ['name' => 'Settings Table', 'status' => 'OK', 'details' => 'Table exists'];
         } else {
             $status['checks'][] = ['name' => 'Settings Table', 'status' => 'FAIL', 'details' => 'Table missing'];
+
             return response()->json($status);
         }
 

@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Http\Middleware;
 
-use ExilonCMS\Providers\RouteServiceProvider;
 use Closure;
+use ExilonCMS\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;

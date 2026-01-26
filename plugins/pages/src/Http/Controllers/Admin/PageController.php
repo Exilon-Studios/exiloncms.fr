@@ -3,8 +3,8 @@
 namespace ExilonCMS\Plugins\Pages\Http\Controllers\Admin;
 
 use ExilonCMS\Http\Controllers\Controller;
-use ExilonCMS\Plugins\Pages\Models\Page;
 use ExilonCMS\Models\Role;
+use ExilonCMS\Plugins\Pages\Models\Page;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -48,7 +48,7 @@ class PageController extends Controller
 
         $page = Page::create($validated);
 
-        if (!empty($validated['role_ids'])) {
+        if (! empty($validated['role_ids'])) {
             $page->roles()->attach($validated['role_ids']);
         }
 
@@ -102,7 +102,7 @@ class PageController extends Controller
 
     public function toggle(Page $page)
     {
-        $page->update(['is_enabled' => !$page->is_enabled]);
+        $page->update(['is_enabled' => ! $page->is_enabled]);
 
         return back()->with('success', 'Page status updated.');
     }

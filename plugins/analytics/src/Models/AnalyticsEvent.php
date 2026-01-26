@@ -20,9 +20,13 @@ use Illuminate\Database\Eloquent\Model;
 class AnalyticsEvent extends Model
 {
     const TYPE_PAGE_VIEW = 'page_view';
+
     const TYPE_CLICK = 'click';
+
     const TYPE_FORM_SUBMIT = 'form_submit';
+
     const TYPE_DOWNLOAD = 'download';
+
     const TYPE_CUSTOM = 'custom';
 
     protected $fillable = [

@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use ExilonCMS\Plugins\Shop\Models\Category;
 use ExilonCMS\Plugins\Shop\Models\Item;
+use Illuminate\Database\Seeder;
 
 class ShopSeeder extends Seeder
 {

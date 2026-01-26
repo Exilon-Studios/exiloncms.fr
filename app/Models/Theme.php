@@ -22,7 +22,9 @@ use Illuminate\Support\Facades\Cache;
 class Theme extends Model
 {
     const TYPE_GAMING = 'gaming';
+
     const TYPE_BLOG = 'blog';
+
     const TYPE_ECOMMERCE = 'ecommerce';
 
     protected $fillable = [

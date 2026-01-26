@@ -1,16 +1,16 @@
 <?php
 
-return array (
-      'nav' => array (
+return [
+    'nav' => [
         'profile' => 'Profil',
         'admin' => 'Panel administrateur',
         'dashboard' => 'Tableau de bord',
         'logout' => 'Déconnexion',
-      ),
-      'user' => array (
+    ],
+    'user' => [
         'theme' => 'Thème',
-      ),
-      'theme' => array (
+    ],
+    'theme' => [
         'title' => 'Personnalisation du thème',
         'description' => 'Choisissez votre palette de couleurs et prévisualisez en temps réel',
         'light' => 'Clair',
@@ -37,45 +37,45 @@ return array (
         'current' => 'Actuel',
         'apply' => 'Appliquer',
         'cancel' => 'Annuler',
-      ),
-      'maintenance' => array (
+    ],
+    'maintenance' => [
         'title' => 'Maintenance en cours',
         'message' => 'Le site est actuellement en maintenance. Revenez bientôt.',
-      ),
-      'loading' => 'Chargement...',
-      'actions' => array (
+    ],
+    'loading' => 'Chargement...',
+    'actions' => [
         'cancel' => 'Annuler',
         'delete' => 'Supprimer',
         'update' => 'Mettre à jour',
-      ),
-      'profile' => array (
+    ],
+    'profile' => [
         'title' => 'Profil',
         'current_password' => 'Mot de passe actuel',
         'change_email' => 'Changer l\'email',
-        '2fa' => array (
-          'enable' => 'Activer la double authentification',
-        ),
-        'delete' => array (
-          'btn' => 'Supprimer le compte',
-        ),
-      ),
-      'fields' => array (
+        '2fa' => [
+            'enable' => 'Activer la double authentification',
+        ],
+        'delete' => [
+            'btn' => 'Supprimer le compte',
+        ],
+    ],
+    'fields' => [
         'money' => 'Argent',
-      ),
-      'pages' => array (
+    ],
+    'pages' => [
         'title' => 'Accueil',
-      ),
-      'footer' => array (
+    ],
+    'footer' => [
         'pages' => 'Pages',
         'socials' => 'Réseaux sociaux',
-        'auth' => array (
-          'register' => 'S\'inscrire',
-          'login' => 'Se connecter',
-        ),
+        'auth' => [
+            'register' => 'S\'inscrire',
+            'login' => 'Se connecter',
+        ],
         'legal' => 'Mentions légales',
         'account' => 'Mon compte',
-      ),
-      'dashboard' => array (
+    ],
+    'dashboard' => [
         'title' => 'Tableau de bord',
         'nav' => 'Tableau de bord',
         'status' => 'Statut',
@@ -87,8 +87,8 @@ return array (
         'balance' => 'Solde',
         'account_age' => 'Âge du compte',
         'role' => 'Rôle',
-      ),
-      'hero' => array (
+    ],
+    'hero' => [
         'game_mode' => 'Survival + PvP',
         'survival_pvp' => 'Survie et PvP dans un monde ouvert',
         'community' => 'Communauté',
@@ -97,21 +97,21 @@ return array (
         'weekly' => 'Chaque semaine',
         'performance' => 'Performance',
         'tps' => '{tps} TPS',
-      ),
-      'blog' => array (
+    ],
+    'blog' => [
         'view_all' => 'Voir tout',
         'read_more' => 'Lire la suite',
         'no_posts' => 'Aucun article pour le moment',
         'no_posts_hint' => 'Revenez bientôt pour découvrir nos dernières actualités !',
-      ),
-      'shop_plugin' => array (
+    ],
+    'shop_plugin' => [
         'name' => 'Shop',
         'version' => 'Version',
         'description' => 'Système de boutique complet avec paiements multiples et facturation',
         'author' => 'ExilentStudios',
-      ),
-      'sidebar' => array (
+    ],
+    'sidebar' => [
         'documentation' => 'Documentation',
         'official_site' => 'Site officiel',
-      ),
-    );
+    ],
+];
