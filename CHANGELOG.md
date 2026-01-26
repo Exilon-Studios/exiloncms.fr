@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 2026-01-26
 
+FIX: Fix syntax error in ResourceInstallController (space instead of backslash in use statement)
 FEATURE: Add Hytale game support with player UUID lookup via playerdb.co API
 FEATURE: Add HytaleGame class with avatar URL and username lookup
 FEATURE: Add Hytale to game selection in installer

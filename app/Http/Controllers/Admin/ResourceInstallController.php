@@ -8,7 +8,7 @@ use ExilonCMS\Models\Resource;
 use ExilonCMS\Models\Theme;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades Gate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http as HttpClient;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
