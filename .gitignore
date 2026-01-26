@@ -31,3 +31,9 @@ Thumbs.db
 /docs/
 C:Users*
 nul
+
+# Build artifacts and release files
+/release/
+*.zip
+build-*.php
+create-installer*.php
