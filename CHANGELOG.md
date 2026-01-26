@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 2026-01-26
 
-FEATURE: Add default blog theme included with CMS distribution
+FEATURE: Add default themes (Blog, Gaming, E-Commerce) included with CMS distribution
+FEATURE: All themes are marketplace-ready with proper versioning for API updates
 FIX: Add type checks to ThemeLoader to prevent "Cannot access offset of type Theme on array" error
 FIX: Auto-redirect from requirements page to database step when all checks pass
 FIX: Fix Inertia redirect loop - use Inertia::location() instead of Laravel redirect() for installation
