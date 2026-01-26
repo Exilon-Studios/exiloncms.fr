@@ -140,7 +140,11 @@
       "Bash(grep:*)",
       "Bash(ren:*)",
       "Bash(gh repo edit:*)",
-      "Bash(gh run:*)"
+      "Bash(gh run:*)",
+      "Bash(do gh release delete:*)",
+      "Bash(Get-ChildItem:*)",
+      "Bash(ForEach-Object { php -l $_FullName })",
+      "Bash([:*)"
     ],
     "deny": [],
     "ask": []

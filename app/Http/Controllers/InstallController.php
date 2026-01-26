@@ -575,11 +575,11 @@ class InstallController extends Controller
      * This route is called after installation completes and handles the redirect to home.
      * It bypasses the installation check middleware.
      */
-    public function installed(Request $request): \Illuminate\Http\RedirectResponse
+    public function installed(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         // Check if user is authenticated
         if (Auth::check()) {
-            return redirect('/')->with('success', 'Installation completed successfully!');
+            return \Inertia\Inertia::location(url('/'));
         }
 
         // Try to authenticate with the session
@@ -589,12 +589,12 @@ class InstallController extends Controller
             if ($user) {
                 Auth::login($user);
                 session()->forget('install_user_id');
-                return redirect('/')->with('success', 'Installation completed successfully!');
+                return \Inertia\Inertia::location(url('/'));
             }
         }
 
-        // Just redirect to home - the middleware will handle authentication
-        return redirect('/')->with('success', 'Installation completed successfully!');
+        // Just redirect to home using Inertia location
+        return \Inertia\Inertia::location(url('/'));
     }
 
     /**
@@ -967,8 +967,8 @@ class InstallController extends Controller
             // Save session again after login
             session()->save();
 
-            // Redirect to the installed route which handles the final redirect
-            return redirect()->route('install.installed');
+            // Redirect to home using Inertia location (forces browser navigation)
+            return \Inertia\Inertia::location(url('/'));
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (Throwable $e) {
