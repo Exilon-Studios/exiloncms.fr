@@ -4,6 +4,12 @@
     "type": "project",
     "description": "ExilonCMS - Modern Content Management System for game servers with React + Inertia",
     "keywords": ["cms", "exiloncms", "laravel", "inertia", "react", "minecraft", "game-server"],
+    "homepage": "https://exiloncms.fr",
+    "support": {
+        "issues": "https://github.com/Exilon-Studios/exiloncms.fr/issues",
+        "source": "https://github.com/Exilon-Studios/exiloncms.fr",
+        "docs": "https://exiloncms.fr/docs"
+    },
     "license": "GPL-3.0-or-later",
     "version": "0.2.3",
     "require": {
@@ -45,6 +51,16 @@
     "autoload": {
         "psr-4": {
             "ExilonCMS\\": "app/",
+            "ExilonCMS\\Plugins\\Analytics\\": "plugins/analytics/src/",
+            "ExilonCMS\\Plugins\\Blog\\": "plugins/blog/src/",
+            "ExilonCMS\\Plugins\\Docs\\": "plugins/docs/src/",
+            "ExilonCMS\\Plugins\\Legal\\": "plugins/legal/src/",
+            "ExilonCMS\\Plugins\\Notifications\\": "plugins/notifications/src/",
+            "ExilonCMS\\Plugins\\Pages\\": "plugins/pages/src/",
+            "ExilonCMS\\Plugins\\Releases\\": "plugins/releases/src/",
+            "ExilonCMS\\Plugins\\Shop\\": "plugins/shop/src/",
+            "ExilonCMS\\Plugins\\Translations\\": "plugins/translations/src/",
+            "ExilonCMS\\Plugins\\Votes\\": "plugins/votes/src/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
         },
