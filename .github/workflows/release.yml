@@ -96,8 +96,9 @@ jobs:
 
       - name: Create installer ZIP
         run: |
-          # Create standalone installer ZIP
-          zip -r exiloncms-installer-${{ github.ref_name }}.zip installer/
+          # Create standalone installer ZIP (contents at root, not in installer/ folder)
+          cd installer
+          zip -r ../exiloncms-installer-${{ github.ref_name }}.zip .
 
       - name: Generate checksums
         run: |
