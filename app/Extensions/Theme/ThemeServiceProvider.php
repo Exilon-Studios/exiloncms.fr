@@ -34,7 +34,8 @@ class ThemeServiceProvider extends ServiceProvider
     {
         $activeTheme = $this->loader->getActiveTheme();
 
-        if (! $activeTheme || $activeTheme['id'] === 'default') {
+        // Type check: ensure we have an array with id key
+        if (! $activeTheme || !is_array($activeTheme) || !isset($activeTheme['id']) || $activeTheme['id'] === 'default') {
             return;
         }
 
@@ -46,16 +47,16 @@ class ThemeServiceProvider extends ServiceProvider
         }
 
         // Add theme views to view finder
-        $viewsPath = $activeTheme['path'] . '/resources/views';
+        $viewsPath = ($activeTheme['path'] ?? '') . '/resources/views';
 
-        if (is_dir($viewsPath)) {
+        if (isset($activeTheme['path']) && is_dir($viewsPath)) {
             View::addLocation($viewsPath);
         }
 
         // Load theme translations
-        $langPath = $activeTheme['path'] . '/resources/lang';
+        $langPath = ($activeTheme['path'] ?? '') . '/resources/lang';
 
-        if (is_dir($langPath)) {
+        if (isset($activeTheme['path']) && is_dir($langPath)) {
             $this->loadTranslationsFrom($langPath, 'theme');
         }
     }
@@ -69,6 +70,11 @@ class ThemeServiceProvider extends ServiceProvider
         $themes = $this->loader->getThemes();
 
         foreach ($themes as $theme) {
+            // Type check: ensure theme is an array with required keys
+            if (!is_array($theme) || !isset($theme['id'], $theme['path'])) {
+                continue;
+            }
+
             $viewsPath = $theme['path'] . '/resources/views';
 
             if (is_dir($viewsPath)) {

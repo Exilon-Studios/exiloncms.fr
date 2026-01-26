@@ -102,7 +102,14 @@ class ThemeLoader
             ];
         }
 
-        return $this->themes[$activeThemeId] ?? null;
+        $theme = $this->themes[$activeThemeId] ?? null;
+
+        // Type check: ensure we return an array, not an object
+        if ($theme !== null && is_array($theme)) {
+            return $theme;
+        }
+
+        return null;
     }
 
     /**

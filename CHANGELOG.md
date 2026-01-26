@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 2026-01-26
 
+FIX: Add type checks to ThemeLoader to prevent "Cannot access offset of type Theme on array" error
+FIX: Auto-redirect from requirements page to database step when all checks pass
 FIX: Fix Inertia redirect loop - use Inertia::location() instead of Laravel redirect() for installation
 FIX: Fix syntax error in ResourceInstallController (space instead of backslash in use statement)
 FEATURE: Add Hytale game support with player UUID lookup via playerdb.co API

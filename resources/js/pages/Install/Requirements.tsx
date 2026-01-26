@@ -35,6 +35,16 @@ export default function Requirements({ requirements: initialRequirements }: Prop
     }
   }, []);
 
+  // Auto-redirect to database step if all requirements are met
+  useEffect(() => {
+    if (!checking && allOk && canContinue) {
+      const timer = setTimeout(() => {
+        router.get(route('install.database'));
+      }, 1500); // Wait 1.5s before redirecting
+      return () => clearTimeout(timer);
+    }
+  }, [checking, allOk, canContinue]);
+
   const checkRequirements = async () => {
     setChecking(true);
     try {
