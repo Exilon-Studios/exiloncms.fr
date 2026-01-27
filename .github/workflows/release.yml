@@ -68,6 +68,7 @@ jobs:
                       --exclude='RELEASE.md' \
                       --exclude='screenshots' \
                       --exclude='*.log' \
+                      --exclude='release' \
                       . release/exiloncms/
 
           # Create storage directories structure
