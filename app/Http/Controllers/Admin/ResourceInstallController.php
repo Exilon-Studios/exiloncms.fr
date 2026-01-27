@@ -55,7 +55,8 @@ class ResourceInstallController extends Controller
 
         // Get locally installed resources to avoid showing duplicates
         $localResources = Resource::pluck('slug')->toArray();
-        $localThemes = Theme::pluck('path')->map(fn ($path) => basename($path))->toArray();
+        // Theme::pluck('path') returns slugs directly, not full paths
+        $localThemes = Theme::pluck('path')->toArray();
 
         return Inertia::render('Admin/Resources/External/ExternalInstall', [
             'resources' => $resources,

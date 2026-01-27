@@ -53,6 +53,9 @@ return [
             'no_results' => 'No resources found',
             'no_resources' => 'No resources available on marketplace',
             'installing' => 'Installing...',
+            'external_install' => 'External Installation',
+            'external_title' => 'External Resources',
+            'external_description' => 'Browse and install verified themes from an external source',
         ],
         'legal' => [
             'heading' => 'Legal',
@@ -813,6 +816,23 @@ return [
 
     // ==================== UPDATES ====================
     'update' => [
+        'title' => 'Updates',
+        'description' => 'Check and install system updates',
+        'current_version' => 'Current version',
+        'currently_running' => 'Currently running',
+        'last_version' => 'Latest version',
+        'available' => 'Update available',
+        'published' => 'Published',
+        'latest' => 'Latest version',
+        'changelog' => 'Changelog',
+        'check' => 'Check for updates',
+        'download' => 'Download update',
+        'install' => 'Install update',
+        'confirm_install' => 'Are you sure you want to install this update? Make sure you have a backup.',
+        'backup_warning' => 'Warning: Always backup your site before installing updates.',
+        'not_downloaded' => 'Update not downloaded yet',
+        'downloaded' => 'Update downloaded successfully',
+        'installed' => 'Update installed successfully',
         'index' => [
             'title' => 'Updates',
             'description' => 'Check and install system updates',

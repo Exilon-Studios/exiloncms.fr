@@ -14,9 +14,12 @@ class PluginLoader
 
     protected bool $loaded = false;
 
+    protected string $cacheKey;
+
     public function __construct()
     {
         $this->pluginsPath = base_path('plugins');
+        $this->cacheKey = 'plugins.loaded.v1';
     }
 
     /**
@@ -24,8 +27,8 @@ class PluginLoader
      */
     public function loadPlugins(): void
     {
-        // Skip if already loaded to prevent spam in dev mode
-        if ($this->loaded) {
+        // Use persistent cache to prevent loading multiple times per request
+        if ($this->loaded || Cache::has($this->cacheKey)) {
             return;
         }
 
@@ -40,6 +43,9 @@ class PluginLoader
         }
 
         $this->loaded = true;
+
+        // Cache for 5 minutes to prevent spam in logs
+        Cache::put($this->cacheKey, true, 300);
 
         // Single log line instead of spamming one per plugin
         if (! empty($this->plugins)) {
@@ -227,7 +233,8 @@ class PluginLoader
      */
     public function clearCache(): void
     {
-        Cache::forget('plugins.loaded');
+        $this->loaded = false;
+        Cache::forget($this->cacheKey);
     }
 
     /**

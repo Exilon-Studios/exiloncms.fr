@@ -7,7 +7,6 @@ export default function Mode() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     if (!selectedMode) return;
 
     setIsSubmitting(true);
@@ -19,7 +18,9 @@ export default function Mode() {
     }
   };
 
-  const handleModeSelect = (mode: 'production' | 'demo') => {
+  const handleModeSelect = (e: React.MouseEvent, mode: 'production' | 'demo') => {
+    e.preventDefault();
+    e.stopPropagation();
     setSelectedMode(mode);
   };
 
@@ -191,11 +192,11 @@ export default function Mode() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => handleModeSelect('production')}
+                onClick={(e) => handleModeSelect(e, 'production')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    handleModeSelect('production');
+                    setSelectedMode('production');
                   }
                 }}
                 style={cardStyle('production')}
@@ -273,11 +274,11 @@ export default function Mode() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={() => handleModeSelect('demo')}
+                onClick={(e) => handleModeSelect(e, 'demo')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    handleModeSelect('demo');
+                    setSelectedMode('demo');
                   }
                 }}
                 style={{
