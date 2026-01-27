@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { useState, FormEvent, ChangeEvent } from 'react';
+import { useState, FormEvent } from 'react';
 
 export default function Mode() {
   const [selectedMode, setSelectedMode] = useState<'production' | 'demo' | null>(null);
@@ -18,9 +18,8 @@ export default function Mode() {
     }
   };
 
-  const handleModeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    e.stopPropagation();
-    setSelectedMode(e.target.value as 'production' | 'demo');
+  const handleModeSelect = (mode: 'production' | 'demo') => {
+    setSelectedMode(mode);
   };
 
   const cardStyle = (mode: 'production' | 'demo') => ({
@@ -188,192 +187,153 @@ export default function Mode() {
 
             <form onSubmit={handleSubmit}>
               {/* Production Mode */}
-              <div style={{ position: 'relative' }}>
-                <input
-                  type="radio"
-                  id="mode-production"
-                  name="mode"
-                  value="production"
-                  checked={selectedMode === 'production'}
-                  onChange={handleModeChange}
-                  style={{
-                    position: 'absolute',
-                    opacity: 0,
-                    pointerEvents: 'none',
-                    zIndex: 1,
-                  }}
-                />
-                <label
-                  htmlFor="mode-production"
-                  style={{
-                    display: 'block',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div style={cardStyle('production')}>
-                    <div style={iconContainerStyle('production')}>
-                      {selectedMode === 'production' ? (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
-                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                          <polyline points="22 4 12 14.01 9 11.01" />
-                        </svg>
-                      ) : (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="1.5">
-                          <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                          <path d="M2 17l10 5 10-5" />
-                          <path d="M2 12l10 5 10-5" />
-                        </svg>
-                      )}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{
-                        color: '#ffffff',
-                        fontSize: '15px',
-                        fontWeight: '500',
-                        margin: '0 0 4px 0',
-                      }}>
-                        Production Mode
-                      </h3>
-                      <p style={{
-                        color: '#888888',
-                        fontSize: '12px',
-                        margin: '0 0 8px 0',
-                        lineHeight: '1.4',
-                      }}>
-                        Full-featured installation for your live server
-                      </p>
-                      <ul style={{
-                        color: '#666666',
-                        fontSize: '11px',
-                        margin: 0,
-                        paddingLeft: '16px',
-                        lineHeight: '1.5',
-                      }}>
-                        <li>User registration enabled</li>
-                        <li>All features available</li>
-                        <li>Standard authentication</li>
-                        <li>Ready for production use</li>
-                      </ul>
-                    </div>
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      border: '1px solid ' + (
-                        selectedMode === 'production'
-                          ? '#22c55e'
-                          : 'rgba(255,255,255,0.2)'
-                      ),
-                      background: selectedMode === 'production'
-                        ? '#22c55e'
-                        : 'transparent',
-                      flexShrink: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      {selectedMode === 'production' && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="3">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-                </label>
+              <div
+                onClick={() => handleModeSelect('production')}
+                style={cardStyle('production')}
+              >
+                <div style={iconContainerStyle('production')}>
+                  {selectedMode === 'production' ? (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="1.5">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                      <path d="M2 17l10 5 10-5" />
+                      <path d="M2 12l10 5 10-5" />
+                    </svg>
+                  )}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{
+                    color: '#ffffff',
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    margin: '0 0 4px 0',
+                  }}>
+                    Production Mode
+                  </h3>
+                  <p style={{
+                    color: '#888888',
+                    fontSize: '12px',
+                    margin: '0 0 8px 0',
+                    lineHeight: '1.4',
+                  }}>
+                    Full-featured installation for your live server
+                  </p>
+                  <ul style={{
+                    color: '#666666',
+                    fontSize: '11px',
+                    margin: 0,
+                    paddingLeft: '16px',
+                    lineHeight: '1.5',
+                  }}>
+                    <li>User registration enabled</li>
+                    <li>All features available</li>
+                    <li>Standard authentication</li>
+                    <li>Ready for production use</li>
+                  </ul>
+                </div>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  border: '1px solid ' + (
+                    selectedMode === 'production'
+                      ? '#22c55e'
+                      : 'rgba(255,255,255,0.2)'
+                  ),
+                  background: selectedMode === 'production'
+                    ? '#22c55e'
+                    : 'transparent',
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  {selectedMode === 'production' && (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </div>
               </div>
 
               {/* Demo Mode */}
-              <div style={{ position: 'relative', marginTop: '16px' }}>
-                <input
-                  type="radio"
-                  id="mode-demo"
-                  name="mode"
-                  value="demo"
-                  checked={selectedMode === 'demo'}
-                  onChange={handleModeChange}
-                  style={{
-                    position: 'absolute',
-                    opacity: 0,
-                    pointerEvents: 'none',
-                    zIndex: 1,
-                  }}
-                />
-                <label
-                  htmlFor="mode-demo"
-                  style={{
-                    display: 'block',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <div style={cardStyle('demo')}>
-                    <div style={iconContainerStyle('demo')}>
-                      {selectedMode === 'demo' ? (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
-                          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                          <polyline points="22 4 12 14.01 9 11.01" />
-                        </svg>
-                      ) : (
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5">
-                          <circle cx="12" cy="12" r="10" />
-                          <polygon points="10 8 16 12 10 16 10 8" />
-                        </svg>
-                      )}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <h3 style={{
-                        color: '#ffffff',
-                        fontSize: '15px',
-                        fontWeight: '500',
-                        margin: '0 0 4px 0',
-                      }}>
-                        Demo Mode
-                      </h3>
-                      <p style={{
-                        color: '#888888',
-                        fontSize: '12px',
-                        margin: '0 0 8px 0',
-                        lineHeight: '1.4',
-                      }}>
-                        Safe presentation mode for showcasing ExilonCMS
-                      </p>
-                      <ul style={{
-                        color: '#666666',
-                        fontSize: '11px',
-                        margin: 0,
-                        paddingLeft: '16px',
-                        lineHeight: '1.5',
-                      }}>
-                        <li>Registration disabled</li>
-                        <li>Special quick login buttons</li>
-                        <li>Admin-only user management</li>
-                        <li>Safe for public demonstrations</li>
-                      </ul>
-                    </div>
-                    <div style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      border: '1px solid ' + (
-                        selectedMode === 'demo'
-                          ? '#3b82f6'
-                          : 'rgba(255,255,255,0.2)'
-                      ),
-                      background: selectedMode === 'demo'
-                        ? '#3b82f6'
-                        : 'transparent',
-                      flexShrink: 0,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      {selectedMode === 'demo' && (
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="3">
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                      )}
-                    </div>
-                  </div>
-                </label>
+              <div
+                onClick={() => handleModeSelect('demo')}
+                style={{
+                  ...cardStyle('demo'),
+                  marginTop: '16px',
+                }}
+              >
+                <div style={iconContainerStyle('demo')}>
+                  {selectedMode === 'demo' ? (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                      <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                  ) : (
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="1.5">
+                      <circle cx="12" cy="12" r="10" />
+                      <polygon points="10 8 16 12 10 16 10 8" />
+                    </svg>
+                  )}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{
+                    color: '#ffffff',
+                    fontSize: '15px',
+                    fontWeight: '500',
+                    margin: '0 0 4px 0',
+                  }}>
+                    Demo Mode
+                  </h3>
+                  <p style={{
+                    color: '#888888',
+                    fontSize: '12px',
+                    margin: '0 0 8px 0',
+                    lineHeight: '1.4',
+                  }}>
+                    Safe presentation mode for showcasing ExilonCMS
+                  </p>
+                  <ul style={{
+                    color: '#666666',
+                    fontSize: '11px',
+                    margin: 0,
+                    paddingLeft: '16px',
+                    lineHeight: '1.5',
+                  }}>
+                    <li>Registration disabled</li>
+                    <li>Special quick login buttons</li>
+                    <li>Admin-only user management</li>
+                    <li>Safe for public demonstrations</li>
+                  </ul>
+                </div>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  border: '1px solid ' + (
+                    selectedMode === 'demo'
+                      ? '#3b82f6'
+                      : 'rgba(255,255,255,0.2)'
+                  ),
+                  background: selectedMode === 'demo'
+                    ? '#3b82f6'
+                    : 'transparent',
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  {selectedMode === 'demo' && (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </div>
               </div>
 
               {/* Info box */}

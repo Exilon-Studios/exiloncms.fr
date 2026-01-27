@@ -134,6 +134,7 @@ class HandleInertiaRequests extends Middleware
                 'pages' => trans('pages'),
                 'dashboard' => trans('dashboard'),
                 'marketplace' => trans('marketplace'),
+                'shop' => trans('shop'),
             ],
             // Share unread notifications count for authenticated users
             'unreadNotificationsCount' => $user ? $this->getUnreadNotificationsCount($user) : 0,

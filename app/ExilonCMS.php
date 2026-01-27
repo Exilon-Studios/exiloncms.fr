@@ -9,18 +9,27 @@ use Illuminate\Support\Str;
 class ExilonCMS
 {
     /**
-     * The ExilonCMS version.
-     *
-     * @var string
-     */
-    private const VERSION = '0.2.2';
-
-    /**
      * Get the current version of ExilonCMS.
      */
     public static function version(): string
     {
-        return static::VERSION;
+        return static::getVersionFromComposer();
+    }
+
+    /**
+     * Get version from composer.json
+     */
+    protected static function getVersionFromComposer(): string
+    {
+        $composerPath = base_path('composer.json');
+
+        if (! file_exists($composerPath)) {
+            return '0.0.0';
+        }
+
+        $composer = json_decode(file_get_contents($composerPath), true);
+
+        return $composer['version'] ?? '0.0.0';
     }
 
     /**
@@ -28,7 +37,7 @@ class ExilonCMS
      */
     public static function apiVersion(): string
     {
-        return Str::beforeLast(static::VERSION, '.');
+        return Str::beforeLast(static::version(), '.');
     }
 
     /**

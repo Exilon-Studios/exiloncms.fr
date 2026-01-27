@@ -1,5 +1,6 @@
 <?php
 
+use ExilonCMS\Plugins\Shop\Controllers\CartController;
 use ExilonCMS\Plugins\Shop\Models\Category;
 use ExilonCMS\Plugins\Shop\Models\Item;
 use Illuminate\Support\Facades\Route;
@@ -33,3 +34,12 @@ Route::get('/item/{id}', function ($id) {
         'item' => $item,
     ]);
 })->name('shop.item');
+
+// Cart routes
+Route::prefix('cart')->group(function () {
+    Route::get('/items', [CartController::class, 'index'])->name('cart.items');
+    Route::post('/add/{itemId}', [CartController::class, 'add'])->name('cart.add');
+    Route::post('/update/{id}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::delete('/clear', [CartController::class, 'clear'])->name('cart.clear');
+});
