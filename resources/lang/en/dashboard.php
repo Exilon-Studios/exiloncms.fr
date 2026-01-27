@@ -12,7 +12,7 @@ return [
 
     'title' => 'Dashboard',
     'description' => 'Welcome back! Here\'s what\'s happening with your server.',
-    'welcome' => 'Welcome, {name}!',
+    'welcome' => 'Welcome, :name!',
     'welcome_subtitle' => 'Here\'s an overview of your account',
     'balance' => 'Balance',
     'account_age' => 'Account Age',

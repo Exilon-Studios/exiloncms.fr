@@ -32,7 +32,6 @@ export default function Mode() {
     ),
     borderRadius: '8px',
     cursor: 'pointer',
-    transition: 'all 0.15s',
     display: 'flex',
     gap: '16px',
   });

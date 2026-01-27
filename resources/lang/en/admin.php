@@ -833,6 +833,7 @@ return [
         'not_downloaded' => 'Update not downloaded yet',
         'downloaded' => 'Update downloaded successfully',
         'installed' => 'Update installed successfully',
+        'up_to_date' => 'Your system is up to date',
         'index' => [
             'title' => 'Updates',
             'description' => 'Check and install system updates',
