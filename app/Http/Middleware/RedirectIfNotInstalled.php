@@ -30,11 +30,16 @@ class RedirectIfNotInstalled
             return $next($request);
         }
 
-        // If request is for the install page or debug routes, let it through
+        // If request is for the install page or wizard routes, let it through
         foreach ($this->except as $pattern) {
             if ($request->is($pattern)) {
                 return $next($request);
             }
+        }
+
+        // If current request is already for install.index, don't redirect again!
+        if ($request->route() && $request->route()->getName() === 'install.index') {
+            return $next($request);
         }
 
         // Otherwise, redirect to install page
