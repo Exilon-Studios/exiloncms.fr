@@ -203,7 +203,7 @@ class UpdateManager
     protected function downloadUpdateZip(string $downloadUrl, string $savePath): bool
     {
         try {
-            $response = Http::timeout(120)->followRedirects()->get($downloadUrl);
+            $response = Http::timeout(120)->get($downloadUrl);
 
             if (! $response->successful()) {
                 Log::error('Failed to download update', [
