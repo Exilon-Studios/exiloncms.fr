@@ -25,7 +25,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Gamepad2, BookOpen, ShoppingCart, Check, Eye, Power, Palette } from 'lucide-react';
 
 interface Theme {
-  id: number;
+  id: number | string;
   name: string;
   slug: string;
   description: string;
@@ -40,7 +40,6 @@ interface Theme {
 
 interface Props {
   themes: Theme[];
-  activeTheme: { id: number; name: string; slug: string } | null;
 }
 
 const themeIcons = {
@@ -49,7 +48,7 @@ const themeIcons = {
   ecommerce: ShoppingCart,
 };
 
-export default function ThemesIndex({ themes, activeTheme }: Props) {
+export default function ThemesIndex({ themes }: Props) {
   const [activatingTheme, setActivatingTheme] = useState<Theme | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -96,7 +95,7 @@ export default function ThemesIndex({ themes, activeTheme }: Props) {
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {themes.map((theme) => {
             const Icon = themeIcons[theme.type as keyof typeof themeIcons] || Palette;
-            const isActive = activeTheme?.id === theme.id;
+            const isActive = theme.is_active;
 
             return (
               <Card
@@ -181,14 +180,6 @@ export default function ThemesIndex({ themes, activeTheme }: Props) {
             );
           })}
         </div>
-
-        {activeTheme && (
-          <div className="rounded-lg border bg-muted/50 p-4">
-            <p className="text-sm">
-              <strong>Active Theme:</strong> {activeTheme.name}
-            </p>
-          </div>
-        )}
       </div>
 
       <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>

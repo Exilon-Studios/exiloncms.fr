@@ -32,32 +32,28 @@ class ThemeController extends Controller
             'type_label' => 'File Theme',
         ])->values();
 
-        // Get database themes (if any)
-        $dbThemes = Theme::all()->map(fn ($theme) => [
-            'id' => $theme->id,
-            'name' => $theme->name,
-            'slug' => $theme->slug,
-            'description' => $theme->description,
-            'version' => $theme->version,
-            'author' => $theme->author,
-            'thumbnail' => $theme->thumbnail,
-            'is_active' => $theme->is_active,
-            'is_enabled' => $theme->is_enabled,
-            'type' => $theme->type,
-            'type_label' => $theme->getTypeLabel(),
-        ]);
+        // Get database themes (if any), excluding ones that conflict with file-based themes
+        $fileThemeIds = $fileThemes->pluck('slug')->toArray();
+        $dbThemes = Theme::all()
+            ->filter(fn ($theme) => ! in_array($theme->slug, $fileThemeIds))
+            ->map(fn ($theme) => [
+                'id' => $theme->id,
+                'name' => $theme->name,
+                'slug' => $theme->slug,
+                'description' => $theme->description,
+                'version' => $theme->version,
+                'author' => $theme->author,
+                'thumbnail' => $theme->thumbnail,
+                'is_active' => $theme->is_active,
+                'is_enabled' => $theme->is_enabled,
+                'type' => $theme->type,
+                'type_label' => $theme->getTypeLabel(),
+            ]);
 
         $themes = $fileThemes->concat($dbThemes);
 
-        $activeThemeId = $themeLoader->getActiveThemeId();
-
         return Inertia::render('Admin/Themes/Index', [
             'themes' => $themes,
-            'activeTheme' => $activeThemeId ? [
-                'id' => $activeThemeId,
-                'name' => $themeLoader->getTheme($activeThemeId)['name'] ?? $activeThemeId,
-                'slug' => $activeThemeId,
-            ] : null,
         ]);
     }
 
@@ -126,21 +122,30 @@ class ThemeController extends Controller
     /**
      * Toggle theme enabled status.
      */
-    public function toggleEnabled(Request $request, int $themeId)
+    public function toggleEnabled(Request $request, string|int $themeId)
     {
         try {
-            $theme = Theme::findOrFail($themeId);
+            $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
 
-            $theme->update(['is_enabled' => ! $theme->is_enabled]);
+            // Check if it's a file-based theme (string ID) or database theme (integer ID)
+            if (is_string($themeId) && $themeLoader->hasTheme($themeId)) {
+                // File-based themes are always enabled - cannot be toggled
+                return back()->with('error', 'File-based themes are always enabled.');
+            } else {
+                // Database theme - use model
+                $theme = Theme::findOrFail($themeId);
 
-            // If disabling the active theme, deactivate it first
-            if (! $theme->is_enabled && $theme->is_active) {
-                $theme->deactivate();
+                $theme->update(['is_enabled' => ! $theme->is_enabled]);
+
+                // If disabling the active theme, deactivate it first
+                if (! $theme->is_enabled && $theme->is_active) {
+                    $theme->deactivate();
+                }
+
+                Artisan::call('cache:clear');
+
+                return back()->with('success', $theme->is_enabled ? 'Theme enabled.' : 'Theme disabled.');
             }
-
-            Artisan::call('cache:clear');
-
-            return back()->with('success', $theme->is_enabled ? 'Theme enabled.' : 'Theme disabled.');
         } catch (\Exception $e) {
             return back()->with('error', 'Error updating theme: '.$e->getMessage());
         }
@@ -149,27 +154,50 @@ class ThemeController extends Controller
     /**
      * Publish theme assets.
      */
-    public function publishAssets(int $themeId)
+    public function publishAssets(string|int $themeId)
     {
         try {
-            $theme = Theme::findOrFail($themeId);
+            $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
 
-            // Publish theme assets to public directory
-            $themePath = resource_path("views/themes/{$theme->slug}");
-            $publicPath = public_path("themes/{$theme->slug}");
+            // Check if it's a file-based theme (string ID) or database theme (integer ID)
+            if (is_string($themeId) && $themeLoader->hasTheme($themeId)) {
+                // File-based theme
+                $themePath = base_path("themes/{$themeId}");
+                $publicPath = public_path("themes/{$themeId}");
 
-            if (is_dir($themePath)) {
-                if (! is_dir(public_path('themes'))) {
-                    mkdir(public_path('themes'), 0755, true);
+                if (is_dir($themePath)) {
+                    if (! is_dir(public_path('themes'))) {
+                        mkdir(public_path('themes'), 0755, true);
+                    }
+
+                    // Symlink or copy assets
+                    if (! file_exists($publicPath)) {
+                        symlink($themePath, $publicPath);
+                    }
                 }
 
-                // Symlink or copy assets
-                if (! file_exists($publicPath)) {
-                    symlink($themePath, $publicPath);
+                return back()->with('success', 'Theme assets published successfully!');
+            } else {
+                // Database theme
+                $theme = Theme::findOrFail($themeId);
+
+                // Publish theme assets to public directory
+                $themePath = resource_path("views/themes/{$theme->slug}");
+                $publicPath = public_path("themes/{$theme->slug}");
+
+                if (is_dir($themePath)) {
+                    if (! is_dir(public_path('themes'))) {
+                        mkdir(public_path('themes'), 0755, true);
+                    }
+
+                    // Symlink or copy assets
+                    if (! file_exists($publicPath)) {
+                        symlink($themePath, $publicPath);
+                    }
                 }
+
+                return back()->with('success', 'Theme assets published successfully!');
             }
-
-            return back()->with('success', 'Theme assets published successfully!');
         } catch (\Exception $e) {
             return back()->with('error', 'Error publishing assets: '.$e->getMessage());
         }
@@ -178,7 +206,7 @@ class ThemeController extends Controller
     /**
      * Preview a theme.
      */
-    public function preview(Request $request, int $themeId)
+    public function preview(Request $request, string|int $themeId)
     {
         $request->session()->put('preview_theme', $themeId);
 

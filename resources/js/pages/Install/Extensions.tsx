@@ -27,8 +27,9 @@ interface PageProps {
 }
 
 export default function Extensions({ plugins, themes, selectedPlugins, selectedTheme }: PageProps) {
+  // Default to 'blog' theme if no theme is selected
   const [selectedPluginsList, setSelectedPluginsList] = useState<string[]>(selectedPlugins);
-  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(selectedTheme);
+  const [selectedThemeId, setSelectedThemeId] = useState<string | null>(selectedTheme || 'blog');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -255,142 +256,123 @@ export default function Extensions({ plugins, themes, selectedPlugins, selectedT
             </p>
 
             <form onSubmit={handleSubmit}>
-              {/* Plugins Section */}
-              {plugins.length > 0 && (
-                <div style={{ marginBottom: '24px' }}>
-                  <h3 style={{
-                    color: '#888888',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    marginBottom: '12px',
-                  }}>
-                    Plugins ({selectedPluginsList.length} selected)
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {plugins.map((plugin) => (
-                      <div
-                        key={plugin.id}
-                        onClick={() => togglePlugin(plugin.id)}
-                        style={pluginCardStyle(plugin.id)}
-                        onMouseOver={(e) => {
-                          if (!selectedPluginsList.includes(plugin.id)) {
-                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                            e.currentTarget.style.background = '#0f0f0f';
-                          }
-                        }}
-                        onMouseOut={(e) => {
-                          if (!selectedPluginsList.includes(plugin.id)) {
-                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                            e.currentTarget.style.background = '#0a0a0a';
-                          }
-                        }}
-                      >
-                        <div style={{ flex: 1 }}>
-                          <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>
-                            {plugin.name}
-                          </div>
-                          <div style={{ color: '#666666', fontSize: '11px', marginTop: '2px' }}>
-                            {plugin.description}
-                          </div>
-                          {plugin.author && (
-                            <div style={{ color: '#555555', fontSize: '10px', marginTop: '2px' }}>
-                              by {plugin.author} • v{plugin.version}
+              {/* Scrollable container for extensions */}
+              <div style={{
+                maxHeight: 'calc(100vh - 380px)',
+                overflowY: 'auto',
+                paddingRight: '8px',
+                marginBottom: '16px',
+              }}>
+                {/* Themes Section FIRST */}
+                {themes.length > 0 && (
+                  <div style={{ marginBottom: '24px' }}>
+                    <h3 style={{
+                      color: '#888888',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      marginBottom: '12px',
+                    }}>
+                      Theme
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {themes.map((theme) => (
+                        <div
+                          key={theme.id}
+                          onClick={() => selectTheme(theme.id)}
+                          style={themeCardStyle(theme.id)}
+                          onMouseOver={(e) => {
+                            if (selectedThemeId !== theme.id) {
+                              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                              e.currentTarget.style.background = '#0f0f0f';
+                            }
+                          }}
+                          onMouseOut={(e) => {
+                            if (selectedThemeId !== theme.id) {
+                              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                              e.currentTarget.style.background = '#0a0a0a';
+                            }
+                          }}
+                        >
+                          <div style={{ flex: 1 }}>
+                            <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>
+                              {theme.name}
                             </div>
-                          )}
-                        </div>
-                        <div style={checkboxStyle(selectedPluginsList.includes(plugin.id))}>
-                          {selectedPluginsList.includes(plugin.id) && (
-                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="3">
-                              <polyline points="20 6 9 17 4 12" />
-                            </svg>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Themes Section */}
-              {themes.length > 0 && (
-                <div style={{ marginBottom: '32px' }}>
-                  <h3 style={{
-                    color: '#888888',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.5px',
-                    marginBottom: '12px',
-                  }}>
-                    Theme
-                  </h3>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {themes.map((theme) => (
-                      <div
-                        key={theme.id}
-                        onClick={() => selectTheme(theme.id)}
-                        style={themeCardStyle(theme.id)}
-                        onMouseOver={(e) => {
-                          if (selectedThemeId !== theme.id) {
-                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                            e.currentTarget.style.background = '#0f0f0f';
-                          }
-                        }}
-                        onMouseOut={(e) => {
-                          if (selectedThemeId !== theme.id) {
-                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                            e.currentTarget.style.background = '#0a0a0a';
-                          }
-                        }}
-                      >
-                        <div style={{ flex: 1 }}>
-                          <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>
-                            {theme.name}
-                          </div>
-                          <div style={{ color: '#666666', fontSize: '11px', marginTop: '2px' }}>
-                            {theme.description}
-                          </div>
-                          {theme.author && (
-                            <div style={{ color: '#555555', fontSize: '10px', marginTop: '2px' }}>
-                              by {theme.author} • v{theme.version}
+                            <div style={{ color: '#666666', fontSize: '11px', marginTop: '2px' }}>
+                              {theme.description}
                             </div>
-                          )}
+                            {theme.author && (
+                              <div style={{ color: '#555555', fontSize: '10px', marginTop: '2px' }}>
+                                by {theme.author} • v{theme.version}
+                              </div>
+                            )}
+                          </div>
+                          <div style={radioStyle(selectedThemeId === theme.id)} />
                         </div>
-                        <div style={radioStyle(selectedThemeId === theme.id)} />
-                      </div>
-                    ))}
-                    {/* None option */}
-                    <div
-                      onClick={() => selectTheme(null)}
-                      style={themeCardStyle(null)}
-                      onMouseOver={(e) => {
-                        if (selectedThemeId !== null) {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                          e.currentTarget.style.background = '#0f0f0f';
-                        }
-                      }}
-                      onMouseOut={(e) => {
-                        if (selectedThemeId !== null) {
-                          e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                          e.currentTarget.style.background = '#0a0a0a';
-                        }
-                      }}
-                    >
-                      <div style={{ flex: 1 }}>
-                        <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>
-                          Default Theme
-                        </div>
-                        <div style={{ color: '#666666', fontSize: '11px', marginTop: '2px' }}>
-                          Use the default ExilonCMS theme
-                        </div>
-                      </div>
-                      <div style={radioStyle(selectedThemeId === null)} />
+                      ))}
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+
+                {/* Plugins Section SECOND */}
+                {plugins.length > 0 && (
+                  <div style={{ marginBottom: '24px' }}>
+                    <h3 style={{
+                      color: '#888888',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px',
+                      marginBottom: '12px',
+                    }}>
+                      Plugins ({selectedPluginsList.length} selected)
+                    </h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {plugins.map((plugin) => (
+                        <div
+                          key={plugin.id}
+                          onClick={() => togglePlugin(plugin.id)}
+                          style={pluginCardStyle(plugin.id)}
+                          onMouseOver={(e) => {
+                            if (!selectedPluginsList.includes(plugin.id)) {
+                              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
+                              e.currentTarget.style.background = '#0f0f0f';
+                            }
+                          }}
+                          onMouseOut={(e) => {
+                            if (!selectedPluginsList.includes(plugin.id)) {
+                              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                              e.currentTarget.style.background = '#0a0a0a';
+                            }
+                          }}
+                        >
+                          <div style={{ flex: 1 }}>
+                            <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>
+                              {plugin.name}
+                            </div>
+                            <div style={{ color: '#666666', fontSize: '11px', marginTop: '2px' }}>
+                              {plugin.description}
+                            </div>
+                            {plugin.author && (
+                              <div style={{ color: '#555555', fontSize: '10px', marginTop: '2px' }}>
+                                by {plugin.author} • v{plugin.version}
+                              </div>
+                            )}
+                          </div>
+                          <div style={checkboxStyle(selectedPluginsList.includes(plugin.id))}>
+                            {selectedPluginsList.includes(plugin.id) && (
+                              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000000" strokeWidth="3">
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Info box */}
               <div style={{

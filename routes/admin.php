@@ -14,7 +14,7 @@ use ExilonCMS\Http\Controllers\Admin\MarketplaceController;
 use ExilonCMS\Http\Controllers\Admin\NavbarController;
 use ExilonCMS\Http\Controllers\Admin\NotificationManagerController;
 use ExilonCMS\Http\Controllers\Admin\OnboardingController;
-use ExilonCMS\Http\Controllers\Admin\PluginManagerController;
+use ExilonCMS\Http\Controllers\Admin\PluginController;
 use ExilonCMS\Http\Controllers\Admin\RedirectController;
 use ExilonCMS\Http\Controllers\Admin\ResourceController;
 use ExilonCMS\Http\Controllers\Admin\ResourceInstallController;
@@ -61,13 +61,13 @@ Route::prefix('themes')->name('themes.')->middleware('can:admin.settings')->grou
 });
 
 // ============================================================
-// PLUGIN MANAGER ROUTES (WordPress-style)
+// PLUGIN MANAGEMENT ROUTES
 // ============================================================
 Route::prefix('plugins')->name('plugins.')->middleware('can:admin.settings')->group(function () {
-    Route::get('/', [PluginManagerController::class, 'index'])->name('index');
-    Route::post('/upload', [PluginManagerController::class, 'upload'])->name('upload');
-    Route::post('/{plugin}/toggle', [PluginManagerController::class, 'toggle'])->name('toggle');
-    Route::delete('/{plugin}', [PluginManagerController::class, 'delete'])->name('delete');
+    Route::get('/', [PluginController::class, 'index'])->name('index');
+    Route::post('/{id}/toggle', [PluginController::class, 'toggle'])->name('toggle');
+    Route::get('/{id}/config', [PluginController::class, 'config'])->name('config');
+    Route::delete('/{id}', [PluginController::class, 'destroy'])->name('destroy');
 });
 
 // ============================================================

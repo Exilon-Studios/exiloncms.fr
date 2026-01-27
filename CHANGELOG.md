@@ -5,6 +5,18 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.6] - 2026-01-27
+
+### Fixed
+- **Critical**: Fixed "PluginInstalled model not found" error - removed legacy PluginManagerController and updated routes to use PluginController
+- **Critical**: Fixed ThemeController type errors - methods now accept `string|int` for themeId to support both file-based and database themes
+- Fixed duplicate themes appearing in admin list - database themes now filtered out if file-based theme with same slug exists
+- Removed "Active Theme" section from bottom of themes admin page for cleaner UI
+- Installer extensions page UI improvements - made container scrollable and reversed order (Themes first, then Plugins)
+- Updated Theme interface in React to support string IDs for file-based themes
+
+---
+
 ## [1.3.5] - 2026-01-27
 
 ### Added
