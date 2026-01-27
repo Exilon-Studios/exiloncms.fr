@@ -191,11 +191,7 @@ export default function Mode() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleModeSelect('production');
-                }}
+                onClick={() => handleModeSelect('production')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -203,18 +199,6 @@ export default function Mode() {
                   }
                 }}
                 style={cardStyle('production')}
-                onMouseOver={(e) => {
-                  if (selectedMode !== 'production') {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                    e.currentTarget.style.background = '#0f0f0f';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (selectedMode !== 'production') {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                    e.currentTarget.style.background = '#0a0a0a';
-                  }
-                }}
               >
                 <div style={iconContainerStyle('production')}>
                   {selectedMode === 'production' ? (
@@ -289,11 +273,7 @@ export default function Mode() {
               <div
                 role="button"
                 tabIndex={0}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleModeSelect('demo');
-                }}
+                onClick={() => handleModeSelect('demo')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -303,18 +283,6 @@ export default function Mode() {
                 style={{
                   ...cardStyle('demo'),
                   marginTop: '16px',
-                }}
-                onMouseOver={(e) => {
-                  if (selectedMode !== 'demo') {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                    e.currentTarget.style.background = '#0f0f0f';
-                  }
-                }}
-                onMouseOut={(e) => {
-                  if (selectedMode !== 'demo') {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                    e.currentTarget.style.background = '#0a0a0a';
-                  }
                 }}
               >
                 <div style={iconContainerStyle('demo')}>

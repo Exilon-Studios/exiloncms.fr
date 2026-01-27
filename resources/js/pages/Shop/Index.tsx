@@ -92,7 +92,7 @@ export default function ShopIndex({ categories, featured_items, money }: ShopPro
                 </PublicLayoutSection>
 
                 {/* Featured Items */}
-                {featured_items.length > 0 && (
+                {featured_items && featured_items.length > 0 && (
                     <PublicLayoutSection title={trans('shop.featured_items')}>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             {featured_items.map((item) => {

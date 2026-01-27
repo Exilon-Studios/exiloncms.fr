@@ -12,6 +12,8 @@ class PluginLoader
 
     protected array $plugins = [];
 
+    protected bool $loaded = false;
+
     public function __construct()
     {
         $this->pluginsPath = base_path('plugins');
@@ -22,6 +24,11 @@ class PluginLoader
      */
     public function loadPlugins(): void
     {
+        // Skip if already loaded to prevent spam in dev mode
+        if ($this->loaded) {
+            return;
+        }
+
         if (! File::exists($this->pluginsPath)) {
             return;
         }
@@ -30,6 +37,13 @@ class PluginLoader
 
         foreach ($pluginDirectories as $pluginPath) {
             $this->loadPlugin($pluginPath);
+        }
+
+        $this->loaded = true;
+
+        // Single log line instead of spamming one per plugin
+        if (! empty($this->plugins)) {
+            Log::info("Loaded ".count($this->plugins)." plugin(s): ".implode(', ', array_column($this->plugins, 'name')));
         }
     }
 
@@ -65,8 +79,6 @@ class PluginLoader
             if (class_exists($providerClass)) {
                 $this->plugins[] = $pluginConfig;
                 app()->register($providerClass);
-
-                Log::info("Loaded plugin: {$pluginConfig['name']}");
             }
         } catch (\Exception $e) {
             Log::error("Failed to load plugin at {$pluginPath}: ".$e->getMessage());
