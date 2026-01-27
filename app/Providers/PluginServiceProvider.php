@@ -58,13 +58,7 @@ class PluginServiceProvider extends ServiceProvider
      */
     protected function loadPluginMigrationsFrom(string $path): void
     {
-        $this->publishes([
-            $path => database_path('migrations'),
-        ], 'plugins-migrations');
-
-        // Also load migrations for Laravel to discover them
-        foreach (glob($path.'/*.php') as $migrationFile) {
-            require_once $migrationFile;
-        }
+        // Use Laravel's loadMigrationsFrom to automatically register plugin migrations
+        $this->loadMigrationsFrom($path);
     }
 }
