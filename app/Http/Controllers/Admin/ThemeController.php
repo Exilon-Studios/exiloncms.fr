@@ -15,7 +15,25 @@ class ThemeController extends Controller
      */
     public function index()
     {
-        $themes = Theme::all()->map(fn ($theme) => [
+        $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
+
+        // Get file-based themes from ThemeLoader
+        $fileThemes = collect($themeLoader->getThemes())->map(fn ($theme, $id) => [
+            'id' => $id, // Use the theme ID from loader
+            'name' => $theme['name'],
+            'slug' => $theme['id'],
+            'description' => $theme['description'],
+            'version' => $theme['version'],
+            'author' => $theme['author'],
+            'thumbnail' => $theme['screenshot'] ?? null,
+            'is_active' => $themeLoader->isActive($theme['id']),
+            'is_enabled' => true, // File themes are always enabled
+            'type' => 'file', // Mark as file-based theme
+            'type_label' => 'File Theme',
+        ])->values();
+
+        // Get database themes (if any)
+        $dbThemes = Theme::all()->map(fn ($theme) => [
             'id' => $theme->id,
             'name' => $theme->name,
             'slug' => $theme->slug,
@@ -29,14 +47,16 @@ class ThemeController extends Controller
             'type_label' => $theme->getTypeLabel(),
         ]);
 
-        $activeTheme = Theme::getActive();
+        $themes = $fileThemes->concat($dbThemes);
+
+        $activeThemeId = $themeLoader->getActiveThemeId();
 
         return Inertia::render('Admin/Themes/Index', [
             'themes' => $themes,
-            'activeTheme' => $activeTheme ? [
-                'id' => $activeTheme->id,
-                'name' => $activeTheme->name,
-                'slug' => $activeTheme->slug,
+            'activeTheme' => $activeThemeId ? [
+                'id' => $activeThemeId,
+                'name' => $themeLoader->getTheme($activeThemeId)['name'] ?? $activeThemeId,
+                'slug' => $activeThemeId,
             ] : null,
         ]);
     }
@@ -44,20 +64,32 @@ class ThemeController extends Controller
     /**
      * Activate a theme.
      */
-    public function activate(Request $request, int $themeId)
+    public function activate(Request $request, string|int $themeId)
     {
         $request->validate([
             'confirm' => 'required|accepted',
         ]);
 
         try {
-            $theme = Theme::findOrFail($themeId);
+            $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
 
-            if (! $theme->is_enabled) {
-                return back()->with('error', 'This theme is disabled and cannot be activated.');
+            // Check if it's a file-based theme (string ID) or database theme (integer ID)
+            if (is_string($themeId) && $themeLoader->hasTheme($themeId)) {
+                // File-based theme - use ThemeLoader
+                $themeLoader->activateTheme($themeId);
+            } else {
+                // Database theme - use model
+                $theme = Theme::findOrFail($themeId);
+
+                if (! $theme->is_enabled) {
+                    return back()->with('error', 'This theme is disabled and cannot be activated.');
+                }
+
+                $theme->activate();
+
+                // Also update ThemeLoader cache
+                $themeLoader->activateTheme($theme->slug);
             }
-
-            $theme->activate();
 
             // Clear all caches
             Artisan::call('cache:clear');
@@ -76,11 +108,9 @@ class ThemeController extends Controller
     public function deactivate(Request $request)
     {
         try {
-            $activeTheme = Theme::getActive();
-
-            if ($activeTheme) {
-                $activeTheme->deactivate();
-            }
+            // Use ThemeLoader instead of database model
+            $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
+            $themeLoader->deactivateTheme();
 
             // Clear caches
             Artisan::call('cache:clear');

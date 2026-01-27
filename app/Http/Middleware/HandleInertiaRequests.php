@@ -116,8 +116,8 @@ class HandleInertiaRequests extends Middleware
                     'description' => setting('description', 'ExilonCMS - Modern Content Management System for game servers'),
                     'og_image' => setting('og_image') ? image_url(setting('og_image')) : null,
                 ],
-                // Active theme
-                'activeTheme' => Schema::hasTable('themes') ? Theme::getActive()?->slug : null,
+                // Active theme (from ThemeLoader, not database)
+                'activeTheme' => app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->getActiveThemeId(),
             ],
             'navbar' => $this->loadNavbarElements($user),
             'socialLinks' => SocialLink::orderBy('position')->get()->map(fn ($link) => [

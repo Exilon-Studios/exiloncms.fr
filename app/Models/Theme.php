@@ -54,6 +54,7 @@ class Theme extends Model
 
     /**
      * Scope to get the active theme.
+     * NOTE: This is only for database queries. Use ThemeLoader for the actual active theme.
      */
     public function scopeActive($query)
     {
@@ -61,32 +62,22 @@ class Theme extends Model
     }
 
     /**
-     * Get the active theme.
-     */
-    public static function getActive(): ?self
-    {
-        return Cache::remember('active_theme', now()->addDay(), function () {
-            return static::active()->enabled()->first();
-        });
-    }
-
-    /**
      * Activate this theme and deactivate all others.
+     * NOTE: This only affects database. Use ThemeLoader::activateTheme() instead.
      */
     public function activate(): void
     {
         static::where('is_active', true)->update(['is_active' => false]);
         $this->update(['is_active' => true]);
-        Cache::forget('active_theme');
     }
 
     /**
      * Deactivate this theme.
+     * NOTE: This only affects database. Use ThemeLoader::deactivateTheme() instead.
      */
     public function deactivate(): void
     {
         $this->update(['is_active' => false]);
-        Cache::forget('active_theme');
     }
 
     /**

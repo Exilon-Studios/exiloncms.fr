@@ -8,8 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.1] - 2026-01-27
 
 ### Fixed
+- Removed Theme::getActive() static method that conflicted with ThemeLoader cache
 - ThemeLoader completely rewritten following Azuriom's pattern - no more database Theme model conflicts
 - ThemeLoader now stores active theme ID in constructor to prevent type errors
+- ThemeController updated to use ThemeLoader instead of database Theme model
+- HandleInertiaRequests now uses ThemeLoader for active theme instead of database model
 - InstallController redirect error during installation - changed from `route('home')` to `url('/')`
 - Removed unnecessary requirements check step from installer wizard - now goes directly to database configuration
 - Fixed wizard navigation - all back buttons now use correct `/wizard/*` paths
