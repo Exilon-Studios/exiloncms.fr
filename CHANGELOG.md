@@ -5,6 +5,27 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.5] - 2026-01-27
+
+### Added
+- **Plugin and theme management pages** - Admin interface to enable/disable/configure installed plugins and activate/switch themes
+- **Navigation links** - Plugins and Themes now accessible from admin sidebar under Settings section
+- **Installer extensions selection step** - Choose plugins and themes during installation before admin account creation
+- **Marketplace update checking service** - ExtensionUpdateService checks for plugin and theme updates from marketplace.exiloncms.fr
+- **Discord webhook notification service** - DiscordNotificationService sends notifications for CMS, plugin, and theme updates
+- **Extension update controller** - New admin endpoints for checking updates and sending notifications
+- **DISCORD_UPDATE_WEBHOOK_URL** - New environment variable for Discord webhook notifications
+
+### Changed
+- Plugin selections during installer are now automatically enabled in settings after installation
+- Theme selection during installer is now automatically activated after installation
+- Updated version to 1.3.5
+
+### Fixed
+- Fixed Laravel 12 compatibility issue in UpdateManager - removed deprecated `followRedirects()` method call (v1.3.4 hotfix)
+
+---
+
 ## [1.3.1] - 2026-01-27
 
 ### Fixed

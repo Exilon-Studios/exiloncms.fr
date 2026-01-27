@@ -5,6 +5,7 @@ use ExilonCMS\Http\Controllers\Admin\AdminController;
 use ExilonCMS\Http\Controllers\Admin\BanController;
 use ExilonCMS\Http\Controllers\Admin\CompanySettingsController;
 use ExilonCMS\Http\Controllers\Admin\DatabaseManagerController;
+use ExilonCMS\Http\Controllers\Admin\ExtensionUpdateController;
 use ExilonCMS\Http\Controllers\Admin\ImageController;
 use ExilonCMS\Http\Controllers\Admin\IntegrationsController;
 use ExilonCMS\Http\Controllers\Admin\LanguageController;
@@ -141,6 +142,13 @@ Route::prefix('updates')->name('update.')->middleware('can:admin.update')->group
     Route::post('/fetch', [UpdateController::class, 'fetch'])->name('fetch');
     Route::post('/download', [UpdateController::class, 'download'])->name('download');
     Route::post('/install', [UpdateController::class, 'install'])->name('install');
+
+    // Extension updates
+    Route::prefix('extensions')->name('extensions.')->group(function () {
+        Route::get('/', [ExtensionUpdateController::class, 'index'])->name('index');
+        Route::post('/check', [ExtensionUpdateController::class, 'check'])->name('check');
+        Route::post('/notify', [ExtensionUpdateController::class, 'sendNotification'])->name('notify');
+    });
 });
 
 Route::resource('navbar-elements', NavbarController::class)->except('show')->middleware('can:admin.navbar');

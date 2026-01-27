@@ -82,6 +82,8 @@ return [
             'navbar' => 'Navigation',
             'servers' => 'Servers',
             'translations' => 'Translations',
+            'plugins' => 'Plugins',
+            'themes' => 'Themes',
         ],
         'other' => [
             'update' => 'Updates',

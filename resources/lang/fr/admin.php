@@ -50,6 +50,8 @@ return [
             'security' => 'Sécurité',
             'servers' => 'Serveurs',
             'translations' => 'Traductions',
+            'plugins' => 'Plugins',
+            'themes' => 'Thèmes',
         ],
         'other' => [
             'update' => 'Mises à jour',

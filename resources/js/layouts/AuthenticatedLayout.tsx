@@ -27,6 +27,8 @@ import {
   IconBuilding,
   IconDatabase,
   IconWebhook,
+  IconPlug,
+  IconPalette,
 } from '@tabler/icons-react';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
@@ -310,6 +312,22 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
           permission: 'admin.settings',
           icon: (
             <IconLanguage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: trans('admin.nav.settings.plugins'),
+          href: '/admin/plugins',
+          permission: 'admin.settings',
+          icon: (
+            <IconPlug className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: trans('admin.nav.settings.themes'),
+          href: '/admin/themes',
+          permission: 'admin.settings',
+          icon: (
+            <IconPalette className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
         },
         {

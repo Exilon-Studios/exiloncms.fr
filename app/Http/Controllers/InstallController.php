@@ -151,6 +151,8 @@ class InstallController extends Controller
             'checkRequirementsWeb',
             'showDatabaseWeb',
             'configureDatabaseWeb',
+            'showModeWeb',
+            'showExtensionsWeb',
             'showAdminWeb',
             'showCompleteWeb',
         ]);
@@ -827,6 +829,86 @@ class InstallController extends Controller
         session()->put('install_mode', $validated['mode']);
         session()->save();
 
+        return redirect()->route('install.extensions');
+    }
+
+    /**
+     * Show plugin and theme selection page.
+     */
+    public function showExtensionsWeb(): Response
+    {
+        // Scan available plugins from plugins/ directory
+        $plugins = [];
+        $pluginsPath = base_path('plugins');
+
+        if (is_dir($pluginsPath)) {
+            $pluginDirs = glob($pluginsPath.'/*/plugin.json', GLOB_NOSORT);
+            foreach ($pluginDirs as $pluginJson) {
+                $data = json_decode(file_get_contents($pluginJson), true);
+                if ($data) {
+                    $pluginId = $data['id'] ?? basename(dirname($pluginJson));
+                    $plugins[] = [
+                        'id' => $pluginId,
+                        'name' => $data['name'] ?? $pluginId,
+                        'description' => $data['description'] ?? '',
+                        'version' => $data['version'] ?? '1.0.0',
+                        'author' => $data['author'] ?? '',
+                        'icon' => $data['icon'] ?? null,
+                    ];
+                }
+            }
+        }
+
+        // Scan available themes from themes/ directory
+        $themes = [];
+        $themesPath = base_path('themes');
+
+        if (is_dir($themesPath)) {
+            $themeDirs = glob($themesPath.'/*/theme.json', GLOB_NOSORT);
+            foreach ($themeDirs as $themeJson) {
+                $data = json_decode(file_get_contents($themeJson), true);
+                if ($data) {
+                    $themeId = $data['id'] ?? basename(dirname($themeJson));
+                    $themes[] = [
+                        'id' => $themeId,
+                        'name' => $data['name'] ?? $themeId,
+                        'description' => $data['description'] ?? '',
+                        'version' => $data['version'] ?? '1.0.0',
+                        'author' => $data['author'] ?? '',
+                        'screenshot' => $data['screenshot'] ?? null,
+                    ];
+                }
+            }
+        }
+
+        // Get currently selected plugins/themes from session
+        $selectedPlugins = session('install_plugins', []);
+        $selectedTheme = session('install_theme', null);
+
+        return Inertia::render('Install/Extensions', [
+            'plugins' => $plugins,
+            'themes' => $themes,
+            'selectedPlugins' => $selectedPlugins,
+            'selectedTheme' => $selectedTheme,
+        ]);
+    }
+
+    /**
+     * Save plugin and theme selection.
+     */
+    public function saveExtensionsWeb(Request $request)
+    {
+        $validated = $this->validate($request, [
+            'plugins' => ['nullable', 'array'],
+            'plugins.*' => ['string'],
+            'theme' => ['nullable', 'string'],
+        ]);
+
+        // Store selections in session
+        session()->put('install_plugins', $validated['plugins'] ?? []);
+        session()->put('install_theme', $validated['theme'] ?? null);
+        session()->save();
+
         return redirect()->route('install.admin');
     }
 
@@ -927,6 +1009,36 @@ class InstallController extends Controller
                         ]
                     );
                 }
+            }
+
+            // Process selected plugins and theme from installer
+            $selectedPlugins = session('install_plugins', []);
+            $selectedTheme = session('install_theme', null);
+
+            // Enable selected plugins
+            if (! empty($selectedPlugins)) {
+                \ExilonCMS\Models\Setting::updateOrCreate(
+                    ['key' => 'enabled_plugins'],
+                    [
+                        'name' => 'Enabled Plugins',
+                        'value' => json_encode($selectedPlugins),
+                        'type' => 'array',
+                        'group' => 'plugins',
+                    ]
+                );
+            }
+
+            // Activate selected theme
+            if ($selectedTheme) {
+                \ExilonCMS\Models\Setting::updateOrCreate(
+                    ['key' => 'active_theme'],
+                    [
+                        'name' => 'Active Theme',
+                        'value' => $selectedTheme,
+                        'type' => 'text',
+                        'group' => 'theme',
+                    ]
+                );
             }
 
             // Get admin role
