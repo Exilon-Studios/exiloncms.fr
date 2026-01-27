@@ -150,7 +150,11 @@
       "Bash(git fetch:*)",
       "Bash(rsync:*)",
       "Bash(wsl:*)",
-      "Bash(wsl.exe zip:*)"
+      "Bash(wsl.exe zip:*)",
+      "Bash(Where-Object { $_Name -match \"migration\" })",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(npm run build:all:*)"
     ],
     "deny": [],
     "ask": []

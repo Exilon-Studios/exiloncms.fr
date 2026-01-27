@@ -7,6 +7,7 @@ export default function Mode() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     if (!selectedMode) return;
 
     setIsSubmitting(true);
@@ -16,6 +17,10 @@ export default function Mode() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleModeSelect = (mode: 'production' | 'demo') => {
+    setSelectedMode(mode);
   };
 
   const cardStyle = (mode: 'production' | 'demo') => ({
@@ -184,7 +189,19 @@ export default function Mode() {
             <form onSubmit={handleSubmit}>
               {/* Production Mode */}
               <div
-                onClick={() => setSelectedMode('production')}
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleModeSelect('production');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleModeSelect('production');
+                  }
+                }}
                 style={cardStyle('production')}
                 onMouseOver={(e) => {
                   if (selectedMode !== 'production') {
@@ -270,7 +287,19 @@ export default function Mode() {
 
               {/* Demo Mode */}
               <div
-                onClick={() => setSelectedMode('demo')}
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleModeSelect('demo');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleModeSelect('demo');
+                  }
+                }}
                 style={{
                   ...cardStyle('demo'),
                   marginTop: '16px',

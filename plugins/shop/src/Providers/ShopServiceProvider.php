@@ -70,7 +70,7 @@ class ShopServiceProvider extends BasePluginServiceProvider
     {
         $migrationsPath = $this->pluginPath.'/database/migrations';
 
-        if (File::exists($migrationsPath) && $this->app->runningInConsole()) {
+        if (File::exists($migrationsPath)) {
             $this->loadMigrationsFrom($migrationsPath);
         }
     }

@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.1] - 2026-01-27
 
 ### Fixed
+- Installation mode selection cards now properly handle click events with preventDefault/stopPropagation
+- Added keyboard accessibility (Enter/Space) to mode selection cards
+- Shop plugin migrations added - creates categories, items, orders, order_items, payments, payment_items, and gateways tables
+- Fixed "no such table: categories" error when accessing shop routes after fresh installation
+- **Plugin migrations now run automatically during web installer** (removed `runningInConsole()` check from BasePluginServiceProvider and ShopServiceProvider)
 - Plugin migrations now automatically registered and executed with standard `php artisan migrate` command
 - ActionLog now checks if plugin model classes exist before registering them (prevents Post/Comment/like errors when plugins disabled)
 - Removed Theme::getActive() static method that conflicted with ThemeLoader cache
