@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.1] - 2026-01-27
 
 ### Fixed
-- ThemeLoader type error - added proper type checking to distinguish between array-based file themes and Theme model objects
+- ThemeLoader completely rewritten following Azuriom's pattern - no more database Theme model conflicts
+- ThemeLoader now stores active theme ID in constructor to prevent type errors
 - InstallController redirect error during installation - changed from `route('home')` to `url('/')`
 - Removed unnecessary requirements check step from installer wizard - now goes directly to database configuration
 - Fixed wizard navigation - all back buttons now use correct `/wizard/*` paths

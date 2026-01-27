@@ -10,9 +10,13 @@ class ThemeLoader
     /** @var array<string, array{id: string, name: string, version: string, path: string}> */
     protected array $themes = [];
 
+    /** @var string|null The currently active theme ID */
+    protected ?string $activeThemeId = null;
+
     public function __construct()
     {
         $this->discoverThemes();
+        $this->activeThemeId = Cache::get('active_theme', 'blog');
     }
 
     /**
@@ -53,7 +57,6 @@ class ThemeLoader
                 'supports' => $data['supports'] ?? [],
                 'path' => $themeDir,
                 'service_provider' => $data['service_provider'] ?? null,
-                'active' => $this->isActive($data['id']),
             ];
         }
     }
@@ -89,9 +92,8 @@ class ThemeLoader
      */
     public function getActiveTheme(): ?array
     {
-        $activeThemeId = Cache::get('active_theme', 'blog');
-
-        if ($activeThemeId === 'default') {
+        // If active theme is explicitly set to 'default', return default theme info
+        if ($this->activeThemeId === 'default') {
             return [
                 'id' => 'default',
                 'name' => 'Default',
@@ -101,28 +103,30 @@ class ThemeLoader
             ];
         }
 
-        // Check file-based themes first with proper type checking
-        // Ensure the theme exists AND is an array (not a Theme model)
-        if (isset($this->themes[$activeThemeId])) {
-            $theme = $this->themes[$activeThemeId];
-            if (is_array($theme)) {
-                return $theme;
-            }
-            // If it's not an array, it might be a Theme model from database
-            // Clear the cache to prevent future conflicts
-            Cache::forget('active_theme');
+        // Return the active theme if it exists
+        if (isset($this->themes[$this->activeThemeId])) {
+            return $this->themes[$this->activeThemeId];
         }
 
-        // Fall back to blog theme if active theme not found
-        if (isset($this->themes['blog']) && is_array($this->themes['blog'])) {
-            // Set blog as the default active theme
+        // Fall back to blog theme
+        if (isset($this->themes['blog'])) {
+            // Update cache to use blog as default
             Cache::forever('active_theme', 'blog');
+            $this->activeThemeId = 'blog';
+
             return $this->themes['blog'];
         }
 
-        // If not found in file-based themes, return null
-        // Don't mix with database themes to avoid type conflicts
+        // No theme available
         return null;
+    }
+
+    /**
+     * Get the active theme ID.
+     */
+    public function getActiveThemeId(): string
+    {
+        return $this->activeThemeId;
     }
 
     /**
@@ -130,7 +134,7 @@ class ThemeLoader
      */
     public function isActive(string $themeId): bool
     {
-        return Cache::get('active_theme', 'default') === $themeId;
+        return $this->activeThemeId === $themeId;
     }
 
     /**
@@ -138,11 +142,11 @@ class ThemeLoader
      */
     public function activateTheme(string $themeId): bool
     {
-        $theme = $this->getTheme($themeId);
-
-        if (! $theme) {
+        if (! isset($this->themes[$themeId])) {
             return false;
         }
+
+        $theme = $this->themes[$themeId];
 
         // Check requirements
         if (! empty($theme['requires'])) {
@@ -154,6 +158,7 @@ class ThemeLoader
         }
 
         Cache::forever('active_theme', $themeId);
+        $this->activeThemeId = $themeId;
 
         if ($theme['service_provider']) {
             Cache::forever('active_theme_provider', $theme['service_provider']);
@@ -170,6 +175,7 @@ class ThemeLoader
     public function deactivateTheme(): void
     {
         Cache::forever('active_theme', 'default');
+        $this->activeThemeId = 'default';
         Cache::forget('active_theme_provider');
         Cache::forget('theme.config');
     }
@@ -282,12 +288,10 @@ class ThemeLoader
      */
     public function getActiveThemeProvider(): ?string
     {
-        $activeTheme = $this->getActiveTheme();
-
-        if (! $activeTheme || $activeTheme['id'] === 'default') {
+        if ($this->activeThemeId === 'default') {
             return null;
         }
 
-        return $activeTheme['service_provider'] ?? null;
+        return $this->themes[$this->activeThemeId]['service_provider'] ?? null;
     }
 }
