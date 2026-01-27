@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, ChangeEvent } from 'react';
 
 export default function Mode() {
   const [selectedMode, setSelectedMode] = useState<'production' | 'demo' | null>(null);
@@ -18,10 +18,8 @@ export default function Mode() {
     }
   };
 
-  const handleModeSelect = (e: React.MouseEvent, mode: 'production' | 'demo') => {
-    e.preventDefault();
-    e.stopPropagation();
-    setSelectedMode(mode);
+  const handleModeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSelectedMode(e.target.value as 'production' | 'demo');
   };
 
   const cardStyle = (mode: 'production' | 'demo') => ({
@@ -189,18 +187,20 @@ export default function Mode() {
 
             <form onSubmit={handleSubmit}>
               {/* Production Mode */}
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={(e) => handleModeSelect(e, 'production')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setSelectedMode('production');
-                  }
-                }}
-                style={cardStyle('production')}
-              >
+              <label htmlFor="mode-production" style={cardStyle('production')}>
+                <input
+                  type="radio"
+                  id="mode-production"
+                  name="mode"
+                  value="production"
+                  checked={selectedMode === 'production'}
+                  onChange={handleModeChange}
+                  style={{
+                    position: 'absolute',
+                    opacity: 0,
+                    pointerEvents: 'none',
+                  }}
+                />
                 <div style={iconContainerStyle('production')}>
                   {selectedMode === 'production' ? (
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2">
@@ -268,24 +268,29 @@ export default function Mode() {
                     </svg>
                   )}
                 </div>
-              </div>
+              </label>
 
               {/* Demo Mode */}
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={(e) => handleModeSelect(e, 'demo')}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setSelectedMode('demo');
-                  }
-                }}
+              <label
+                htmlFor="mode-demo"
                 style={{
                   ...cardStyle('demo'),
                   marginTop: '16px',
                 }}
               >
+                <input
+                  type="radio"
+                  id="mode-demo"
+                  name="mode"
+                  value="demo"
+                  checked={selectedMode === 'demo'}
+                  onChange={handleModeChange}
+                  style={{
+                    position: 'absolute',
+                    opacity: 0,
+                    pointerEvents: 'none',
+                  }}
+                />
                 <div style={iconContainerStyle('demo')}>
                   {selectedMode === 'demo' ? (
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" strokeWidth="2">
@@ -352,7 +357,7 @@ export default function Mode() {
                     </svg>
                   )}
                 </div>
-              </div>
+              </label>
 
               {/* Info box */}
               <div style={{
