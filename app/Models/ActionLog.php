@@ -201,6 +201,11 @@ class ActionLog extends Model
 
     public static function registerLogModel(string $class, string $transPrefix): void
     {
+        // Check if the class exists before trying to instantiate it
+        if (! class_exists($class)) {
+            return;
+        }
+
         $table = str_replace('_', '-', (new $class)->getTable());
 
         self::$actions[$table.'.created'] = [

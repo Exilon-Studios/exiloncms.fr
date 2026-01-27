@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.1] - 2026-01-27
 
 ### Fixed
+- ActionLog now checks if plugin model classes exist before registering them (prevents Post/Comment/like errors when plugins disabled)
 - Removed Theme::getActive() static method that conflicted with ThemeLoader cache
 - ThemeLoader completely rewritten following Azuriom's pattern - no more database Theme model conflicts
 - ThemeLoader now stores active theme ID in constructor to prevent type errors
