@@ -244,23 +244,55 @@ class UpdateManager
     public function extract(string $zipPath, string $extractTo): bool
     {
         try {
+            // Ensure extract directory exists
+            if (! File::exists($extractTo)) {
+                File::makeDirectory($extractTo, 0755, true);
+            }
+
+            // Clean up extract directory if it exists
+            if (File::exists($extractTo)) {
+                File::deleteDirectory($extractTo);
+                File::makeDirectory($extractTo, 0755, true);
+            }
+
             $zip = new \ZipArchive;
 
             if ($zip->open($zipPath) === true) {
-                $zip->extractTo($extractTo);
+                $result = $zip->extractTo($extractTo);
                 $zip->close();
 
-                // Clean up zip file
+                if ($result === false) {
+                    Log::error('ZipArchive::extractTo() returned false', [
+                        'zip_path' => $zipPath,
+                        'extract_to' => $extractTo,
+                    ]);
+                    return false;
+                }
+
+                // Clean up zip file AFTER successful extraction
                 File::delete($zipPath);
+
+                Log::info('Update extracted successfully', [
+                    'extract_to' => $extractTo,
+                ]);
 
                 return true;
             }
+
+            $errorCode = $zip->open($zipPath);
+            Log::error('Failed to open zip file', [
+                'zip_path' => $zipPath,
+                'error_code' => $errorCode,
+                'file_exists' => File::exists($zipPath),
+                'file_size' => File::exists($zipPath) ? filesize($zipPath) : 0,
+            ]);
 
             return false;
         } catch (\Exception $e) {
             Log::error('Failed to extract update', [
                 'zip_path' => $zipPath,
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return false;
@@ -347,10 +379,24 @@ class UpdateManager
     {
         // Find the extracted directory (usually the root of the zip)
         $dirs = File::directories($sourcePath);
+
+        if (empty($dirs)) {
+            Log::error('No directories found in extracted update', ['source' => $sourcePath]);
+            return;
+        }
+
         $actualSource = count($dirs) === 1 ? $dirs[0] : $sourcePath;
 
-        // Copy all files except storage and vendor
+        Log::info('Copying update files', [
+            'from' => $actualSource,
+            'to' => $destPath,
+        ]);
+
+        // Get all files from the actual source
         $items = File::allFiles($actualSource);
+
+        $copiedCount = 0;
+        $skippedCount = 0;
 
         foreach ($items as $item) {
             $relativePath = $item->getRelativePathname();
@@ -359,7 +405,10 @@ class UpdateManager
             if (Str::startsWith($relativePath, 'storage/') ||
                 Str::startsWith($relativePath, 'vendor/') ||
                 Str::startsWith($relativePath, 'node_modules/') ||
+                Str::startsWith($relativePath, '.env') ||
+                Str::startsWith($relativePath, 'bootstrap/cache/') ||
                 $relativePath === '.env') {
+                $skippedCount++;
                 continue;
             }
 
@@ -371,7 +420,13 @@ class UpdateManager
             }
 
             File::copy($item->getPathname(), $destFile);
+            $copiedCount++;
         }
+
+        Log::info('Update files copied', [
+            'copied' => $copiedCount,
+            'skipped' => $skippedCount,
+        ]);
     }
 
     /**
@@ -451,42 +506,143 @@ class UpdateManager
      */
     protected function runPostInstall(string $extractPath): void
     {
-        // Check if composer.json changed
+        Log::info('Running post-install scripts...');
+
+        $cwd = base_path();
+
+        // Check if composer.json changed (compare with current)
         $newComposerJson = $extractPath.'/composer.json';
+        $currentComposerJson = $cwd.'/composer.json';
         if (File::exists($newComposerJson)) {
-            // Run composer install
-            $this->runCommand('composer install --no-interaction --optimize-autoloader');
+            // Always run composer install to ensure dependencies are up to date
+            Log::info('Running composer install...');
+            $this->runCommand('composer install --no-interaction --optimize-autoloader --no-dev', 300);
         }
 
         // Check if package.json changed
         $newPackageJson = $extractPath.'/package.json';
         if (File::exists($newPackageJson)) {
             // Run npm install
-            $this->runCommand('npm install');
+            Log::info('Running npm install...');
+            $this->runCommand('npm install', 180);
             // Build assets
-            $this->runCommand('npm run build');
+            Log::info('Running npm run build...');
+            $this->runCommand('npm run build', 180);
         }
 
         // Run migrations
-        $this->runCommand('php artisan migrate --force');
+        Log::info('Running migrations...');
+        $this->runCommand('php artisan migrate --force', 60);
 
-        // Clear and cache config
-        $this->runCommand('php artisan config:clear');
-        $this->runCommand('php artisan config:cache');
+        // Clear all caches
+        Log::info('Clearing caches...');
+        $this->runCommand('php artisan cache:clear', 30);
+        $this->runCommand('php artisan config:clear', 30);
+        $this->runCommand('php artisan route:clear', 30);
+        $this->runCommand('php artisan view:clear', 30);
+        $this->runCommand('php artisan cache:clear', 30);
+
+        Log::info('Post-install scripts completed');
     }
 
     /**
-     * Run a shell command
+     * Run a shell command with timeout
      */
-    protected function runCommand(string $command): void
+    protected function runCommand(string $command, int $timeoutSeconds = 120): void
     {
         $cwd = base_path();
-        exec('cd '.escapeshellarg($cwd)." && {$command} 2>&1", $output, $returnCode);
+
+        Log::info('Running command', [
+            'command' => $command,
+            'timeout' => $timeoutSeconds.'s',
+        ]);
+
+        $output = [];
+        $returnCode = 0;
+
+        // Use proc_open for better control with timeouts
+        $descriptorspec = [
+            0 => ['pipe', 'r'],  // stdin
+            1 => ['pipe', 'w'],  // stdout
+            2 => ['pipe', 'w'],  // stderr
+        ];
+
+        $process = proc_open(
+            'cd '.escapeshellarg($cwd)." && {$command}",
+            $descriptorspec,
+            $pipes
+        );
+
+        if (is_resource($process)) {
+            // Set timeout
+            $timeout = time() + $timeoutSeconds;
+
+            // Close stdin
+            fclose($pipes[0]);
+
+            // Set stdout and stderr to non-blocking mode
+            stream_set_blocking($pipes[1], false);
+            stream_set_blocking($pipes[2], false);
+
+            $stdout = '';
+            $stderr = '';
+
+            while (true) {
+                // Check timeout
+                if (time() > $timeout) {
+                    proc_terminate($process, 9); // SIGKILL
+                    Log::error('Command timeout', [
+                        'command' => $command,
+                        'timeout' => $timeoutSeconds,
+                    ]);
+                    break;
+                }
+
+                // Check if process is still running
+                $status = proc_get_status($process);
+                if (! $status['running']) {
+                    $returnCode = $status['exitcode'];
+                    break;
+                }
+
+                // Read output
+                $stdoutChunk = fread($pipes[1], 8192);
+                if ($stdoutChunk !== false && $stdoutChunk !== '') {
+                    $stdout .= $stdoutChunk;
+                }
+
+                $stderrChunk = fread($pipes[2], 8192);
+                if ($stderrChunk !== false && $stderrChunk !== '') {
+                    $stderr .= $stderrChunk;
+                }
+
+                // Small sleep to prevent CPU spinning
+                usleep(100000); // 0.1 seconds
+            }
+
+            // Close pipes
+            fclose($pipes[1]);
+            fclose($pipes[2]);
+
+            // Close process
+            proc_close($process);
+
+            $output = array_filter(array_merge(
+                explode("\n", trim($stdout)),
+                explode("\n", trim($stderr))
+            ));
+        }
 
         if ($returnCode !== 0) {
             Log::warning('Command failed', [
                 'command' => $command,
+                'return_code' => $returnCode,
                 'output' => implode("\n", $output),
+            ]);
+        } else {
+            Log::info('Command succeeded', [
+                'command' => $command,
+                'output_lines' => count($output),
             ]);
         }
     }

@@ -5,6 +5,18 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.7] - 2026-01-27
+
+### Fixed
+- **Critical**: Fixed automatic update system - now properly extracts ZIP files and runs post-install scripts
+- Fixed extract() method - creates directory before extraction and validates extraction result
+- Fixed copyUpdateFiles() - added error handling for empty directories and logging
+- Improved runPostInstall() - now runs composer install, npm install, npm build, and migrations with proper timeouts
+- Improved runCommand() - uses proc_open with timeout support instead of exec()
+- Added comprehensive logging for debugging update process
+
+---
+
 ## [1.3.6] - 2026-01-27
 
 ### Fixed

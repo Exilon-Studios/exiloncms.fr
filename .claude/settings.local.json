@@ -154,7 +154,10 @@
       "Bash(Where-Object { $_Name -match \"migration\" })",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Select-Object -ExpandProperty Name)",
-      "Bash(npm run build:all:*)"
+      "Bash(npm run build:all:*)",
+      "Bash(if:*)",
+      "Bash(then cat \"$dir/theme.json\")",
+      "Bash(else echo \"No theme.json found\")"
     ],
     "deny": [],
     "ask": []
