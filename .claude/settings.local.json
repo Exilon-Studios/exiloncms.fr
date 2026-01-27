@@ -147,7 +147,10 @@
       "Bash([:*)",
       "Bash(do gh:*)",
       "Bash(./vendor/bin/pint:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(rsync:*)",
+      "Bash(wsl:*)",
+      "Bash(wsl.exe zip:*)"
     ],
     "deny": [],
     "ask": []
