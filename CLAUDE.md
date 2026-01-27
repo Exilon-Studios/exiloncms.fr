@@ -17,10 +17,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **High-Level Architecture:**
 - **Inertia.js** as the bridge between Laravel backend and React frontend (no API routes)
-- **Plugin System** for extensible modular functionality (Blog, Docs, Shop, Analytics, etc.)
+- **Extension System** (Plugins + Themes) loaded via `ExtensionServiceProvider` with lazy loading pattern
 - **Role-based permissions** with gates and policies for authorization
-- **Game integration** layer supporting Minecraft (Java/Bedrock), FiveM, and Steam games
+- **Game integration** layer supporting Minecraft (Java/Bedrock), FiveM, Hytale, and Steam games
 - **Marketplace integration** with marketplace.exiloncms.fr for packages and extensions
+- **Standalone Installer** in `installer/` directory for web-based setup
 
 ## Development Commands
 
@@ -339,7 +340,47 @@ php artisan game:create MyGame
 
 This generates a basic game class that extends `Game` and implements required methods for server communication, user authentication, and attribute mapping.
 
-### 5. Plugin System
+### 5. Extension System (Plugins + Themes)
+
+ExilonCMS uses a unified extension system that handles both plugins and themes through service providers.
+
+**Architecture:**
+- `ExtensionServiceProvider` (app/Providers/ExtensionServiceProvider.php) - Registers extension loaders
+- `PluginServiceProvider` (app/Extensions/Plugin/PluginServiceProvider.php) - Loads plugins via PluginLoader
+- `ThemeServiceProvider` (app/Extensions/Theme/ThemeServiceProvider.php) - Loads active theme via ThemeLoader
+
+**Critical: Lazy Loading Pattern**
+Extensions MUST use lazy loading to avoid "Class cache does not exist" errors during `package:discover`:
+
+```php
+public function register(): void
+{
+    $this->app->singleton(PluginLoader::class, function () {
+        return new PluginLoader;
+    });
+    // DON'T instantiate loader here - cache not available yet
+}
+
+public function boot(): void
+{
+    // Skip during package:discover
+    if ($this->app->runningInConsole() && isset($_SERVER['argv'])
+        && in_array('package:discover', $_SERVER['argv'])) {
+        return;
+    }
+
+    // Lazy load in boot(), not register()
+    $this->loader = $this->app->make(PluginLoader::class);
+}
+```
+
+**Why this matters:**
+- During `composer install` → `package:discover`, the cache service isn't available
+- If you try to use `Cache::get()` in `register()`, you get "Class cache does not exist"
+- Always defer service instantiation to `boot()` phase
+- Check for `package:discover` in argv to skip during discovery
+
+### 6. Plugin System
 
 ExilonCMS uses a modular plugin architecture for extending functionality. Plugins are auto-discovered from the `plugins/` directory.
 
@@ -435,7 +476,7 @@ class BlogServiceProvider extends ServiceProvider
 - Plugin migrations are auto-registered and run with standard `php artisan migrate`
 - Plugin namespaces are auto-loaded via `composer.json` autoload configuration
 
-### 6. Roles & Permissions
+### 7. Roles & Permissions
 
 **Models:**
 - `User` (ExilonCMS\Models\User)
@@ -463,7 +504,7 @@ const { auth } = usePage<PageProps>().props;
 )}
 ```
 
-### 8. File Structure
+### 9. File Structure
 
 **Backend:**
 - `app/Models/` - Eloquent models
@@ -486,7 +527,7 @@ const { auth } = usePage<PageProps>().props;
 - `resources/js/lib/` - Utility functions
 - `resources/views/app.blade.php` - Root HTML wrapper (ONLY Blade file)
 
-### 9. TypeScript Configuration
+### 10. TypeScript Configuration
 
 TypeScript uses **strict mode** with:
 - `noUnusedLocals`, `noUnusedParameters`
@@ -509,7 +550,7 @@ import { PageProps } from '@/types';
 // @/hooks/*          → resources/js/hooks/*
 ```
 
-### 10. Database & Models
+### 11. Database & Models
 
 **Database:** Uses PostgreSQL by default (configurable in `.env`).
 
@@ -526,7 +567,7 @@ import { PageProps } from '@/types';
 - `HasUser`, `Loggable`, `HasImage`, `HasMarkdown`
 - `InteractsWithMoney`, `TwoFactorAuthenticatable`
 
-### 11. Settings System
+### 12. Settings System
 
 Settings are stored in the `settings` table and accessed via helper:
 
@@ -537,7 +578,7 @@ setting('site_name'); // Without default
 
 Common settings: `name`, `description`, `locale`, `timezone`, `money` (currency name).
 
-### 12. Helper Functions
+### 13. Helper Functions
 
 Available globally via `app/helpers.php`:
 
@@ -564,7 +605,7 @@ get_color(string $hex, string $type) // Extract color values
 mix_colors(string $color1, string $color2, int $percentage) // Mix two colors
 ```
 
-### 13. Frontend Libraries
+### 14. Frontend Libraries
 
 The project uses several key React libraries:
 
@@ -592,17 +633,20 @@ The project uses several key React libraries:
 
 ## Important Notes
 
-1. **Never create Blade views** - Use React + Inertia only (except root `app.blade.php`)
-2. **All routes return Inertia responses** - Controllers use `Inertia::render()`
-3. **TypeScript is strict** - Handle all edge cases, nullable types
-4. **Namespace is ExilonCMS\\** - Not App\\
-5. **Database agnostic** - Migrations must work on PostgreSQL and MySQL
+1. **Namespace is `ExilonCMS\`** - Not `App\`
+2. **Never create Blade views** - Use React + Inertia only (except root `app.blade.php`)
+3. **All routes return Inertia responses** - Controllers use `Inertia::render()`
+4. **TypeScript is strict** - Handle all edge cases, nullable types
+5. **Database agnostic** - Migrations must work on PostgreSQL, MySQL, and SQLite
 6. **No direct API calls** - Use Inertia for data flow between Laravel and React
 7. **Flash messages** - Use session flash for success/error messages, accessed via `usePage().props.flash`
 8. **Helper functions** - Available globally via `app/helpers.php` and `app/color_helpers.php` (auto-loaded in composer.json)
 9. **Tailwind CSS v3.4** - Uses `@tailwind` directives in `resources/css/app.css`
 10. **Plugin system** - All modular features (Blog, Docs, Shop, etc.) are implemented as plugins in `plugins/` directory
 11. **Marketplace integration** - Packages are installed from marketplace.exiloncms.fr via API
+12. **CRITICAL: Use ziggy-js for routes in JavaScript** - NEVER import from `vendor/tightenco/ziggy` as the vendor directory doesn't exist in CI builds. Always use `import { route } from 'ziggy-js'`
+13. **Extension lazy loading** - Extensions MUST use lazy loading in `boot()` phase, NOT `register()`. The cache service isn't available during `package:discover`, so instantiating services in `register()` will cause "Class cache does not exist" errors. Always check for package:discover and lazy load in `boot()`.
+14. **Run Pint before committing** - Code style is enforced in CI via `./vendor/bin/pint --test`. Run `./vendor/bin/pint` to auto-fix issues before pushing.
 
 ## Common Patterns
 
@@ -790,3 +834,33 @@ php artisan translations:verify
 ```
 
 These are useful when adding new translation keys or updating existing ones.
+
+## CI/CD & Release
+
+**CI Workflow** (`.github/workflows/ci.yml`):
+- Tests on PHP 8.2/8.3 with Laravel 11/12 matrix
+- Runs Laravel Pint code style checks (`./vendor/bin/pint --test`)
+- Builds frontend assets (`npm run build`)
+- Tests plugin loading after fresh migrations
+- Tests and translation checks are commented out (require full CMS installation)
+
+**Release Workflow** (`.github/workflows/release.yml`):
+- Triggered by version tags (`v*`) or manual dispatch
+- Runs `npm run build:all` to build both main and installer assets
+- Creates two ZIP files:
+  - `exiloncms-{version}.zip` - Full CMS package (excludes dev files)
+  - `exiloncms-installer-{version}.zip` - Standalone web installer
+- Publishes to GitHub Releases with generated release notes
+- Notifies marketplace webhook at `https://marketplace.exiloncms.fr/api/webhook/release`
+
+**Release process:**
+1. Update version in `composer.json` and `package.json`
+2. Update `CHANGELOG.md`
+3. Commit and push changes
+4. Create and push tag: `git tag v1.3.0 && git push origin v1.3.0`
+5. CI automatically builds and publishes release
+
+**Important for CI:**
+- Always run `./vendor/bin/pint` before committing - CI will fail on code style issues
+- Use `ziggy-js` npm package for routes, NEVER vendor imports
+- Keep `release/` directory clean - it's generated during release build
