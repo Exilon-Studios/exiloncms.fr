@@ -206,17 +206,11 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
                 width: '24px',
                 height: '4px',
                 borderRadius: '2px',
-                background: '#333333',
-              }} />
-              <div style={{
-                width: '24px',
-                height: '4px',
-                borderRadius: '2px',
                 background: '#ffffff',
               }} />
             </div>
             <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
-              Step 4 of 4: Create admin account
+              Step 3 of 3: Create admin account
             </p>
 
             {/* Summary */}
@@ -529,7 +523,7 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
 
               {/* Back button */}
               <a
-                href="/install/mode"
+                href="/wizard/mode"
                 style={{
                   display: 'block',
                   textAlign: 'center',

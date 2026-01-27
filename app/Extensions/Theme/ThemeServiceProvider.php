@@ -50,17 +50,20 @@ class ThemeServiceProvider extends ServiceProvider
         }
 
         // Add theme views to view finder
-        $viewsPath = ($activeTheme['path'] ?? '').'/resources/views';
+        $themePath = $activeTheme['path'] ?? '';
+        if ($themePath) {
+            $viewsPath = $themePath.'/resources/views';
 
-        if (isset($activeTheme['path']) && is_dir($viewsPath)) {
-            View::addLocation($viewsPath);
-        }
+            if (is_dir($viewsPath)) {
+                View::addLocation($viewsPath);
+            }
 
-        // Load theme translations
-        $langPath = ($activeTheme['path'] ?? '').'/resources/lang';
+            // Load theme translations
+            $langPath = $themePath.'/resources/lang';
 
-        if (isset($activeTheme['path']) && is_dir($langPath)) {
-            $this->loadTranslationsFrom($langPath, 'theme');
+            if (is_dir($langPath)) {
+                $this->loadTranslationsFrom($langPath, 'theme');
+            }
         }
     }
 

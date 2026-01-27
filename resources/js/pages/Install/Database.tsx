@@ -170,12 +170,6 @@ export default function Database({ errors: initialErrors = {} }: Props) {
                 width: '24px',
                 height: '4px',
                 borderRadius: '2px',
-                background: '#ffffff',
-              }} />
-              <div style={{
-                width: '24px',
-                height: '4px',
-                borderRadius: '2px',
                 background: '#333333',
               }} />
               <div style={{
@@ -186,7 +180,7 @@ export default function Database({ errors: initialErrors = {} }: Props) {
               }} />
             </div>
             <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
-              Step 2 of 4: Configure database
+              Step 1 of 3: Configure database
             </p>
 
             {/* Database type info */}
@@ -512,31 +506,6 @@ export default function Database({ errors: initialErrors = {} }: Props) {
                     </>
                   )}
                 </button>
-
-                <a
-                  href="/install/requirements"
-                  style={{
-                    padding: '12px 20px',
-                    background: 'transparent',
-                    color: '#888888',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    textDecoration: 'none',
-                    transition: 'all 0.15s',
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
-                    e.currentTarget.style.color = '#ffffff';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
-                    e.currentTarget.style.color = '#888888';
-                  }}
-                >
-                  Back
-                </a>
               </div>
             </form>
           </div>

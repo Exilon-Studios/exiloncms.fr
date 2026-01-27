@@ -5,32 +5,60 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2026-01-26
+## [1.3.1] - 2026-01-27
 
-FIX: Fix CI workflow - add lint/typecheck scripts and create SQLite database before migrations
-FIX: Fix composer autoload error during package:discover - ThemeLoader now lazy-loads in boot() phase instead of register()
-FIX: Fix missing Payment model import in shop plugin PaymentManager
-FIX: Fix JavaScript "Cannot access before initialization" error in Requirements component
-FEATURE: Add plugin/theme update checker system with source URL tracking
-FEATURE: Updates are checked from original download URL (marketplace, GitHub, etc.)
-FEATURE: Admin notifications when updates are available
-FEATURE: Add default themes (Blog, Gaming, E-Commerce) included with CMS distribution
-FEATURE: All themes are marketplace-ready with proper versioning for API updates
-FIX: Add type checks to ThemeLoader to prevent "Cannot access offset of type Theme on array" error
-FIX: Auto-redirect from requirements page to database step when all checks pass
-FIX: Fix Inertia redirect loop - use Inertia::location() instead of Laravel redirect() for installation
-FIX: Fix syntax error in ResourceInstallController (space instead of backslash in use statement)
-FEATURE: Add Hytale game support with player UUID lookup via playerdb.co API
-FEATURE: Add HytaleGame class with avatar URL and username lookup
-FEATURE: Add Hytale to game selection in installer
-FEATURE: Add French translations for Hytale game
+### Fixed
+- ThemeLoader type error - added proper type checking to distinguish between array-based file themes and Theme model objects
+- InstallController redirect error during installation - changed from `route('home')` to `url('/')`
+- Removed unnecessary requirements check step from installer wizard - now goes directly to database configuration
+- Fixed wizard navigation - all back buttons now use correct `/wizard/*` paths
+- Updated step indicators to reflect 3-step installation process (was 4 steps)
+- Set blog theme as the default active theme with automatic fallback
+- ThemeServiceProvider now properly handles themes without service providers
 
-FEATURE: Complete shop plugin rewrite with payment gateway system
-FEATURE: Add Tebex payment gateway integration (official FiveM payment platform)
-FEATURE: Add PaymentManager with support for multiple payment gateways
-FEATURE: Add Payment, PaymentItem, Gateway, Order, OrderItem models
-FEATURE: Add webhook handlers for payment notifications
-FEATURE: Add payment status tracking (pending, completed, failed, refunded, chargeback)
-FEATURE: Add migrations for shop_payments, shop_payment_items, shop_gateways tables
-FEATURE: Add PaymentMethod abstract base class for custom payment gateways
-FEATURE: Add support for in-game item delivery via server bridge commands
+---
+
+## [1.3.0] - 2026-01-26
+
+### Added
+- Plugin and theme update checker system with source URL tracking
+- Automatic update notifications in admin panel
+- Default themes included with CMS distribution (Blog, Gaming, E-Commerce)
+- All themes are marketplace-ready with proper versioning for API updates
+- Hytale game support with player UUID lookup via playerdb.co API
+- HytaleGame class with avatar URL and username lookup
+- French translations for Hytale game
+- Complete shop plugin rewrite with payment gateway system
+- Tebex payment gateway integration (official FiveM payment platform)
+- PaymentManager with support for multiple payment gateways
+- Payment, PaymentItem, Gateway, Order, OrderItem models
+- Webhook handlers for payment notifications
+- Payment status tracking (pending, completed, failed, refunded, chargeback)
+- Migrations for shop_payments, shop_payment_items, shop_gateways tables
+- PaymentMethod abstract base class for custom payment gateways
+- Support for in-game item delivery via server bridge commands
+
+### Changed
+- CI workflow improvements - added lint/typecheck scripts and SQLite database creation before migrations
+- ThemeLoader now lazy-loads in boot() phase instead of register() for better performance
+- Auto-redirect from requirements page to database step when all checks pass
+
+### Fixed
+- Missing Payment model import in shop plugin PaymentManager
+- JavaScript "Cannot access before initialization" error in Requirements component
+- Added type checks to ThemeLoader to prevent "Cannot access offset of type Theme on array" error
+- Inertia redirect loop - now uses Inertia::location() instead of Laravel redirect() for installation
+- Syntax error in ResourceInstallController (space instead of backslash in use statement)
+- Included themes and plugins in distribution builds
+
+---
+
+## [1.2.9] - 2025-12-15
+
+### Added
+- Initial release with Inertia.js v2 and React 19
+- Plugin system for extensible architecture
+- Multi-game support (Minecraft, FiveM, Steam games)
+- Marketplace integration
+- TipTap rich text editor
+- shadcn/ui components

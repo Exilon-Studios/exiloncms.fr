@@ -140,7 +140,7 @@ class InstallController extends Controller
         $this->middleware(function (Request $request, callable $next) {
             // Permettre l'accès si le CMS n'est pas encore installé
             if (is_installed()) {
-                return redirect()->route('home');
+                return redirect('/');
             }
 
             return $next($request);

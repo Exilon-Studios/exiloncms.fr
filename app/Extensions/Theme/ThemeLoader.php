@@ -89,7 +89,7 @@ class ThemeLoader
      */
     public function getActiveTheme(): ?array
     {
-        $activeThemeId = Cache::get('active_theme', 'default');
+        $activeThemeId = Cache::get('active_theme', 'blog');
 
         if ($activeThemeId === 'default') {
             return [
@@ -101,9 +101,23 @@ class ThemeLoader
             ];
         }
 
-        // Check file-based themes first
-        if (isset($this->themes[$activeThemeId]) && is_array($this->themes[$activeThemeId])) {
-            return $this->themes[$activeThemeId];
+        // Check file-based themes first with proper type checking
+        // Ensure the theme exists AND is an array (not a Theme model)
+        if (isset($this->themes[$activeThemeId])) {
+            $theme = $this->themes[$activeThemeId];
+            if (is_array($theme)) {
+                return $theme;
+            }
+            // If it's not an array, it might be a Theme model from database
+            // Clear the cache to prevent future conflicts
+            Cache::forget('active_theme');
+        }
+
+        // Fall back to blog theme if active theme not found
+        if (isset($this->themes['blog']) && is_array($this->themes['blog'])) {
+            // Set blog as the default active theme
+            Cache::forever('active_theme', 'blog');
+            return $this->themes['blog'];
         }
 
         // If not found in file-based themes, return null

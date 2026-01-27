@@ -17,21 +17,24 @@ Route::middleware([
     // ============================================================
     // Installation Wizard (after standalone installer extracts CMS)
     // ============================================================
-    Route::get('/wizard', [InstallController::class, 'showRequirementsWeb'])->name('install.index');
+
+    // Start with database configuration (requirements step removed)
+    Route::get('/wizard', [InstallController::class, 'showDatabaseWeb'])->name('install.index');
     Route::post('/wizard', [InstallController::class, 'install'])->name('install.submit');
 
-    Route::get('/wizard/requirements', [InstallController::class, 'showRequirementsWeb'])->name('install.requirements');
-    Route::post('/wizard/requirements', [InstallController::class, 'checkRequirementsWeb'])->name('install.requirements.check');
-
+    // Database configuration
     Route::get('/wizard/database', [InstallController::class, 'showDatabaseWeb'])->name('install.database');
     Route::post('/wizard/database', [InstallController::class, 'configureDatabaseWeb'])->name('install.database.save');
 
+    // Installation mode selection
     Route::get('/wizard/mode', [InstallController::class, 'showModeWeb'])->name('install.mode');
     Route::post('/wizard/mode', [InstallController::class, 'saveModeWeb'])->name('install.mode.save');
 
+    // Admin user creation
     Route::get('/wizard/admin', [InstallController::class, 'showAdminWeb'])->name('install.admin');
     Route::post('/wizard/admin', [InstallController::class, 'createAdminWeb'])->name('install.admin.save');
 
+    // Installation complete
     Route::get('/wizard/complete', [InstallController::class, 'showCompleteWeb'])->name('install.complete');
 
     // Post-installation redirect (bypasses middleware checks)

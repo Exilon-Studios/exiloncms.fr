@@ -9,15 +9,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Stack:**
 - Backend: Laravel 12, PHP 8.2+, PostgreSQL (recommended) or MySQL
 - Frontend: React 19, TypeScript (strict mode), Inertia.js v2
-- UI: Tailwind CSS v3, shadcn/ui components
+- UI: Tailwind CSS v3.4, shadcn/ui components
 - Build: Vite 7 with HMR
-- Visual Editor: Puck drag-and-drop page builder
+- Rich Text: TipTap editor
 
 **Namespace:** `ExilonCMS\` (not `App\`)
 
 **High-Level Architecture:**
 - **Inertia.js** as the bridge between Laravel backend and React frontend (no API routes)
-- **Puck Editor** for visual page building with reusable React components
+- **Plugin System** for extensible modular functionality (Blog, Docs, Shop, Analytics, etc.)
 - **Role-based permissions** with gates and policies for authorization
 - **Game integration** layer supporting Minecraft (Java/Bedrock), FiveM, and Steam games
 - **Marketplace integration** with marketplace.exiloncms.fr for packages and extensions
@@ -41,15 +41,15 @@ php artisan migrate:fresh --seed
 php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="password"
 npm install
 npm run build
-
-# Create Puck editor permission
-php artisan db:seed --class=PuckPermissionSeeder
 ```
 
 ### Development Workflow
 ```bash
 # Start all dev servers (concurrent: Laravel, Queue, Logs, Vite)
 composer dev
+
+# Windows (without logs)
+composer dev-windows
 
 # Or manually:
 # Terminal 1 - Laravel backend
@@ -98,6 +98,18 @@ php artisan attachments:purge
 php artisan logs:purge
 ```
 
+### Plugin Management Commands
+```bash
+# List all installed plugins
+php artisan plugin:list
+
+# Install a plugin from marketplace
+php artisan plugin:install <plugin-slug>
+
+# Uninstall a plugin
+php artisan plugin:uninstall <plugin-slug>
+```
+
 ### Testing & Quality
 ```bash
 # Run PHPUnit tests
@@ -107,6 +119,9 @@ composer test
 
 # Run specific test
 php artisan test --filter=UserTest
+
+# TypeScript type checking
+npm run typecheck
 
 # Code formatting (Laravel Pint)
 ./vendor/bin/pint
@@ -135,7 +150,14 @@ docker exec -it exiloncms_db psql -U exiloncms -d exiloncms
 
 ### Building for Production
 ```bash
+# Build main app assets
 npm run build
+
+# Build installer assets
+npm run build:installer
+
+# Build everything
+npm run build:all
 ```
 
 ### ExilonCMS CLI (Project Scaffolding)
@@ -239,7 +261,7 @@ Global props are shared via `app/Http/Middleware/HandleInertiaRequests.php`:
 - `socialLinks`: Array of social media links
 
 **Translations:**
-- `trans`: Pre-loaded translation keys (auth, messages, admin, pages, puck, dashboard, marketplace)
+- `trans`: Pre-loaded translation keys (auth, messages, admin, pages, dashboard, marketplace)
 
 **Updates:**
 - `updatesCount`: Count of available CMS updates (admin only)
@@ -317,7 +339,103 @@ php artisan game:create MyGame
 
 This generates a basic game class that extends `Game` and implements required methods for server communication, user authentication, and attribute mapping.
 
-### 7. Roles & Permissions
+### 5. Plugin System
+
+ExilonCMS uses a modular plugin architecture for extending functionality. Plugins are auto-discovered from the `plugins/` directory.
+
+**Plugin Structure:**
+```
+plugins/
+└── blog/
+    ├── plugin.json              # Plugin metadata
+    ├── composer.json            # Plugin dependencies
+    ├── src/
+    │   └── BlogServiceProvider.php  # Service provider
+    ├── routes/
+    │   ├── web.php              # Public routes
+    │   └── admin.php            # Admin routes
+    ├── database/
+    │   └── migrations/          # Plugin migrations
+    └── resources/
+        └── js/
+            └── pages/           # React pages for plugin
+```
+
+**plugin.json format:**
+```json
+{
+  "id": "blog",
+  "name": "Blog",
+  "version": "1.0.0",
+  "description": "Blog system with posts, categories, tags and comments",
+  "author": "ExilonCMS",
+  "namespace": "ExilonCMS\\Plugins\\Blog",
+  "service_provider": "ExilonCMS\\Plugins\\Blog\\BlogServiceProvider",
+  "dependencies": {
+    "exiloncms": ">=1.0.0"
+  },
+  "permissions": [
+    "blog.posts.create",
+    "blog.posts.edit",
+    "blog.posts.delete"
+  ],
+  "settings": {
+    "posts_per_page": {
+      "type": "integer",
+      "default": 10,
+      "label": "Posts per page"
+    }
+  }
+}
+```
+
+**Plugin Service Provider:**
+```php
+namespace ExilonCMS\Plugins\Blog;
+
+use ExilonCMS\Models\Permission;
+use Illuminate\Support\ServiceProvider;
+
+class BlogServiceProvider extends ServiceProvider
+{
+    public function boot(): void
+    {
+        // Load routes
+        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
+        $this->loadRoutesFrom(__DIR__.'/../routes/admin.php');
+
+        // Load migrations
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+
+        // Register permissions
+        Permission::registerPermissions([
+            'blog.posts.create' => 'Create blog posts',
+            'blog.posts.edit' => 'Edit blog posts',
+            'blog.posts.delete' => 'Delete blog posts',
+        ]);
+    }
+}
+```
+
+**Built-in Plugins:**
+- **Analytics** - Website analytics and statistics tracking
+- **Blog** - News/blog system with categories, tags, and comments
+- **Docs** - Documentation system with categories
+- **Legal** - Legal pages (privacy policy, terms of service)
+- **Notifications** - User notification system with channels and templates
+- **Pages** - Custom page management
+- **Releases** - Release notes and changelogs
+- **Shop** - E-commerce for game server items
+- **Translations** - Translation management interface
+- **Votes** - Voting system for game servers
+
+**Plugin Loading:**
+- Plugins are auto-discovered by `PluginLoader` service (`app/Services/PluginLoader.php`)
+- `PluginServiceProvider` registers all plugins on boot
+- Plugin migrations are auto-registered and run with standard `php artisan migrate`
+- Plugin namespaces are auto-loaded via `composer.json` autoload configuration
+
+### 6. Roles & Permissions
 
 **Models:**
 - `User` (ExilonCMS\Models\User)
@@ -446,53 +564,7 @@ get_color(string $hex, string $type) // Extract color values
 mix_colors(string $color1, string $color2, int $percentage) // Mix two colors
 ```
 
-### 13. Puck Visual Editor
-
-ExilonCMS includes **Puck Editor** - a drag-and-drop visual page builder.
-
-**Key files:**
-- `resources/js/puck/config.tsx` - Puck configuration and component registry
-- `resources/js/puck/components/` - Puck component definitions
-- `resources/js/pages/Admin/PuckEditor.tsx` - Full-screen editor interface
-- `resources/js/pages/PuckPage.tsx` - Public page renderer
-
-**Database:** Pages table includes `puck_data` (JSON) and `use_puck` (boolean) columns.
-
-**Permission:** `admin.pages.puck-edit` controls access to the editor.
-
-**Creating Puck components:**
-```tsx
-// resources/js/puck/components/MyBlock.tsx
-export const MyBlock = ({ title, content }: { title: string; content: string }) => (
-  <div className="p-4 border rounded">
-    <h2>{title}</h2>
-    <p>{content}</p>
-  </div>
-);
-
-// Add to config.tsx
-import { MyBlock } from './components/MyBlock';
-
-export const puckConfig: Config = {
-  components: {
-    MyBlock: {
-      fields: {
-        title: { type: 'text' },
-        content: { type: 'text' },
-      },
-      defaultProps: {
-        title: 'Default Title',
-        content: 'Default content',
-      },
-      render: MyBlock,
-    },
-  },
-};
-```
-
-**Available components:** HeadingBlock, ParagraphBlock, ButtonBlock, ImageBlock, HeroBlock, NavbarBlock, FooterBlock, ContainerBlock, SpacerBlock, ThemeSettingsBlock, BlogBlock, HowItWorksBlock.
-
-### 14. Frontend Libraries
+### 13. Frontend Libraries
 
 The project uses several key React libraries:
 
@@ -513,10 +585,10 @@ The project uses several key React libraries:
 
 **Data Fetching:**
 - `@tanstack/react-query` - Server state management
-
-**Visual Editor:**
-- `@measured/puck` - Drag-and-drop page builder
 - `@tanstack/react-table` - Table components
+
+**Drag & Drop:**
+- `@dnd-kit/core` - Drag and drop utilities
 
 ## Important Notes
 
@@ -528,8 +600,9 @@ The project uses several key React libraries:
 6. **No direct API calls** - Use Inertia for data flow between Laravel and React
 7. **Flash messages** - Use session flash for success/error messages, accessed via `usePage().props.flash`
 8. **Helper functions** - Available globally via `app/helpers.php` and `app/color_helpers.php` (auto-loaded in composer.json)
-9. **Tailwind CSS v3** - Uses `@tailwind` directives in `resources/css/app.css`
-10. **Marketplace integration** - Packages are installed from marketplace.exiloncms.fr via API
+9. **Tailwind CSS v3.4** - Uses `@tailwind` directives in `resources/css/app.css`
+10. **Plugin system** - All modular features (Blog, Docs, Shop, etc.) are implemented as plugins in `plugins/` directory
+11. **Marketplace integration** - Packages are installed from marketplace.exiloncms.fr via API
 
 ## Common Patterns
 
@@ -634,7 +707,6 @@ docker exec -it exiloncms_db mysql -u root -p -e "SHOW TABLES;"
 - **Database connection failed**: Verify `.env` DB credentials and that DB server is running
 - **500 error on Inertia pages**: Check `storage/logs/laravel.log` for details
 - **PostgreSQL connection refused**: Ensure Docker is running (`docker-compose up -d`)
-- **Puck permission missing**: Run `php artisan db:seed --class=PuckPermissionSeeder`
 - **Composer autoload issues**: Run `composer dump-autoload`
 - **Installation state issues**: The `is_installed()` helper checks if CMS is installed. If returning false, check `installed_at` setting in database or create one of the fallback files (`public/installed.json`, `bootstrap/cache/installed`, or `storage/installed.json`)
 
@@ -653,7 +725,6 @@ Key middleware registered in `bootstrap/app.php`:
 - `captcha` - reCAPTCHA verification
 - `admin` / `admin.access` - Require admin role
 - `registration` - Check if registration is enabled
-- `puck.edit` - Check Puck editor permission
 
 ## Routing Structure
 

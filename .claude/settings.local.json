@@ -146,7 +146,8 @@
       "Bash(ForEach-Object { php -l $_FullName })",
       "Bash([:*)",
       "Bash(do gh:*)",
-      "Bash(./vendor/bin/pint:*)"
+      "Bash(./vendor/bin/pint:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
