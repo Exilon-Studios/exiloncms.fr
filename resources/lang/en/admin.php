@@ -57,6 +57,12 @@ return [
             'external_title' => 'External Resources',
             'external_description' => 'Browse and install verified themes from an external source',
         ],
+        'resources' => [
+            'heading' => 'Resources',
+            'external_install' => 'External Installation',
+            'external_title' => 'External Resources',
+            'external_description' => 'Browse and install verified themes from an external source',
+        ],
         'legal' => [
             'heading' => 'Legal',
             'company' => 'Company',

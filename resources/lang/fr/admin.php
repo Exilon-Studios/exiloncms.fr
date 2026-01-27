@@ -25,6 +25,12 @@ return [
             'pending_title' => 'Ressources en attente',
             'sellers_title' => 'Demandes de vendeurs',
         ],
+        'resources' => [
+            'heading' => 'Ressources',
+            'external_install' => 'Installation externe',
+            'external_title' => 'Ressources externes',
+            'external_description' => 'Parcourir et installer des thèmes vérifiés depuis une source externe',
+        ],
         'legal' => [
             'heading' => 'Légal',
             'company' => 'Entreprise',

@@ -7,7 +7,7 @@ use ExilonCMS\Plugins\Blog\Http\Controllers\Admin\TagController;
 use Illuminate\Support\Facades\Route;
 
 // Admin blog routes
-Route::prefix('blog')->name('blog.admin.')->middleware(['auth', 'admin'])->group(function () {
+Route::middleware(['auth', 'admin'])->group(function () {
     // Posts
     Route::prefix('posts')->name('posts.')->group(function () {
         Route::get('/', [PostController::class, 'index'])->name('index');
@@ -19,7 +19,7 @@ Route::prefix('blog')->name('blog.admin.')->middleware(['auth', 'admin'])->group
     });
 
     // Categories
-    Route::prefix('categories')->name('categories.')->group(function () {
+    Route::prefix('blog/categories')->name('blog.categories.')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('index');
         Route::get('/create', [CategoryController::class, 'create'])->name('create');
         Route::post('/', [CategoryController::class, 'store'])->name('store');
@@ -29,7 +29,7 @@ Route::prefix('blog')->name('blog.admin.')->middleware(['auth', 'admin'])->group
     });
 
     // Tags
-    Route::prefix('tags')->name('tags.')->group(function () {
+    Route::prefix('blog/tags')->name('blog.tags.')->group(function () {
         Route::get('/', [TagController::class, 'index'])->name('index');
         Route::get('/create', [TagController::class, 'create'])->name('create');
         Route::post('/', [TagController::class, 'store'])->name('store');
@@ -39,7 +39,7 @@ Route::prefix('blog')->name('blog.admin.')->middleware(['auth', 'admin'])->group
     });
 
     // Comments
-    Route::prefix('comments')->name('comments.')->group(function () {
+    Route::prefix('blog/comments')->name('blog.comments.')->group(function () {
         Route::get('/', [CommentController::class, 'index'])->name('index');
         Route::put('/{comment}', [CommentController::class, 'update'])->name('update');
         Route::delete('/{comment}', [CommentController::class, 'destroy'])->name('destroy');

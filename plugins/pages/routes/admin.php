@@ -3,7 +3,7 @@
 use ExilonCMS\Plugins\Pages\Http\Controllers\Admin\PageController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'can:pages.manage'])->group(function () {
+Route::prefix('pages')->name('pages.')->middleware(['auth', 'can:pages.manage'])->group(function () {
     Route::get('/', [PageController::class, 'index'])->name('index');
     Route::get('/create', [PageController::class, 'create'])->name('create');
     Route::post('/', [PageController::class, 'store'])->name('store');

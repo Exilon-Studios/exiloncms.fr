@@ -105,7 +105,7 @@ export function NotificationDropdown({ unreadCount: initialUnreadCount }: Notifi
 
   const fetchUnreadCount = async () => {
     try {
-      const response = await fetch('/user/notifications/unread-count');
+      const response = await fetch('/notifications/unread-count');
       const data = await response.json();
       setUnreadCount(data.count || 0);
     } catch (error) {

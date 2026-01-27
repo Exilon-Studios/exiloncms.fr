@@ -697,11 +697,6 @@ class SettingsController extends Controller
      */
     public function updateMaintenance(Request $request)
     {
-        // DUMP DEBUG - Affiche les données reçues
-        dump('=== MAINTENANCE UPDATE DEBUG ===');
-        dump('All request:', $request->all());
-        dump('maintenance_status:', $request->input('maintenance_status'), 'Type:', gettype($request->input('maintenance_status')));
-
         $this->validate($request, [
             'maintenance_title' => ['nullable', 'string', 'max:100'],
             'maintenance_subtitle' => ['nullable', 'string', 'max:500'],
@@ -711,13 +706,9 @@ class SettingsController extends Controller
         $rawValue = $request->input('maintenance_status', false);
         $enabled = filter_var($rawValue, FILTER_VALIDATE_BOOLEAN);
 
-        dump('Raw value:', $rawValue, 'Enabled:', $enabled, 'Type:', gettype($enabled));
-
         $paths = $request->filled('is_global')
             ? null
             : array_filter($request->input('paths', []));
-
-        dump('Paths:', $paths);
 
         Setting::updateSettings([
             'maintenance.enabled' => $enabled,
@@ -725,11 +716,6 @@ class SettingsController extends Controller
             'maintenance.subtitle' => $request->input('maintenance_subtitle'),
             'maintenance.paths' => empty($paths) ? null : $paths,
         ]);
-
-        // Verify what was saved
-        $saved = \ExilonCMS\Models\Setting::where('name', 'maintenance.enabled')->first();
-        dump('Saved in DB:', $saved?->value, 'Type:', gettype($saved?->value));
-        dump('=== END DEBUG ===');
 
         return to_route('admin.settings.maintenance')
             ->with('success', trans('admin.settings.updated'));

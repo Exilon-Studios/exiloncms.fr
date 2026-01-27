@@ -105,7 +105,7 @@ export default function MaintenanceSettings({ status, paths, title, subtitle }: 
                     <Checkbox
                       id="maintenance_status"
                       checked={data.maintenance_status}
-                      onCheckedChange={(checked) => setData('maintenance_status', !!checked)}
+                      onCheckedChange={(checked) => setData('maintenance_status', checked === true)}
                     />
                     <Label htmlFor="maintenance_status" className="cursor-pointer">
                       {trans('admin.settings.maintenance.enable_mode')}
