@@ -4,6 +4,21 @@ All notable changes to ExilonCMS will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [1.3.8] - 2026-01-27
+
+### Added
+- **Update ZIP** - GitHub releases now include 3 ZIP files:
+  - `exiloncms-x.y.z.zip` - Full package (complete installation)
+  - `exiloncms-installer-x.y.z.zip` - Standalone web installer
+  - `exiloncms-update-x.y.z.zip` - Lightweight update package (code only, no data/storage/plugins/themes)
+- UpdateManager now prioritizes update package for automatic updates (faster downloads)
+
+### Fixed
+- Automatic update system now properly runs composer install, npm install, npm build, and migrations
+- Update package excludes: storage/, vendor/, node_modules/, plugins/, themes/, .env to preserve user data
+
+---
+
 
 ## [1.3.7] - 2026-01-27
 

@@ -86,9 +86,22 @@ class UpdateManager
 
                 $update = null;
                 if ($hasUpdate) {
-                    // Find the CMS zip asset
+                    // Find the CMS update zip asset (prioritize update package over full package)
                     $zipAsset = collect($release['assets'] ?? [])
-                        ->first(fn ($asset) => str_ends_with($asset['name'], '.zip') && ! str_contains($asset['name'], 'installer'));
+                        ->first(fn ($asset) =>
+                            str_ends_with($asset['name'], '.zip') &&
+                            ! str_contains($asset['name'], 'installer') &&
+                            str_contains($asset['name'], 'update') // Prioritize update package
+                        );
+
+                    // Fallback to full package if update package not found
+                    if (! $zipAsset) {
+                        $zipAsset = collect($release['assets'] ?? [])
+                            ->first(fn ($asset) =>
+                                str_ends_with($asset['name'], '.zip') &&
+                                ! str_contains($asset['name'], 'installer')
+                            );
+                    }
 
                     $update = [
                         'version' => $latestVersion,

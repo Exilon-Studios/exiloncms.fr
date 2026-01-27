@@ -95,6 +95,39 @@ jobs:
           zip -r ../exiloncms-${{ github.ref_name }}.zip exiloncms/
           cd ..
 
+      - name: Create update ZIP (lightweight, without vendor/node_modules/storage/plugins/themes)
+        run: |
+          cd release/exiloncms
+
+          # Create update package - ONLY code updates, NO data, NO user-installed extensions
+          zip -r ../../exiloncms-update-${{ github.ref_name }}.zip \
+            app/ \
+            config/ \
+            database/migrations/ \
+            routes/ \
+            resources/ \
+            public/build/ \
+            bootstrap/ \
+            composer.json \
+            package.json \
+            CHANGELOG.md \
+            -x "*.log" \
+            -x "storage/**/*" \
+            -x ".env" \
+            -x ".env.backup" \
+            -x "vendor/**/*" \
+            -x "node_modules/**/*" \
+            -x ".git/**/*" \
+            -x "tests/**/*" \
+            -x "phpunit.xml" \
+            -x "composer.lock" \
+            -x "package-lock.json" \
+            -x "plugins/**/*" \
+            -x "themes/**/*" \
+            -x "public/themes/**/*"
+
+          cd ../..
+
       - name: Create installer ZIP
         run: |
           # Create standalone installer ZIP (contents at root, not in installer/ folder)
@@ -124,6 +157,15 @@ jobs:
 
           ### Upgrading
           If you're already running ExilonCMS, use the built-in update system in the admin panel at \`/admin/updates\`.
+
+          **Alternative**: Download the lightweight \`exiloncms-update-${{ steps.get_version.outputs.version }}.zip\` and extract it over your installation, then run:
+          \`\`\`bash
+          composer install --no-dev
+          npm install
+          npm run build
+          php artisan migrate --force
+          php artisan cache:clear
+          \`\`\`
           EOF
 
       - name: Create GitHub Release
@@ -135,6 +177,7 @@ jobs:
           files: |
             exiloncms-${{ steps.get_version.outputs.version }}.zip
             exiloncms-installer-${{ steps.get_version.outputs.version }}.zip
+            exiloncms-update-${{ steps.get_version.outputs.version }}.zip
           draft: false
           prerelease: false
         env:
