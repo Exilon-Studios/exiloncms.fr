@@ -132,11 +132,10 @@ jobs:
           name: ExilonCMS ${{ steps.get_version.outputs.version }}
           body_path: release_notes.md
           files: |
-            exiloncms-*.zip
-            exiloncms-installer-*.zip
+            exiloncms-${{ steps.get_version.outputs.version }}.zip
+            exiloncms-installer-${{ steps.get_version.outputs.version }}.zip
           draft: false
           prerelease: false
-          update_existing_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
