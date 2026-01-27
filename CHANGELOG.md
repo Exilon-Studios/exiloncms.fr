@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated step indicators to reflect 3-step installation process (was 4 steps)
 - Set blog theme as the default active theme with automatic fallback
 - ThemeServiceProvider now properly handles themes without service providers
+- Fixed installer redirect loop - admin creation now properly creates installation marker and redirects to home with cache clear
 
 ---
 

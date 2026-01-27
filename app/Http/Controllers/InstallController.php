@@ -955,12 +955,15 @@ class InstallController extends Controller
             Artisan::call('config:clear');
             Artisan::call('view:clear');
 
+            // Create installation marker FIRST (before session/redirect)
+            $this->createInstallationMarker();
+
+            // Clear all caches to ensure is_installed() returns true
+            Artisan::call('cache:clear');
+
             // Save user ID to session for auth persistence
             session()->put('install_user_id', $user->id);
             session()->save();
-
-            // Create installation marker LAST (before any redirects)
-            $this->createInstallationMarker();
 
             // Log the user in
             Auth::login($user, remember: true);
@@ -968,8 +971,8 @@ class InstallController extends Controller
             // Save session again after login
             session()->save();
 
-            // Redirect to home using Inertia location (forces browser navigation)
-            return \Inertia\Inertia::location(url('/'));
+            // Return Inertia redirect to home
+            return redirect('/');
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
         } catch (Throwable $e) {
