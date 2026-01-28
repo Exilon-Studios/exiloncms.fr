@@ -909,10 +909,9 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
   </div>
 
   <script>
-    const apiUrl = window.location.href.includes('public')
-      ? window.location.pathname.replace('/public/', '/?execute=php')
-      : (window.location.pathname + (window.location.pathname.includes('?') ? '&' : '?') + 'execute=php');
-    const finalApiUrl = apiUrl.startsWith('/') ? apiUrl : '/' + apiUrl;
+    // Use /installer as API endpoint to avoid conflicts with CMS routes
+    const apiUrl = '/installer?execute=php';
+    const finalApiUrl = apiUrl;
 
     function updateSteps(step, text) {
       for (let i = 1; i <= 3; i++) {

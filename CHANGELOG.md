@@ -5,6 +5,16 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.12] - 2026-01-28
+
+### Fixed
+- **Critical**: Fixed standalone installer - now uses /installer endpoint instead of /wizard to avoid conflicts
+- Standalone installer API endpoint changed from /wizard?execute=php to /installer?execute=php
+- Added /installer and /installer/* to RedirectIfNotInstalled exceptions
+- Installer now properly redirects to /wizard after extraction completes
+
+---
+
 ## [1.3.11] - 2026-01-28
 
 ### Fixed

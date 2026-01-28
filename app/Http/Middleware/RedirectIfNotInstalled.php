@@ -12,6 +12,8 @@ class RedirectIfNotInstalled
      * The paths that should be reachable even if not installed.
      */
     protected array $except = [
+        'installer',
+        'installer/*',
         'install',
         'install/*',
         'wizard',
