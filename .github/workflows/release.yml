@@ -135,13 +135,14 @@ jobs:
           # Create install.php copy for the ZIP (to avoid being overwritten by CMS extraction)
           cp index.php install.php
           # Create README with instructions
-          echo "# ExilonCMS Installer
+          cat > README.txt << 'EOF'
+          # ExilonCMS Installer
 
-Extract all files in a folder on your server, then access:
-https://your-domain.com/install.php
+          Extract all files in a folder on your server, then access:
+          https://your-domain.com/install.php
 
-The installer will download and setup ExilonCMS automatically.
-" > README.txt
+          The installer will download and setup ExilonCMS automatically.
+          EOF
           # Create ZIP including both index.php and install.php
           zip -r ../exiloncms-installer-${{ github.ref_name }}.zip .
           # Clean up temporary install.php
