@@ -130,9 +130,22 @@ jobs:
 
       - name: Create installer ZIP
         run: |
-          # Create standalone installer ZIP (contents at root, not in installer/ folder)
+          # Create standalone installer ZIP with install.php as entry point (not index.php)
           cd installer
+          # Create install.php copy for the ZIP (to avoid being overwritten by CMS extraction)
+          cp index.php install.php
+          # Create README with instructions
+          echo "# ExilonCMS Installer
+
+Extract all files in a folder on your server, then access:
+https://your-domain.com/install.php
+
+The installer will download and setup ExilonCMS automatically.
+" > README.txt
+          # Create ZIP including both index.php and install.php
           zip -r ../exiloncms-installer-${{ github.ref_name }}.zip .
+          # Clean up temporary install.php
+          rm -f install.php
 
       - name: Get version from tag
         id: get_version
@@ -152,7 +165,7 @@ jobs:
           📖 [Installation Documentation](https://exiloncms.fr/docs/installation) | 📝 [Changelog](https://github.com/Exilon-Studios/ExilonCMS/blob/main/CHANGELOG.md)
 
           ### Quick Start
-          - **Standalone Installer**: Download \`exiloncms-installer-${{ steps.get_version.outputs.version }}.zip\` below, extract, and run \`php -S localhost:8000\` in the installer directory
+          - **Standalone Installer**: Download \`exiloncms-installer-${{ steps.get_version.outputs.version }}.zip\` below, extract, and access \`install.php\` in your browser
           - **Full Package**: Download \`exiloncms-${{ steps.get_version.outputs.version }}.zip\` below and follow the manual setup guide
 
           ### Upgrading

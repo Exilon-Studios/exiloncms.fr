@@ -5,7 +5,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ExilonCMS</title>
+  <title>ExilonCMS Installer</title>
 </head>
 <body style="font-family: sans-serif; text-align: center; margin-top: 1rem">
 <h1>ExilonCMS - PHP installation issue</h1>
