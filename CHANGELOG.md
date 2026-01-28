@@ -5,6 +5,17 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.11] - 2026-01-28
+
+### Fixed
+- **Critical**: Complete rewrite of install wizard middleware logic to prevent redirect loops
+- RedirectIfNotInstalled now prioritizes install/wizard path checking BEFORE installation status
+- InstallController middleware simplified to avoid conflicts with global middleware
+- Routes now work correctly: /install shows welcome, /wizard shows database config
+- Added saveModeWeb and saveExtensionsWeb to middleware exclusions
+
+---
+
 ## [1.3.10] - 2026-01-28
 
 ### Fixed

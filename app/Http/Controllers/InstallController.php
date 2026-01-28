@@ -135,13 +135,18 @@ class InstallController extends Controller
         ]);
 
         // Middleware pour les nouvelles routes Web (Inertia/React)
-        // Permet l'accès si le CMS n'est pas installé
-        // Note: createAdminWeb is excluded because it creates the installation marker
-        // Note: showCompleteWeb is excluded to avoid redirect loop after installation
+        // Si le CMS est déjà installé, rediriger vers l'accueil
+        // SAUF pour showCompleteWeb et installed qui sont utilisés après l'installation
         $this->middleware(function (Request $request, callable $next) {
-            // Si le CMS est déjà installé, rediriger vers l'accueil
-            // SAUF pour showCompleteWeb qui est affichée après l'installation
-            if (is_installed() && $request->route()?->getName() !== 'install.complete') {
+            $routeName = $request->route()?->getName();
+
+            // Ces routes sont accessibles même si le CMS est installé
+            if (in_array($routeName, ['install.complete', 'install.installed'])) {
+                return $next($request);
+            }
+
+            // Si le CMS est installé et qu'on n'est pas sur les routes autorisées, rediriger
+            if (is_installed()) {
                 return redirect('/');
             }
 
@@ -154,9 +159,13 @@ class InstallController extends Controller
             'showDatabaseWeb',
             'configureDatabaseWeb',
             'showModeWeb',
+            'saveModeWeb',
             'showExtensionsWeb',
+            'saveExtensionsWeb',
             'showAdminWeb',
+            'createAdminWeb',
             'showCompleteWeb',
+            'installed',
         ]);
 
         $this->middleware(function (Request $request, callable $next) {

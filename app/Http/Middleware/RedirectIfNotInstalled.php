@@ -25,24 +25,23 @@ class RedirectIfNotInstalled
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // If CMS is installed, continue normally
-        if (is_installed()) {
-            return $next($request);
-        }
+        $path = $request->path();
+        $routeName = $request->route()?->getName();
 
-        // If request is for the install page or wizard routes, let it through
+        // Check if request is for install/wizard routes - ALWAYS allow these
         foreach ($this->except as $pattern) {
+            // Match patterns like 'install', 'install/*', 'wizard', 'wizard/*'
             if ($request->is($pattern)) {
                 return $next($request);
             }
         }
 
-        // If current request is already for install routes, don't redirect again!
-        if ($request->route() && ($request->route()->getName() === 'install.index' || $request->route()->getName() === 'install.database')) {
+        // If CMS is installed, continue normally for non-install routes
+        if (is_installed()) {
             return $next($request);
         }
 
-        // Otherwise, redirect to install page
+        // CMS not installed and not on install page - redirect to install
         return redirect()->route('install.index');
     }
 }
