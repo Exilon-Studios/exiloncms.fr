@@ -37,8 +37,8 @@ class RedirectIfNotInstalled
             }
         }
 
-        // If current request is already for install.index, don't redirect again!
-        if ($request->route() && $request->route()->getName() === 'install.index') {
+        // If current request is already for install routes, don't redirect again!
+        if ($request->route() && ($request->route()->getName() === 'install.index' || $request->route()->getName() === 'install.database')) {
             return $next($request);
         }
 

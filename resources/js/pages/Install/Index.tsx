@@ -18,18 +18,18 @@ export default function InstallIndex({ phpVersion, minPhpVersion }: Props) {
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        console.log('[Install/Index] Navigating to plugins step...');
+        console.log('[Install/Index] Navigating to database step...');
 
-        // Store app_url in sessionStorage and go to plugins step
+        // Store app_url in sessionStorage and go to database step
         sessionStorage.setItem('install_app_url', data.app_url);
 
         try {
             let targetUrl: string;
             if (typeof (window as any).route === 'function') {
-                targetUrl = (window as any).route('install.plugins');
+                targetUrl = (window as any).route('install.database');
                 console.log('[Install/Index] Route URL from ziggy:', targetUrl);
             } else {
-                targetUrl = '/install/plugins';
+                targetUrl = '/wizard';
                 console.log('[Install/Index] Using fallback URL:', targetUrl);
             }
             get(targetUrl as any);

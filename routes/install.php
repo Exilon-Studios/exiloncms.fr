@@ -18,13 +18,16 @@ Route::middleware([
     // Installation Wizard (after standalone installer extracts CMS)
     // ============================================================
 
-    // Start with database configuration (requirements step removed)
-    Route::get('/wizard', [InstallController::class, 'showDatabaseWeb'])->name('install.index');
-    Route::post('/wizard', [InstallController::class, 'install'])->name('install.submit');
+    // Welcome / Requirements page (shows PHP version, extensions, etc.)
+    Route::get('/install', [InstallController::class, 'index'])->name('install.index');
+    Route::post('/install', [InstallController::class, 'install'])->name('install.submit');
 
     // Database configuration
-    Route::get('/wizard/database', [InstallController::class, 'showDatabaseWeb'])->name('install.database');
-    Route::post('/wizard/database', [InstallController::class, 'configureDatabaseWeb'])->name('install.database.save');
+    Route::get('/wizard', [InstallController::class, 'showDatabaseWeb'])->name('install.database');
+    Route::post('/wizard', [InstallController::class, 'configureDatabaseWeb'])->name('install.database.save');
+
+    // Database configuration (alternative route)
+    Route::get('/wizard/database', [InstallController::class, 'showDatabaseWeb'])->name('install.database.alt');
 
     // Installation mode selection
     Route::get('/wizard/mode', [InstallController::class, 'showModeWeb'])->name('install.mode');
