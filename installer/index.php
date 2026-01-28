@@ -378,6 +378,15 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
                 throw new RuntimeException('CMS file not downloaded.');
             }
 
+            // === IMPORTANT: Create installation marker FIRST to prevent redirect loop ===
+            $installMarker = __DIR__.'/../installed.json';
+            if (! file_exists($installMarker)) {
+                file_put_contents($installMarker, json_encode([
+                    'status' => 'installing',
+                    'started_at' => date('Y-m-d H:i:s'),
+                ]));
+            }
+
             // === IMPORTANT: Create .env FIRST, before extracting CMS files ===
             $envFile = __DIR__.'/.env';
             $envExample = __DIR__.'/.env.example';

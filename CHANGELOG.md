@@ -5,6 +5,16 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.14] - 2026-01-28
+
+### Fixed
+- **Critical**: Fixed redirect loop - installer now creates installed.json marker BEFORE extracting CMS
+- This prevents middleware from redirecting back to installer during CMS extraction
+- installed.json marker is created at the start of extraction to signal "installation in progress"
+- Users can now complete installation without being stuck in redirect loop
+
+---
+
 ## [1.3.13] - 2026-01-28
 
 ### Fixed
