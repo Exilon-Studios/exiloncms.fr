@@ -5,6 +5,16 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.19] - 2026-01-29
+
+### Fixed
+- **Critical**: Fixed ZIP file name pattern matching to support 'v' prefix
+- Installer now correctly identifies exiloncms-vX.Y.Z.zip files
+- Fixes 'No CMS zip file found in release assets' error
+- Both naming conventions now supported (with and without 'v' prefix)
+
+---
+
 ## [1.3.18] - 2026-01-29
 
 ### Fixed
