@@ -3,7 +3,6 @@
 namespace ExilonCMS\Http\Controllers;
 
 use ExilonCMS\Models\LandingSetting;
-use ExilonCMS\Models\Post;
 use ExilonCMS\Models\Server;
 use Inertia\Inertia;
 
@@ -14,11 +13,20 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $posts = Post::published()
-            ->with('author')
-            ->latest('published_at')
-            ->take(3)
-            ->get();
+        // Try to get posts from Blog plugin if available
+        $posts = [];
+        try {
+            if (class_exists('ExilonCMS\Models\Post')) {
+                $posts = \ExilonCMS\Models\Post::published()
+                    ->with('author')
+                    ->latest('published_at')
+                    ->take(3)
+                    ->get();
+            }
+        } catch (\Exception $e) {
+            // Blog plugin not available or not set up
+            $posts = [];
+        }
 
         $server = Server::where('home_display', true)->first();
         $servers = Server::where('home_display', true)->get();

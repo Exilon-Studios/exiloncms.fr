@@ -5,6 +5,16 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.30] - 2026-01-29
+
+### Fixed
+- **Critical**: Fixed "Class 'ExilonCMS\Models\Post' not found" error in HomeController
+- HomeController now checks if Blog plugin's Post model exists before using it
+- Returns empty posts array when Blog plugin is disabled or not installed
+- Homepage now loads correctly regardless of plugin status
+
+---
+
 ## [1.3.29] - 2026-01-29
 
 ### Fixed
