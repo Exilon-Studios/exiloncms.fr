@@ -5,6 +5,16 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.18] - 2026-01-29
+
+### Fixed
+- **Critical**: Installer now downloads full CMS package instead of update package
+- Changed ZIP selection to match exiloncms-x.y.z.zip pattern (full package with vendor/)
+- Prevents "vendor/ directory missing" error during installation
+- Installer now correctly identifies and downloads the complete CMS package
+
+---
+
 ## [1.3.17] - 2026-01-29
 
 ### Fixed
