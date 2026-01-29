@@ -5,6 +5,17 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.15] - 2026-01-29
+
+### Fixed
+- **Critical**: Fixed installer and CMS index.php files for all server configurations
+- Standalone installer now creates correct Laravel bootstrap in both index.php and public/index.php after extraction
+- Release workflow now copies public/index.php to root index.php for servers where DocumentRoot is not public/
+- This fixes issues where servers (like Plesk) use the root directory as DocumentRoot instead of public/
+- Both standalone installer and full CMS ZIP now work correctly on all server configurations
+
+---
+
 ## [1.3.14] - 2026-01-28
 
 ### Fixed
