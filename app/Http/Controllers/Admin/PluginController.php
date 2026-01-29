@@ -2,6 +2,7 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
+use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Extensions\Plugin\PluginLoader;
 use ExilonCMS\Extensions\Theme\ThemeLoader;
 use Illuminate\Http\Request;
