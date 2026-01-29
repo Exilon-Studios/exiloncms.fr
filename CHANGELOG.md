@@ -5,6 +5,17 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.17] - 2026-01-29
+
+### Fixed
+- **Critical**: Removed slow composer install step from installer
+- CMS ZIP already includes vendor/ directory (built by CI)
+- Installation now completes in seconds instead of minutes
+- Installer simply verifies vendor/ exists instead of running composer
+- Much faster and more reliable installation process
+
+---
+
 ## [1.3.16] - 2026-01-29
 
 ### Fixed
