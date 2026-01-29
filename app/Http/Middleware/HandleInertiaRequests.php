@@ -45,8 +45,12 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
-        // If CMS is not installed, return minimal data without database queries
-        if (! is_installed()) {
+        // Check if database tables exist (more reliable than checking files)
+        // During installation, tables don't exist yet, so return minimal data
+        $databaseReady = Schema::hasTable('migrations') && Schema::hasTable('settings');
+
+        // If database is not ready (installation in progress), return minimal data without DB queries
+        if (! $databaseReady) {
             return [
                 ...parent::share($request),
                 'auth' => ['user' => null],
@@ -120,12 +124,7 @@ class HandleInertiaRequests extends Middleware
                 'activeTheme' => app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->getActiveThemeId(),
             ],
             'navbar' => $this->loadNavbarElements($user),
-            'socialLinks' => SocialLink::orderBy('position')->get()->map(fn ($link) => [
-                'title' => $link->title,
-                'value' => $link->value,
-                'icon' => $link->icon,
-                'color' => $link->color,
-            ]),
+            'socialLinks' => $this->loadSocialLinks(),
             // Share translations for common keys
             'trans' => [
                 'auth' => trans('auth'),
@@ -208,6 +207,19 @@ class HandleInertiaRequests extends Middleware
 
             return $data;
         })->values()->toArray();
+    }
+
+    /**
+     * Load social links from database
+     */
+    protected function loadSocialLinks(): array
+    {
+        return SocialLink::orderBy('position')->get()->map(fn ($link) => [
+            'title' => $link->title,
+            'value' => $link->value,
+            'icon' => $link->icon,
+            'color' => $link->color,
+        ])->toArray();
     }
 
     /**

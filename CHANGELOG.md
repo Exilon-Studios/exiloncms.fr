@@ -5,6 +5,24 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.23] - 2026-01-29
+
+### Fixed
+- **Critical**: Fixed "Database file does not exist" error on /wizard during installation
+- HandleInertiaRequests now checks if database tables exist (not just installed files)
+- Single global check for `Schema::hasTable('migrations')` instead of per-table checks
+- Eliminates all "table doesn't exist" errors during installation wizard
+- Removed creation of installed.json marker from standalone installer
+- Installation state now determined by actual database table existence
+
+### Technical Details
+Changed from file-based installation detection to table-based detection:
+- **Before**: Checked for `public/installed.json` file (unreliable)
+- **After**: Checks for `migrations` and `settings` tables existence (reliable)
+- This prevents loading database data before wizard creates the database
+
+---
+
 ## [1.3.22] - 2026-01-29
 
 ### Changed
