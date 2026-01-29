@@ -45,35 +45,15 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
 
-        // Check if database tables exist (more reliable than checking files)
-        // During installation, tables don't exist yet, so return minimal data
-        $databaseReady = Schema::hasTable('migrations') && Schema::hasTable('settings');
-
-        // If database is not ready (installation in progress), return minimal data without DB queries
-        if (! $databaseReady) {
-            return [
-                ...parent::share($request),
-                'auth' => ['user' => null],
-                'flash' => [
-                    'success' => fn () => $request->session()->get('success'),
-                    'error' => fn () => $request->session()->get('error'),
-                    'info' => fn () => $request->session()->get('info'),
-                    'warning' => fn () => $request->session()->get('warning'),
-                ],
-                'settings' => [
-                    'name' => config('app.name'),
-                    'locale' => app()->getLocale(),
-                ],
-                'navbar' => [],
-                'socialLinks' => [],
-                'trans' => [],
-            ];
-        }
-
-        // Get admin permissions if user has admin access
+        // Get admin permissions if user has admin access (with error handling)
         $adminPermissions = [];
-        if ($user && $user->hasAdminAccess()) {
-            $adminPermissions = $user->role->permissions->pluck('permission')->toArray();
+        try {
+            if ($user && $user->hasAdminAccess()) {
+                $adminPermissions = $user->role->permissions->pluck('permission')->toArray();
+            }
+        } catch (\Exception $e) {
+            // Role or permissions might not exist yet, use empty array
+            $adminPermissions = [];
         }
 
         return [
@@ -123,8 +103,8 @@ class HandleInertiaRequests extends Middleware
                 // Active theme (from ThemeLoader, not database)
                 'activeTheme' => app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->getActiveThemeId(),
             ],
-            'navbar' => $this->loadNavbarElements($user),
-            'socialLinks' => $this->loadSocialLinks(),
+            'navbar' => $this->safeLoadNavbarElements($user),
+            'socialLinks' => $this->safeLoadSocialLinks(),
             // Share translations for common keys
             'trans' => [
                 'auth' => trans('auth'),
@@ -138,8 +118,8 @@ class HandleInertiaRequests extends Middleware
             // Share unread notifications count for authenticated users
             'unreadNotificationsCount' => $user ? $this->getUnreadNotificationsCount($user) : 0,
             // Share onboarding progress for admin users
-            'onboardingComplete' => $user && $user->role && $user->role->is_admin ? OnboardingStep::isComplete($user->id) : true,
-            'onboardingProgress' => $user && $user->role && $user->role->is_admin ? OnboardingStep::getUserProgress($user->id) : [],
+            'onboardingComplete' => $this->safeGetOnboardingComplete($user),
+            'onboardingProgress' => $this->safeGetOnboardingProgress($user),
             // Share available updates count for admin users
             'updatesCount' => $user && $user->hasAdminAccess() ? $this->getUpdatesCount() : 0,
         ];
@@ -161,10 +141,73 @@ class HandleInertiaRequests extends Middleware
     }
 
     /**
+     * Safely load navbar elements with error handling
+     */
+    protected function safeLoadNavbarElements($user): array
+    {
+        try {
+            return $this->loadNavbarElements($user);
+        } catch (\Exception $e) {
+            // Table might not exist yet, return empty array
+            return [];
+        }
+    }
+
+    /**
+     * Safely load social links with error handling
+     */
+    protected function safeLoadSocialLinks(): array
+    {
+        try {
+            return $this->loadSocialLinks();
+        } catch (\Exception $e) {
+            // Table might not exist yet, return empty array
+            return [];
+        }
+    }
+
+    /**
+     * Safely get onboarding complete status
+     */
+    protected function safeGetOnboardingComplete($user): bool
+    {
+        try {
+            if (! $user || ! $user->role || ! $user->role->is_admin) {
+                return true;
+            }
+            return OnboardingStep::isComplete($user->id);
+        } catch (\Exception $e) {
+            // Table might not exist yet, assume complete
+            return true;
+        }
+    }
+
+    /**
+     * Safely get onboarding progress
+     */
+    protected function safeGetOnboardingProgress($user): array
+    {
+        try {
+            if (! $user || ! $user->role || ! $user->role->is_admin) {
+                return [];
+            }
+            return OnboardingStep::getUserProgress($user->id);
+        } catch (\Exception $e) {
+            // Table might not exist yet, return empty array
+            return [];
+        }
+    }
+
+    /**
      * Load navbar elements from database
      */
     protected function loadNavbarElements($user): array
     {
+        // Check if table exists first
+        if (! Schema::hasTable('navbar_elements')) {
+            return [];
+        }
+
         $elements = Cache::get(NavbarElement::CACHE_KEY, function () {
             return NavbarElement::orderBy('position')->with('roles')->get();
         });
@@ -214,6 +257,11 @@ class HandleInertiaRequests extends Middleware
      */
     protected function loadSocialLinks(): array
     {
+        // Check if table exists first
+        if (! Schema::hasTable('social_links')) {
+            return [];
+        }
+
         return SocialLink::orderBy('position')->get()->map(fn ($link) => [
             'title' => $link->title,
             'value' => $link->value,

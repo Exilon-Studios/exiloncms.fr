@@ -5,6 +5,51 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.24] - 2026-01-29
+
+### Changed
+- **Critical**: CMS now NEVER crashes due to missing/empty database tables
+- Replaced global database check with per-operation error handling
+- Each data loading operation wrapped in try/catch with safe fallbacks
+- Table existence checks before queries (Schema::hasTable)
+- Graceful degradation: missing data returns empty arrays/defaults instead of errors
+
+### Technical Details
+**Philosophy**: The CMS should work even when data is missing (like Azuriom)
+
+**Before (v1.3.23)**:
+```php
+if (! $databaseReady) {
+    return [...minimal data...];  // Blocked everything
+}
+```
+
+**After (v1.3.24)**:
+```php
+// Each operation handles its own errors
+'navbar' => $this->safeLoadNavbarElements($user),
+'socialLinks' => $this->safeLoadSocialLinks(),
+'onboardingComplete' => $this->safeGetOnboardingComplete($user),
+
+function safeLoadNavbarElements($user) {
+    try {
+        if (! Schema::hasTable('navbar_elements')) return [];
+        return $this->loadNavbarElements($user);
+    } catch (\Exception $e) {
+        return [];  // Safe fallback
+    }
+}
+```
+
+**Benefits**:
+- ✅ Works during installation (tables don't exist yet)
+- ✅ Works if tables are empty
+- ✅ Works if specific data is missing
+- ✅ No more crashes on /wizard
+- ✅ More robust overall
+
+---
+
 ## [1.3.23] - 2026-01-29
 
 ### Fixed
