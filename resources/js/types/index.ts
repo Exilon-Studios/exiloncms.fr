@@ -133,3 +133,9 @@ export type KeysOfType<T, U> = {
 
 export * from './admin';
 
+// ============================================
+// RE-EXPORT MODEL TYPES
+// ============================================
+
+export * from './models';
+

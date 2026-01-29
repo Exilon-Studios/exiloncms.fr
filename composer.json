@@ -11,7 +11,7 @@
         "docs": "https://exiloncms.fr/docs"
     },
     "license": "GPL-3.0-or-later",
-    "version": "1.3.30",
+    "version": "1.3.31",
     "require": {
         "php": "^8.2",
         "ext-json": "*",

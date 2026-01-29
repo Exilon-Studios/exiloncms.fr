@@ -63,6 +63,12 @@ class PluginController extends Controller
             // Disable plugin
             $enabledPlugins = $enabledPlugins->filter(fn ($p) => $p !== $id)->values()->toArray();
 
+            // Save to settings BEFORE returning
+            setting(['enabled_plugins' => $enabledPlugins]);
+
+            // Clear cache to reload plugins
+            Artisan::call('cache:clear');
+
             Log::info("Plugin disabled: {$id}");
 
             return back()->with('success', trans('admin.plugins.disabled', ['name' => $plugin['name']]));
@@ -76,13 +82,16 @@ class PluginController extends Controller
                 Artisan::call('migrate', ['--force' => true]);
             }
 
+            // Save to settings BEFORE returning
+            setting(['enabled_plugins' => $enabledPlugins]);
+
+            // Clear cache to reload plugins
+            Artisan::call('cache:clear');
+
             Log::info("Plugin enabled: {$id}");
 
             return back()->with('success', trans('admin.plugins.enabled', ['name' => $plugin['name']]));
         }
-
-        // Save to settings
-        setting(['enabled_plugins' => $enabledPlugins]);
     }
 
     /**

@@ -5,6 +5,24 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.31] - 2026-01-29
+
+### Fixed
+- **Critical**: Fixed PluginController toggle - setting was never saved (code after return statement)
+- **Critical**: Added Enable/Disable and Delete buttons to admin plugins page
+- Plugins can now be properly enabled/disabled from admin panel
+- Cache is cleared when plugins are toggled to ensure changes take effect
+
+### Changed
+- **Homepage is now dynamic and adapts to enabled plugins**
+  - Blog plugin enabled → Shows latest posts section
+  - Shop plugin enabled → Shows shop CTA section
+  - No plugins → Shows simple welcome/contact section
+- Homepage uses design tokens (primary, muted, card) for theme customization
+- Cart icon only shows when Shop plugin is enabled
+
+---
+
 ## [1.3.30] - 2026-01-29
 
 ### Fixed

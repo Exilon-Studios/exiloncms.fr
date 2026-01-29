@@ -1,6 +1,8 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
+import { route } from 'ziggy-js';
+import { IconToggleLeft, IconToggleRight, IconTrash } from '@tabler/icons-react';
 
 interface Plugin {
   id: string;
@@ -20,6 +22,16 @@ interface Props {
 }
 
 export default function PluginsIndex({ plugins }: Props) {
+  const togglePlugin = (pluginId: string) => {
+    router.post(route('admin.plugins.toggle', pluginId));
+  };
+
+  const deletePlugin = (pluginId: string) => {
+    if (confirm('Are you sure you want to delete this plugin? This action cannot be undone.')) {
+      router.delete(route('admin.plugins.destroy', pluginId));
+    }
+  };
+
   return (
     <AuthenticatedLayout>
       <Head title="Plugins" />
@@ -60,6 +72,37 @@ export default function PluginsIndex({ plugins }: Props) {
                 {plugin.has_admin_routes && <span>Admin</span>}
                 {plugin.has_migrations && <span>DB</span>}
                 {plugin.has_settings && <span>Settings</span>}
+              </div>
+
+              <div className="mt-4 flex items-center gap-2">
+                <button
+                  onClick={() => togglePlugin(plugin.id)}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    plugin.enabled
+                      ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30'
+                      : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30'
+                  }`}
+                >
+                  {plugin.enabled ? (
+                    <>
+                      <IconToggleLeft className="h-3.5 w-3.5" />
+                      Disable
+                    </>
+                  ) : (
+                    <>
+                      <IconToggleRight className="h-3.5 w-3.5" />
+                      Enable
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => deletePlugin(plugin.id)}
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <IconTrash className="h-3.5 w-3.5" />
+                  Delete
+                </button>
               </div>
             </div>
           ))}
