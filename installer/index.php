@@ -553,6 +553,22 @@ $app->handleRequest(Request::capture());
                     file_put_contents($envFile, $envContent);
                 }
 
+                // === CRITICAL: Install composer dependencies before running migrations ===
+                // Check if vendor/ exists, if not run composer install
+                if (! is_dir(__DIR__.'/vendor')) {
+                    $data['status'] = 'Installing dependencies...';
+                    $data['message'] = 'Running composer install (this may take a while)...';
+                    send_json_response($data);
+
+                    // Try composer install with timeout
+                    @exec('cd '.escapeshellarg(__DIR__).' && composer install --no-dev --prefer-dist --optimize-autoloader 2>&1', $composerOutput, $composerReturnCode);
+
+                    if ($composerReturnCode !== 0 && ! is_dir(__DIR__.'/vendor')) {
+                        // Composer failed - this is critical
+                        throw new RuntimeException('Composer install failed. Please ensure composer is available on your server or download the full package instead.');
+                    }
+                }
+
                 // Run migrations and seeders after extraction
                 // (database file was already created before extraction)
                 @exec('cd '.escapeshellarg(__DIR__).' && php artisan migrate --force 2>&1', $migrateOutput, $migrateReturnCode);
