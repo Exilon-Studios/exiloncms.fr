@@ -553,20 +553,9 @@ $app->handleRequest(Request::capture());
                     file_put_contents($envFile, $envContent);
                 }
 
-                // === CRITICAL: Install composer dependencies before running migrations ===
-                // Check if vendor/ exists, if not run composer install
+                // === CRITICAL: Verify vendor/ exists (should be included in CMS ZIP) ===
                 if (! is_dir(__DIR__.'/vendor')) {
-                    $data['status'] = 'Installing dependencies...';
-                    $data['message'] = 'Running composer install (this may take a while)...';
-                    send_json_response($data);
-
-                    // Try composer install with timeout
-                    @exec('cd '.escapeshellarg(__DIR__).' && composer install --no-dev --prefer-dist --optimize-autoloader 2>&1', $composerOutput, $composerReturnCode);
-
-                    if ($composerReturnCode !== 0 && ! is_dir(__DIR__.'/vendor')) {
-                        // Composer failed - this is critical
-                        throw new RuntimeException('Composer install failed. Please ensure composer is available on your server or download the full package instead.');
-                    }
+                    throw new RuntimeException('vendor/ directory missing! The CMS ZIP should include all dependencies. Please download the full package (exiloncms-v1.3.16.zip) instead of the update package.');
                 }
 
                 // Run migrations and seeders after extraction
