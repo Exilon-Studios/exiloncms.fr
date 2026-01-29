@@ -5,18 +5,34 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.21] - 2026-01-29
+## [1.3.22] - 2026-01-29
 
-### Fixed
-- **Critical**: Fixed PHP binary detection on Plesk servers where PHP_BINARY points to php-fpm
-- Installer now converts php-fpm path to php CLI path automatically (e.g., /opt/plesk/php/8.3/bin/php-fpm → /opt/plesk/php/8.3/bin/php)
-- Added fallback to common PHP CLI paths if converted path doesn't exist
-- Error messages now include detected PHP binary path for debugging
-- Migrations should now run successfully on all hosting configurations
+### Changed
+- **Critical**: Installer now follows Azuriom's approach for maximum compatibility
+- Migrations are NO LONGER executed by standalone installer (avoids php-fpm/php-cli issues)
+- Database creation is now handled by web wizard instead of installer
+- Web wizard runs migrations via `Artisan::call()` in pure PHP (works on ALL hosting platforms)
+- This approach works reliably on Plesk, cPanel, and any web hosting without shell access
+
+### Technical Details
+Standalone installer now ONLY:
+1. Downloads CMS from GitHub
+2. Extracts files
+3. Creates .env configuration
+4. Fixes index.php for all server types
+5. Redirects to web wizard
+
+Web wizard (InstallController) handles:
+- Database configuration
+- Migration execution via `Artisan::call('migrate', ['--force' => true])`
+- Admin account creation
+- Site configuration
+
+This matches Azuriom's architecture and eliminates all shell/PHP binary detection issues.
 
 ---
 
-## [1.3.20] - 2026-01-29
+## [1.3.21] - 2026-01-29
 
 ### Fixed
 - **Critical**: Fixed migrations not running automatically during installation
