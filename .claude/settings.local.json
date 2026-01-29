@@ -157,7 +157,10 @@
       "Bash(npm run build:all:*)",
       "Bash(if:*)",
       "Bash(then cat \"$dir/theme.json\")",
-      "Bash(else echo \"No theme.json found\")"
+      "Bash(else echo \"No theme.json found\")",
+      "Bash(gh workflow run:*)",
+      "Bash(yamllint:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

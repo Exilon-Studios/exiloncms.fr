@@ -583,6 +583,38 @@ $app->handleRequest(Request::capture());
                 $migrationOutput = '';
                 $migrationError = '';
 
+                // === CRITICAL: Find the correct PHP CLI binary ===
+                // On Plesk servers, PHP_BINARY might point to php-fpm instead of php CLI
+                // We need to detect and fix this
+                $phpBinary = PHP_BINARY;
+
+                // Check if PHP_BINARY is php-fpm (common on Plesk servers)
+                if (strpos($phpBinary, 'php-fpm') !== false) {
+                    // Try to convert php-fpm path to php path
+                    // e.g., /opt/plesk/php/8.3/bin/php-fpm -> /opt/plesk/php/8.3/bin/php
+                    $phpBinary = str_replace('php-fpm', 'php', $phpBinary);
+
+                    // Verify the converted path exists and is executable
+                    if (! file_exists($phpBinary) || ! is_executable($phpBinary)) {
+                        // Fallback to common PHP CLI paths
+                        $commonPaths = [
+                            '/usr/bin/php',
+                            '/usr/local/bin/php',
+                            '/opt/plesk/php/8.3/bin/php',
+                            '/opt/plesk/php/8.2/bin/php',
+                            '/opt/plesk/php/8.1/bin/php',
+                            'php',  // Let the shell find it
+                        ];
+
+                        foreach ($commonPaths as $path) {
+                            if ($path === 'php' || (file_exists($path) && is_executable($path))) {
+                                $phpBinary = $path;
+                                break;
+                            }
+                        }
+                    }
+                }
+
                 // Try to run php artisan migrate
                 $descriptorspec = [
                     0 => ['pipe', 'r'],  // stdin
@@ -590,7 +622,7 @@ $app->handleRequest(Request::capture());
                     2 => ['pipe', 'w'],  // stderr
                 ];
 
-                $cmd = escapeshellcmd(PHP_BINARY).' '.escapeshellarg(__DIR__.'/artisan').' migrate --force';
+                $cmd = escapeshellcmd($phpBinary).' '.escapeshellarg(__DIR__.'/artisan').' migrate --force';
                 $process = proc_open($cmd, $descriptorspec, $pipes, __DIR__);
 
                 if (is_resource($process)) {
@@ -612,16 +644,16 @@ $app->handleRequest(Request::capture());
                         $migrationsRun = true;
                     } else {
                         // Migration failed - log detailed error
-                        $errorMsg = "Migration command failed with exit code {$exitCode}. Output: {$migrationOutput}. Error: {$migrationError}";
+                        $errorMsg = "Migration command failed with exit code {$exitCode}. PHP binary: {$phpBinary}. Output: {$migrationOutput}. Error: {$migrationError}";
                         error_log("ExilonCMS Installer Migration Error: {$errorMsg}");
                         throw new RuntimeException("Database migration failed. This is required for ExilonCMS to work. Error: {$errorMsg}");
                     }
                 } else {
                     // proc_open failed - try shell_exec as fallback
-                    error_log("ExilonCMS Installer: proc_open failed, trying shell_exec");
+                    error_log("ExilonCMS Installer: proc_open failed, trying shell_exec with PHP: {$phpBinary}");
                     $output = shell_exec($cmd.' 2>&1');
                     if ($output === null || $output === false) {
-                        throw new RuntimeException("Failed to run migrations. Could not execute artisan command. Please ensure PHP has permission to execute shell commands.");
+                        throw new RuntimeException("Failed to run migrations. Could not execute artisan command. PHP binary: {$phpBinary}. Please ensure PHP has permission to execute shell commands.");
                     }
                     $migrationOutput = $output;
                     $migrationsRun = true;

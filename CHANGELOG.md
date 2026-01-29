@@ -5,6 +5,17 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.21] - 2026-01-29
+
+### Fixed
+- **Critical**: Fixed PHP binary detection on Plesk servers where PHP_BINARY points to php-fpm
+- Installer now converts php-fpm path to php CLI path automatically (e.g., /opt/plesk/php/8.3/bin/php-fpm → /opt/plesk/php/8.3/bin/php)
+- Added fallback to common PHP CLI paths if converted path doesn't exist
+- Error messages now include detected PHP binary path for debugging
+- Migrations should now run successfully on all hosting configurations
+
+---
+
 ## [1.3.20] - 2026-01-29
 
 ### Fixed
