@@ -5,6 +5,15 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.27] - 2026-01-29
+
+### Fixed
+- **Critical**: Fixed "Session store not set on request" error during installation/wizard
+- ThemeServiceProvider now checks if session exists before accessing it
+- Prevents crash when session middleware hasn't run yet
+
+---
+
 ## [1.3.26] - 2026-01-29
 
 ### Added - EXTREME MODULARITY 🚀
