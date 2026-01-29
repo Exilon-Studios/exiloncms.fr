@@ -397,18 +397,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $envFile = __DIR__.'/.env';
             $envExample = __DIR__.'/.env.example';
 
-            // Create database directory and file BEFORE extraction
-            $dbDir = __DIR__.'/database';
-            if (! is_dir($dbDir)) {
-                mkdir($dbDir, 0755, true);
-            }
-            $dbFile = __DIR__.'/database/database.sqlite';
-            if (! file_exists($dbFile)) {
-                touch($dbFile);
-                chmod($dbFile, 0644);
-            }
-
-            // Create storage directories required by Laravel
+            // Create storage directories required by Laravel (will be preserved during extraction)
             $storageDirs = [
                 __DIR__.'/storage/framework',
                 __DIR__.'/storage/framework/cache',
@@ -489,6 +478,32 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $zip->close();
             unlink($zipFile);
 
+            // === CRITICAL: After extraction, ensure database file exists and is writable ===
+            // This must be done AFTER extraction to ensure it's in the correct location
+            $dbDir = __DIR__.'/database';
+            if (! is_dir($dbDir)) {
+                mkdir($dbDir, 0755, true);
+            }
+            $dbFile = __DIR__.'/database/database.sqlite';
+
+            // Create database file if it doesn't exist or is not writable
+            if (! file_exists($dbFile) || ! is_writable($dbFile)) {
+                // Remove existing file if it exists but isn't writable
+                if (file_exists($dbFile)) {
+                    @unlink($dbFile);
+                }
+                // Create new database file
+                if (touch($dbFile) === false) {
+                    throw new RuntimeException('Failed to create database file at '.$dbFile.'. Please ensure the directory is writable.');
+                }
+                chmod($dbFile, 0666); // Make it writable by PHP
+            }
+
+            // Verify database file is writable
+            if (! is_writable($dbFile)) {
+                throw new RuntimeException('Database file exists but is not writable: '.$dbFile);
+            }
+
             // === CRITICAL: Fix index.php files for servers where DocumentRoot is not public/ ===
             // Create proper Laravel bootstrap files
 
@@ -559,10 +574,71 @@ $app->handleRequest(Request::capture());
                     throw new RuntimeException('vendor/ directory missing! The CMS ZIP should include all dependencies. Please download the full package (exiloncms-v1.3.16.zip) instead of the update package.');
                 }
 
-                // Run migrations and seeders after extraction
-                // (database file was already created before extraction)
-                @exec('cd '.escapeshellarg(__DIR__).' && php artisan migrate --force 2>&1', $migrateOutput, $migrateReturnCode);
-                @exec('cd '.escapeshellarg(__DIR__).' && php artisan db:seed --force 2>&1', $seedOutput, $seedReturnCode);
+                // === CRITICAL: Run migrations using proc_open (more reliable than exec) ===
+                // Use proc_open instead of exec because:
+                // 1. We can capture both stdout and stderr
+                // 2. We can get the actual exit code
+                // 3. It works better in restricted environments
+                $migrationsRun = false;
+                $migrationOutput = '';
+                $migrationError = '';
+
+                // Try to run php artisan migrate
+                $descriptorspec = [
+                    0 => ['pipe', 'r'],  // stdin
+                    1 => ['pipe', 'w'],  // stdout
+                    2 => ['pipe', 'w'],  // stderr
+                ];
+
+                $cmd = escapeshellcmd(PHP_BINARY).' '.escapeshellarg(__DIR__.'/artisan').' migrate --force';
+                $process = proc_open($cmd, $descriptorspec, $pipes, __DIR__);
+
+                if (is_resource($process)) {
+                    // Close stdin
+                    fclose($pipes[0]);
+
+                    // Read stdout
+                    $migrationOutput = stream_get_contents($pipes[1]);
+                    fclose($pipes[1]);
+
+                    // Read stderr
+                    $migrationError = stream_get_contents($pipes[2]);
+                    fclose($pipes[2]);
+
+                    // Get exit code
+                    $exitCode = proc_close($process);
+
+                    if ($exitCode === 0) {
+                        $migrationsRun = true;
+                    } else {
+                        // Migration failed - log detailed error
+                        $errorMsg = "Migration command failed with exit code {$exitCode}. Output: {$migrationOutput}. Error: {$migrationError}";
+                        error_log("ExilonCMS Installer Migration Error: {$errorMsg}");
+                        throw new RuntimeException("Database migration failed. This is required for ExilonCMS to work. Error: {$errorMsg}");
+                    }
+                } else {
+                    // proc_open failed - try shell_exec as fallback
+                    error_log("ExilonCMS Installer: proc_open failed, trying shell_exec");
+                    $output = shell_exec($cmd.' 2>&1');
+                    if ($output === null || $output === false) {
+                        throw new RuntimeException("Failed to run migrations. Could not execute artisan command. Please ensure PHP has permission to execute shell commands.");
+                    }
+                    $migrationOutput = $output;
+                    $migrationsRun = true;
+                }
+
+                // Verify that migrations actually created tables by checking for navbar_elements table
+                if ($migrationsRun) {
+                    try {
+                        $dbTest = new PDO('sqlite:'.$dbFile);
+                        $result = $dbTest->query("SELECT name FROM sqlite_master WHERE type='table' AND name='navbar_elements'");
+                        if ($result === false || $result->fetch() === false) {
+                            throw new RuntimeException("Migrations ran but navbar_elements table was not created. Migration output: {$migrationOutput}");
+                        }
+                    } catch (PDOException $e) {
+                        throw new RuntimeException("Failed to verify database tables: {$e->getMessage()}. Migration output: {$migrationOutput}");
+                    }
+                }
             }
 
             $data['extracted'] = true;
