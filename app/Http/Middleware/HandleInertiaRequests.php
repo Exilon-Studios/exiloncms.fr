@@ -125,7 +125,6 @@ class HandleInertiaRequests extends Middleware
             // Share enabled plugins for conditional UI rendering
             'enabledPlugins' => collect(setting('enabled_plugins', []))->toArray(),
         ];
-        ];
     }
 
     /**
