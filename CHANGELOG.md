@@ -5,6 +5,17 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.16] - 2026-01-29
+
+### Fixed
+- **Critical**: Installer now runs composer install automatically after CMS extraction
+- This ensures vendor/ directory exists before running Laravel migrations
+- Prevents HTTP 500 errors when accessing /wizard after installation
+- Installer now fully prepares CMS for immediate use without manual commands
+- Combined all previous v1.3.15 fixes (index.php bootstrap, installed.json location)
+
+---
+
 ## [1.3.15] - 2026-01-29
 
 ### Fixed
