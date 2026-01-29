@@ -3,6 +3,7 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { route } from 'ziggy-js';
 import { IconToggleLeft, IconToggleRight, IconTrash } from '@tabler/icons-react';
+import { clsx } from 'clsx';
 
 interface Plugin {
   id: string;
@@ -62,9 +63,10 @@ export default function PluginsIndex({ plugins }: Props) {
                     <span>{plugin.author}</span>
                   </div>
                 </div>
-                <div className={`ml-2 h-2 w-2 rounded-full ${
+                <div className={clsx(
+                  'ml-2 h-2 w-2 rounded-full',
                   plugin.enabled ? 'bg-green-500' : 'bg-gray-300'
-                }`} />
+                )} />
               </div>
 
               <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
@@ -77,11 +79,12 @@ export default function PluginsIndex({ plugins }: Props) {
               <div className="mt-4 flex items-center gap-2">
                 <button
                   onClick={() => togglePlugin(plugin.id)}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  className={clsx(
+                    'flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
                     plugin.enabled
                       ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30'
                       : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30'
-                  }`}
+                  )}
                 >
                   {plugin.enabled ? (
                     <>
