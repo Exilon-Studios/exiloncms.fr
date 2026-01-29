@@ -488,6 +488,36 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $zip->close();
             unlink($zipFile);
 
+            // === CRITICAL: Fix index.php files for servers where DocumentRoot is not public/ ===
+            // Create proper Laravel bootstrap files
+
+            // 1. Fix public/index.php - must contain Laravel bootstrap directly
+            $publicIndexContent = '<?php
+
+use Illuminate\Foundation\Application;
+use Illuminate\Http\Request;
+
+define(\'LARAVEL_START\', microtime(true));
+
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.\'/../storage/framework/maintenance.php\')) {
+    require $maintenance;
+}
+
+// Register the Composer autoloader...
+require __DIR__.\'/../vendor/autoload.php\';
+
+// Bootstrap Laravel and handle the request...
+/** @var Application $app */
+$app = require_once __DIR__.\'/../bootstrap/app.php\';
+
+$app->handleRequest(Request::capture());
+';
+            file_put_contents(__DIR__.'/public/index.php', $publicIndexContent);
+
+            // 2. Create root index.php - same as public/index.php for servers where DocumentRoot is root
+            file_put_contents(__DIR__.'/index.php', $publicIndexContent);
+
             // Now that files are extracted, ensure .env is properly set up
             if (! file_exists($envFile) && file_exists($envExample)) {
                 copy($envExample, $envFile);

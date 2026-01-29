@@ -89,6 +89,9 @@ jobs:
             cp release/exiloncms/.env.example release/exiloncms/.env
           fi
 
+          # Replace root index.php with public/index.php for servers where DocumentRoot is not public/
+          cp release/exiloncms/public/index.php release/exiloncms/index.php
+
       - name: Create release ZIP
         run: |
           cd release
