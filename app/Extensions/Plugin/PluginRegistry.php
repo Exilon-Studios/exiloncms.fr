@@ -188,7 +188,7 @@ class PluginRegistry
             )->toArray();
         }
 
-        return $links;
+        return $links->toArray();
     }
 
     /**
