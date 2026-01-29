@@ -5,6 +5,26 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.32] - 2026-01-29
+
+### Fixed
+- **Critical**: Completely rewrote update UI with real-time progress information
+- Removed broken modal that showed blank screen during updates
+- Update system now shows step-by-step progress with percentage bar
+- Added separate Download and Install buttons (no more confusing single button)
+- Added confirmation dialog before installing update
+- Progress shows: backup → extract → copy files → composer → npm → build → migrate → cache
+- Success/error messages now properly displayed
+- Page auto-refreshes after download and redirects after install
+
+### Changed
+- Update page now displays clear information at each step
+- Added "What's New" section with full changelog from GitHub
+- Added warnings before installation (what will be preserved)
+- Better visual feedback during long-running operations
+
+---
+
 ## [1.3.31] - 2026-01-29
 
 ### Fixed
