@@ -85,12 +85,12 @@ export default function PluginsIndex({ plugins }: Props) {
                 >
                   {plugin.enabled ? (
                     <>
-                      <IconToggleLeft className="h-3.5 w-3.5" />
+                      <IconToggleLeft className="h-[14px] w-[14px]" />
                       Disable
                     </>
                   ) : (
                     <>
-                      <IconToggleRight className="h-3.5 w-3.5" />
+                      <IconToggleRight className="h-[14px] w-[14px]" />
                       Enable
                     </>
                   )}
@@ -100,7 +100,7 @@ export default function PluginsIndex({ plugins }: Props) {
                   onClick={() => deletePlugin(plugin.id)}
                   className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
                 >
-                  <IconTrash className="h-3.5 w-3.5" />
+                  <IconTrash className="h-[14px] w-[14px]" />
                   Delete
                 </button>
               </div>
