@@ -37,7 +37,14 @@ class ThemeServiceProvider extends ServiceProvider
     protected function registerActiveTheme(): void
     {
         // Check for preview theme in session (for admin preview functionality)
-        $previewThemeId = request()->session()->get('preview_theme');
+        $previewThemeId = null;
+        try {
+            if (request()->hasSession()) {
+                $previewThemeId = request()->session()->get('preview_theme');
+            }
+        } catch (\Exception $e) {
+            // Session not available yet, skip preview check
+        }
 
         if ($previewThemeId && $this->loader->hasTheme($previewThemeId)) {
             $activeTheme = $this->loader->getTheme($previewThemeId);
@@ -79,10 +86,11 @@ class ThemeServiceProvider extends ServiceProvider
 
         // Share theme info with Inertia for React components
         if (class_exists('\Inertia\Inertia')) {
+            $isPreview = ! empty($previewThemeId);
             \Inertia\Inertia::share('theme', fn () => [
                 'id' => $activeTheme['id'],
                 'name' => $activeTheme['name'],
-                'isPreview' => ! empty($previewThemeId),
+                'isPreview' => $isPreview,
                 'path' => $activeTheme['path'] ?? '',
             ]);
         }
