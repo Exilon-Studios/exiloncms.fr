@@ -309,10 +309,11 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
             $data['version'] = $version;
             $data['tagName'] = $tagName;
 
-            // Find the CMS zip asset (not the installer)
+            // Find the FULL CMS zip asset (not installer, not update package)
             $zipAsset = null;
             foreach ($release->assets ?? [] as $asset) {
-                if (str_ends_with($asset->name, '.zip') && ! str_contains($asset->name, 'installer')) {
+                // Must match exiloncms-x.y.z.zip pattern (full package)
+                if (preg_match('/^exiloncms-[0-9]+\.[0-9]+\.[0-9]+\.zip$/', $asset->name)) {
                     $zipAsset = $asset;
                     break;
                 }
