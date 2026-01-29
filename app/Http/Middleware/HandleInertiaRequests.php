@@ -122,6 +122,9 @@ class HandleInertiaRequests extends Middleware
             'onboardingProgress' => $this->safeGetOnboardingProgress($user),
             // Share available updates count for admin users
             'updatesCount' => $user && $user->hasAdminAccess() ? $this->getUpdatesCount() : 0,
+            // Share enabled plugins for conditional UI rendering
+            'enabledPlugins' => collect(setting('enabled_plugins', []))->toArray(),
+        ];
         ];
     }
 

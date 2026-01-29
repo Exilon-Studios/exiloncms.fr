@@ -16,6 +16,7 @@ class ThemeController extends Controller
     public function index()
     {
         $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
+        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
 
         // Get file-based themes from ThemeLoader
         $fileThemes = collect($themeLoader->getThemes())->map(fn ($theme, $id) => [
@@ -30,6 +31,8 @@ class ThemeController extends Controller
             'is_enabled' => true, // File themes are always enabled
             'type' => 'file', // Mark as file-based theme
             'type_label' => 'File Theme',
+            'requires_plugins' => $this->getRequiredPlugins($theme['requires'] ?? []),
+            'missing_plugins' => $this->getMissingPlugins($theme['requires'] ?? [], $enabledPlugins),
         ])->values();
 
         // Get database themes (if any), excluding ones that conflict with file-based themes
@@ -48,6 +51,8 @@ class ThemeController extends Controller
                 'is_enabled' => $theme->is_enabled,
                 'type' => $theme->type,
                 'type_label' => $theme->getTypeLabel(),
+                'requires_plugins' => [],
+                'missing_plugins' => [],
             ]);
 
         $themes = $fileThemes->concat($dbThemes);
@@ -55,6 +60,41 @@ class ThemeController extends Controller
         return Inertia::render('Admin/Themes/Index', [
             'themes' => $themes,
         ]);
+    }
+
+    /**
+     * Get required plugins from theme requires array.
+     */
+    protected function getRequiredPlugins(array $requires): array
+    {
+        $plugins = [];
+
+        foreach ($requires as $package => $constraint) {
+            if (str_starts_with($package, 'plugin:')) {
+                $plugins[] = str_replace('plugin:', '', $package);
+            }
+        }
+
+        return $plugins;
+    }
+
+    /**
+     * Get missing plugins from theme requires array.
+     */
+    protected function getMissingPlugins(array $requires, array $enabledPlugins): array
+    {
+        $missing = [];
+
+        foreach ($requires as $package => $constraint) {
+            if (str_starts_with($package, 'plugin:')) {
+                $pluginId = str_replace('plugin:', '', $package);
+                if (! in_array($pluginId, $enabledPlugins, true)) {
+                    $missing[] = $pluginId;
+                }
+            }
+        }
+
+        return $missing;
     }
 
     /**
@@ -72,6 +112,14 @@ class ThemeController extends Controller
             // Check if it's a file-based theme (string ID) or database theme (integer ID)
             if (is_string($themeId) && $themeLoader->hasTheme($themeId)) {
                 // File-based theme - use ThemeLoader
+                $theme = $themeLoader->getTheme($themeId);
+
+                // Check plugin dependencies before activation
+                $missingPlugins = $this->checkPluginDependencies($theme);
+                if (! empty($missingPlugins)) {
+                    return back()->with('error', 'This theme requires the following plugins to be enabled: '.implode(', ', $missingPlugins).'. Please enable them first.');
+                }
+
                 $themeLoader->activateTheme($themeId);
             } else {
                 // Database theme - use model
@@ -96,6 +144,27 @@ class ThemeController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Error activating theme: '.$e->getMessage());
         }
+    }
+
+    /**
+     * Check theme plugin dependencies.
+     */
+    protected function checkPluginDependencies(array $theme): array
+    {
+        $requires = $theme['requires'] ?? [];
+        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
+        $missingPlugins = [];
+
+        foreach ($requires as $package => $constraint) {
+            if (str_starts_with($package, 'plugin:')) {
+                $pluginId = str_replace('plugin:', '', $package);
+                if (! in_array($pluginId, $enabledPlugins, true)) {
+                    $missingPlugins[] = $pluginId;
+                }
+            }
+        }
+
+        return $missingPlugins;
     }
 
     /**

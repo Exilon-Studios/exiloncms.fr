@@ -8,14 +8,45 @@ interface SocialLink {
   color: string;
 }
 
+interface FooterLink {
+  plugin: string;
+  label: string;
+  url?: string;
+  route?: string;
+  position: number;
+}
+
 export default function Footer() {
-  const { settings, socialLinks, navbar } = usePage().props as any;
+  const { settings, socialLinks, navbar, pluginFooterLinks = {} } = usePage().props as any;
 
   const pages = navbar || [];
-  const legals = [
-    { title: trans('messages.footer.privacy'), href: '/privacy' },
-    { title: trans('messages.footer.terms'), href: '/terms' },
-  ];
+
+  // Build dynamic footer categories from plugins
+  const footerCategories = Object.entries(pluginFooterLinks).map(([category, links]: [string, FooterLink[]]) => ({
+    title: category,
+    links: links.sort((a, b) => a.position - b.position),
+  }));
+
+  // Default pages category
+  const pagesCategory = {
+    title: trans('messages.footer.pages'),
+    links: pages.slice(0, 5).map((page: any) => ({
+      label: page.name,
+      url: page.link,
+    })),
+  };
+
+  // Social links category
+  const socialsCategory = {
+    title: trans('messages.footer.socials'),
+    links: socialLinks?.map((social: SocialLink) => ({
+      label: social.title,
+      url: social.value,
+    })) || [],
+  };
+
+  // Combine all categories
+  const allCategories = [pagesCategory, socialsCategory, ...footerCategories];
 
   return (
     <div className="relative w-full overflow-hidden border-t border-border bg-background px-8 py-12">
@@ -30,61 +61,25 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 grid grid-cols-2 items-start gap-10 sm:mt-0 md:mt-0 lg:grid-cols-3">
-          <div className="flex w-full flex-col justify-center space-y-4">
-            <p className="font-bold text-foreground">
-              {trans('messages.footer.pages')}
-            </p>
-            <ul className="list-none space-y-4 text-muted-foreground">
-              {pages.slice(0, 5).map((page: any, idx: number) => (
-                <li key={'page-' + idx} className="list-none">
-                  <Link
-                    className="hover:text-foreground transition-colors no-underline"
-                    href={page.link}
-                  >
-                    {page.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col justify-center space-y-4">
-            <p className="font-bold text-foreground">
-              {trans('messages.footer.socials')}
-            </p>
-            <ul className="list-none space-y-4 text-muted-foreground">
-              {socialLinks?.map((social: SocialLink, idx: number) => (
-                <li key={'social-' + idx} className="list-none">
-                  <a
-                    className="hover:text-foreground transition-colors no-underline"
-                    href={social.value}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {social.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="flex flex-col justify-center space-y-4">
-            <p className="font-bold text-foreground">
-              {trans('messages.footer.legal')}
-            </p>
-            <ul className="list-none space-y-4 text-muted-foreground">
-              {legals.map((legal, idx) => (
-                <li key={'legal-' + idx} className="list-none">
-                  <Link
-                    className="hover:text-foreground transition-colors no-underline"
-                    href={legal.href}
-                  >
-                    {legal.title}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {allCategories.slice(0, 3).map((category, idx) => (
+            <div key={`cat-${idx}`} className="flex w-full flex-col justify-center space-y-4">
+              <p className="font-bold text-foreground">
+                {category.title}
+              </p>
+              <ul className="list-none space-y-4 text-muted-foreground">
+                {category.links?.map((link: any, linkIdx: number) => (
+                  <li key={`link-${idx}-${linkIdx}`} className="list-none">
+                    <Link
+                      className="hover:text-foreground transition-colors no-underline"
+                      href={link.url || link.route || '#'}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
     </div>

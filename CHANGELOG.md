@@ -5,6 +5,57 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.26] - 2026-01-29
+
+### Added - EXTREME MODULARITY 🚀
+- **Hook System**: 6 hook contracts for extreme CMS extensibility
+  - `AuthenticationHook` - OAuth providers, 2FA methods
+  - `MediaHook` - Storage drivers, image filters, CDN
+  - `SearchHook` - Searchable content types
+  - `NotificationHook` - Notification channels
+  - `PaymentGatewayHook` - Payment gateways
+  - `UserExtensionHook` - Custom user fields, profile sections
+- **PluginHookManager**: Central registry for all plugin hooks
+- **Plugin CLI Hook Support**: `make:plugin` now supports hook implementation generation
+- **Theme Preview**: Theme preview now actually loads the theme design (checks session `preview_theme`)
+- **Theme Plugin Dependencies**: Themes can declare required plugins via `plugin:` prefix in theme.json
+- **Theme Dependency Validation**: System validates theme plugin requirements before activation
+- **Theme Admin UI**: Shows required/missing plugins in theme list
+
+### Fixed
+- **Route Conflict**: Fixed duplicate `home` route name conflict (web.php vs admin.php)
+  - Renamed admin route from `home` to `settings.home`
+- **Theme Preview Error**: Theme preview now works correctly with proper theme loading
+
+### Technical Details
+**Hook System Architecture**:
+```php
+// Plugin service provider implements hooks
+class MyPluginServiceProvider implements AuthenticationHook, MediaHook {
+    public function registerAuthProviders(): array { ... }
+    public function registerStorageDrivers(): array { ... }
+}
+
+// Automatically registered by PluginServiceProvider
+PluginHookManager::registerAuthHook('my-plugin', $provider);
+
+// Used throughout CMS
+$providers = PluginHookManager::getAuthProviders();
+```
+
+**Theme Plugin Dependencies**:
+```json
+{
+  "requires": {
+    "exiloncms": ">=1.0.0",
+    "plugin:shop": ">=1.0.0",
+    "plugin:payments": ">=1.0.0"
+  }
+}
+```
+
+---
+
 ## [1.3.25] - 2026-01-29
 
 ### Fixed

@@ -32,15 +32,26 @@ class ThemeServiceProvider extends ServiceProvider
 
     /**
      * Register the active theme.
+     * Checks for preview theme in session first, then falls back to active theme.
      */
     protected function registerActiveTheme(): void
     {
-        $activeTheme = $this->loader->getActiveTheme();
+        // Check for preview theme in session (for admin preview functionality)
+        $previewThemeId = request()->session()->get('preview_theme');
+
+        if ($previewThemeId && $this->loader->hasTheme($previewThemeId)) {
+            $activeTheme = $this->loader->getTheme($previewThemeId);
+        } else {
+            $activeTheme = $this->loader->getActiveTheme();
+        }
 
         // Type check: ensure we have an array with id key
         if (! $activeTheme || ! is_array($activeTheme) || ! isset($activeTheme['id']) || $activeTheme['id'] === 'default') {
             return;
         }
+
+        // Validate theme plugin dependencies
+        $this->validateThemeDependencies($activeTheme);
 
         // Register service provider if defined
         $providerClass = $activeTheme['service_provider'] ?? null;
@@ -63,6 +74,41 @@ class ThemeServiceProvider extends ServiceProvider
 
             if (is_dir($langPath)) {
                 $this->loadTranslationsFrom($langPath, 'theme');
+            }
+        }
+
+        // Share theme info with Inertia for React components
+        if (class_exists('\Inertia\Inertia')) {
+            \Inertia\Inertia::share('theme', fn () => [
+                'id' => $activeTheme['id'],
+                'name' => $activeTheme['name'],
+                'isPreview' => ! empty($previewThemeId),
+                'path' => $activeTheme['path'] ?? '',
+            ]);
+        }
+    }
+
+    /**
+     * Validate theme plugin dependencies.
+     */
+    protected function validateThemeDependencies(array $theme): void
+    {
+        $requires = $theme['requires'] ?? [];
+
+        foreach ($requires as $package => $constraint) {
+            // Skip CMS version requirement
+            if ($package === 'exiloncms') {
+                continue;
+            }
+
+            // Check if it's a plugin dependency
+            if (str_starts_with($package, 'plugin:')) {
+                $pluginId = str_replace('plugin:', '', $package);
+                $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
+
+                if (! in_array($pluginId, $enabledPlugins, true)) {
+                    throw new \Exception("Theme '{$theme['name']}' requires the '{$pluginId}' plugin to be enabled. Please enable this plugin first.");
+                }
             }
         }
     }

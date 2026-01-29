@@ -25,5 +25,44 @@
       "default": true,
       "label": "Show last updated date"
     }
+  },
+  "footer_links": {
+    "Légal": [
+      {
+        "label": "Politique de confidentialité",
+        "route": "legal.privacy",
+        "position": 10
+      },
+      {
+        "label": "Conditions d'utilisation",
+        "route": "legal.terms",
+        "position": 20
+      },
+      {
+        "label": "Mentions légales",
+        "route": "legal.mentions",
+        "position": 30
+      }
+    ]
+  },
+  "pages": {
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "description": "Page de politique de confidentialité GDPR",
+      "route": "legal.privacy",
+      "layout": "public"
+    },
+    "terms": {
+      "title": "Conditions d'utilisation",
+      "description": "Conditions générales d'utilisation",
+      "route": "legal.terms",
+      "layout": "public"
+    },
+    "mentions": {
+      "title": "Mentions légales",
+      "description": "Mentions légales obligatoires",
+      "route": "legal.mentions",
+      "layout": "public"
+    }
   }
 }
