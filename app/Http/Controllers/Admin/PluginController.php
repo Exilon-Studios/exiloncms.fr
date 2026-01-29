@@ -49,19 +49,19 @@ class PluginController extends Controller
     /**
      * Toggle plugin enabled status.
      */
-    public function toggle(Request $request, string $id)
+    public function toggle(Request $request, string $plugin)
     {
-        $plugin = $this->pluginLoader->getPlugin($id);
+        $pluginData = $this->pluginLoader->getPlugin($plugin);
 
-        if (! $plugin) {
+        if (! $pluginData) {
             return back()->with('error', trans('admin.plugins.not_found'));
         }
 
         $enabledPlugins = collect(setting('enabled_plugins', []));
 
-        if ($enabledPlugins->contains($id)) {
+        if ($enabledPlugins->contains($plugin)) {
             // Disable plugin
-            $enabledPlugins = $enabledPlugins->filter(fn ($p) => $p !== $id)->values()->toArray();
+            $enabledPlugins = $enabledPlugins->filter(fn ($p) => $p !== $plugin)->values()->toArray();
 
             // Save to settings BEFORE returning
             setting(['enabled_plugins' => $enabledPlugins]);
@@ -69,16 +69,16 @@ class PluginController extends Controller
             // Clear cache to reload plugins
             Artisan::call('cache:clear');
 
-            Log::info("Plugin disabled: {$id}");
+            Log::info("Plugin disabled: {$plugin}");
 
-            return back()->with('success', trans('admin.plugins.disabled', ['name' => $plugin['name']]));
+            return back()->with('success', trans('admin.plugins.disabled', ['name' => $pluginData['name']]));
         } else {
             // Enable plugin
-            $enabledPlugins->push($id);
+            $enabledPlugins->push($plugin);
             $enabledPlugins = $enabledPlugins->unique()->values()->toArray();
 
             // Run migrations if they exist
-            if (File::exists($plugin['path'].'/database/migrations')) {
+            if (File::exists($pluginData['path'].'/database/migrations')) {
                 Artisan::call('migrate', ['--force' => true]);
             }
 
@@ -88,24 +88,24 @@ class PluginController extends Controller
             // Clear cache to reload plugins
             Artisan::call('cache:clear');
 
-            Log::info("Plugin enabled: {$id}");
+            Log::info("Plugin enabled: {$plugin}");
 
-            return back()->with('success', trans('admin.plugins.enabled', ['name' => $plugin['name']]));
+            return back()->with('success', trans('admin.plugins.enabled', ['name' => $pluginData['name']]));
         }
     }
 
     /**
      * Get plugin configuration.
      */
-    public function config(string $id)
+    public function config(string $plugin)
     {
-        $plugin = $this->pluginLoader->getPlugin($id);
+        $pluginData = $this->pluginLoader->getPlugin($plugin);
 
-        if (! $plugin) {
+        if (! $pluginData) {
             abort(404);
         }
 
-        $configFile = $plugin['path'].'/config/config.php';
+        $configFile = $pluginData['path'].'/config/config.php';
 
         if (! File::exists($configFile)) {
             return back()->with('error', trans('admin.plugins.no_config'));
@@ -113,34 +113,34 @@ class PluginController extends Controller
 
         // TODO: Load and display plugin configuration
         return Inertia::render('Admin/Plugins/Config', [
-            'plugin' => $plugin,
+            'plugin' => $pluginData,
         ]);
     }
 
     /**
      * Delete plugin.
      */
-    public function destroy(Request $request, string $id)
+    public function destroy(Request $request, string $plugin)
     {
-        $plugin = $this->pluginLoader->getPlugin($id);
+        $pluginData = $this->pluginLoader->getPlugin($plugin);
 
-        if (! $plugin) {
+        if (! $pluginData) {
             return back()->with('error', trans('admin.plugins.not_found'));
         }
 
         // Disable plugin first
         $enabledPlugins = collect(setting('enabled_plugins', []))
-            ->filter(fn ($p) => $p !== $id)
+            ->filter(fn ($p) => $p !== $plugin)
             ->values()
             ->toArray();
         setting(['enabled_plugins' => $enabledPlugins]);
 
         // Delete plugin directory
-        File::deleteDirectory($plugin['path']);
+        File::deleteDirectory($pluginData['path']);
 
-        Log::info("Plugin deleted: {$id}");
+        Log::info("Plugin deleted: {$plugin}");
 
         return redirect()->route('admin.plugins.index')
-            ->with('success', trans('admin.plugins.deleted', ['name' => $plugin['name']]));
+            ->with('success', trans('admin.plugins.deleted', ['name' => $pluginData['name']]));
     }
 }

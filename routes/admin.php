@@ -65,9 +65,9 @@ Route::prefix('themes')->name('themes.')->middleware('can:admin.settings')->grou
 // ============================================================
 Route::prefix('plugins')->name('plugins.')->middleware('can:admin.settings')->group(function () {
     Route::get('/', [PluginController::class, 'index'])->name('index');
-    Route::post('/{id}/toggle', [PluginController::class, 'toggle'])->name('toggle');
-    Route::get('/{id}/config', [PluginController::class, 'config'])->name('config');
-    Route::delete('/{id}', [PluginController::class, 'destroy'])->name('destroy');
+    Route::post('/{plugin}/toggle', [PluginController::class, 'toggle'])->name('toggle');
+    Route::get('/{plugin}/config', [PluginController::class, 'config'])->name('config');
+    Route::delete('/{plugin}', [PluginController::class, 'destroy'])->name('destroy');
 });
 
 // ============================================================
