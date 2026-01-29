@@ -5,6 +5,15 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.29] - 2026-01-29
+
+### Fixed
+- **Critical**: Fixed TypeError in PluginRegistry::getFooterLinks()
+- Return value now always matches array type hint
+- Application no longer crashes when loading footer links
+
+---
+
 ## [1.3.28] - 2026-01-29
 
 ### Fixed
