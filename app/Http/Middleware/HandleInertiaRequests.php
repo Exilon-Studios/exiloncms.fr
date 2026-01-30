@@ -142,7 +142,7 @@ class HandleInertiaRequests extends Middleware
 
         if ($activeTheme) {
             // This will be available as window.__exiloncms_theme in the browser
-            app('inertia')->share('__exiloncms_theme', $activeTheme);
+            \Inertia\Inertia::share('__exiloncms_theme', $activeTheme);
         }
 
         return 'app';
