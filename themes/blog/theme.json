@@ -7,7 +7,8 @@
   "url": "https://exiloncms.fr",
   "screenshot": "https://exiloncms.fr/assets/themes/blog/screenshot.png",
   "requires": {
-    "exiloncms": ">=1.0.0"
+    "exiloncms": ">=1.0.0",
+    "plugin:blog": ">=1.0.0"
   },
   "supports": {
     "color": true,

@@ -33,8 +33,8 @@ class PluginLoader
      */
     protected function discoverPlugins(): void
     {
-        // Use persistent cache to prevent loading multiple times per request
-        if ($this->loaded || Cache::has($this->cacheKey)) {
+        // Check if already loaded in this instance
+        if ($this->loaded) {
             return;
         }
 
@@ -118,9 +118,6 @@ class PluginLoader
         }
 
         $this->loaded = true;
-
-        // Cache for 5 minutes
-        Cache::put($this->cacheKey, true, 300);
 
         if (! empty($this->plugins)) {
             Log::info('Discovered '.count($this->plugins).' plugin(s): '.implode(', ', array_keys($this->plugins)));
@@ -288,6 +285,7 @@ class PluginLoader
     public function clearCache(): void
     {
         $this->loaded = false;
-        Cache::forget($this->cacheKey);
+        $this->plugins = [];
+        $this->pluginsMeta = [];
     }
 }

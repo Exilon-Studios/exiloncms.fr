@@ -97,11 +97,15 @@ class ThemeServiceProvider extends ServiceProvider
     }
 
     /**
-     * Validate theme plugin dependencies.
+     * Validate theme plugin dependencies and auto-enable them if needed.
+     * When a theme is activated, automatically enable required plugins
+     * while keeping existing plugins active.
      */
     protected function validateThemeDependencies(array $theme): void
     {
         $requires = $theme['requires'] ?? [];
+        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
+        $pluginsEnabled = false;
 
         foreach ($requires as $package => $constraint) {
             // Skip CMS version requirement
@@ -112,12 +116,25 @@ class ThemeServiceProvider extends ServiceProvider
             // Check if it's a plugin dependency
             if (str_starts_with($package, 'plugin:')) {
                 $pluginId = str_replace('plugin:', '', $package);
-                $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
 
+                // Auto-enable plugin if it's not already enabled
                 if (! in_array($pluginId, $enabledPlugins, true)) {
-                    throw new \Exception("Theme '{$theme['name']}' requires the '{$pluginId}' plugin to be enabled. Please enable this plugin first.");
+                    // Check if plugin exists
+                    $pluginLoader = app(\ExilonCMS\Classes\Plugin\PluginLoader::class);
+                    if ($pluginLoader->hasPlugin($pluginId)) {
+                        $enabledPlugins[] = $pluginId;
+                        $pluginsEnabled = true;
+                    }
                 }
             }
+        }
+
+        // Save updated enabled plugins list if any were auto-enabled
+        if ($pluginsEnabled) {
+            \ExilonCMS\Models\Setting::updateOrCreate(
+                ['name' => 'enabled_plugins'],
+                ['value' => json_encode($enabledPlugins)]
+            );
         }
     }
 

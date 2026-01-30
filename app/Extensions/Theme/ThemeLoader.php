@@ -16,7 +16,12 @@ class ThemeLoader
     public function __construct()
     {
         $this->discoverThemes();
-        $this->activeThemeId = Cache::get('active_theme', 'blog');
+        // Set blog as default theme if none is set
+        $this->activeThemeId = Cache::get('active_theme', function () {
+            $defaultTheme = 'blog';
+            Cache::forever('active_theme', $defaultTheme);
+            return $defaultTheme;
+        });
     }
 
     /**
@@ -152,7 +157,7 @@ class ThemeLoader
     }
 
     /**
-     * Activate a theme.
+     * Activate a theme and automatically enable required plugins.
      */
     public function activateTheme(string $themeId): bool
     {
@@ -162,11 +167,25 @@ class ThemeLoader
 
         $theme = $this->themes[$themeId];
 
-        // Check plugin dependencies
-        $missingPlugins = $this->checkPluginDependencies($theme);
-        if (! empty($missingPlugins)) {
-            throw new \Exception('This theme requires the following plugins to be enabled: '.implode(', ', $missingPlugins));
+        // Get currently enabled plugins
+        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
+
+        // Auto-enable required plugins that aren't already enabled
+        $requires = $theme['requires'] ?? [];
+        foreach ($requires as $package => $constraint) {
+            if (str_starts_with($package, 'plugin:')) {
+                $pluginId = str_replace('plugin:', '', $package);
+                if (! in_array($pluginId, $enabledPlugins, true)) {
+                    $enabledPlugins[] = $pluginId;
+                }
+            }
         }
+
+        // Save updated enabled plugins list
+        \ExilonCMS\Models\Setting::updateOrCreate(
+            ['name' => 'enabled_plugins'],
+            ['value' => json_encode($enabledPlugins)]
+        );
 
         Cache::forever('active_theme', $themeId);
         $this->activeThemeId = $themeId;

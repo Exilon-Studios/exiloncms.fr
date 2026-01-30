@@ -22,9 +22,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Vite now includes theme CSS files in build process
   - Theme CSS properly loads in preview mode
 
+### Added
+- **Auto-Enable Required Plugins**: Theme activation now automatically enables required plugins
+  - ThemeLoader automatically enables plugins when activating a theme
+  - ThemeServiceProvider auto-enables theme dependencies on boot
+  - Existing enabled plugins remain active when switching themes
+  - Blog theme now requires blog plugin for proper functionality
+- **EnableBlogPluginSeeder**: Database seeder to enable blog plugin by default
+  - Sets blog plugin as enabled in settings
+  - Sets blog theme as active theme
+  - Run with: `php artisan db:seed --class=EnableBlogPluginSeeder`
+
 ### Changed
 - **PluginController**: Removed unused `ThemeLoader` dependency
 - **Vite Config**: Added automatic discovery and inclusion of theme CSS files
+- **Theme Dependencies**: Blog theme now declares `plugin:blog` as requirement
 
 ## [1.3.37] - 2026-01-30
 
