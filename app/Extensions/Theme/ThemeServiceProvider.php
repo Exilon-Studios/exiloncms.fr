@@ -106,7 +106,13 @@ class ThemeServiceProvider extends ServiceProvider
     protected function validateThemeDependencies(array $theme): void
     {
         // Skip if settings table doesn't exist (during installation)
-        if (! Schema::hasTable('settings')) {
+        // Use try-catch because Schema::hasTable() will try to connect to non-existent database
+        try {
+            if (! Schema::hasTable('settings')) {
+                return;
+            }
+        } catch (\Exception $e) {
+            // Database doesn't exist yet, skip validation
             return;
         }
 
