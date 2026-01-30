@@ -5,6 +5,15 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-01-30
+
+### Changed
+- Migrated Plugin system to use new `ExilonCMS\Classes\Plugin\PluginLoader` instead of old loader
+  - Updated PluginListCommand, PluginInstallCommand, ExtensionUpdateService, and PluginController
+  - Removed deprecated `loadPlugin()` method calls
+  - Updated to use `getPluginsMeta()` for plugin metadata access
+  - Fixed plugin existence checks to use plugin IDs instead of names
+
 ## [1.3.36] - 2026-01-29
 
 ### Added

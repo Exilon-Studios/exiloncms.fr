@@ -2,7 +2,7 @@
 
 namespace ExilonCMS\Services;
 
-use ExilonCMS\Extensions\Plugin\PluginLoader;
+use ExilonCMS\Classes\Plugin\PluginLoader;
 use ExilonCMS\Extensions\Theme\ThemeLoader;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -51,7 +51,7 @@ class ExtensionUpdateService
 
         try {
             $pluginLoader = app(PluginLoader::class);
-            $installedPlugins = $pluginLoader->getPlugins();
+            $installedPlugins = $pluginLoader->getPluginsMeta();
 
             $updates = [];
             foreach ($installedPlugins as $pluginId => $plugin) {

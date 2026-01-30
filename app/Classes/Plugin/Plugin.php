@@ -2,32 +2,96 @@
 
 namespace ExilonCMS\Classes\Plugin;
 
+use ExilonCMS\Attributes\PluginMeta;
+use ExilonCMS\Models\Setting;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
+use ReflectionClass;
 
 /**
  * Base class for plugins
  *
  * Plugins should extend this class and use the #[PluginMeta] attribute
+ *
+ * Example:
+ * #[PluginMeta(
+ *     name: 'My Plugin',
+ *     description: 'Plugin description',
+ *     version: '1.0.0',
+ *     author: 'Author Name',
+ *     dependencies: [],
+ *     permissions: []
+ * )]
+ * class MyPlugin extends Plugin
+ * {
+ *     public function boot(): void
+ *     {
+ *         // Plugin initialization
+ *     }
+ * }
  */
 abstract class Plugin
 {
     /**
-     * Get the plugin's configuration values
+     * Get the plugin's metadata from attribute
+     */
+    public function getMeta(): ?PluginMeta
+    {
+        $reflection = new ReflectionClass($this);
+        $attributes = $reflection->getAttributes(PluginMeta::class);
+
+        if (empty($attributes)) {
+            return null;
+        }
+
+        return $attributes[0]->newInstance();
+    }
+
+    /**
+     * Get the plugin's configuration value from database
      */
     public function config(string $key, mixed $default = null): mixed
     {
-        // TODO: Load from database settings
-        return $default;
+        $pluginId = $this->getId();
+        $setting = Setting::where('key', "plugin_{$pluginId}_{$key}")->first();
+
+        return $setting?->value ?? $default;
+    }
+
+    /**
+     * Set a configuration value for this plugin
+     */
+    public function setConfig(string $key, mixed $value): void
+    {
+        $pluginId = $this->getId();
+        Setting::updateOrCreate(
+            ['key' => "plugin_{$pluginId}_{$key}"],
+            ['value' => $value]
+        );
     }
 
     /**
      * Get the plugin's configuration fields for the admin panel
      *
-     * @return array<array{name: string, label: string, type: string, default: mixed, description?: string}>
+     * Override this method to define configuration fields
+     *
+     * @return array<array{name: string, label: string, type: string, default: mixed, description?: string, validation?: string}>
      */
     public function getConfigFields(): array
     {
         return [];
+    }
+
+    /**
+     * Get all configuration values as an array
+     */
+    public function getAllConfig(): array
+    {
+        $config = [];
+        foreach ($this->getConfigFields() as $field) {
+            $config[$field['name']] = $this->config($field['name'], $field['default'] ?? null);
+        }
+        return $config;
     }
 
     /**
@@ -36,6 +100,7 @@ abstract class Plugin
     public function installed(): void
     {
         // Override in plugin
+        Log::info("Plugin {$this->getId()} installed");
     }
 
     /**
@@ -44,6 +109,7 @@ abstract class Plugin
     public function uninstalled(): void
     {
         // Override in plugin
+        Log::info("Plugin {$this->getId()} uninstalled");
     }
 
     /**
@@ -52,6 +118,7 @@ abstract class Plugin
     public function upgraded(string $oldVersion): void
     {
         // Override in plugin
+        Log::info("Plugin {$this->getId()} upgraded from {$oldVersion} to {$this->getMeta()?->version}");
     }
 
     /**
@@ -59,77 +126,128 @@ abstract class Plugin
      */
     public function boot(): void
     {
-        // Override in plugin
+        // Override in plugin to register routes, views, etc.
+    }
+
+    /**
+     * Get plugin ID from metadata
+     */
+    public function getId(): string
+    {
+        return $this->getMeta()?->id ?? strtolower(class_basename($this));
+    }
+
+    /**
+     * Get plugin name from metadata
+     */
+    public function getName(): string
+    {
+        return $this->getMeta()?->name ?? class_basename($this);
+    }
+
+    /**
+     * Get plugin version from metadata
+     */
+    public function getVersion(): string
+    {
+        return $this->getMeta()?->version ?? '1.0.0';
+    }
+
+    /**
+     * Get plugin description from metadata
+     */
+    public function getDescription(): string
+    {
+        return $this->getMeta()?->description ?? '';
+    }
+
+    /**
+     * Get plugin author from metadata
+     */
+    public function getAuthor(): string
+    {
+        return $this->getMeta()?->author ?? '';
+    }
+
+    /**
+     * Get plugin URL from metadata
+     */
+    public function getUrl(): string
+    {
+        return $this->getMeta()?->url ?? '';
+    }
+
+    /**
+     * Get plugin dependencies from metadata
+     */
+    public function getDependencies(): array
+    {
+        return $this->getMeta()?->dependencies ?? [];
+    }
+
+    /**
+     * Get plugin permissions from metadata
+     */
+    public function getPermissions(): array
+    {
+        return $this->getMeta()?->permissions ?? [];
+    }
+
+    /**
+     * Get plugin root directory path
+     */
+    protected function getPluginPath(): string
+    {
+        $reflection = new ReflectionClass($this);
+        return dirname(dirname($reflection->getFileName()));
     }
 
     /**
      * Get plugin routes path
      */
-    protected function getRoutesPath(): string
+    public function getRoutesPath(): string
     {
-        $reflection = new \ReflectionClass($this);
-        $pluginDir = dirname($reflection->getFileName());
-
-        return $pluginDir.'/../routes/web.php';
+        return $this->getPluginPath().'/routes/web.php';
     }
 
     /**
      * Get admin routes path
      */
-    protected function getAdminRoutesPath(): string
+    public function getAdminRoutesPath(): string
     {
-        $reflection = new \ReflectionClass($this);
-        $pluginDir = dirname($reflection->getFileName());
-
-        return $pluginDir.'/../routes/admin.php';
+        return $this->getPluginPath().'/routes/admin.php';
     }
 
     /**
      * Get migrations path
      */
-    protected function getMigrationsPath(): string
+    public function getMigrationsPath(): string
     {
-        $reflection = new \ReflectionClass($this);
-        $pluginDir = dirname($reflection->getFileName());
-
-        return $pluginDir.'/../database/migrations';
+        return $this->getPluginPath().'/database/migrations';
     }
 
     /**
      * Get views path
      */
-    protected function getViewsPath(): string
+    public function getViewsPath(): string
     {
-        $reflection = new \ReflectionClass($this);
-        $pluginDir = dirname($reflection->getFileName());
-
-        return $pluginDir.'/../resources/views';
+        return $this->getPluginPath().'/resources/views';
     }
 
     /**
      * Get lang path
      */
-    protected function getLangPath(): string
+    public function getLangPath(): string
     {
-        $reflection = new \ReflectionClass($this);
-        $pluginDir = dirname($reflection->getFileName());
-
-        return $pluginDir.'/../resources/lang';
+        return $this->getPluginPath().'/resources/lang';
     }
 
     /**
-     * Get plugin ID
+     * Get resources path (for JS, CSS, images, etc.)
      */
-    public function getId(): string
+    public function getResourcesPath(): string
     {
-        $reflection = new \ReflectionClass($this);
-        $attributes = $reflection->getAttributes(\ExilonCMS\Attributes\PluginMeta::class);
-
-        if (empty($attributes)) {
-            return strtolower(class_basename($this));
-        }
-
-        return $attributes[0]->newInstance()->id;
+        return $this->getPluginPath().'/resources';
     }
 
     /**
@@ -170,5 +288,14 @@ abstract class Plugin
     public function hasLang(): bool
     {
         return File::exists($this->getLangPath());
+    }
+
+    /**
+     * Get plugin namespace (for class loading)
+     */
+    public function getNamespace(): string
+    {
+        $reflection = new ReflectionClass($this);
+        return $reflection->getNamespaceName();
     }
 }

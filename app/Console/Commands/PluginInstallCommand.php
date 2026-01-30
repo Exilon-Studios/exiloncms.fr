@@ -3,7 +3,7 @@
 namespace ExilonCMS\Console\Commands;
 
 use ExilonCMS\Models\PluginInstalled;
-use ExilonCMS\Services\PluginLoader;
+use ExilonCMS\Classes\Plugin\PluginLoader;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -71,7 +71,7 @@ class PluginInstallCommand extends Command
             });
 
             $this->task('Registering plugin', function () use ($loader, $pluginPath) {
-                $loader->loadPlugin($pluginPath);
+                // Plugin is automatically discovered by PluginLoader
 
                 return true;
             });
@@ -158,7 +158,7 @@ class PluginInstallCommand extends Command
                 $config = json_decode(File::get($pluginJsonPath), true);
 
                 // Load plugin
-                $loader->loadPlugin($pluginPath);
+                // Plugin is automatically discovered by PluginLoader
 
                 // Check if already in database
                 $installed = PluginInstalled::firstOrCreate(

@@ -2,7 +2,7 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
-use ExilonCMS\Extensions\Plugin\PluginLoader;
+use ExilonCMS\Classes\Plugin\PluginLoader;
 use ExilonCMS\Extensions\Theme\ThemeLoader;
 use ExilonCMS\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -23,7 +23,7 @@ class PluginController extends Controller
      */
     public function index()
     {
-        $plugins = $this->pluginLoader->getPlugins();
+        $plugins = $this->pluginLoader->getPluginsMeta();
 
         // Get enabled plugins from settings
         $enabledPlugins = collect(setting('enabled_plugins', []))->flip()->toArray();
@@ -31,7 +31,11 @@ class PluginController extends Controller
         // Add enabled status to each plugin
         $plugins = collect($plugins)->map(function ($plugin) use ($enabledPlugins) {
             return [
-                ...$plugin,
+                'id' => $plugin['id'],
+                'name' => $plugin['name'],
+                'version' => $plugin['version'],
+                'description' => $plugin['description'],
+                'author' => $plugin['author'],
                 'enabled' => isset($enabledPlugins[$plugin['id']]),
                 'has_routes' => File::exists($plugin['path'].'/routes/web.php'),
                 'has_admin_routes' => File::exists($plugin['path'].'/routes/admin.php'),
@@ -50,7 +54,8 @@ class PluginController extends Controller
      */
     public function toggle(Request $request, string $plugin)
     {
-        $pluginData = $this->pluginLoader->getPlugin($plugin);
+        $pluginsMeta = $this->pluginLoader->getPluginsMeta();
+        $pluginData = $pluginsMeta[$plugin] ?? null;
 
         if (! $pluginData) {
             return back()->with('error', trans('admin.plugins.not_found'));
@@ -98,7 +103,8 @@ class PluginController extends Controller
      */
     public function config(string $plugin)
     {
-        $pluginData = $this->pluginLoader->getPlugin($plugin);
+        $pluginsMeta = $this->pluginLoader->getPluginsMeta();
+        $pluginData = $pluginsMeta[$plugin] ?? null;
 
         if (! $pluginData) {
             abort(404);
@@ -121,7 +127,8 @@ class PluginController extends Controller
      */
     public function destroy(Request $request, string $plugin)
     {
-        $pluginData = $this->pluginLoader->getPlugin($plugin);
+        $pluginsMeta = $this->pluginLoader->getPluginsMeta();
+        $pluginData = $pluginsMeta[$plugin] ?? null;
 
         if (! $pluginData) {
             return back()->with('error', trans('admin.plugins.not_found'));

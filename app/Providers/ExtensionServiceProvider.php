@@ -17,8 +17,8 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->app->singleton(SettingsRepository::class);
 
-        // Register simplified plugin and theme service providers
-        $this->app->register(SimplifiedPluginServiceProvider::class);
+        // Register theme service provider
+        // Plugin service provider is registered in bootstrap/app.php
         $this->app->register(ThemeServiceProvider::class);
     }
 

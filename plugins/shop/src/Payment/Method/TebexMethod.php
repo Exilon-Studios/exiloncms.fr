@@ -1,9 +1,10 @@
 <?php
 
-namespace ExilonCMS\Plugins\Shop\Payment;
+namespace ExilonCMS\Plugins\Shop\Payment\Method;
 
 use ExilonCMS\Plugins\Shop\Models\Gateway;
 use ExilonCMS\Plugins\Shop\Models\Payment;
+use ExilonCMS\Plugins\Shop\Payment\PaymentMethod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 

@@ -2,7 +2,7 @@
 
 namespace ExilonCMS\Console\Commands;
 
-use ExilonCMS\Services\PluginLoader;
+use ExilonCMS\Classes\Plugin\PluginLoader;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -52,7 +52,7 @@ class PluginListCommand extends Command
             try {
                 $config = json_decode(File::get($pluginJsonPath), true);
 
-                $isLoaded = $loader->hasPlugin($config['name']);
+                $isLoaded = isset($config['id']) && $loader->hasPlugin($config['id']);
                 $status = $isLoaded
                     ? '<fg=green>✓ Active</fg>'
                     : '<fg=yellow>✗ Inactive</fg>';
