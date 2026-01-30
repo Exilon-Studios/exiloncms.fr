@@ -32,11 +32,6 @@ createInertiaApp({
 
   // Auto-import pages from pages directory with theme override support
   resolve: (name) => {
-    // Inject active theme ID into window for client-side theme resolution
-    if (props.initialPage.props.activeTheme) {
-      (window as any).__exiloncms_theme = props.initialPage.props.activeTheme;
-    }
-
     // Try to resolve theme page first, then fall back to core pages
     return resolvePageComponent(
       `./pages/${name}.tsx`,
