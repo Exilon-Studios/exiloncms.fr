@@ -39,7 +39,6 @@ interface AuthenticationHook
      * Validate user credentials from custom source.
      * Used for external authentication (LDAP, SAML, etc.)
      *
-     * @param array $credentials
      * @return array{success: bool, user_data?: array, error?: string}
      */
     public function validateCredentials(array $credentials): array;
@@ -48,8 +47,6 @@ interface AuthenticationHook
      * Get user profile data from external source.
      * Used for OAuth/SSO flows.
      *
-     * @param string $provider
-     * @param string $token
      * @return array<string, mixed>
      */
     public function getUserProfile(string $provider, string $token): array;
@@ -58,8 +55,7 @@ interface AuthenticationHook
      * Synchronize user data with external source.
      * Called during login or on schedule.
      *
-     * @param \ExilonCMS\Models\User $user
-     * @return bool
+     * @param  \ExilonCMS\Models\User  $user
      */
     public function syncUser($user): bool;
 }

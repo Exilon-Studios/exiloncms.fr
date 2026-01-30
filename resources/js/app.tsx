@@ -30,14 +30,33 @@ globalThis.route = ziggyRoute;
 createInertiaApp({
   title: (title) => `${title} - ${appName}`,
 
-  // Auto-import pages from pages directory
-  resolve: (name) =>
-    resolvePageComponent(
+  // Auto-import pages from pages directory with theme override support
+  resolve: (name) => {
+    // Inject active theme ID into window for client-side theme resolution
+    if (props.initialPage.props.activeTheme) {
+      (window as any).__exiloncms_theme = props.initialPage.props.activeTheme;
+    }
+
+    // Try to resolve theme page first, then fall back to core pages
+    return resolvePageComponent(
       `./pages/${name}.tsx`,
-      import.meta.glob('./pages/**/*.tsx')
-    ),
+      {
+        // Core CMS pages
+        ...import.meta.glob('./pages/**/*.tsx'),
+        // Theme pages (will override core pages if they exist)
+        ...import.meta.glob('./../../../themes/*/resources/js/pages/**/*.tsx', {
+          eager: false,
+        }),
+      }
+    );
+  },
 
   setup({ el, App, props }) {
+    // Inject active theme ID into window for client-side theme resolution
+    if ((props as any).initialPage?.props?.activeTheme) {
+      (window as any).__exiloncms_theme = (props as any).initialPage.props.activeTheme;
+    }
+
     const root = createRoot(el);
     root.render(
       <ThemeProvider>

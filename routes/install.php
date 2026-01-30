@@ -29,15 +29,7 @@ Route::middleware([
     // Database configuration (alternative route)
     Route::get('/wizard/database', [InstallController::class, 'showDatabaseWeb'])->name('install.database.alt');
 
-    // Installation mode selection
-    Route::get('/wizard/mode', [InstallController::class, 'showModeWeb'])->name('install.mode');
-    Route::post('/wizard/mode', [InstallController::class, 'saveModeWeb'])->name('install.mode.save');
-
-    // Plugin and theme selection
-    Route::get('/wizard/extensions', [InstallController::class, 'showExtensionsWeb'])->name('install.extensions');
-    Route::post('/wizard/extensions', [InstallController::class, 'saveExtensionsWeb'])->name('install.extensions.save');
-
-    // Admin user creation
+    // Admin user creation (direct from database config, no mode/extensions steps)
     Route::get('/wizard/admin', [InstallController::class, 'showAdminWeb'])->name('install.admin');
     Route::post('/wizard/admin', [InstallController::class, 'createAdminWeb'])->name('install.admin.save');
 

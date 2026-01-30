@@ -308,7 +308,7 @@ class PluginMakeCommand extends Command
 
         // Check for invalid characters
         if (! preg_match('/^[a-z0-9-]+$/', $slug)) {
-            $this->error("Plugin name can only contain lowercase letters, numbers, and hyphens.");
+            $this->error('Plugin name can only contain lowercase letters, numbers, and hyphens.');
 
             return false;
         }
@@ -329,7 +329,7 @@ class PluginMakeCommand extends Command
         array $options
     ): void {
         $pluginPath = base_path("plugins/{$slug}");
-        $namespace = "ExilonCMS\\Plugins\\".Str::studly($slug);
+        $namespace = 'ExilonCMS\\Plugins\\'.Str::studly($slug);
 
         // Create directory structure
         File::ensureDirectoryExists($pluginPath, 0755);
@@ -395,8 +395,8 @@ class PluginMakeCommand extends Command
             'description' => $description,
             'author' => $author,
             'url' => config('app.url'),
-            'namespace' => "ExilonCMS\\Plugins\\".Str::studly($slug),
-            'service_provider' => "ExilonCMS\\Plugins\\".Str::studly($slug)."\\\\".Str::studly($slug)."ServiceProvider",
+            'namespace' => 'ExilonCMS\\Plugins\\'.Str::studly($slug),
+            'service_provider' => 'ExilonCMS\\Plugins\\'.Str::studly($slug).'\\\\'.Str::studly($slug).'ServiceProvider',
             'dependencies' => array_merge([
                 'exiloncms' => '>=1.0.0',
             ], array_fill_keys($dependencies, '>=1.0.0')),

@@ -2,9 +2,9 @@
 
 namespace ExilonCMS\Http\Controllers\Admin;
 
-use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Extensions\Plugin\PluginLoader;
 use ExilonCMS\Extensions\Theme\ThemeLoader;
+use ExilonCMS\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
@@ -16,8 +16,7 @@ class PluginController extends Controller
     public function __construct(
         private PluginLoader $pluginLoader,
         private ThemeLoader $themeLoader,
-    ) {
-    }
+    ) {}
 
     /**
      * Display all plugins with their status.

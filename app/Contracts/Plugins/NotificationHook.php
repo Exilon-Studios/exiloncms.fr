@@ -37,18 +37,13 @@ interface NotificationHook
     /**
      * Send notification through custom channel.
      *
-     * @param string $channel
-     * @param \ExilonCMS\Models\User $user
-     * @param array $data
-     * @return bool
+     * @param  \ExilonCMS\Models\User  $user
      */
     public function sendNotification(string $channel, $user, array $data): bool;
 
     /**
      * Get notification template.
      *
-     * @param string $type
-     * @param string $locale
      * @return array{subject: string, body: string, html: string}
      */
     public function getNotificationTemplate(string $type, string $locale): array;
@@ -56,7 +51,6 @@ interface NotificationHook
     /**
      * Validate notification configuration.
      *
-     * @param string $channel
      * @return array{valid: bool, error?: string}
      */
     public function validateNotificationConfig(string $channel): array;

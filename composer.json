@@ -2,8 +2,8 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "exilon-studios/exiloncms",
     "type": "project",
-    "description": "ExilonCMS - Modern Content Management System for game servers with React + Inertia",
-    "keywords": ["cms", "exiloncms", "laravel", "inertia", "react", "minecraft", "game-server"],
+    "description": "ExilonCMS - Modern Content Management System with React + Inertia",
+    "keywords": ["cms", "exiloncms", "laravel", "inertia", "react"],
     "homepage": "https://exiloncms.fr",
     "support": {
         "issues": "https://github.com/Exilon-Studios/exiloncms.fr/issues",
@@ -11,7 +11,7 @@
         "docs": "https://exiloncms.fr/docs"
     },
     "license": "GPL-3.0-or-later",
-    "version": "1.3.33",
+    "version": "1.3.36",
     "require": {
         "php": "^8.2",
         "ext-json": "*",

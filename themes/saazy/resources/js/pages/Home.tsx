@@ -1,42 +1,43 @@
 import { Head, usePage } from '@inertiajs/react';
 import HeroSaazy from '@/components/HeroSaazy';
-import { PageProps } from '@/types';
-
-interface Server {
-  id: number;
-  name: string;
-  fullAddress: string;
-  joinUrl?: string;
-  isOnline: boolean;
-  onlinePlayers?: number;
-  maxPlayers?: number;
-  playersPercents?: number;
-}
+import { PageProps, ServerStatus } from '@/types';
+import PreviewBanner from '@/components/theme/PreviewBanner';
+import PluginFeatures from '@/components/theme/PluginFeatures';
 
 interface Props {
-  siteName?: string;
-  servers: Server[];
-  posts: any[];
-  settings?: {
-    description?: string;
-    logo?: string;
-    background?: string;
-  };
+    siteName?: string;
+    servers: ServerStatus[];
+    posts: any[];
+    settings?: {
+        description?: string;
+        logo?: string;
+        background?: string;
+    };
+    enabledPlugins?: string[];
+    isPreviewMode?: boolean;
 }
 
-export default function ThemeHome({ siteName, servers, posts, settings }: Props) {
-  const { auth } = usePage<PageProps>().props;
+export default function ThemeHome({ siteName, servers, posts, settings, enabledPlugins = [], isPreviewMode = false }: Props) {
+    const { auth } = usePage<PageProps>().props;
 
-  return (
-    <>
-      <Head title={siteName || 'ExilonCMS'} />
+    return (
+        <>
+            <Head title={siteName || 'ExilonCMS'} />
 
-      {/* Hero Saazy Component with all sections */}
-      <HeroSaazy
-        siteName={siteName}
-        servers={servers}
-        showCustomizationNote={true}
-      />
-    </>
-  );
+            {/* Preview banner */}
+            {isPreviewMode && <PreviewBanner />}
+
+            {/* Hero Saazy Component with all sections */}
+            <HeroSaazy
+                siteName={siteName}
+                servers={servers}
+                showCustomizationNote={true}
+            />
+
+            {/* Dynamic Plugin Features */}
+            <div className="container mx-auto px-4 py-12">
+                <PluginFeatures enabledPlugins={enabledPlugins} variant="grid" />
+            </div>
+        </>
+    );
 }

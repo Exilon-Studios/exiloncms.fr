@@ -54,8 +54,6 @@ interface MediaHook
      * Process image after upload.
      * Apply filters, optimization, CDN upload, etc.
      *
-     * @param string $imagePath
-     * @param array $options
      * @return string Processed image URL
      */
     public function processUpload(string $imagePath, array $options = []): string;
@@ -63,17 +61,11 @@ interface MediaHook
     /**
      * Delete image from storage.
      * Handle CDN deletion, cache invalidation, etc.
-     *
-     * @param string $imagePath
-     * @return bool
      */
     public function deleteImage(string $imagePath): bool;
 
     /**
      * Get image URL with CDN if enabled.
-     *
-     * @param string $imagePath
-     * @return string
      */
     public function getImageUrl(string $imagePath): string;
 }

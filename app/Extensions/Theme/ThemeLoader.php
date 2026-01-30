@@ -123,10 +123,24 @@ class ThemeLoader
 
     /**
      * Get the active theme ID.
+     * Supports preview mode via session.
      */
     public function getActiveThemeId(): string
     {
+        // Check if we're in preview mode
+        if (session()->has('preview_theme')) {
+            return session('preview_theme');
+        }
+
         return $this->activeThemeId;
+    }
+
+    /**
+     * Check if we're in preview mode.
+     */
+    public function isPreviewMode(): bool
+    {
+        return session()->has('preview_theme');
     }
 
     /**
@@ -148,13 +162,10 @@ class ThemeLoader
 
         $theme = $this->themes[$themeId];
 
-        // Check requirements
-        if (! empty($theme['requires'])) {
-            foreach ($theme['requires'] as $package => $constraint) {
-                if (! class_exists($package)) {
-                    throw new \Exception("Theme requires {$package} but it's not installed.");
-                }
-            }
+        // Check plugin dependencies
+        $missingPlugins = $this->checkPluginDependencies($theme);
+        if (! empty($missingPlugins)) {
+            throw new \Exception('This theme requires the following plugins to be enabled: '.implode(', ', $missingPlugins));
         }
 
         Cache::forever('active_theme', $themeId);
@@ -167,6 +178,27 @@ class ThemeLoader
         Cache::forget('theme.config');
 
         return true;
+    }
+
+    /**
+     * Check plugin dependencies for a theme.
+     */
+    protected function checkPluginDependencies(array $theme): array
+    {
+        $requires = $theme['requires'] ?? [];
+        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
+        $missingPlugins = [];
+
+        foreach ($requires as $package => $constraint) {
+            if (str_starts_with($package, 'plugin:')) {
+                $pluginId = str_replace('plugin:', '', $package);
+                if (! in_array($pluginId, $enabledPlugins, true)) {
+                    $missingPlugins[] = $pluginId;
+                }
+            }
+        }
+
+        return $missingPlugins;
     }
 
     /**

@@ -13,6 +13,9 @@ class HomeController extends Controller
      */
     public function index()
     {
+        // Get enabled plugins for dynamic content
+        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
+
         // Try to get posts from Blog plugin if available
         $posts = [];
         try {
@@ -39,6 +42,7 @@ class HomeController extends Controller
             'siteName' => setting('name', 'ExilonCMS'),
             'posts' => $posts,
             'landingSettings' => $landingSettings,
+            'enabledPlugins' => $enabledPlugins,
             'server' => $server ? [
                 'id' => $server->id,
                 'name' => $server->name,

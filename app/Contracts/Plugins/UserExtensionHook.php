@@ -46,7 +46,7 @@ interface UserExtensionHook
     /**
      * Get custom user data for API responses.
      *
-     * @param \ExilonCMS\Models\User $user
+     * @param  \ExilonCMS\Models\User  $user
      * @return array<string, mixed>
      */
     public function getUserData($user): array;
@@ -54,8 +54,7 @@ interface UserExtensionHook
     /**
      * Validate custom user field values.
      *
-     * @param string $field
-     * @param mixed $value
+     * @param  mixed  $value
      * @return array{valid: bool, error?: string}
      */
     public function validateUserField(string $field, $value): array;
@@ -63,7 +62,7 @@ interface UserExtensionHook
     /**
      * Get user permissions for plugin features.
      *
-     * @param \ExilonCMS\Models\User $user
+     * @param  \ExilonCMS\Models\User  $user
      * @return array<string, bool>
      */
     public function getUserPermissions($user): array;

@@ -102,6 +102,8 @@ class HandleInertiaRequests extends Middleware
                 ],
                 // Active theme (from ThemeLoader, not database)
                 'activeTheme' => app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->getActiveThemeId(),
+                // Preview mode status
+                'isPreviewMode' => app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->isPreviewMode(),
             ],
             'navbar' => $this->safeLoadNavbarElements($user),
             'socialLinks' => $this->safeLoadSocialLinks(),
@@ -114,6 +116,7 @@ class HandleInertiaRequests extends Middleware
                 'dashboard' => trans('dashboard'),
                 'marketplace' => trans('marketplace'),
                 'shop' => trans('shop'),
+                'theme' => trans('theme'),
             ],
             // Share unread notifications count for authenticated users
             'unreadNotificationsCount' => $user ? $this->getUnreadNotificationsCount($user) : 0,
@@ -124,7 +127,25 @@ class HandleInertiaRequests extends Middleware
             'updatesCount' => $user && $user->hasAdminAccess() ? $this->getUpdatesCount() : 0,
             // Share enabled plugins for conditional UI rendering
             'enabledPlugins' => collect(setting('enabled_plugins', []))->toArray(),
+            // Share active theme for theme page override system
+            'activeTheme' => app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->getActiveThemeId(),
         ];
+    }
+
+    /**
+     * Root view for Inertia responses
+     */
+    public function rootView(Request $request): string
+    {
+        // Inject active theme into JavaScript for client-side theme resolution
+        $activeTheme = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->getActiveThemeId();
+
+        if ($activeTheme) {
+            // This will be available as window.__exiloncms_theme in the browser
+            app('inertia')->share('__exiloncms_theme', $activeTheme);
+        }
+
+        return 'app';
     }
 
     /**
@@ -177,6 +198,7 @@ class HandleInertiaRequests extends Middleware
             if (! $user || ! $user->role || ! $user->role->is_admin) {
                 return true;
             }
+
             return OnboardingStep::isComplete($user->id);
         } catch (\Exception $e) {
             // Table might not exist yet, assume complete
@@ -193,6 +215,7 @@ class HandleInertiaRequests extends Middleware
             if (! $user || ! $user->role || ! $user->role->is_admin) {
                 return [];
             }
+
             return OnboardingStep::getUserProgress($user->id);
         } catch (\Exception $e) {
             // Table might not exist yet, return empty array

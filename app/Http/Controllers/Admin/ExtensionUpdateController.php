@@ -16,8 +16,7 @@ class ExtensionUpdateController extends Controller
         private ExtensionUpdateService $updateService,
         private DiscordNotificationService $discordService,
         private UpdateManager $cmsUpdateManager,
-    ) {
-    }
+    ) {}
 
     /**
      * Display extension updates page.

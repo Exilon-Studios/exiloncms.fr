@@ -5,6 +5,196 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.36] - 2026-01-29
+
+### Added
+- **DRY Compliance**: Created shared components and types to eliminate code duplication
+  - `PreviewBanner` component - Shared preview banner for all themes
+  - `PluginFeatures` component - Dynamic plugin feature display
+  - `SiteSettings`, `PluginFeaturesProps`, `ServerStatus` types in `@/types`
+- **Dynamic Theme System**: All themes now dynamically adapt based on enabled plugins
+  - Gaming, E-commerce, Saazy, and Blog themes detect and display only enabled plugin features
+  - Home pages use shared `PluginFeatures` component with grid/flex variants
+- **Theme Preview Mode**: Fixed preview system to actually show theme designs
+  - `ThemeLoader::getActiveThemeId()` now checks session for preview mode
+  - `ThemeLoader::isPreviewMode()` method for preview state detection
+  - Preview banner shared across all themes
+  - `isPreviewMode` shared with Inertia for frontend access
+- **Theme Dependency Validation**: Fixed plugin dependency validation
+  - `ThemeLoader::checkPluginDependencies()` validates `plugin:*` requirements
+  - Proper error messages when required plugins are missing
+  - Validation happens before theme activation
+- **Plugin Configuration**: Added `enabledPlugins` to Home page props for dynamic content
+- **Internationalization (i18n)**: Core theme components now fully translatable
+  - Added `resources/lang/en/theme.php` for English translations
+  - Added `resources/lang/fr/theme.php` for French translations
+  - `PreviewBanner` component uses translatable strings (preview banner, exit button)
+  - `PluginFeatures` component uses translatable feature names and descriptions
+  - Theme translations shared via `HandleInertiaRequests` middleware
+  - Fallback to English if translation missing
+
+### Changed
+- **DRY Principles**: Removed all duplicated types/interfaces from theme files
+  - All types now centralized in `resources/js/types/index.ts`
+  - Themes import from shared `@/types` instead of redefining
+- **Theme Architecture**: Themes are now developer-friendly and maintainable
+  - Custom themes work standalone without CMS management
+  - Shared components prevent code duplication across themes
+  - Plugin detection is automatic and consistent
+
+### Technical Details
+**Shared Components**:
+```
+resources/js/components/theme/
+├── PreviewBanner.tsx       # Preview mode banner
+└── PluginFeatures.tsx      # Dynamic plugin features (grid/flex)
+```
+
+**Shared Types**:
+```typescript
+// resources/js/types/index.ts
+export interface SiteSettings { ... }
+export interface PluginFeaturesProps { ... }
+export interface ServerStatus { ... }
+```
+
+**Theme Usage Example**:
+```tsx
+import { PageProps } from '@/types';
+import PreviewBanner from '@/components/theme/PreviewBanner';
+import PluginFeatures from '@/components/theme/PluginFeatures';
+
+export default function Home() {
+    const { settings, enabledPlugins, isPreviewMode } = usePage<PageProps>().props;
+
+    return (
+        <>
+            {isPreviewMode && <PreviewBanner />}
+            <PluginFeatures enabledPlugins={enabledPlugins} variant="grid" />
+        </>
+    );
+}
+```
+
+## [1.3.35] - 2026-01-29
+
+### Added
+- **Simplified Plugin System**: New plugin architecture based on Paymenter
+  - PHP 8 Attributes for plugin metadata (`#[PluginMeta]`)
+  - PSR-4 autoloading via composer (auto-discovery)
+  - Simple `Plugin` base class (no complex service providers required)
+  - Convention over configuration for routes, views, migrations
+- **PluginMeta attribute**: Define plugin metadata using PHP 8 attributes instead of JSON files
+- **Simplified PluginLoader**: Auto-discovers plugins via composer autoload classmap
+- **SimplifiedPluginServiceProvider**: Cleaner plugin loading following Paymenter architecture
+
+### Changed
+- **Plugin autoload**: Simplified from hardcoded per-plugin entries to wildcard `ExilonCMS\Plugins\` namespace
+- **Plugin loading**: Removed complex service provider requirement, now uses simple base class
+- **Extension system**: Simplified following Paymenter's clean architecture
+- **Code quality**: Ran Laravel Pint to ensure PSR-12 compliance
+
+### Technical Details
+**New Plugin Structure**:
+```
+plugins/
+└── blog/
+    ├── src/
+    │   └── Blog.php              # Main plugin class with #[PluginMeta] attribute
+    ├── routes/
+    │   ├── web.php              # Public routes (auto-loaded)
+    │   └── admin.php            # Admin routes (auto-loaded)
+    ├── database/
+    │   └── migrations/          # Migrations (auto-loaded)
+    └── resources/
+        ├── views/               # Views (auto-loaded)
+        └── lang/                # Translations (auto-loaded)
+```
+
+**Plugin Class Example**:
+```php
+<?php
+
+namespace ExilonCMS\Plugins\Blog;
+
+use ExilonCMS\Attributes\PluginMeta;
+use ExilonCMS\Classes\Plugin\Plugin;
+
+#[PluginMeta(
+    id: 'blog',
+    name: 'Blog',
+    version: '1.0.0',
+    description: 'Blog system with posts and categories',
+    author: 'ExilonCMS',
+)]
+class Blog extends Plugin
+{
+    public function boot(): void
+    {
+        // Plugin initialization
+    }
+}
+```
+
+## [1.3.34] - 2026-01-29
+
+### Changed
+- **Simplified installer**: Removed mode selection (production/demo) step
+- **Simplified installer**: Removed extensions (plugins/themes) selection step
+- **Direct flow**: Installer now goes Database → Admin → Complete (was 4 steps, now 2)
+- **Default theme**: Blog theme is now activated by default after installation
+- **Default mode**: Production mode is set by default
+- **General-purpose positioning**: CMS is now positioned for all communities and businesses, not just gaming
+  - Updated README.md to emphasize broad use cases (businesses, e-commerce, content creators, organizations)
+  - Updated composer.json description and keywords to be more inclusive
+  - Removed gaming-focused language from marketing materials
+
+### Added
+- **Theme Page Override System**: Themes can now override any core, plugin, or admin page with their own React components
+  - Theme pages loaded from `themes/{theme-id}/resources/js/pages/`
+  - Priority: Theme page → Plugin page → Core page (fallback)
+  - Enables complete customization of the entire CMS
+- **Active theme sharing**: Theme ID now shared with frontend via HandleInertiaRequests middleware
+- **Theme example**: Blog theme includes example Home.tsx override demonstrating DRY principles
+- **Theme resolver utility**: `@/lib/theme-resolver.ts` for client-side theme page resolution
+- **Vite theme aliases**: `@/theme` and `@/themePages` aliases for theme imports
+
+### Technical Details
+**Theme Override Architecture**:
+```
+themes/
+└── blog/
+    ├── theme.json              # Theme metadata
+    └── resources/
+        └── js/
+            └── pages/
+                └── Home.tsx      # Override core Home page
+```
+
+**Page Resolution Priority**:
+1. Active theme page (if exists)
+2. Plugin page (if route belongs to plugin)
+3. Core CMS page (fallback)
+
+**Usage Example**:
+```tsx
+// Theme pages are automatically discovered by Vite
+// Create a file at themes/my-theme/resources/js/pages/Shop.tsx
+// It will automatically override the core Shop page when that theme is active
+```
+
+**Best Practices Implemented**:
+- DRY principles with reusable components
+- Clean TypeScript interfaces
+- Proper component composition
+- Clear separation of concerns
+
+### Fixed
+- Fixed extra closing brace syntax error in HandleInertiaRequests.php
+- Updated marketplace links to point to correct URL (https://exiloncms.fr/marketplace)
+
+---
+
 ## [1.3.33] - 2026-01-29
 
 ### Fixed

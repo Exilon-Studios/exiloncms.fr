@@ -19,8 +19,6 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
 
   // Get data from sessionStorage
   const appUrl = sessionStorage.getItem('install_app_url') || window.location.origin;
-  const selectedPlugins = JSON.parse(sessionStorage.getItem('install_selected_plugins') || '[]');
-  const selectedTheme = sessionStorage.getItem('install_selected_theme') || '';
 
   const { data, setData } = useForm({
     app_url: appUrl,
@@ -28,8 +26,6 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
     email: 'admin@example.com',
     password: '',
     password_confirmation: '',
-    selected_plugins: selectedPlugins,
-    selected_theme: selectedTheme,
   });
 
   const submit = async (e: React.FormEvent) => {
@@ -200,41 +196,12 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
                 width: '24px',
                 height: '4px',
                 borderRadius: '2px',
-                background: '#333333',
-              }} />
-              <div style={{
-                width: '24px',
-                height: '4px',
-                borderRadius: '2px',
                 background: '#ffffff',
               }} />
             </div>
             <p style={{ color: '#666666', fontSize: '12px', marginTop: '12px' }}>
-              Step 3 of 3: Create admin account
+              Step 2 of 2: Create admin account
             </p>
-
-            {/* Summary */}
-            {selectedPlugins.length > 0 && (
-              <div style={{ marginTop: '24px' }}>
-                <p style={{ color: '#666666', fontSize: '11px', marginBottom: '8px' }}>
-                  Plugins to install:
-                </p>
-                {selectedPlugins.map((plugin: string) => (
-                  <div key={plugin} style={{
-                    display: 'inline-block',
-                    padding: '4px 8px',
-                    background: '#111111',
-                    borderRadius: '4px',
-                    color: '#888888',
-                    fontSize: '11px',
-                    marginRight: '4px',
-                    marginBottom: '4px',
-                  }}>
-                    {plugin}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
 
@@ -523,7 +490,7 @@ export default function InstallAdmin({ phpVersion, minPhpVersion }: Props) {
 
               {/* Back button */}
               <a
-                href="/wizard/mode"
+                href="/wizard/database"
                 style={{
                   display: 'block',
                   textAlign: 'center',

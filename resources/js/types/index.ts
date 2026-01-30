@@ -40,7 +40,72 @@ export interface PageProps<T extends Record<string, unknown> = Record<string, un
   updatesCount?: number;
   onboardingComplete?: boolean;
   onboardingProgress?: unknown[];
+  settings?: SiteSettings;
+  enabledPlugins?: string[];
+  isPreviewMode?: boolean;
+  activeTheme?: string;
   [key: string]: unknown;
+}
+
+// ============================================
+// SITE SETTINGS TYPES
+// ============================================
+
+export interface SiteSettings {
+  name: string;
+  description: string;
+  locale: string;
+  background?: string;
+  favicon?: string;
+  copyright?: string;
+  darkTheme?: boolean;
+  installMode?: string;
+  navbar?: NavbarSettings;
+  marketplaceUrl?: string;
+  seo?: SEOSettings;
+  activeTheme?: string;
+  isPreviewMode?: boolean;
+}
+
+export interface NavbarSettings {
+  links_position?: 'left' | 'center' | 'right';
+  links_spacing?: string;
+  style?: 'transparent' | 'solid' | 'floating';
+  background?: string;
+}
+
+export interface SEOSettings {
+  title: string;
+  description: string;
+  og_image?: string;
+}
+
+// ============================================
+// THEME & PLUGIN TYPES
+// ============================================
+
+export interface PluginFeatures {
+  id: string;
+  icon: string;
+  title: string;
+  description: string;
+  href: string;
+}
+
+export interface PluginFeaturesProps {
+  enabledPlugins: string[];
+  variant?: 'grid' | 'flex';
+}
+
+export interface ServerStatus {
+  id: number;
+  name: string;
+  fullAddress: string;
+  joinUrl?: string;
+  isOnline: boolean;
+  onlinePlayers?: number;
+  maxPlayers?: number;
+  playersPercents?: number;
 }
 
 // ============================================

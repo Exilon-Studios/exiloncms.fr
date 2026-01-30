@@ -30,44 +30,29 @@ interface PaymentGatewayHook
     /**
      * Process payment.
      *
-     * @param string $gateway
-     * @param array $payload
      * @return array{success: bool, transaction_id?: string, error?: string}
      */
     public function processPayment(string $gateway, array $payload): array;
 
     /**
      * Verify payment webhook/callback.
-     *
-     * @param string $gateway
-     * @param array $payload
-     * @return bool
      */
     public function verifyPaymentWebhook(string $gateway, array $payload): bool;
 
     /**
      * Get payment gateway configuration form.
      *
-     * @param string $gateway
      * @return array{fields: array, validation: array}
      */
     public function getGatewayConfig(string $gateway): array;
 
     /**
      * Get payment gateway fee.
-     *
-     * @param string $gateway
-     * @param float $amount
-     * @return float
      */
     public function getGatewayFee(string $gateway, float $amount): float;
 
     /**
      * Refund payment.
-     *
-     * @param string $transactionId
-     * @param float|null $amount
-     * @return bool
      */
     public function refundPayment(string $transactionId, ?float $amount = null): bool;
 }

@@ -158,10 +158,6 @@ class InstallController extends Controller
             'checkRequirementsWeb',
             'showDatabaseWeb',
             'configureDatabaseWeb',
-            'showModeWeb',
-            'saveModeWeb',
-            'showExtensionsWeb',
-            'saveExtensionsWeb',
             'showAdminWeb',
             'createAdminWeb',
             'showCompleteWeb',
@@ -811,116 +807,12 @@ class InstallController extends Controller
                 ]);
             }
 
-            return redirect()->route('install.mode');
+            return redirect()->route('install.admin');
         } catch (Throwable $e) {
             throw ValidationException::withMessages([
                 'connection' => 'Impossible de se connecter à la base de données: '.$e->getMessage(),
             ]);
         }
-    }
-
-    /**
-     * Show installation mode selection page.
-     */
-    public function showModeWeb(): Response
-    {
-        return Inertia::render('Install/Mode');
-    }
-
-    /**
-     * Save installation mode selection.
-     */
-    public function saveModeWeb(Request $request)
-    {
-        $validated = $this->validate($request, [
-            'mode' => ['required', 'in:production,demo'],
-        ]);
-
-        // Store mode in session for later steps
-        session()->put('install_mode', $validated['mode']);
-        session()->save();
-
-        return redirect()->route('install.extensions');
-    }
-
-    /**
-     * Show plugin and theme selection page.
-     */
-    public function showExtensionsWeb(): Response
-    {
-        // Scan available plugins from plugins/ directory
-        $plugins = [];
-        $pluginsPath = base_path('plugins');
-
-        if (is_dir($pluginsPath)) {
-            $pluginDirs = glob($pluginsPath.'/*/plugin.json', GLOB_NOSORT);
-            foreach ($pluginDirs as $pluginJson) {
-                $data = json_decode(file_get_contents($pluginJson), true);
-                if ($data) {
-                    $pluginId = $data['id'] ?? basename(dirname($pluginJson));
-                    $plugins[] = [
-                        'id' => $pluginId,
-                        'name' => $data['name'] ?? $pluginId,
-                        'description' => $data['description'] ?? '',
-                        'version' => $data['version'] ?? '1.0.0',
-                        'author' => $data['author'] ?? '',
-                        'icon' => $data['icon'] ?? null,
-                    ];
-                }
-            }
-        }
-
-        // Scan available themes from themes/ directory
-        $themes = [];
-        $themesPath = base_path('themes');
-
-        if (is_dir($themesPath)) {
-            $themeDirs = glob($themesPath.'/*/theme.json', GLOB_NOSORT);
-            foreach ($themeDirs as $themeJson) {
-                $data = json_decode(file_get_contents($themeJson), true);
-                if ($data) {
-                    $themeId = $data['id'] ?? basename(dirname($themeJson));
-                    $themes[] = [
-                        'id' => $themeId,
-                        'name' => $data['name'] ?? $themeId,
-                        'description' => $data['description'] ?? '',
-                        'version' => $data['version'] ?? '1.0.0',
-                        'author' => $data['author'] ?? '',
-                        'screenshot' => $data['screenshot'] ?? null,
-                    ];
-                }
-            }
-        }
-
-        // Get currently selected plugins/themes from session
-        $selectedPlugins = session('install_plugins', []);
-        $selectedTheme = session('install_theme', null);
-
-        return Inertia::render('Install/Extensions', [
-            'plugins' => $plugins,
-            'themes' => $themes,
-            'selectedPlugins' => $selectedPlugins,
-            'selectedTheme' => $selectedTheme,
-        ]);
-    }
-
-    /**
-     * Save plugin and theme selection.
-     */
-    public function saveExtensionsWeb(Request $request)
-    {
-        $validated = $this->validate($request, [
-            'plugins' => ['nullable', 'array'],
-            'plugins.*' => ['string'],
-            'theme' => ['nullable', 'string'],
-        ]);
-
-        // Store selections in session
-        session()->put('install_plugins', $validated['plugins'] ?? []);
-        session()->put('install_theme', $validated['theme'] ?? null);
-        session()->save();
-
-        return redirect()->route('install.admin');
     }
 
     /**
@@ -969,88 +861,27 @@ class InstallController extends Controller
                 Artisan::call('storage:link', ! windows_os() ? ['--relative' => true] : []);
             }
 
-            // Save installation mode to database
-            $installMode = session('install_mode', 'production');
+            // Set default installation mode to production
             \ExilonCMS\Models\Setting::updateOrCreate(
-                ['key' => 'install_mode'],
+                ['name' => 'install_mode'],
                 [
-                    'name' => 'Installation Mode',
-                    'value' => $installMode,
+                    'key' => 'install_mode',
+                    'value' => 'production',
                     'type' => 'text',
                     'group' => 'system',
                 ]
             );
 
-            // If demo mode, disable registration and create demo users
-            if ($installMode === 'demo') {
-                \ExilonCMS\Models\Setting::updateOrCreate(
-                    ['key' => 'registration_enabled'],
-                    [
-                        'name' => 'Allow Registration',
-                        'value' => '0',
-                        'type' => 'boolean',
-                        'group' => 'auth',
-                    ]
-                );
-
-                // Create demo admin user (for quick login)
-                $demoAdminRole = \ExilonCMS\Models\Role::where('is_admin', true)->first();
-                \ExilonCMS\Models\User::updateOrCreate(
-                    ['email' => 'admin@demo.local'],
-                    [
-                        'name' => 'Demo Admin',
-                        'password' => Hash::make('demo123'),
-                        'role_id' => $demoAdminRole->id,
-                        'email_verified_at' => now(),
-                        'password_changed_at' => now(),
-                    ]
-                );
-
-                // Create demo player user (for quick login)
-                $playerRole = \ExilonCMS\Models\Role::where('is_admin', false)->first();
-                if ($playerRole) {
-                    \ExilonCMS\Models\User::updateOrCreate(
-                        ['email' => 'player@demo.local'],
-                        [
-                            'name' => 'Demo Player',
-                            'password' => Hash::make('demo123'),
-                            'role_id' => $playerRole->id,
-                            'email_verified_at' => now(),
-                            'password_changed_at' => now(),
-                        ]
-                    );
-                }
-            }
-
-            // Process selected plugins and theme from installer
-            $selectedPlugins = session('install_plugins', []);
-            $selectedTheme = session('install_theme', null);
-
-            // Enable selected plugins
-            if (! empty($selectedPlugins)) {
-                \ExilonCMS\Models\Setting::updateOrCreate(
-                    ['key' => 'enabled_plugins'],
-                    [
-                        'name' => 'Enabled Plugins',
-                        'value' => json_encode($selectedPlugins),
-                        'type' => 'array',
-                        'group' => 'plugins',
-                    ]
-                );
-            }
-
-            // Activate selected theme
-            if ($selectedTheme) {
-                \ExilonCMS\Models\Setting::updateOrCreate(
-                    ['key' => 'active_theme'],
-                    [
-                        'name' => 'Active Theme',
-                        'value' => $selectedTheme,
-                        'type' => 'text',
-                        'group' => 'theme',
-                    ]
-                );
-            }
+            // Set default theme to 'blog'
+            \ExilonCMS\Models\Setting::updateOrCreate(
+                ['name' => 'active_theme'],
+                [
+                    'key' => 'active_theme',
+                    'value' => 'blog',
+                    'type' => 'text',
+                    'group' => 'theme',
+                ]
+            );
 
             // Get admin role
             $adminRole = Role::where('is_admin', true)->firstOrFail();

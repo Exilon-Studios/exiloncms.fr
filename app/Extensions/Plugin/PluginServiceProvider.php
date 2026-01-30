@@ -8,8 +8,6 @@ use ExilonCMS\Contracts\Plugins\NotificationHook;
 use ExilonCMS\Contracts\Plugins\PaymentGatewayHook;
 use ExilonCMS\Contracts\Plugins\SearchHook;
 use ExilonCMS\Contracts\Plugins\UserExtensionHook;
-use ExilonCMS\Extensions\Plugin\PluginRegistry;
-use ExilonCMS\Extensions\Plugin\PluginHookManager;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -122,6 +120,7 @@ class PluginServiceProvider extends ServiceProvider
         // Circular dependency detected
         if (isset($visiting[$pluginId])) {
             \Log::warning("Circular dependency detected in plugin: {$pluginId}");
+
             return;
         }
 
@@ -142,6 +141,7 @@ class PluginServiceProvider extends ServiceProvider
             $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
             if (! in_array($depPluginId, $enabledPlugins, true)) {
                 \Log::warning("Plugin {$pluginId} requires {$depPluginId} but it's not enabled. Skipping {$pluginId}.");
+
                 return;
             }
 

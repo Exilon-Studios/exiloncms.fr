@@ -3,7 +3,6 @@
 namespace ExilonCMS\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * @property int $id

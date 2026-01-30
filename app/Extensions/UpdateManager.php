@@ -88,8 +88,7 @@ class UpdateManager
                 if ($hasUpdate) {
                     // Find the CMS update zip asset (prioritize update package over full package)
                     $zipAsset = collect($release['assets'] ?? [])
-                        ->first(fn ($asset) =>
-                            str_ends_with($asset['name'], '.zip') &&
+                        ->first(fn ($asset) => str_ends_with($asset['name'], '.zip') &&
                             ! str_contains($asset['name'], 'installer') &&
                             str_contains($asset['name'], 'update') // Prioritize update package
                         );
@@ -97,8 +96,7 @@ class UpdateManager
                     // Fallback to full package if update package not found
                     if (! $zipAsset) {
                         $zipAsset = collect($release['assets'] ?? [])
-                            ->first(fn ($asset) =>
-                                str_ends_with($asset['name'], '.zip') &&
+                            ->first(fn ($asset) => str_ends_with($asset['name'], '.zip') &&
                                 ! str_contains($asset['name'], 'installer')
                             );
                     }
@@ -279,6 +277,7 @@ class UpdateManager
                         'zip_path' => $zipPath,
                         'extract_to' => $extractTo,
                     ]);
+
                     return false;
                 }
 
@@ -395,6 +394,7 @@ class UpdateManager
 
         if (empty($dirs)) {
             Log::error('No directories found in extracted update', ['source' => $sourcePath]);
+
             return;
         }
 
@@ -422,6 +422,7 @@ class UpdateManager
                 Str::startsWith($relativePath, 'bootstrap/cache/') ||
                 $relativePath === '.env') {
                 $skippedCount++;
+
                 continue;
             }
 

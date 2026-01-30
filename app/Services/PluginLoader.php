@@ -49,7 +49,7 @@ class PluginLoader
 
         // Single log line instead of spamming one per plugin
         if (! empty($this->plugins)) {
-            Log::info("Loaded ".count($this->plugins)." plugin(s): ".implode(', ', array_column($this->plugins, 'name')));
+            Log::info('Loaded '.count($this->plugins).' plugin(s): '.implode(', ', array_column($this->plugins, 'name')));
         }
     }
 

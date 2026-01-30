@@ -2,7 +2,6 @@
 
 namespace ExilonCMS\Services;
 
-use ExilonCMS\ExilonCMS;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
