@@ -173,7 +173,7 @@ class PluginLoader
     /**
      * Get a specific plugin metadata by ID
      */
-    public function getPluginMeta(string $id): ?array
+    public function getPluginMetadata(string $id): ?array
     {
         return $this->pluginsMeta[$id] ?? null;
     }
