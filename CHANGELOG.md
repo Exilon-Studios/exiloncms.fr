@@ -21,8 +21,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Created `theme.css` files for all themes (blog, gaming, ecommerce, saazy)
   - Vite now includes theme CSS files in build process
   - Theme CSS properly loads in preview mode
+- **Installation Database Error**: Fixed ThemeServiceProvider trying to access database before installation
+  - Added `Schema::hasTable('settings')` check before accessing settings
+  - Prevents errors during fresh installation when database doesn't exist yet
 
 ### Added
+- **Payment Gateway System**: Complete payment system inspired by Paymenter
+  - `Extension` base class for all extensions with config management
+  - `Gateway` abstract class for payment gateways
+  - `ExtensionHelper` with payment methods (pay, addPayment, handleWebhook)
+  - Support for billing agreements (recurring payments)
+  - Webhook handling for payment providers
+  - Migration helpers for extensions
+  - Auto-discovery via composer autoload (same as plugins)
+- **Auto-Update Script**: Paymenter-style update system (`update.sh`)
+  - Automatic backup before update
+  - Downloads latest release from GitHub
+  - Runs migrations and optimizations
+  - Preserves user permissions
+  - Usage: `./update.sh` or `./update.sh --url=CUSTOM_URL`
 - **Auto-Enable Required Plugins**: Theme activation now automatically enables required plugins
   - ThemeLoader automatically enables plugins when activating a theme
   - ThemeServiceProvider auto-enables theme dependencies on boot

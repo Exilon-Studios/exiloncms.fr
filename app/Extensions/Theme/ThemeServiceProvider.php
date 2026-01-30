@@ -2,6 +2,7 @@
 
 namespace ExilonCMS\Extensions\Theme;
 
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
@@ -100,9 +101,15 @@ class ThemeServiceProvider extends ServiceProvider
      * Validate theme plugin dependencies and auto-enable them if needed.
      * When a theme is activated, automatically enable required plugins
      * while keeping existing plugins active.
+     * Skips validation if database is not available (during installation).
      */
     protected function validateThemeDependencies(array $theme): void
     {
+        // Skip if settings table doesn't exist (during installation)
+        if (! Schema::hasTable('settings')) {
+            return;
+        }
+
         $requires = $theme['requires'] ?? [];
         $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
         $pluginsEnabled = false;
