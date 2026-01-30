@@ -171,14 +171,6 @@ class PluginLoader
     }
 
     /**
-     * Get a specific plugin metadata by ID
-     */
-    public function getPluginMetadata(string $id): ?array
-    {
-        return $this->pluginsMeta[$id] ?? null;
-    }
-
-    /**
      * Check if a plugin exists
      */
     public function hasPlugin(string $id): bool
