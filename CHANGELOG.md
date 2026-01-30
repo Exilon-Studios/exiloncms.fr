@@ -5,6 +5,27 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.38] - 2026-01-30
+
+### Fixed
+- **Plugin Discovery Cache**: Fixed plugin cache preventing discovery
+  - PluginLoader now correctly clears cache when plugins are enabled/disabled
+  - Cache key properly flushed to force plugin rediscovery
+- **Sidebar Plugin Links**: Fixed sidebar links showing for disabled plugins
+  - Legal section now only shows if 'legal' plugin is enabled
+  - Pages link now only shows if 'pages' plugin is enabled
+  - Posts link now only shows if 'blog' plugin is enabled
+  - Added `enabledPlugins` check in `filterLinks()` function
+- **Theme CSS System**: Implemented theme-specific CSS loading
+  - Added `active_theme_css()` helper to load theme CSS files
+  - Created `theme.css` files for all themes (blog, gaming, ecommerce, saazy)
+  - Vite now includes theme CSS files in build process
+  - Theme CSS properly loads in preview mode
+
+### Changed
+- **PluginController**: Removed unused `ThemeLoader` dependency
+- **Vite Config**: Added automatic discovery and inclusion of theme CSS files
+
 ## [1.3.37] - 2026-01-30
 
 ### Fixed

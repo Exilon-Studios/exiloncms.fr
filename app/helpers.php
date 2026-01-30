@@ -245,6 +245,34 @@ if (! function_exists('dark_theme')) {
     }
 }
 
+if (! function_exists('active_theme_css')) {
+    /**
+     * Get the CSS URL for the active theme (or preview theme).
+     * Returns null if the theme doesn't have custom CSS.
+     */
+    function active_theme_css(): ?string
+    {
+        $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
+        $themeId = $themeLoader->getActiveThemeId();
+        $theme = $themeLoader->getTheme($themeId);
+
+        if (! $theme) {
+            return null;
+        }
+
+        // Check if theme has a CSS file
+        $cssPath = $theme['path'].'/resources/css/theme.css';
+
+        if (! file_exists($cssPath)) {
+            return null;
+        }
+
+        // Return the path to the theme CSS
+        // In dev, Vite will handle it; in production, it's in the build manifest
+        return '/themes/'.$themeId.'/resources/css/theme.css';
+    }
+}
+
 if (! function_exists('scheduler_running')) {
     /**
      * Verify if the scheduler is configured and running.

@@ -3,7 +3,6 @@
 namespace ExilonCMS\Http\Controllers\Admin;
 
 use ExilonCMS\Classes\Plugin\PluginLoader;
-use ExilonCMS\Extensions\Theme\ThemeLoader;
 use ExilonCMS\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -15,7 +14,6 @@ class PluginController extends Controller
 {
     public function __construct(
         private PluginLoader $pluginLoader,
-        private ThemeLoader $themeLoader,
     ) {}
 
     /**
@@ -70,7 +68,10 @@ class PluginController extends Controller
             // Save to settings BEFORE returning
             setting(['enabled_plugins' => $enabledPlugins]);
 
-            // Clear cache to reload plugins
+            // Clear plugin cache to force rediscovery
+            $this->pluginLoader->clearCache();
+
+            // Clear Laravel cache
             Artisan::call('cache:clear');
 
             Log::info("Plugin disabled: {$plugin}");
@@ -89,7 +90,10 @@ class PluginController extends Controller
             // Save to settings BEFORE returning
             setting(['enabled_plugins' => $enabledPlugins]);
 
-            // Clear cache to reload plugins
+            // Clear plugin cache to force rediscovery
+            $this->pluginLoader->clearCache();
+
+            // Clear Laravel cache
             Artisan::call('cache:clear');
 
             Log::info("Plugin enabled: {$plugin}");

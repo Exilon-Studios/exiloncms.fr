@@ -21,10 +21,25 @@ function getActiveTheme(): string | null {
     }
 }
 
+// Get all theme CSS files that exist
+function getThemeCssFiles(): string[] {
+    const themes = ['gaming', 'ecommerce', 'saazy', 'blog'];
+    const cssFiles: string[] = [];
+
+    for (const theme of themes) {
+        const themeCss = `themes/${theme}/resources/css/theme.css`;
+        if (fs.existsSync(path.resolve(__dirname, themeCss))) {
+            cssFiles.push(themeCss);
+        }
+    }
+
+    return cssFiles;
+}
+
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.tsx'],
+            input: ['resources/css/app.css', 'resources/js/app.tsx', ...getThemeCssFiles()],
             ssr: 'resources/js/ssr.tsx',
             refresh: true,
         }),

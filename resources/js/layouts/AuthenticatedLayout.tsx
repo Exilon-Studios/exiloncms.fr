@@ -33,7 +33,7 @@ import {
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   const pageProps = usePage<PageProps>().props as any;
-  const { auth, settings, updatesCount = 0 } = pageProps;
+  const { auth, settings, updatesCount = 0, enabledPlugins = [] } = pageProps;
 
   // Check if we're in admin section - hide user-facing shop links there
   const url = pageProps.url || window.location.pathname;
@@ -51,6 +51,11 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   // Helper function to filter links based on permissions
   const filterLinks = (links: any[]): any[] => {
     return links.filter(link => {
+      // Check if plugin is enabled (if link requires a plugin)
+      if (link.plugin && !enabledPlugins.includes(link.plugin)) {
+        return false;
+      }
+
       // Admin users can see all links regardless of specific permissions
       if (auth.user?.role?.is_admin) {
         return true;
@@ -121,6 +126,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
           label: trans('admin.nav.content.pages'),
           href: '/admin/pages',
           permission: 'admin.pages',
+          plugin: 'pages',
           icon: (
             <IconFile className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
@@ -129,6 +135,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
           label: trans('admin.nav.content.posts'),
           href: '/admin/posts',
           permission: 'admin.posts',
+          plugin: 'blog',
           icon: (
             <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
@@ -262,6 +269,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         {
           type: 'section',
           label: trans('admin.nav.legal.heading'),
+          plugin: 'legal',
           children: [
             {
               label: trans('admin.nav.legal.company'),
