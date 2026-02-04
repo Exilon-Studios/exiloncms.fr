@@ -1,231 +1,256 @@
+# ExilonCMS
+
 <div align="center">
 
-# 🚀 ExilonCMS
+**Un CMS moderne et extensible pour les communautés et les entreprises**
 
-**A modern, extensible CMS for communities and businesses**
-
-[![Latest Release](https://img.shields.io/github/v/release/Exilon-Studios/exiloncms.fr)](https://github.com/Exilon-Studios/exiloncms.fr/releases)
-[![License](https://img.shields.io/github/license/Exilon-Studios/exiloncms.fr)](LICENSE)
+[![Dernière Release](https://img.shields.io/github/v/release/Exilon-Studios/exiloncms.fr)](https://github.com/Exilon-Studios/exiloncms.fr/releases)
+[![Licence](https://img.shields.io/github/license/Exilon-Studios/exiloncms.fr)](LICENSE)
 [![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)](https://php.net)
 [![Laravel](https://img.shields.io/badge/Laravel-12-FF2D20?logo=laravel&logoColor=white)](https://laravel.com)
 
-A powerful, modern content management system built for communities, businesses, and creators. Featuring an extensible plugin architecture, dynamic theming, and a developer-friendly API.
+Un puissant système de gestion de contenu moderne conçu pour les communautés, les entreprises et les créateurs. Avec une architecture de plugins extensible, des thèmes dynamiques et une API conviviale pour les développeurs.
+
+[🇬🇧 **English**](README_EN.md) | **🇫🇷 Français**
 
 </div>
 
 ---
 
-## ✨ Features
+## ✨ Fonctionnalités
 
-- 🎨 **Dynamic Theme System** - Theme page overrides allow complete customization of any page
-- 🔌 **Extensible Plugin Architecture** - Add features with modular plugins
-- 🚀 **Modern Tech Stack** - Laravel 12, React 19, Inertia.js v2, TypeScript, Tailwind CSS v3.4
-- 🎯 **Developer-Friendly** - Clear API, CLI tools, and comprehensive documentation
-- 🌍 **Multi-language Support** - Built-in translation system
-- 🔐 **Role-based Access Control** - Granular permissions and user management
-- 🔄 **Automatic Updates** - Seamless updates from GitHub with automatic backups
-- 📦 **Extension Marketplace** - Browse and install extensions from [exiloncms.fr/marketplace](https://exiloncms.fr/marketplace)
-- 📱 **Responsive Design** - Beautiful, mobile-first interface out of the box
+- 🎨 **Système de Thèmes Dynamiques** - Les overrides de pages thèmes permettent une personnalisation complète
+- 🔌 **Architecture de Plugins Extensible** - Ajoutez des fonctionnalités avec des plugins modulaires
+- 🚀 **Stack Moderne** - Laravel 12, React 19, Inertia.js v2, TypeScript, Tailwind CSS v3.4
+- 🎯 **Convivial pour les Développeurs** - API claire, outils CLI et documentation complète
+- 🌍 **Support Multi-langues** - Système de traduction intégré
+- 🔐 **Contrôle d'Accès par Rôles** - Permissions granulaires et gestion des utilisateurs
+- 🔄 **Mises à Jour Automatiques** - Mises à jour transparentes depuis GitHub avec sauvegardes automatiques
+- 📦 **Marketplace d'Extensions** - Parcourez et installez des extensions depuis [exiloncms.fr/marketplace](https://exiloncms.fr/marketplace)
+- 📱 **Design Responsive** - Interface mobile-first belle et fonctionnelle
 
-### Use Cases
+### Cas d'Utilisation
 
-ExilonCMS is designed for:
-- **Communities** - Gaming servers, forums, social platforms
-- **Businesses** - Corporate sites, portfolios, product showcases
-- **E-commerce** - Online stores with integrated payment gateways
-- **Content Creators** - Blogs, news sites, documentation platforms
-- **Organizations** - Non-profits, educational institutions, clubs
+ExilonCMS est conçu pour :
+- **Communautés** - Serveurs de jeu, forums, plateformes sociales
+- **Entreprises** - Sites d'entreprise, portfolios, vitrines de produits
+- **E-commerce** - Boutiques en ligne avec passerelles de paiement intégrées
+- **Créateurs de Contenu** - Blogs, sites d'actualités, plateformes de documentation
+- **Organisations** - Associations à but non lucratif, établissements d'enseignement, clubs
 
 ---
 
-## 📋 Requirements
+## 📋 Prérequis
 
-- **PHP**: 8.2 or higher
-- **Database**: SQLite 3.8+ (included), PostgreSQL 10+, or MySQL 8+
-- **Web Server**: Apache, Nginx, or Laravel Valet
-- **Extensions**: curl, fileinfo, json, mbstring, openssl, pdo, zip, bcmath
+- **PHP** : 8.2 ou supérieur
+- **Base de données** : SQLite 3.8+ (inclus), PostgreSQL 10+, ou MySQL 8+
+- **Serveur Web** : Apache, Nginx, ou Laravel Valet
+- **Extensions** : curl, fileinfo, json, mbstring, openssl, pdo, zip, bcmath
 
 ---
 
 ## 🚀 Installation
 
-### Option 1: Standalone Web Installer (Recommended)
+### Option 1 : Installateur Web Autonome (Recommandé)
 
-The easiest way to install ExilonCMS with an interactive web interface:
+Le moyen le plus simple d'installer ExilonCMS avec une interface web interactive :
 
 ```bash
-# Download the installer
+# Télécharger l'installateur
 wget https://github.com/Exilon-Studios/exiloncms.fr/releases/latest/download/exiloncms-installer.zip
 
-# Extract it
+# Extraire
 unzip exiloncms-installer.zip
 
-# Start the PHP server
+# Démarrer le serveur PHP
 php -S localhost:8000
 
-# Open http://localhost:8000 in your browser
-# The installer will:
-# ✅ Download the latest CMS automatically
-# ✅ Guide you through database setup
-# ✅ Create your admin account
-# ✅ Configure your site settings
+# Ouvrir http://localhost:8000 dans le navigateur
+# L'installateur va :
+# ✅ Télécharger automatiquement la dernière version du CMS
+# ✅ Vous guider dans la configuration de la base de données
+# ✅ Créer votre compte administrateur
+# ✅ Configurer les paramètres de votre site
 ```
 
-### Option 2: Manual Installation
+### Option 2 : Installation Manuelle
 
-Download the full CMS package and set it up manually:
+Téléchargez le package complet du CMS et configurez-le manuellement :
 
 ```bash
-# Download from GitHub Releases
+# Télécharger depuis les Releases GitHub
 wget https://github.com/Exilon-Studios/exiloncms.fr/releases/latest/download/exiloncms.zip
 
-# Extract
+# Extraire
 unzip exiloncms.zip
 cd exiloncms
 
-# Install dependencies
+# Installer les dépendances
 composer install
 
-# Configure environment
+# Configurer l'environnement
 cp .env.example .env
 php artisan key:generate
 
-# Edit .env and set your database (SQLite by default)
+# Éditer .env et configurer la base de données (SQLite par défaut)
 # DB_DATABASE=database/database.sqlite
 
-# Run migrations
+# Exécuter les migrations
 php artisan migrate --seed
 
-# Create admin user
+# Créer l'utilisateur admin
 php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="password"
 
-# Start development server
+# Démarrer le serveur de développement
 php artisan serve
 ```
 
-Visit `http://localhost:8000` to access your site.
+Visitez `http://localhost:8000` pour accéder à votre site.
+
+### Installation Docker
+
+```bash
+# Démarrer PostgreSQL
+docker-compose up -d
+
+# Configurer la base de données dans .env
+# DB_CONNECTION=pgsql
+# DB_HOST=127.0.0.1
+# DB_PORT=5432
+# DB_DATABASE=exiloncms
+# DB_USERNAME=exiloncms
+# DB_PASSWORD=secret
+
+# Installer et lancer
+composer install
+npm install
+npm run build
+php artisan migrate --seed
+php artisan key:generate
+php artisan serve
+```
 
 ---
 
-## 🎯 Development
+## 🎯 Développement
 
 ```bash
-# Start all services (Laravel + Queue + Vite)
+# Démarrer tous les services (Laravel + Queue + Vite)
 composer dev
 
-# Windows (without logs)
+# Windows (sans logs)
 composer dev-windows
 
-# Or start individually:
-php artisan serve      # Laravel backend
-npm run dev            # Vite frontend (with HMR)
+# Ou individuellement :
+php artisan serve      # Backend Laravel
+npm run dev            # Frontend Vite (avec HMR)
 ```
 
 ```bash
-# Run tests
+# Exécuter les tests
 composer test
 
-# Code formatting (required before committing)
+# Formatage du code (requis avant commit)
 ./vendor/bin/pint
 
-# Clear cache
+# Vider le cache
 php artisan optimize:clear
 
-# Type checking
+# Vérification des types TypeScript
 npm run typecheck
 ```
 
 ---
 
-## 📦 Extensibility
+## 📦 Extensibilité
 
-### Plugin System
+### Système de Plugins
 
-ExilonCMS comes with several built-in plugins:
+ExilonCMS est fourni avec plusieurs plugins intégrés :
 
-- **Analytics** - Website analytics and statistics tracking
-- **Blog** - News, articles, and blog system
-- **Docs** - Documentation system with categories
-- **Legal** - Legal pages (privacy policy, terms of service)
-- **Notifications** - User notification system
-- **Pages** - Custom page management
-- **Releases** - Release notes and changelogs
-- **Shop** - E-commerce with payment gateway support
-- **Translations** - Translation management interface
-- **Votes** - Voting and polling system
+- **Analytics** - Analytics du site et suivi des statistiques
+- **Blog** - Actualités, articles et système de blog
+- **Documentation** - Système de documentation avec catégories
+- **Legal** - Pages légales (politique de confidentialité, conditions d'utilisation)
+- **Notifications** - Système de notifications utilisateurs
+- **Pages** - Gestion des pages personnalisées
+- **Releases** - Notes de version et changelogs
+- **Shop** - E-commerce avec support des passerelles de paiement
+- **Translations** - Interface de gestion des traductions
+- **Votes** - Système de vote et sondages
 
 ```bash
-# Plugin management
+# Gestion des plugins
 php artisan plugin:list
 php artisan plugin:install <plugin>
 php artisan plugin:uninstall <plugin>
 ```
 
-### Creating Plugins
+### Créer des Plugins
 
 ```bash
-# Create a new plugin
-php artisan make:plugin MyPlugin
+# Créer un nouveau plugin
+php artisan make:plugin MonPlugin
 
-# Plugin structure:
+# Structure d'un plugin :
 plugins/
-└── my-plugin/
-    ├── plugin.json              # Plugin metadata
-    ├── composer.json            # Dependencies
+└── mon-plugin/
+    ├── plugin.json              # Métadonnées du plugin
+    ├── composer.json            # Dépendances
     ├── src/
-    │   └── MyPluginServiceProvider.php
+    │   └── MonPlugin.php        # Classe principale
     ├── routes/
-    │   ├── web.php              # Public routes
-    │   └── admin.php            # Admin routes
+    │   ├── web.php              # Routes publiques
+    │   └── admin.php            # Routes admin
     ├── database/
-    │   └── migrations/          # Plugin migrations
+    │   └── migrations/          # Migrations du plugin
     └── resources/
         └── js/
-            └── pages/           # React pages
+            └── pages/           # Pages React
 ```
 
-### Theme System
+### Système de Thèmes
 
-ExilonCMS features a powerful theme override system:
+ExilonCMS dispose d'un puissant système d'override de thèmes :
 
 ```bash
-# Create a new theme
-php artisan theme:create MyTheme
+# Créer un nouveau thème
+php artisan theme:create MonTheme
 
-# Theme structure:
+# Structure d'un thème :
 themes/
-└── my-theme/
-    ├── theme.json              # Theme metadata
+└── mon-theme/
+    ├── theme.json              # Métadonnées du thème
     ├── resources/
-    │   ├── css/                # Theme styles
+    │   ├── css/                # Styles du thème
     │   ├── js/
-    │   │   └── pages/          # Theme page overrides
-    │   │       ├── Home.tsx    # Override home page
-    │   │       ├── Shop.tsx    # Override shop page
-    │   │       └── Blog.tsx    # Override blog page
-    │   └── views/              # Blade templates (optional)
-    └── assets/                 # Theme assets
+    │   │   └── pages/          # Overrides de pages du thème
+    │   │       ├── Home.tsx    # Override la page d'accueil
+    │   │       ├── Shop.tsx    # Override la page boutique
+    │   │       └── Blog.tsx    # Override la page blog
+    │   └── views/              # Templates Blade (optionnel)
+    └── assets/                 # Assets du thème
 ```
 
-**Theme Page Override Priority:**
-1. Active theme page (if exists)
-2. Plugin page (if route belongs to plugin)
-3. Core CMS page (fallback)
+**Priorité d'Override des Pages :**
+1. Page du thème actif (si existe)
+2. Page du plugin (si la route appartient à un plugin)
+3. Page du CMS core (fallback)
 
-This means you can override ANY page (core, plugin, or admin) by creating a corresponding file in your theme's `resources/js/pages/` directory.
+Cela signifie que vous pouvez override N'IMPORTE QUELLE page (core, plugin, ou admin) en créant un fichier correspondant dans le dossier `resources/js/pages/` de votre thème.
 
 ---
 
-## 🔄 Updating
+## 🔄 Mises à Jour
 
-ExilonCMS supports automatic updates via GitHub:
+ExilonCMS supporte les mises à jour automatiques via GitHub :
 
-1. Go to `/admin/updates` in your admin panel
-2. Check for available updates
-3. Download the update (automatic backup created)
-4. Install and apply
+1. Allez sur `/admin/updates` dans votre panneau admin
+2. Vérifiez les mises à jour disponibles
+3. Téléchargez la mise à jour (sauvegarde automatique créée)
+4. Installez et appliquez
 
-Or manually:
+Ou manuellement :
 
 ```bash
 git pull origin main
@@ -239,104 +264,102 @@ php artisan optimize:clear
 
 ## 📚 Documentation
 
-Full documentation is available at: [https://exiloncms.fr/docs](https://exiloncms.fr/docs)
+La documentation complète est disponible sur : [https://exiloncms.fr/docs](https://exiloncms.fr/docs)
 
-### Documentation Areas
+### Zones de Documentation
 
-- **Getting Started** - Installation and basic setup
-- **Plugin Development** - Creating custom plugins
-- **Theme Development** - Building custom themes
-- **API Reference** - REST API and hooks
-- **Configuration** - System settings and options
+- **Premiers Pas** - Installation et configuration de base
+- **Développement de Plugins** - Créer des plugins personnalisés
+- **Développement de Thèmes** - Créer des thèmes personnalisés
+- **Référence API** - API REST et hooks
+- **Configuration** - Paramètres système et options
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Stack Technique
 
 ### Backend
-- **Framework**: Laravel 12
-- **Language**: PHP 8.2+
-- **Database**: SQLite / PostgreSQL / MySQL
-- **Architecture**: Service-oriented with dependency injection
+- **Framework** : Laravel 12
+- **Langage** : PHP 8.2+
+- **Base de données** : SQLite / PostgreSQL / MySQL
+- **Architecture** : Orientée services avec injection de dépendances
 
 ### Frontend
-- **Framework**: React 19
-- **Language**: TypeScript (strict mode)
-- **Routing**: Inertia.js v2 (SPA without API)
-- **Styling**: Tailwind CSS v3.4
-- **UI Components**: shadcn/ui (Radix UI primitives)
-- **Rich Text**: Tiptap editor
-- **Forms**: React Hook Form + Zod validation
-- **Build Tool**: Vite 7
+- **Framework** : React 19
+- **Langage** : TypeScript (mode strict)
+- **Routing** : Inertia.js v2 (SPA sans API)
+- **Styling** : Tailwind CSS v3.4
+- **UI Components** : shadcn/ui (primitives Radix UI)
+- **Rich Text** : Éditeur Tiptap
+- **Forms** : React Hook Form + validation Zod
+- **Build Tool** : Vite 7
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contribuer
 
-Contributions are welcome! We accept contributions for:
-- Bug fixes and improvements
-- New plugins and themes
-- Documentation improvements
-- Performance optimizations
+Les contributions sont les bienvenues ! Nous acceptons les contributions pour :
+- Corrections de bugs et améliorations
+- Nouveaux plugins et thèmes
+- Améliorations de la documentation
+- Optimisations de performance
 
-Please see our contributing guidelines for more details.
+1. Fork le repository
+2. Créez votre branche feature (`git checkout -b feature/AmazingFeature`)
+3. Commit vos changements (`git commit -m 'Add some AmazingFeature'`)
+4. Push vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+### Style de Code
 
-### Code Style
-
-- Run `./vendor/bin/pint` before committing (required in CI)
-- Follow PSR-12 coding standards
-- Add tests for new features
-- Update documentation as needed
+- Exécutez `./vendor/bin/pint` avant de commit (requis dans la CI)
+- Suivez les standards de codage PSR-12
+- Ajoutez des tests pour les nouvelles fonctionnalités
+- Mettez à jour la documentation si nécessaire
 
 ---
 
-## 🌐 Community
+## 🌐 Communauté
 
-- **Website**: [https://exiloncms.fr](https://exiloncms.fr)
-- **Documentation**: [https://exiloncms.fr/docs](https://exiloncms.fr/docs)
-- **Extension Marketplace**: [https://exiloncms.fr/marketplace](https://exiloncms.fr/marketplace)
-- **GitHub Issues**: [Bug reports and feature requests](https://github.com/Exilon-Studios/exiloncms.fr/issues)
-- **Discussions**: [Community discussions](https://github.com/Exilon-Studios/exiloncms.fr/discussions)
-
----
-
-## 📄 License
-
-ExilonCMS is open-sourced software licensed under the [GPL-3.0-or-later](LICENSE).
-
-This means:
-- ✅ Free to use for personal and commercial projects
-- ✅ Free to modify and extend
-- ✅ Free to distribute (with source code)
-- ❌ Cannot close-source derivative works
-
-See [LICENSE](LICENSE) for the full text.
+- **Site Web** : [https://exiloncms.fr](https://exiloncms.fr)
+- **Documentation** : [https://exiloncms.fr/docs](https://exiloncms.fr/docs)
+- **Marketplace** : [https://exiloncms.fr/marketplace](https://exiloncms.fr/marketplace)
+- **GitHub Issues** : [Rapports de bugs et demandes de fonctionnalités](https://github.com/Exilon-Studios/exiloncms.fr/issues)
+- **Discussions** : [Discussions communautaires](https://github.com/Exilon-Studios/exiloncms.fr/discussions)
 
 ---
 
-## 🙏 Acknowledgments
+## 📄 Licence
 
-Built with inspiration from:
+ExilonCMS est un logiciel open-source sous licence [GPL-3.0-or-later](LICENSE).
+
+Cela signifie :
+- ✅ Gratuit à utiliser pour des projets personnels et commerciaux
+- ✅ Gratuit à modifier et étendre
+- ✅ Gratuit à distribuer (avec code source)
+- ❌ Ne peut pas fermer le code source de travaux dérivés
+
+Voir [LICENSE](LICENSE) pour le texte complet.
+
+---
+
+## 🙏 Remerciements
+
+Inspiré par :
 - [Laravel](https://laravel.com) - The PHP Framework For Web Artisans
 - [React](https://react.dev) - The library for web and native user interfaces
 - [Inertia.js](https://inertiajs.com) - Build single-page apps without building an API
 - [shadcn/ui](https://ui.shadcn.com) - Beautifully designed components
 - [Tailwind CSS](https://tailwindcss.com) - A utility-first CSS framework
-- [Azuriom](https://azuriom.com) - Game server CMS inspiration
-- [Paymenter](https://paymenter.org) - Billing platform inspiration
+- [Azuriom](https://azuriom.com) - Inspiration pour le CMS de serveurs de jeu
+- [Paymenter](https://paymenter.org) - Inspiration pour la plateforme de facturation
 
 ---
 
 <div align="center">
 
-**Built with ❤️ by Exilon Studios**
+**Développé avec ❤️ par Exilon Studios**
 
-[Website](https://exiloncms.fr) • [Documentation](https://exiloncms.fr/docs) • [Marketplace](https://exiloncms.fr/marketplace)
+[Site Web](https://exiloncms.fr) • [Documentation](https://exiloncms.fr/docs) • [Marketplace](https://exiloncms.fr/marketplace)
 
 </div>
