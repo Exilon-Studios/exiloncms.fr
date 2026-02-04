@@ -1,12 +1,12 @@
 'use client';
 
-import { Moon, Sun, Monitor } from 'lucide-react';
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { Moon, Sun } from 'lucide-react';
+import { useContext, useEffect, useState } from 'react';
+import { ThemeContext } from '@/contexts/ThemeContext';
 
 export default function ThemeSwitcher() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useContext(ThemeContext);
 
   useEffect(() => {
     setMounted(true);
@@ -20,17 +20,10 @@ export default function ThemeSwitcher() {
     );
   }
 
-  const nextTheme = theme === 'dark' ? 'light' : theme === 'light' ? 'system' : 'dark';
+  const nextTheme = theme === 'dark' ? 'light' : 'dark';
 
   const getThemeIcon = () => {
-    switch (theme) {
-      case 'dark':
-        return <Moon className="h-5 w-5" />;
-      case 'light':
-        return <Sun className="h-5 w-5" />;
-      default:
-        return <Monitor className="h-5 w-5" />;
-    }
+    return theme === 'dark' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />;
   };
 
   return (
@@ -45,7 +38,7 @@ export default function ThemeSwitcher() {
 
       <div className="absolute top-full right-0 mt-1 rounded-md bg-background border shadow-lg p-1 z-50 hidden group-hover:block">
         <div className="text-xs text-muted-foreground px-2 py-1 mb-1">
-          {theme === 'dark' ? 'Dark Mode' : theme === 'light' ? 'Light Mode' : 'System'}
+          {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
         </div>
       </div>
     </div>
