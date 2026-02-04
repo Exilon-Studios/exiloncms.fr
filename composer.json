@@ -66,9 +66,7 @@
         },
         "files": [
             "app/color_helpers.php",
-            "app/helpers.php",
-            "app/helpers/plugin.php",
-            "app/helpers/hooks.php"
+            "app/helpers.php"
         ]
     },
     "autoload-dev": {
