@@ -13,11 +13,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Shield, AlertCircle, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { trans } from '@/lib/i18n';
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from '@/components/ui/input-otp';
 
 interface TwoFactorEnableProps extends PageProps {
   secret: string;
@@ -114,21 +109,18 @@ export default function TwoFactorEnable({ secret, qrCode }: TwoFactorEnableProps
                   <div className="space-y-2">
                     <Label htmlFor="code" className="text-lg">{trans('admin.users.edit.2fa_code')}</Label>
                     <div className="flex justify-center py-2">
-                      <InputOTP
+                      <Input
+                        id="code"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         maxLength={6}
                         value={data.code}
-                        onChange={(value) => setData('code', value)}
-                        containerClassName="gap-3"
-                      >
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} className="w-14 h-16 text-2xl" />
-                          <InputOTPSlot index={1} className="w-14 h-16 text-2xl" />
-                          <InputOTPSlot index={2} className="w-14 h-16 text-2xl" />
-                          <InputOTPSlot index={3} className="w-14 h-16 text-2xl" />
-                          <InputOTPSlot index={4} className="w-14 h-16 text-2xl" />
-                          <InputOTPSlot index={5} className="w-14 h-16 text-2xl" />
-                        </InputOTPGroup>
-                      </InputOTP>
+                        onChange={(e) => setData('code', e.target.value)}
+                        className="w-64 text-center text-2xl tracking-widest"
+                        placeholder="000000"
+                        autoComplete="one-time-code"
+                      />
                     </div>
                     {errors.code && (
                       <p className="text-sm text-destructive flex items-center gap-1">

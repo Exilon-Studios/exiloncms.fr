@@ -6,12 +6,8 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEvent } from 'react';
 import { PageProps } from '@/types';
 import { useTrans } from '@/lib/trans';
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from '@/components/ui/input-otp';
 import { ArrowLeft, Lock } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 export default function TwoFactor() {
   const { settings } = usePage<PageProps>().props;
@@ -54,20 +50,17 @@ export default function TwoFactor() {
             {/* Code Input */}
             <div className="space-y-4">
               <div className="flex justify-center">
-                <InputOTP
+                <Input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength={6}
                   value={data.code}
-                  onChange={(value) => setData('code', value)}
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} className="w-12 h-14 text-lg text-center" />
-                    <InputOTPSlot index={1} className="w-12 h-14 text-lg text-center" />
-                    <InputOTPSlot index={2} className="w-12 h-14 text-lg text-center" />
-                    <InputOTPSlot index={3} className="w-12 h-14 text-lg text-center" />
-                    <InputOTPSlot index={4} className="w-12 h-14 text-lg text-center" />
-                    <InputOTPSlot index={5} className="w-12 h-14 text-lg text-center" />
-                  </InputOTPGroup>
-                </InputOTP>
+                  onChange={(e) => setData('code', e.target.value)}
+                  className="w-64 text-center text-2xl tracking-widest"
+                  placeholder="000000"
+                  autoComplete="one-time-code"
+                />
               </div>
 
               {errors.code && (
