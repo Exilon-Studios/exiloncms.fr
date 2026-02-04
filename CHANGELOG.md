@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.72] - 2026-02-04
 
+### Removed
+- **Unused code cleanup**: Removed all unused components, pages, and dependencies
+  - Deleted theme components (aceternity, vorix, hostinkar, wion) - 50+ unused files
+  - Removed unused UI components (data-table, input-otp, modal-dialog)
+  - Deleted unused pages (Resources, Maintenance, Admin/Bans, Admin/Images)
+  - Removed unused admin controllers (ExtensionUpdateController, ResourceController)
+  - Cleaned up admin routes (removed resources, extension updates routes)
+  - Removed unused npm packages (@uploadthing/*, motion duplicate)
+- **Legacy plugin cleanup**: Removed old docs plugin, replaced with new documentation plugin
+
 ### Fixed
 - **Translation placeholders**: Fixed trans() function to support {placeholder} format in addition to :placeholder
   - Onboarding page now correctly displays step counts and percentages
