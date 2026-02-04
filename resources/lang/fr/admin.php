@@ -979,3 +979,4 @@ return [
             'select_file_hint' => 'Choisissez un fichier dans l\'arborescence pour l\'éditer',
         ],
     ],
+];

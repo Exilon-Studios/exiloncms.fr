@@ -149,8 +149,6 @@ abstract class Plugin
      *
      * Override this method to programmatically define widgets
      * Alternatively, use plugin.json with "widgets" key
-     *
-     * @return array
      */
     public function getWidgets(): array
     {
@@ -163,8 +161,6 @@ abstract class Plugin
      *
      * Override this method to programmatically define header elements
      * Alternatively, use plugin.json with "header_icons" key
-     *
-     * @return array
      */
     public function getHeaderElements(): array
     {
@@ -177,8 +173,6 @@ abstract class Plugin
      *
      * Override this method to programmatically define admin navigation
      * Alternatively, use plugin.json with "admin_section" or "navigation" key
-     *
-     * @return array
      */
     public function getNavigation(): array
     {
@@ -235,6 +229,7 @@ abstract class Plugin
         // Support legacy 'admin_section' format
         if (isset($manifest['admin_section'])) {
             $section = $manifest['admin_section'];
+
             return [
                 'icon' => $section['icon'] ?? 'Plugin',
                 'position' => $section['position'] ?? 100,

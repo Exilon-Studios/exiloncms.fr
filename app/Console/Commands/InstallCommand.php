@@ -5,7 +5,6 @@ namespace ExilonCMS\Console\Commands;
 use ExilonCMS\Extensions\UpdateManager;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -575,14 +574,14 @@ DOCKERFILE;
         // Theme
         if (! empty($this->config['selected_theme'])) {
             $this->info("Theme selected: {$this->config['selected_theme']}");
-            $this->warn("  Marketplace integration has been removed. Please install themes manually.");
+            $this->warn('  Marketplace integration has been removed. Please install themes manually.');
         }
 
         // Plugins
         if (! empty($this->config['selected_plugins'])) {
             foreach ($this->config['selected_plugins'] as $plugin) {
                 $this->info("Plugin available locally: {$plugin}");
-                $this->warn("  Marketplace integration has been removed. Please install plugins manually.");
+                $this->warn('  Marketplace integration has been removed. Please install plugins manually.');
             }
         }
     }

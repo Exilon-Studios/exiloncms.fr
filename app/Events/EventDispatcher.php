@@ -31,7 +31,6 @@ class EventDispatcher
      * @param  string  $event  Event name (e.g., 'user.created', 'order.completed')
      * @param  callable  $listener  Callback function to execute when event is dispatched
      * @param  int  $priority  Priority (higher = executed first). Default 0.
-     * @return void
      */
     public static function listen(string $event, callable $listener, int $priority = 0): void
     {
@@ -50,7 +49,6 @@ class EventDispatcher
      *
      * @param  string  $event  Event name
      * @param  array  $payload  Data to pass to listeners
-     * @return void
      */
     public static function dispatch(string $event, array $payload = []): void
     {
@@ -78,9 +76,6 @@ class EventDispatcher
 
     /**
      * Get all listeners for an event.
-     *
-     * @param  string  $event
-     * @return array
      */
     public static function getListeners(string $event): array
     {
@@ -89,9 +84,6 @@ class EventDispatcher
 
     /**
      * Remove all listeners for an event.
-     *
-     * @param  string  $event
-     * @return void
      */
     public static function forget(string $event): void
     {
@@ -100,9 +92,6 @@ class EventDispatcher
 
     /**
      * Check if an event has any listeners.
-     *
-     * @param  string  $event
-     * @return bool
      */
     public static function hasListeners(string $event): bool
     {
@@ -111,8 +100,6 @@ class EventDispatcher
 
     /**
      * Clear all event listeners.
-     *
-     * @return void
      */
     public static function flush(): void
     {
@@ -126,7 +113,6 @@ class EventDispatcher
      * defined in the plugin's manifest file.
      *
      * @param  string  $pluginId  Plugin ID
-     * @return void
      */
     public static function registerPluginListeners(string $pluginId): void
     {
@@ -158,9 +144,6 @@ class EventDispatcher
 if (! function_exists('register_plugin_event_listeners')) {
     /**
      * Register event listeners from a plugin's manifest.
-     *
-     * @param  string  $pluginId
-     * @return void
      */
     function register_plugin_event_listeners(string $pluginId): void
     {

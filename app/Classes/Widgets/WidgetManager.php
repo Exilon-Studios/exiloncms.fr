@@ -15,8 +15,6 @@ class WidgetManager
 {
     /**
      * Get all available widgets from enabled plugins.
-     *
-     * @return array
      */
     public function getWidgets(): array
     {
@@ -45,7 +43,6 @@ class WidgetManager
      * Get widgets for a specific position.
      *
      * @param  string  $position  e.g., 'dashboard_main', 'dashboard_sidebar'
-     * @return array
      */
     public function getWidgetsByPosition(string $position): array
     {
@@ -56,9 +53,6 @@ class WidgetManager
 
     /**
      * Get user's configured dashboard widgets.
-     *
-     * @param  int|null  $userId
-     * @return array
      */
     public function getUserWidgets(?int $userId = null): array
     {
@@ -80,10 +74,6 @@ class WidgetManager
 
     /**
      * Save user's dashboard widget configuration.
-     *
-     * @param  int  $userId
-     * @param  array  $layout
-     * @return void
      */
     public function saveUserWidgets(int $userId, array $layout): void
     {
@@ -98,8 +88,6 @@ class WidgetManager
 
     /**
      * Get default dashboard widgets.
-     *
-     * @return array
      */
     public function getDefaultWidgets(): array
     {
@@ -111,10 +99,6 @@ class WidgetManager
 
     /**
      * Normalize widget data.
-     *
-     * @param  string  $pluginId
-     * @param  array  $widget
-     * @return array
      */
     protected function normalizeWidget(string $pluginId, array $widget): array
     {
@@ -133,9 +117,6 @@ class WidgetManager
 
     /**
      * Get widget data for rendering.
-     *
-     * @param  string  $widgetId
-     * @return array|null
      */
     public function getWidgetData(string $widgetId): ?array
     {
@@ -153,9 +134,7 @@ class WidgetManager
     /**
      * Check if user has permission to view a widget.
      *
-     * @param  array  $widget
      * @param  \ExilonCMS\Models\User|null  $user
-     * @return bool
      */
     public function canViewWidget(array $widget, $user = null): bool
     {
@@ -183,8 +162,6 @@ class WidgetManager
 
     /**
      * Clear widget cache.
-     *
-     * @return void
      */
     public function clearCache(): void
     {

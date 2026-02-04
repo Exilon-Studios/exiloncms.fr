@@ -7,8 +7,8 @@ use ExilonCMS\Models\NavbarElement;
 use ExilonCMS\Plugins\Blog\Models\Post;
 use ExilonCMS\Plugins\Pages\Models\Page;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\App;
+use Illuminate\Validation\Rule;
 
 class NavbarElementRequest extends FormRequest
 {

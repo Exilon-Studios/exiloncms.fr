@@ -5,7 +5,6 @@ namespace ExilonCMS\Http\Controllers\Admin\Documentation;
 use ExilonCMS\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Response;
 use Inertia\Inertia;
 
 class DocumentationController extends Controller
@@ -27,11 +26,11 @@ class DocumentationController extends Controller
         }
 
         // Get categories for first locale (or 'fr' as default)
-        $defaultLocale = !empty($locales) ? $locales[0] : 'fr';
+        $defaultLocale = ! empty($locales) ? $locales[0] : 'fr';
         $categories = [];
 
-        if (File::exists($docsPath . '/' . $defaultLocale)) {
-            $categoryDirs = File::directories($docsPath . '/' . $defaultLocale);
+        if (File::exists($docsPath.'/'.$defaultLocale)) {
+            $categoryDirs = File::directories($docsPath.'/'.$defaultLocale);
             foreach ($categoryDirs as $dir) {
                 $categories[] = basename($dir);
             }
@@ -51,7 +50,7 @@ class DocumentationController extends Controller
     {
         $filePath = base_path("docs/{$locale}/{$category}/{$page}.md");
 
-        if (!File::exists($filePath)) {
+        if (! File::exists($filePath)) {
             return response()->json(['error' => 'File not found'], 404);
         }
 
@@ -97,7 +96,7 @@ class DocumentationController extends Controller
 
         // Create directory if not exists
         $directory = dirname($filePath);
-        if (!File::exists($directory)) {
+        if (! File::exists($directory)) {
             File::makeDirectory($directory, 0755, true);
         }
 
@@ -107,16 +106,16 @@ class DocumentationController extends Controller
             if ($value === true || $value === false) {
                 $value = $value ? 'true' : 'false';
             } elseif (is_array($value)) {
-                $value = '[' . implode(', ', array_map(fn($v) => '"' . $v . '"', $value)) . ']';
+                $value = '['.implode(', ', array_map(fn ($v) => '"'.$v.'"', $value)).']';
             } else {
-                $value = '"' . $value . '"';
+                $value = '"'.$value.'"';
             }
             $frontmatterYaml .= "{$key}: {$value}\n";
         }
         $frontmatterYaml .= "---\n";
 
         // Save file
-        File::put($filePath, $frontmatterYaml . "\n" . $request->input('markdown'));
+        File::put($filePath, $frontmatterYaml."\n".$request->input('markdown'));
 
         return response()->json([
             'success' => true,

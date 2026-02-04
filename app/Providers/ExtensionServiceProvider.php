@@ -33,12 +33,12 @@ class ExtensionServiceProvider extends ServiceProvider
 
         // Debug: Log database state at boot start
         $logFile = storage_path('logs/boot_debug.log');
-        $debug = date('Y-m-d H:i:s') . ' - BOOT START - DB enabled_plugins: ';
+        $debug = date('Y-m-d H:i:s').' - BOOT START - DB enabled_plugins: ';
         try {
             $dbValue = \Illuminate\Support\Facades\DB::table('settings')->where('name', 'enabled_plugins')->value('value');
-            $debug .= $dbValue . "\n";
+            $debug .= $dbValue."\n";
         } catch (\Exception $e) {
-            $debug .= 'ERROR: ' . $e->getMessage() . "\n";
+            $debug .= 'ERROR: '.$e->getMessage()."\n";
         }
         file_put_contents($logFile, $debug, FILE_APPEND);
 
@@ -48,19 +48,19 @@ class ExtensionServiceProvider extends ServiceProvider
             $repository->set($loadedSettings);
 
             // Debug: Log what was loaded
-            $debugLoaded = date('Y-m-d H:i:s') . ' - LOADED SETTINGS - enabled_plugins: ' . json_encode($loadedSettings['enabled_plugins'] ?? 'NOT SET') . "\n";
+            $debugLoaded = date('Y-m-d H:i:s').' - LOADED SETTINGS - enabled_plugins: '.json_encode($loadedSettings['enabled_plugins'] ?? 'NOT SET')."\n";
             file_put_contents($logFile, $debugLoaded, FILE_APPEND);
         } catch (Exception) {
             //
         }
 
         // Debug: Log database state at boot end
-        $debug2 = date('Y-m-d H:i:s') . ' - BOOT END - DB enabled_plugins: ';
+        $debug2 = date('Y-m-d H:i:s').' - BOOT END - DB enabled_plugins: ';
         try {
             $dbValue2 = \Illuminate\Support\Facades\DB::table('settings')->where('name', 'enabled_plugins')->value('value');
-            $debug2 .= $dbValue2 . "\n";
+            $debug2 .= $dbValue2."\n";
         } catch (\Exception $e) {
-            $debug2 .= 'ERROR: ' . $e->getMessage() . "\n";
+            $debug2 .= 'ERROR: '.$e->getMessage()."\n";
         }
         file_put_contents($logFile, $debug2, FILE_APPEND);
     }
@@ -77,7 +77,7 @@ class ExtensionServiceProvider extends ServiceProvider
         // Debug: log enabled_plugins value
         if (isset($settings['enabled_plugins'])) {
             $logFile = storage_path('logs/settings_debug.log');
-            $debug = date('Y-m-d H:i:s') . ' - enabled_plugins: ' . json_encode($settings['enabled_plugins']) . ' (type: ' . gettype($settings['enabled_plugins']) . ')' . "\n";
+            $debug = date('Y-m-d H:i:s').' - enabled_plugins: '.json_encode($settings['enabled_plugins']).' (type: '.gettype($settings['enabled_plugins']).')'."\n";
             file_put_contents($logFile, $debug, FILE_APPEND);
         }
 

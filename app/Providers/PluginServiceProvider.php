@@ -5,9 +5,9 @@ namespace ExilonCMS\Providers;
 use ExilonCMS\Classes\Plugin\Plugin;
 use ExilonCMS\Classes\Plugin\PluginLoader;
 use ExilonCMS\Events\EventDispatcher;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
 /**

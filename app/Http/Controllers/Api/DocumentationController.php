@@ -5,7 +5,6 @@ namespace ExilonCMS\Http\Controllers\Api;
 use ExilonCMS\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Response;
 
 class DocumentationController extends Controller
 {
@@ -14,9 +13,9 @@ class DocumentationController extends Controller
      */
     public function fileTree(Request $request, string $locale = 'fr')
     {
-        $docsPath = base_path('docs/' . $locale);
+        $docsPath = base_path('docs/'.$locale);
 
-        if (!File::exists($docsPath)) {
+        if (! File::exists($docsPath)) {
             return response()->json(['tree' => []]);
         }
 
@@ -42,7 +41,7 @@ class DocumentationController extends Controller
         // Add directories first
         foreach ($directories as $directory) {
             $name = basename($directory);
-            $relativeName = $relativePath ? $relativePath . '/' . $name : $name;
+            $relativeName = $relativePath ? $relativePath.'/'.$name : $name;
 
             $items[] = [
                 'type' => 'directory',
@@ -61,7 +60,7 @@ class DocumentationController extends Controller
             }
 
             $name = $file->getFilename();
-            $relativeName = $relativePath ? $relativePath . '/' . $name : $name;
+            $relativeName = $relativePath ? $relativePath.'/'.$name : $name;
             $slug = str_replace('.md', '', $name);
 
             // Extract title from frontmatter

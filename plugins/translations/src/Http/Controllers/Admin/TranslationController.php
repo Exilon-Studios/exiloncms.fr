@@ -6,7 +6,6 @@ use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Plugins\Translations\Models\TranslationEntry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
 class TranslationController extends Controller

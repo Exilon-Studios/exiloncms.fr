@@ -24,6 +24,7 @@ class PluginEnableCommand extends Command
             $pluginPath = base_path("plugins/{$plugin}");
             if (! File::exists($pluginPath)) {
                 $this->warn("Plugin '{$plugin}' does not exist");
+
                 continue;
             }
 
@@ -33,7 +34,7 @@ class PluginEnableCommand extends Command
                 $enabledCount++;
 
                 // Run migrations if they exist
-                if (is_dir($pluginPath . '/database/migrations')) {
+                if (is_dir($pluginPath.'/database/migrations')) {
                     $this->call('migrate', ['--force' => true]);
                     $this->info("  Ran migrations for {$plugin}");
                 }

@@ -284,4 +284,3 @@ if (! function_exists('scheduler_running')) {
         return $last !== null && Carbon::parse($last)->diffInHours() < 1;
     }
 }
-

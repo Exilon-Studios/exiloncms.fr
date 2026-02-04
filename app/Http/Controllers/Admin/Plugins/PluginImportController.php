@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use ZipArchive;
 
@@ -128,8 +127,8 @@ class PluginImportController extends Controller
     /**
      * Validate plugin structure and extract metadata.
      *
-     * @param  string  $extractPath
      * @return array Plugin metadata
+     *
      * @throws \Exception
      */
     protected function validatePluginStructure(string $extractPath): array
@@ -182,6 +181,7 @@ class PluginImportController extends Controller
                         // Check if it uses PluginMeta attribute
                         if (str_contains($content, 'PluginMeta') || str_contains($content, 'extends Plugin')) {
                             $pluginId = basename($singleDir);
+
                             return [
                                 'id' => $pluginId,
                                 'name' => ucfirst($pluginId),
@@ -244,7 +244,7 @@ class PluginImportController extends Controller
 
         if (! isset($psr4[$namespace])) {
             // Add namespace to composer.json
-            $psr4[$namespace."\\"] = $srcPath;
+            $psr4[$namespace.'\\'] = $srcPath;
             $composer['autoload']['psr-4'] = $psr4;
 
             File::put($composerPath, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));

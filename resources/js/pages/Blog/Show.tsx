@@ -9,7 +9,7 @@ import { PageProps } from '@/types';
 import BlogThemeLayout from '@/layouts/BlogLayout';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, User, Tag, MessageCircle } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 interface Comment {
   id: number;

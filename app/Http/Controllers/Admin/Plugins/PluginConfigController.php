@@ -6,7 +6,6 @@ use ExilonCMS\Classes\Plugin\PluginLoader;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\Setting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 
 /**
@@ -115,10 +114,6 @@ class PluginConfigController extends Controller
 
     /**
      * Process a field value based on its type.
-     *
-     * @param  mixed  $value
-     * @param  array  $field
-     * @return mixed
      */
     protected function processFieldValue(mixed $value, array $field): mixed
     {
@@ -136,7 +131,6 @@ class PluginConfigController extends Controller
     /**
      * Clear all settings for a plugin.
      *
-     * @param  string  $plugin
      * @return \Illuminate\Http\RedirectResponse
      */
     public function clear(string $plugin)

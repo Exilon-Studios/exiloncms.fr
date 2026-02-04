@@ -128,6 +128,7 @@ if (! function_exists('hex2hsl_value')) {
     function hex2hsl_value(string $hex): string
     {
         $hsl = hex2hsl($hex);
+
         return str_replace('hsl(', '', str_replace(')', '', $hsl));
     }
 }

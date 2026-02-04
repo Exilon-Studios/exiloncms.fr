@@ -40,7 +40,6 @@ class DashboardWidgetController extends Controller
     /**
      * Get widgets by position.
      *
-     * @param  string  $position
      * @return \Illuminate\Http\JsonResponse
      */
     public function getByPosition(Request $request, string $position)
@@ -91,7 +90,6 @@ class DashboardWidgetController extends Controller
     /**
      * Get widget data for rendering.
      *
-     * @param  string  $widgetId
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Request $request, string $widgetId)

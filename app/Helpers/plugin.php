@@ -119,6 +119,7 @@ if (! function_exists('plugin_navigation')) {
         // Support for legacy 'admin_section' format - convert to new format
         if (isset($manifest['admin_section'])) {
             $section = $manifest['admin_section'];
+
             return [
                 'icon' => $section['icon'] ?? 'Plugin',
                 'position' => $section['position'] ?? 100,
@@ -245,6 +246,7 @@ if (! function_exists('plugin_widgets_by_context')) {
         // Filter widgets by context
         return array_filter($widgets, function ($widget) use ($context) {
             $widgetContext = $widget['context'] ?? 'user';
+
             return $widgetContext === $context || $widgetContext === 'both';
         });
     }
@@ -503,6 +505,7 @@ if (! function_exists('plugin_get_sidebar_links')) {
 
         if ($plugin) {
             $links = $plugin->getSidebarLinks();
+
             return $links[$context] ?? [];
         }
 

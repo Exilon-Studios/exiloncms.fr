@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Plugins\Documentation;
 
-use ExilonCMS\Classes\Plugin\Plugin;
 use ExilonCMS\Attributes\PluginMeta;
+use ExilonCMS\Classes\Plugin\Plugin;
 
 #[PluginMeta(
     id: 'documentation',
