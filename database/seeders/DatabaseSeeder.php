@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             CompanySettingsSeeder::class,
             LandingSettingsSeeder::class,
-            MarketplaceSettingsSeeder::class,
             ThemeSeeder::class,
         ];
 
