@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.72] - 2026-02-04
 
+### Fixed
+- **Application bootstrap**: Fixed Route facade error by restoring Laravel 12 `then:` callback pattern in bootstrap/app.php
+  - Routes now properly registered within `withRouting()->then()` callback
+  - Plugin helpers loaded via require_once at bootstrap top
+- **Frontend build**: Removed unused ModalDialog import that was causing Vite build errors
+- **Dependencies**: Restored correct Laravel 12.0 and inertia-laravel 2.0 versions
+
 ### Removed
 - **Unused code cleanup**: Removed all unused components, pages, and dependencies
   - Deleted theme components (aceternity, vorix, hostinkar, wion) - 50+ unused files

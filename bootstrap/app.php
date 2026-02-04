@@ -3,11 +3,10 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Support\Facades\Route;
 
 // Load plugin helpers (must be loaded before PluginServiceProvider)
-require_once __DIR__ . '/../app/helpers/plugin.php';
-require_once __DIR__ . '/../app/helpers/hooks.php';
+require_once __DIR__.'/../app/helpers/plugin.php';
+require_once __DIR__.'/../app/helpers/hooks.php';
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
@@ -18,15 +17,16 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            // Install routes (must be loaded before admin, only work when not installed)
+            // Install routes (loaded before admin, protected by RedirectIfNotInstalled middleware)
             Route::middleware(['web'])
                 ->group(base_path('routes/install.php'));
 
+            // Admin routes
             Route::middleware(['web', 'auth', 'admin'])
                 ->prefix('admin')
                 ->name('admin.')
                 ->group(base_path('routes/admin.php'));
-        }
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [

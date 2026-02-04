@@ -15,7 +15,6 @@ import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { route as ziggyRoute } from 'ziggy-js';
 import { ModalProvider } from '@/lib/modalManager';
-import { ModalDialog } from '@/components/ui/modal-dialog';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
 const appName = import.meta.env.VITE_APP_NAME || 'ExilonCMS';
@@ -108,7 +107,6 @@ createInertiaApp({
       <ThemeProvider>
         <ModalProvider>
           <App {...props} />
-          <ModalDialog />
         </ModalProvider>
       </ThemeProvider>
     );
