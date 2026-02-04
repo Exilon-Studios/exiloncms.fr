@@ -61,7 +61,6 @@ export interface SiteSettings {
   darkTheme?: boolean;
   installMode?: string;
   navbar?: NavbarSettings;
-  marketplaceUrl?: string;
   seo?: SEOSettings;
   activeTheme?: string;
   isPreviewMode?: boolean;

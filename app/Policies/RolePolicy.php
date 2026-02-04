@@ -15,7 +15,9 @@ class RolePolicy
      */
     public function update(User $user, Role $role): bool
     {
-        return $user->role->power > $role->power;
+        // User can update roles with power >= their own power (higher number = lower priority)
+        // Or if they are an admin
+        return $user->role->power >= $role->power || $user->role->is_admin;
     }
 
     /**
@@ -23,6 +25,8 @@ class RolePolicy
      */
     public function delete(User $user, Role $role): bool
     {
-        return $user->role->power > $role->power;
+        // User can delete roles with power >= their own power (higher number = lower priority)
+        // Or if they are an admin
+        return $user->role->power >= $role->power || $user->role->is_admin;
     }
 }

@@ -4,13 +4,17 @@ namespace ExilonCMS\Providers;
 
 use ExilonCMS\Classes\Plugin\Plugin;
 use ExilonCMS\Classes\Plugin\PluginLoader;
+use ExilonCMS\Events\EventDispatcher;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 
 /**
  * Plugin Service Provider
  *
  * Loads and boots all enabled plugins using the new Plugin base class system
+ * Uses file-based storage (plugins/plugins.json) inspired by Azuriom
  */
 class PluginServiceProvider extends ServiceProvider
 {
@@ -32,14 +36,40 @@ class PluginServiceProvider extends ServiceProvider
             return;
         }
 
+        // Load enabled plugins from file (NOT database)
+        $enabledPlugins = $this->loadEnabledPluginsFromFile();
+
         // Lazy load in boot(), not register()
         $this->loader = $this->app->make(PluginLoader::class);
 
-        // Get enabled plugins from settings
-        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
-
         // Load all enabled plugins
         $this->loadPlugins($enabledPlugins);
+
+        // Register event listeners from plugin.json manifests
+        foreach ($enabledPlugins as $pluginId) {
+            EventDispatcher::registerPluginListeners($pluginId);
+        }
+    }
+
+    /**
+     * Load enabled plugins from plugins.json file
+     */
+    protected function loadEnabledPluginsFromFile(): array
+    {
+        $pluginsFile = base_path('plugins/plugins.json');
+
+        if (! File::exists($pluginsFile)) {
+            return [];
+        }
+
+        $content = File::get($pluginsFile);
+        $plugins = json_decode($content, true);
+
+        if (! is_array($plugins)) {
+            return [];
+        }
+
+        return array_filter($plugins, fn ($plugin) => is_string($plugin) && ! empty($plugin));
     }
 
     /**
@@ -47,6 +77,14 @@ class PluginServiceProvider extends ServiceProvider
      */
     protected function loadPlugins(array $enabledPlugins): void
     {
+        // Ensure we have a flat array of plugin IDs
+        $enabledPlugins = collect($enabledPlugins)
+            ->flatten()
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
+
         foreach ($enabledPlugins as $pluginId) {
             $plugin = $this->loader->getPlugin($pluginId);
 
@@ -54,18 +92,24 @@ class PluginServiceProvider extends ServiceProvider
                 continue;
             }
 
-            // Load routes
+            // Load routes - use plugin ID as prefix (e.g., /shop, /blog)
             if ($plugin->hasRoutes()) {
+                $routesPath = $plugin->getRoutesPath();
                 Route::middleware(['web'])
-                    ->prefix('plugins/'.$pluginId)
-                    ->group($plugin->getRoutesPath());
+                    ->prefix($pluginId)
+                    ->group(function () use ($plugin, $routesPath) {
+                        require $routesPath;
+                    });
             }
 
             // Load admin routes
             if ($plugin->hasAdminRoutes()) {
+                $adminRoutesPath = $plugin->getAdminRoutesPath();
                 Route::middleware(['web', 'auth', 'admin'])
                     ->prefix('admin/plugins/'.$pluginId)
-                    ->group($plugin->getAdminRoutesPath());
+                    ->group(function () use ($plugin, $adminRoutesPath) {
+                        require $adminRoutesPath;
+                    });
             }
 
             // Load views

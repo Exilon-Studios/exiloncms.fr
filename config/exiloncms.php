@@ -26,29 +26,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Marketplace Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Configuration for the ExilonCMS marketplace system
-    |
-    */
-
-    'marketplace' => [
-        'enabled' => env('EXILONCMS_MARKETPLACE_ENABLED', true),
-        'url' => env('EXILONCMS_MARKETPLACE_URL', 'https://marketplace.exiloncms.com'),
-        'registry_url' => env('EXILONCMS_MARKETPLACE_REGISTRY_URL', 'https://raw.githubusercontent.com/Exilon-Studios/ExilonCMS-marketplace/main'),
-        'api_version' => 'v1',
-        'registry' => 'registry.json',
-        'cache_duration' => 3600, // 1 hour
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | GitHub Update Configuration
     |--------------------------------------------------------------------------
     |
-    | Configuration for GitHub-based updates (for CMS core updates)
-    | Plugins and themes still use the marketplace above
+    | Configuration for GitHub-based updates
     |
     */
 
@@ -87,7 +68,6 @@ return [
     'features' => [
         'plugins' => true,
         'themes' => true,
-        'marketplace' => true,
         'discord_integration' => env('EXILONCMS_DISCORD_ENABLED', false),
         'analytics' => env('EXILONCMS_ANALYTICS_ENABLED', false),
     ],

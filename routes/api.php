@@ -1,6 +1,7 @@
 <?php
 
 use ExilonCMS\Http\Controllers\Api\AuthController;
+use ExilonCMS\Http\Controllers\Api\DocumentationController;
 use ExilonCMS\Http\Controllers\Api\ExilonLinkController;
 use ExilonCMS\Http\Controllers\Api\FeedController;
 use ExilonCMS\Http\Controllers\Api\PostController;
@@ -71,3 +72,8 @@ Route::prefix('/azlink')->middleware('server.token')->group(function () {
 
 Route::get('/rss', [FeedController::class, 'rss'])->name('feeds.rss');
 Route::get('/atom', [FeedController::class, 'atom'])->name('feeds.atom');
+
+// Documentation API routes
+Route::prefix('docs')->name('docs.')->group(function () {
+    Route::get('/{locale}/tree', [DocumentationController::class, 'fileTree'])->name('tree');
+});

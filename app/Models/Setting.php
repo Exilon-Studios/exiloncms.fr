@@ -31,6 +31,7 @@ class Setting extends Model
      * @var string[]
      */
     private static array $jsonEncoded = [
+        'enabled_plugins',
         'maintenance.paths',
         'themes.config.*',
     ];
@@ -148,8 +149,11 @@ class Setting extends Model
         }
 
         // Force reload ALL settings from database (not cache) and update the singleton
+        // Use keyBy with map to properly trigger the getValueAttribute accessor
         $repository = app(SettingsRepository::class);
-        $settings = Setting::all()->pluck('value', 'name')->all();
+        $settings = Setting::all()->mapWithKeys(fn ($setting) => [
+            $setting->name => $setting->getAttribute('value'),
+        ])->all();
         $repository->set($settings);
 
         // Reset cache with fresh data for 1 day

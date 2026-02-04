@@ -31,6 +31,46 @@
         <link rel="shortcut icon" href="{{ favicon() }}">
         <link rel="icon" type="image/svg+xml" href="{{ favicon() }}">
 
+        @php
+            $activeTheme = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->getActiveThemeId();
+
+            // Get colors from settings, with proper fallback
+            $primaryColor = setting('primary_color');
+            $secondaryColor = setting('secondary_color');
+
+            // If not set or "default", use the actual default colors
+            if (!$primaryColor || $primaryColor === 'default') {
+                $primaryColor = '#3b82f6'; // blue-500
+            }
+            if (!$secondaryColor || $secondaryColor === 'default') {
+                $secondaryColor = '#8b5cf6'; // violet-500
+            }
+
+            $primaryForeground = color_contrast($primaryColor);
+            $secondaryForeground = color_contrast($secondaryColor);
+        @endphp
+
+        <!-- Active Theme Styles (CMS colors injected as HSL for Tailwind) -->
+        <style>
+            :root {
+                /* Tailwind primary - HSL format */
+                --primary: {!! hex2hsl_value($primaryColor) !!};
+                --primary-foreground: {!! hex2hsl_value($primaryForeground) !!};
+
+                /* Tailwind secondary - HSL format */
+                --secondary: {!! hex2hsl_value($secondaryColor) !!};
+                --secondary-foreground: {!! hex2hsl_value($secondaryForeground) !!};
+
+                /* Ring color */
+                --ring: {!! hex2hsl_value($primaryColor) !!};
+            }
+        </style>
+
+        <!-- Active Theme Script -->
+        <script>
+            window.__exiloncms_theme = {!! json_encode($activeTheme) !!};
+        </script>
+
         <!-- Scripts -->
         @routes
         @viteReactRefresh

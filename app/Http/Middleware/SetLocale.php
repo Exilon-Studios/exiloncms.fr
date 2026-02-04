@@ -5,6 +5,7 @@ namespace ExilonCMS\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
@@ -16,8 +17,8 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Get locale from settings, fallback to config
-        $locale = setting('locale', config('app.locale', 'en'));
+        // Get locale from session first (user preference), then settings, then config
+        $locale = Session::get('locale', setting('locale', config('app.locale', 'en')));
 
         // Set the application locale
         App::setLocale($locale);

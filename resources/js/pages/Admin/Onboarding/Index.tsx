@@ -2,6 +2,7 @@ import { Head, useForm, usePage } from '@inertiajs/react';
 import { useEffect, useState, FormEvent } from 'react';
 import { PageProps } from '@/types';
 import { router } from '@inertiajs/react';
+import { trans } from '@/lib/i18n';
 import { SiteNameStep } from '@/components/admin/onboarding/SiteNameStep';
 import { LogoStep } from '@/components/admin/onboarding/LogoStep';
 import { ThemeStep } from '@/components/admin/onboarding/ThemeStep';
@@ -70,13 +71,13 @@ export default function OnboardingIndex({
   };
 
   const skipStep = () => {
-    if (confirm('Êtes-vous sûr de vouloir passer cette étape ? Vous pourrez la configurer plus tard dans les paramètres.')) {
+    if (confirm(trans('admin.onboarding.skip_step_confirm'))) {
       router.post(route('admin.onboarding.skip', currentStep));
     }
   };
 
   const completeOnboarding = () => {
-    if (confirm('Voulez-vous terminer le onboarding ? Vous pourrez configurer le reste plus tard.')) {
+    if (confirm(trans('admin.onboarding.complete_onboarding_confirm'))) {
       router.post(route('admin.onboarding.complete'));
     }
   };
@@ -111,7 +112,7 @@ export default function OnboardingIndex({
 
   return (
     <>
-      <Head title={`Configuration - ${currentStepInfo.title}`} />
+      <Head title={trans('admin.onboarding.page_title', { title: currentStepInfo.title })} />
 
       <div className="min-h-screen bg-background">
         {/* Header */}
@@ -120,17 +121,17 @@ export default function OnboardingIndex({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <h1 className="text-xl font-semibold text-foreground">
-                  Configuration de votre site
+                  {trans('admin.onboarding.site_setup_title')}
                 </h1>
                 <span className="px-2 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                  {completion}% complété
+                  {trans('admin.onboarding.completed', { percent: completion })}
                 </span>
               </div>
               <button
                 onClick={completeOnboarding}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Passer le onboarding →
+                {trans('admin.onboarding.skip_all_button')}
               </button>
             </div>
 
@@ -144,7 +145,7 @@ export default function OnboardingIndex({
                   />
                 </div>
                 <span className="text-xs text-muted-foreground">
-                  Étape {currentStepIndex + 1}/{allSteps.length}
+                  {trans('admin.onboarding.step_label', { current: currentStepIndex + 1, total: allSteps.length })}
                 </span>
               </div>
 
@@ -209,7 +210,7 @@ export default function OnboardingIndex({
                 onClick={skipStep}
                 className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Passer cette étape
+                {trans('admin.onboarding.skip_step_button')}
               </button>
 
               <div className="flex gap-3">
@@ -222,7 +223,7 @@ export default function OnboardingIndex({
                     }}
                     className="px-6 py-2.5 border border-border rounded-lg text-sm font-medium text-foreground hover:bg-muted transition-colors"
                   >
-                    ← Précédent
+                    {trans('admin.onboarding.previous_button')}
                   </button>
                 )}
                 <button
@@ -235,13 +236,13 @@ export default function OnboardingIndex({
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin">
                         <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                       </svg>
-                      Enregistrement...
+                      {trans('admin.onboarding.saving_button')}
                     </>
                   ) : isLastStep ? (
-                    'Terminer'
+                    trans('admin.onboarding.finish_button')
                   ) : (
                     <>
-                      Suivant
+                      {trans('admin.onboarding.next_button')}
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M5 12h14" />
                         <path d="M12 5l7 7-7 7" />
@@ -256,7 +257,7 @@ export default function OnboardingIndex({
           {/* Quick Access Panel */}
           <div className="mt-8 p-6 bg-muted/30 border border-border rounded-xl">
             <h3 className="text-sm font-semibold text-foreground mb-4">
-              Configuration restante
+              {trans('admin.onboarding.remaining_config')}
             </h3>
             <div className="grid md:grid-cols-2 gap-3">
               {userProgress.filter(s => !s.completed).map((step) => (

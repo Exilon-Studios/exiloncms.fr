@@ -21,22 +21,18 @@ interface PublicLayoutProps {
 
 export default function PublicLayout({ children, showCart = false }: PropsWithChildren<PublicLayoutProps>) {
   const pageProps = usePage<PageProps>().props as any;
-  const { settings, cartCount = 0, enabledPlugins = [] } = pageProps;
+  const { settings, cartCount = 0 } = pageProps;
   const [cartOpen, setCartOpen] = useState(false);
-
-  // Only show cart if Shop plugin is enabled
-  const isShopEnabled = enabledPlugins.includes('shop');
-  const shouldShowCart = showCart && isShopEnabled;
 
   return (
     <div className={settings.darkTheme ? 'dark' : ''}>
       <Toaster position="top-right" richColors />
       <FlashMessages />
 
-      <div className="flex flex-col bg-background min-h-screen">
-        <Navbar showCart={shouldShowCart} cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
+      <div className="flex flex-col min-h-screen bg-white dark:bg-gray-950 relative">
+        <Navbar showCart={showCart} cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
 
-        <main className="flex-1">
+        <main className="flex-1 relative z-10">
           <div className="container mx-auto px-4 md:px-6 py-8 max-w-7xl">
             {children}
           </div>
@@ -45,7 +41,7 @@ export default function PublicLayout({ children, showCart = false }: PropsWithCh
         <Footer />
       </div>
 
-      {shouldShowCart && <CartSheet open={cartOpen} onOpenChange={setCartOpen} />}
+      {showCart && <CartSheet open={cartOpen} onOpenChange={setCartOpen} />}
     </div>
   );
 }

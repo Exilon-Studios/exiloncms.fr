@@ -149,6 +149,8 @@ return [
         // Laravel Socialite (must be loaded before GameServiceProvider)
         Laravel\Socialite\SocialiteServiceProvider::class,
         ExilonCMS\Providers\GameServiceProvider::class,
+        // Plugin Service Providers
+        ExilonCMS\Plugins\Documentation\DocumentationServiceProvider::class,
     ])->toArray(),
 
     /*

@@ -31,17 +31,36 @@ function getTranslation(translations: Record<string, any>, key: string): string 
 
 /**
  * Apply replacements to a translation string
+ * Supports :placeholder, {placeholder}, and {0} positional formats
  */
-function applyReplacements(value: string, replacements?: Record<string, string | number>): string {
+function applyReplacements(value: string, replacements?: Record<string, string | number> | string[]): string {
   if (!replacements) {
     return value;
   }
 
   let result = value;
-  for (const [placeholder, replacement] of Object.entries(replacements)) {
-    const regex = new RegExp(`:${placeholder}`, 'g');
-    result = result.replace(regex, String(replacement));
+
+  // Handle array of positional replacements {0}, {1}, etc.
+  if (Array.isArray(replacements)) {
+    replacements.forEach((replacement, index) => {
+      const regex = new RegExp(`\\{${index}\\}`, 'g');
+      result = result.replace(regex, String(replacement));
+    });
+  } else {
+    // Handle named replacements - try both :placeholder and {placeholder} formats
+    for (const [placeholder, replacement] of Object.entries(replacements)) {
+      // Try {placeholder} format first (most common in this project)
+      let regex = new RegExp(`\\{${placeholder}\\}`, 'g');
+      if (regex.test(result)) {
+        result = result.replace(regex, String(replacement));
+      } else {
+        // Fallback to :placeholder format (Laravel style)
+        regex = new RegExp(`:${placeholder}`, 'g');
+        result = result.replace(regex, String(replacement));
+      }
+    }
   }
+
   return result;
 }
 
@@ -49,7 +68,7 @@ function applyReplacements(value: string, replacements?: Record<string, string |
  * Translation helper that works outside React components
  * This version accesses the page props directly from the window object
  */
-export function transStatic(key: string, replacements?: Record<string, string | number>): string {
+export function transStatic(key: string, replacements?: Record<string, string | number> | string[]): string {
   // Try to access translations from window (Inertia initial page)
   if (typeof window !== 'undefined' && (window as any).__INERTIA_PROPS__) {
     const translations = (window as any).__INERTIA_PROPS__.props?.trans as Record<string, any>;
@@ -69,7 +88,7 @@ export function transStatic(key: string, replacements?: Record<string, string | 
  * Translation helper for use inside React components
  * Uses the usePage hook to access current page props
  */
-export function trans(key: string, replacements?: Record<string, string | number>): string {
+export function trans(key: string, replacements?: Record<string, string | number> | string[]): string {
   const { props } = usePage();
   const translations = props.trans as Record<string, any>;
   const value = getTranslation(translations, key);

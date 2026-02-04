@@ -1,11 +1,11 @@
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Bell, Plus, Trash2, Check } from 'lucide-react';
 import { Link, router } from '@inertiajs/react';
-import { clsx } from 'clsx';
+import { trans } from '@/lib/i18n';
 
 interface Notification {
   id: string;
@@ -45,22 +45,22 @@ const levelColors = {
   danger: 'bg-red-500/10 text-red-500 border-red-500/20',
 };
 
-const levelLabels = {
-  info: 'Info',
-  success: 'Succès',
-  warning: 'Attention',
-  danger: 'Erreur',
-};
-
 export default function AdminNotificationsIndex({ notifications, pagination }: Props) {
+  const levelLabels: Record<string, string> = {
+    info: trans('admin.notifications.level.info'),
+    success: trans('admin.notifications.level.success'),
+    warning: trans('admin.notifications.level.warning'),
+    danger: trans('admin.notifications.level.danger'),
+  };
+
   const handleDelete = (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette notification ?')) return;
+    if (!confirm(trans('admin.notifications.delete_confirm'))) return;
     router.delete(route('admin.notifications.destroy', id));
   };
 
   return (
     <AuthenticatedLayout>
-      <Head title="Gestion des notifications" />
+      <Head title={trans('admin.notifications.title')} />
 
       <div className="container mx-auto py-8 px-4">
         {/* Header */}
@@ -71,16 +71,16 @@ export default function AdminNotificationsIndex({ notifications, pagination }: P
                 <Bell className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold">Gestion des notifications</h1>
+                <h1 className="text-2xl font-bold">{trans('admin.notifications.title')}</h1>
                 <p className="text-muted-foreground">
-                  {pagination.total} notification{pagination.total > 1 ? 's' : ''}
+                  {trans('admin.notifications.description')}
                 </p>
               </div>
             </div>
             <Link href={route('admin.notifications.create')}>
               <Button className="gap-2">
                 <Plus className="h-4 w-4" />
-                Nouvelle notification
+                {trans('admin.notifications.create')}
               </Button>
             </Link>
           </div>
@@ -93,13 +93,13 @@ export default function AdminNotificationsIndex({ notifications, pagination }: P
               <table className="w-full">
                 <thead className="border-b bg-muted/50">
                   <tr>
-                    <th className="text-left p-4 font-medium">Niveau</th>
-                    <th className="text-left p-4 font-medium">Message</th>
-                    <th className="text-left p-4 font-medium">Destinataire</th>
-                    <th className="text-left p-4 font-medium">Envoyée par</th>
-                    <th className="text-left p-4 font-medium">Statut</th>
-                    <th className="text-left p-4 font-medium">Date</th>
-                    <th className="text-right p-4 font-medium">Actions</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.notifications.table.level')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.notifications.table.message')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.notifications.table.recipient')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.notifications.table.sender')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.notifications.table.status')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.notifications.table.date')}</th>
+                    <th className="text-right p-4 font-medium">{trans('admin.notifications.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -133,17 +133,17 @@ export default function AdminNotificationsIndex({ notifications, pagination }: P
                             <div className="text-xs text-muted-foreground">{notification.author.email}</div>
                           </div>
                         ) : (
-                          <span className="text-muted-foreground text-sm">Système</span>
+                          <span className="text-muted-foreground text-sm">{trans('admin.notifications.system')}</span>
                         )}
                       </td>
                       <td className="p-4">
                         {notification.read_at ? (
                           <Badge variant="secondary" className="text-xs gap-1">
                             <Check className="h-3 w-3" />
-                            Lue
+                            {trans('admin.notifications.status.read')}
                           </Badge>
                         ) : (
-                          <Badge variant="default" className="text-xs">Non lue</Badge>
+                          <Badge variant="default" className="text-xs">{trans('admin.notifications.status.unread')}</Badge>
                         )}
                       </td>
                       <td className="p-4 text-sm text-muted-foreground">
@@ -175,7 +175,7 @@ export default function AdminNotificationsIndex({ notifications, pagination }: P
             {notifications.length === 0 && (
               <div className="p-12 text-center text-muted-foreground">
                 <Bell className="h-16 w-16 mx-auto mb-4 opacity-30" />
-                <p>Aucune notification</p>
+                <p>{trans('admin.notifications.empty')}</p>
               </div>
             )}
           </CardContent>
@@ -190,11 +190,11 @@ export default function AdminNotificationsIndex({ notifications, pagination }: P
                 size="sm"
                 onClick={() => router.visit(`/admin/notifications?page=${pagination.current_page - 1}`)}
               >
-                Précédent
+                {trans('admin.notifications.pagination.previous')}
               </Button>
             )}
             <span className="flex items-center px-4 text-sm text-muted-foreground">
-              Page {pagination.current_page} sur {pagination.last_page}
+              {trans('admin.notifications.pagination.page_x_of_y', { current: pagination.current_page, last: pagination.last_page })}
             </span>
             {pagination.current_page < pagination.last_page && (
               <Button
@@ -202,7 +202,7 @@ export default function AdminNotificationsIndex({ notifications, pagination }: P
                 size="sm"
                 onClick={() => router.visit(`/admin/notifications?page=${pagination.current_page + 1}`)}
               >
-                Suivant
+                {trans('admin.notifications.pagination.next')}
               </Button>
             )}
           </div>

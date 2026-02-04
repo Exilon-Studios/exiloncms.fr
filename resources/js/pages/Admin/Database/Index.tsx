@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Head, useForm, router } from '@inertiajs/react';
 import { useState } from 'react';
-import { useTrans } from '@/hooks/useTrans';
+import { trans } from '@/lib/i18n';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,7 +44,6 @@ interface Props {
 }
 
 export default function DatabaseIndex({ info, backups }: Props) {
-  const t = useTrans();
   const [selectedBackup, setSelectedBackup] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -77,7 +76,7 @@ export default function DatabaseIndex({ info, backups }: Props) {
   const handleRestore = () => {
     if (!selectedBackup) return;
 
-    if (!confirm('Êtes-vous sûr de vouloir restaurer cette sauvegarde ? La base de données actuelle sera remplacée.')) {
+    if (!confirm(trans('admin.database.restore_confirm'))) {
       return;
     }
 
@@ -86,7 +85,7 @@ export default function DatabaseIndex({ info, backups }: Props) {
       { backup: selectedBackup },
       {
         onSuccess: () => {
-          alert('Base de données restaurée avec succès!');
+          alert(trans('admin.database.restore_success'));
           router.reload();
         },
       }
@@ -94,7 +93,7 @@ export default function DatabaseIndex({ info, backups }: Props) {
   };
 
   const handleDeleteBackup = (filename: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette sauvegarde ?')) {
+    if (!confirm(trans('admin.database.delete_backup_confirm'))) {
       return;
     }
 
@@ -117,7 +116,7 @@ export default function DatabaseIndex({ info, backups }: Props) {
     e.preventDefault();
     importForm.post(route('admin.database.import'), {
       onSuccess: () => {
-        alert('Fichier SQL importé avec succès!');
+        alert(trans('admin.database.import_success'));
         importForm.reset();
         router.reload();
       },
@@ -125,26 +124,26 @@ export default function DatabaseIndex({ info, backups }: Props) {
   };
 
   const handleOptimize = () => {
-    if (!confirm('Cette opération peut prendre du temps sur les grandes bases de données. Continuer ?')) {
+    if (!confirm(trans('admin.database.optimize_confirm'))) {
       return;
     }
 
     router.post(route('admin.database.optimize'), {}, {
       onSuccess: () => {
-        alert('Base de données optimisée avec succès!');
+        alert(trans('admin.database.optimize_success'));
         router.reload();
       },
     });
   };
 
   const handleTruncate = () => {
-    if (!confirm('ATTENTION: Cette action va VIDER toutes les tables de la base de données. Cette action est IRRÉVERSIBLE! Êtes-vous sûr ?')) {
+    if (!confirm(trans('admin.database.truncate_confirm'))) {
       return;
     }
 
     truncateForm.post(route('admin.database.truncate'), {
       onSuccess: () => {
-        alert('Toutes les tables ont été vidées!');
+        alert(trans('admin.database.truncate_success'));
         router.reload();
       },
     });
@@ -152,15 +151,15 @@ export default function DatabaseIndex({ info, backups }: Props) {
 
   return (
     <AuthenticatedLayout>
-      <Head title={t('admin.database.title', 'Gestion de la base de données')} />
+      <Head title={trans('admin.database.title')} />
 
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            {t('admin.database.title', 'Gestion de la base de données')}
+            {trans('admin.database.title')}
           </h1>
           <p className="text-muted-foreground">
-            {t('admin.database.description', 'Gérez, sauvegardez et exportez votre base de données')}
+            {trans('admin.database.description')}
           </p>
         </div>
 
@@ -169,14 +168,14 @@ export default function DatabaseIndex({ info, backups }: Props) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {t('admin.database.driver', 'Driver')}
+                {trans('admin.database.driver')}
               </CardTitle>
               <Database className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold uppercase">{info.driver}</div>
               <p className="text-xs text-muted-foreground">
-                {t('admin.database.connection', 'Connexion')} {info.connection}
+                {trans('admin.database.connection')} {info.connection}
               </p>
             </CardContent>
           </Card>
@@ -184,14 +183,14 @@ export default function DatabaseIndex({ info, backups }: Props) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {t('admin.database.tables', 'Tables')}
+                {trans('admin.database.tables')}
               </CardTitle>
               <TableIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{info.table_count}</div>
               <p className="text-xs text-muted-foreground">
-                {t('admin.database.total_tables', 'tables au total')}
+                {trans('admin.database.total_tables')}
               </p>
             </CardContent>
           </Card>
@@ -199,14 +198,14 @@ export default function DatabaseIndex({ info, backups }: Props) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {t('admin.database.size', 'Taille')}
+                {trans('admin.database.size')}
               </CardTitle>
               <HardDrive className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{info.size}</div>
               <p className="text-xs text-muted-foreground">
-                {t('admin.database.disk_size', 'taille sur disque')}
+                {trans('admin.database.disk_size')}
               </p>
             </CardContent>
           </Card>
@@ -214,14 +213,14 @@ export default function DatabaseIndex({ info, backups }: Props) {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
-                {t('admin.database.version', 'Version')}
+                {trans('admin.database.version')}
               </CardTitle>
               <Settings className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{info.version}</div>
               <p className="text-xs text-muted-foreground">
-                {t('admin.database.sqlite_version', 'version SQLite')}
+                {trans('admin.database.sqlite_version')}
               </p>
             </CardContent>
           </Card>
@@ -230,9 +229,9 @@ export default function DatabaseIndex({ info, backups }: Props) {
         {/* Quick Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('admin.database.actions', 'Actions rapides')}</CardTitle>
+            <CardTitle>{trans('admin.database.actions')}</CardTitle>
             <CardDescription>
-              {t('admin.database.actions_description', 'Opérations courantes sur la base de données')}
+              {trans('admin.database.actions_description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -244,10 +243,10 @@ export default function DatabaseIndex({ info, backups }: Props) {
               >
                 <FileText className="h-5 w-5" />
                 <span className="text-sm font-medium">
-                  {t('admin.database.export_sql', 'Exporter SQL')}
+                  {trans('admin.database.export_sql')}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {t('admin.database.export_sql_desc', 'Télécharger en .sql')}
+                  {trans('admin.database.export_sql_desc')}
                 </span>
               </Button>
 
@@ -258,10 +257,10 @@ export default function DatabaseIndex({ info, backups }: Props) {
               >
                 <Database className="h-5 w-5" />
                 <span className="text-sm font-medium">
-                  {t('admin.database.export_sqlite', 'Exporter SQLite')}
+                  {trans('admin.database.export_sqlite')}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {t('admin.database.export_sqlite_desc', 'Télécharger .sqlite')}
+                  {trans('admin.database.export_sqlite_desc')}
                 </span>
               </Button>
 
@@ -272,10 +271,10 @@ export default function DatabaseIndex({ info, backups }: Props) {
               >
                 <RefreshCw className="h-5 w-5" />
                 <span className="text-sm font-medium">
-                  {t('admin.database.optimize', 'Optimiser')}
+                  {trans('admin.database.optimize')}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {t('admin.database.optimize_desc', 'VACUUM + ANALYZE')}
+                  {trans('admin.database.optimize_desc')}
                 </span>
               </Button>
 
@@ -286,10 +285,10 @@ export default function DatabaseIndex({ info, backups }: Props) {
               >
                 <Trash2 className="h-5 w-5" />
                 <span className="text-sm font-medium">
-                  {t('admin.database.truncate', 'Vider la base')}
+                  {trans('admin.database.truncate')}
                 </span>
                 <span className="text-xs text-muted-foreground">
-                  {t('admin.database.truncate_desc', '⚠️ Irréversible')}
+                  {trans('admin.database.truncate_desc')}
                 </span>
               </Button>
             </div>
@@ -299,16 +298,16 @@ export default function DatabaseIndex({ info, backups }: Props) {
         {/* Create Backup */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('admin.database.create_backup', 'Créer une sauvegarde')}</CardTitle>
+            <CardTitle>{trans('admin.database.create_backup')}</CardTitle>
             <CardDescription>
-              {t('admin.database.create_backup_desc', 'Sauvegarder la base de données actuelle')}
+              {trans('admin.database.create_backup_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4 items-end">
               <div className="flex-1">
                 <Label htmlFor="backup-name">
-                  {t('admin.database.backup_name', 'Nom de la sauvegarde (optionnel)')}
+                  {trans('admin.database.backup_name')}
                 </Label>
                 <Input
                   id="backup-name"
@@ -324,13 +323,13 @@ export default function DatabaseIndex({ info, backups }: Props) {
               <Button onClick={handleBackup} disabled={isLoading}>
                 {isLoading ? (
                   <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    {t('admin.database.creating', 'Création...')}
+                    <RefreshCw className="h-4 w-4 mr-1 animate-spin" />
+                    {trans('admin.database.creating')}
                   </>
                 ) : (
                   <>
-                    <Save className="h-4 w-4 mr-2" />
-                    {t('admin.database.create', 'Créer une sauvegarde')}
+                    <Save className="h-4 w-4 mr-1" />
+                    {trans('admin.database.create')}
                   </>
                 )}
               </Button>
@@ -341,16 +340,16 @@ export default function DatabaseIndex({ info, backups }: Props) {
         {/* Backups List */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('admin.database.backups', 'Sauvegardes')}</CardTitle>
+            <CardTitle>{trans('admin.database.backups')}</CardTitle>
             <CardDescription>
-              {t('admin.database.backups_desc', 'Liste des sauvegardes disponibles')}
+              {trans('admin.database.backups_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {backups.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <FolderOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>{t('admin.database.no_backups', 'Aucune sauvegarde disponible')}</p>
+                <p>{trans('admin.database.no_backups')}</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -388,7 +387,7 @@ export default function DatabaseIndex({ info, backups }: Props) {
                         }
                       >
                         <Download className="h-4 w-4 mr-1" />
-                        {t('admin.database.download', 'Télécharger')}
+                        {trans('admin.database.download')}
                       </Button>
                       <Button
                         variant="destructive"
@@ -406,8 +405,8 @@ export default function DatabaseIndex({ info, backups }: Props) {
             {selectedBackup && (
               <div className="mt-4 pt-4 border-t">
                 <Button onClick={handleRestore} className="w-full">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  {t('admin.database.restore_selected', 'Restaurer la sauvegarde sélectionnée')}
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                  {trans('admin.database.restore_selected')}
                 </Button>
               </div>
             )}
@@ -417,16 +416,16 @@ export default function DatabaseIndex({ info, backups }: Props) {
         {/* Import SQL */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('admin.database.import_sql', 'Importer un fichier SQL')}</CardTitle>
+            <CardTitle>{trans('admin.database.import_sql')}</CardTitle>
             <CardDescription>
-              {t('admin.database.import_sql_desc', 'Importer un fichier SQL pour restaurer ou migrer des données')}
+              {trans('admin.database.import_sql_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleImport} className="space-y-4">
               <div>
                 <Label htmlFor="sql-file">
-                  {t('admin.database.select_file', 'Sélectionner un fichier SQL')}
+                  {trans('admin.database.select_file')}
                 </Label>
                 <Input
                   id="sql-file"
@@ -443,10 +442,10 @@ export default function DatabaseIndex({ info, backups }: Props) {
                 )}
               </div>
               <Button type="submit" disabled={importForm.processing || !importForm.data.sql_file}>
-                <Upload className="h-4 w-4 mr-2" />
+                <Upload className="h-4 w-4 mr-1" />
                 {importForm.processing
-                  ? t('admin.database.importing', 'Importation...')
-                  : t('admin.database.import', 'Importer')}
+                  ? trans('admin.database.importing')
+                  : trans('admin.database.import')}
               </Button>
             </form>
           </CardContent>
@@ -457,26 +456,20 @@ export default function DatabaseIndex({ info, backups }: Props) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <AlertTriangle className="h-5 w-5" />
-              {t('admin.database.info_title', 'Information importante')}
+              {trans('admin.database.info_title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="text-sm space-y-2">
             <p>
-              <strong>{t('admin.database.sqlite_info', 'Base de données SQLite:')}</strong>{' '}
-              {t('admin.database.sqlite_info_desc',
-                'Votre base de données est stockée dans database/database.sqlite. Vous pouvez la copier directement pour faire une sauvegarde manuelle.'
-              )}
+              <strong>{trans('admin.database.sqlite_info')}</strong>{' '}
+              {trans('admin.database.sqlite_info_desc')}
             </p>
             <p>
-              <strong>{t('admin.database.postgres_migration', 'Migration vers PostgreSQL:')}</strong>{' '}
-              {t('admin.database.postgres_migration_desc',
-                'Pour migrer vers PostgreSQL, exportez votre base en SQL, configurez DB_CONNECTION dans .env, puis importez le fichier.'
-              )}
+              <strong>{trans('admin.database.postgres_migration')}</strong>{' '}
+              {trans('admin.database.postgres_migration_desc')}
             </p>
             <p className="text-muted-foreground">
-              {t('admin.database.backup_recommendation',
-                'Nous recommandons de faire des sauvegardes régulières avant toute modification importante.'
-              )}
+              {trans('admin.database.backup_recommendation')}
             </p>
           </CardContent>
         </Card>

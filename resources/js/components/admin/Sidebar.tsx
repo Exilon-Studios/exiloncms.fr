@@ -27,8 +27,8 @@ import {
 } from "@tabler/icons-react";
 import { DropdownUser } from "@/components/DropdownUser";
 import { usePage } from "@inertiajs/react";
-import CartSheet from "@/components/shop/CartSheet";
 import { NotificationDropdown } from "@/components/admin/NotificationDropdown";
+import { PluginHeaderIcons } from "@/components/plugin/PluginHeaderIcons";
 
 interface Links {
   label: string;
@@ -315,6 +315,82 @@ export const SidebarLink = ({
     return <SidebarSeparator label={link.label} className={className} />;
   }
 
+  // Si c'est un lien avec enfants (dropdown menu pour les plugins)
+  if (link.children && link.children.length > 0) {
+    const storageKey = `sidebar-dropdown-${link.label}`;
+    const [isExpanded, setIsExpanded] = useState(() => {
+      if (typeof window === 'undefined') return false;
+      const stored = localStorage.getItem(storageKey);
+      return stored === null ? false : stored === 'true';
+    });
+
+    const toggleExpanded = () => {
+      const newState = !isExpanded;
+      setIsExpanded(newState);
+      localStorage.setItem(storageKey, String(newState));
+    };
+
+    return (
+      <div className="mt-1">
+        <button
+          onClick={toggleExpanded}
+          className={cn(
+            "w-full group/sidebar flex items-center gap-2 rounded-sm px-2 py-2 hover:bg-accent hover:text-accent-foreground transition-colors relative",
+            open ? "justify-start" : "justify-center",
+            className,
+          )}
+        >
+          {link.icon}
+          <motion.span
+            animate={{
+              display: open ? "inline-block" : "none",
+              opacity: open ? 1 : 0,
+            }}
+            className="!m-0 inline-block !p-0 text-sm whitespace-pre text-foreground transition duration-150 flex-1 text-left"
+          >
+            {link.label}
+          </motion.span>
+          <motion.div
+            animate={{
+              display: open ? "inline-block" : "none",
+              opacity: open ? 1 : 0,
+              rotate: isExpanded ? 0 : -90,
+            }}
+            transition={{ duration: 0.2 }}
+            className="text-muted-foreground"
+          >
+            <IconArrowNarrowLeft className="h-3 w-3 rotate-[-90deg]" />
+          </motion.div>
+        </button>
+        <AnimatePresence initial={false}>
+          {isExpanded && open && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="overflow-hidden"
+            >
+              <div className="relative ml-4 pl-4 pr-2 py-1 space-y-1 border-l-2 border-muted">
+                {link.children.map((child, idx) => (
+                  <Link
+                    key={idx}
+                    href={child.href!}
+                    className="flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary/50"></span>
+                    {child.icon && <span className="text-muted-foreground flex-shrink-0">{child.icon}</span>}
+                    <span>{child.label}</span>
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
+
   // Pour les liens externes, utiliser une balise <a> au lieu de Inertia Link
   if (link.external) {
     return (
@@ -429,9 +505,7 @@ export function SidebarLayout({
   siteName = 'ExilonCMS',
 }: SidebarLayoutProps) {
   const [open, setOpen] = useState(true);
-  const [cartOpen, setCartOpen] = useState(false);
   const pageProps = usePage().props as any;
-  const cartCount = pageProps.cartCount || 0;
   const unreadNotificationsCount = pageProps.unreadNotificationsCount || 0;
   const auth = pageProps.auth;
 
@@ -501,28 +575,25 @@ export function SidebarLayout({
           </SidebarBody>
         </Sidebar>
         <div className="flex flex-1 flex-col overflow-hidden">
-          {/* Header bar with cart button */}
+          {/* Header bar with plugin header icons */}
           <header className="h-14 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4 md:px-6 shrink-0">
             <div className="flex-1"></div>
             <div className="flex items-center gap-2">
               {auth?.user && (
                 <>
+                  {/* Account balance */}
+                  {auth.user.money !== undefined && (
+                    <div className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-md bg-primary/10 text-primary text-sm font-medium">
+                      <span className="text-xs opacity-70">{auth.user.money.toFixed(2)}</span>
+                      <span className="text-xs">{pageProps.settings?.money_name || 'points'}</span>
+                    </div>
+                  )}
+
                   {/* Notifications dropdown */}
                   <NotificationDropdown unreadCount={unreadNotificationsCount} />
 
-                  {/* Cart button */}
-                  <button
-                    onClick={() => setCartOpen(true)}
-                    className="relative flex items-center justify-center rounded-md p-2 hover:bg-accent transition-colors"
-                    aria-label="Panier"
-                  >
-                    <IconShoppingCart className="h-5 w-5 text-foreground" />
-                    {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                        {cartCount > 99 ? '99+' : cartCount}
-                      </span>
-                    )}
-                  </button>
+                  {/* Plugin header icons (Shop cart, etc.) */}
+                  <PluginHeaderIcons />
                 </>
               )}
             </div>
@@ -532,7 +603,6 @@ export function SidebarLayout({
           </div>
         </div>
       </div>
-      <CartSheet open={cartOpen} onOpenChange={setCartOpen} />
     </>
   );
 }

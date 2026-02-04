@@ -9,6 +9,65 @@ return [
     ],
     'user' => [
         'theme' => 'Thème',
+        'language' => 'Langue',
+    ],
+    'blog' => [
+        'title' => 'Blog',
+        'newsletter' => [
+            'placeholder' => 'Entrez votre email',
+            'subscribe' => "S'abonner",
+            'success' => 'Vous êtes maintenant abonné à notre newsletter !',
+        ],
+        'hero' => [
+            'title' => 'Partagez vos histoires. Connectez-vous avec vos lecteurs.',
+            'description' => 'Créez et publiez de magnifiques articles de blog sans effort. Concentrez-vous sur l\'essentiel - partager vos histoires avec le monde.',
+            'button' => 'Découvrir les articles',
+            'banner' => 'Nouveau ! Découvrez nos derniers articles et insights',
+        ],
+        'features' => [
+            'title' => 'Fonctionnalités',
+            'subtitle' => 'De l\'idée à la publication',
+            'description' => 'Toutes les fonctionnalités dont vous avez besoin pour créer du contenu captivant, gérer vos articles efficacement et développer votre audience - tout en un seul endroit.',
+        ],
+        'features_cards' => [
+            'search' => 'Recherche puissante pour trouver des articles instantanément, accès facile à toute votre bibliothèque de contenu.',
+            'editor' => 'Éditeur ultrarapide pour rédiger et publier, notez vos idées en déplacement et modifiez-les plus tard.',
+            'autosave' => 'Sauvegarde automatique toutes les 2 secondes pour ne jamais perdre un seul mot.',
+        ],
+        'recent_articles' => 'Articles récents',
+        'view_all' => 'Voir tout',
+        'faq' => [
+            'title' => 'Questions fréquentes',
+            'items' => [
+                'title' => 'De quoi parle ce blog ?',
+                'description' => 'Bienvenue sur notre blog, où nous partageons des articles, des insights et des histoires sur des sujets qui vous intéressent. Notre but est d\'informer, d\'inspirer et d\'engager nos lecteurs avec du contenu de haute qualité. Nous couvrons une large gamme de sujets incluant la technologie, le lifestyle, les tutoriels et des articles d\'opinion.',
+                'title' => 'Comment contacter le support ?',
+                'description' => 'Si vous avez des questions ou des suggestions, n\'hésitez pas à nous contacter. Nous apprécions vos retours et sommes toujours à l\'écoute pour nous améliorer. Vous pouvez nous contacter via notre formulaire de contact ou par email. Nous sommes disponibles 24/7 pour vous aider avec tout problème.',
+                'title' => 'À quelle fréquence publiez-vous du nouveau contenu ?',
+                'description' => 'Nous publions de nouveaux articles régulièrement, typiquement plusieurs fois par semaine. Notre équipe éditoriale travaille dur pour vous apporter du contenu frais et pertinent de manière constante. Vous pouvez vous abonner à notre newsletter pour ne rien manquer.',
+                'title' => 'Puis-je proposer un article en tant qu\'invité ?',
+                'description' => 'Oui, nous acceptons les articles invités de rédacteurs qualifiés. Veuillez consulter nos directives pour les articles invités et soumettre votre article pour examen. Nous recherchons du contenu original et bien écrit qui apporte de la valeur à nos lecteurs.',
+                'title' => 'Avez-vous une newsletter ?',
+                'description' => 'Oui ! Abonnez-vous à notre newsletter pour recevoir les derniers articles, du contenu exclusif et des mises à jour directement dans votre boîte mail. Nous respectons votre vie privée et vous pouvez vous désabonner à tout moment.',
+                'title' => 'Comment partager les articles ?',
+                'description' => 'Vous pouvez facilement partager nos articles en utilisant les boutons de réseaux sociaux sur chaque article. Aidez-nous à faire passer le mot en partageant du contenu que vous trouvez valuable avec vos amis, votre famille et vos abonnés.',
+            ],
+        ],
+        'contact' => [
+            'title' => 'Nos lecteurs nous adorent',
+            'description' => 'Notre blog est suivi par des milliers de lecteurs à travers le monde, rejoignez notre communauté et restez informé.',
+        ],
+        'articles_grid' => [
+            'empty' => 'Aucun article pour le moment.',
+        ],
+        'show' => [
+            'back' => 'Retour au blog',
+            'by_author' => 'Par :author',
+            'published_at' => 'Publié le :date',
+            'views' => ':count vues',
+            'related_posts' => 'Articles similaires',
+            'share' => 'Partager cet article',
+        ],
     ],
     'theme' => [
         'title' => 'Personnalisation du thème',

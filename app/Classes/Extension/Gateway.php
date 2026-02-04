@@ -15,7 +15,6 @@ abstract class Gateway extends Extension
     /**
      * Pay the given invoice with the given total amount.
      *
-     * @param  Invoice  $invoice
      * @param  mixed  $total
      * @return View|string
      */
@@ -43,7 +42,6 @@ abstract class Gateway extends Extension
     /**
      * Create a billing agreement for the given user
      *
-     * @param  User  $user
      * @return View|string
      */
     public function createBillingAgreement(User $user)
@@ -55,7 +53,6 @@ abstract class Gateway extends Extension
      * Cancel the billing agreement
      *
      * @param  mixed  $billingAgreement
-     * @return bool
      */
     public function cancelBillingAgreement($billingAgreement): bool
     {
@@ -65,7 +62,6 @@ abstract class Gateway extends Extension
     /**
      * Charge the billing agreement for the given invoice and amount
      *
-     * @param  Invoice  $invoice
      * @param  mixed  $total
      * @param  mixed  $billingAgreement
      * @return bool

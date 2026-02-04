@@ -92,8 +92,6 @@ class HandleInertiaRequests extends Middleware
                     'style' => setting('navbar.style', 'transparent'),
                     'background' => setting('navbar.background'),
                 ],
-                // Marketplace API URL
-                'marketplaceUrl' => config('services.marketplace.url', 'https://marketplace.exiloncms.fr'),
                 // SEO defaults
                 'seo' => [
                     'title' => setting('name', config('app.name')),
@@ -114,7 +112,6 @@ class HandleInertiaRequests extends Middleware
                 'admin' => trans('admin'),
                 'pages' => trans('pages'),
                 'dashboard' => trans('dashboard'),
-                'marketplace' => trans('marketplace'),
                 'shop' => trans('shop'),
                 'theme' => trans('theme'),
             ],
@@ -126,9 +123,173 @@ class HandleInertiaRequests extends Middleware
             // Share available updates count for admin users
             'updatesCount' => $user && $user->hasAdminAccess() ? $this->getUpdatesCount() : 0,
             // Share enabled plugins for conditional UI rendering
-            'enabledPlugins' => collect(setting('enabled_plugins', []))->toArray(),
+            'enabledPlugins' => get_enabled_plugins(),
+            // Share enabled plugins with config for sidebar
+            'enabledPluginConfigs' => $this->getEnabledPluginConfigs(),
+            // Share plugin navigation from manifests
+            'pluginNavigation' => $this->getPluginNavigation(),
+            // Share plugin header icons from manifests
+            'pluginHeaderIcons' => $this->getPluginHeaderIcons(),
+            // Share sidebar links from plugins (modular system)
+            'publicSidebarLinks' => getPublicSidebarLinks(),
+            'userSidebarLinks' => getUserSidebarLinks(),
+            'adminSidebarLinks' => getAdminSidebarLinks(),
+            // Share widgets from plugins
+            'userWidgets' => getUserWidgets(),
+            'adminWidgets' => getAdminWidgets(),
+            // Share dashboard widgets from plugins (for admin users)
+            'dashboardWidgets' => $user && $user->hasAdminAccess() ? $this->getDashboardWidgets($user) : [],
             // Share active theme for theme page override system
             'activeTheme' => app(\ExilonCMS\Extensions\Theme\ThemeLoader::class)->getActiveThemeId(),
+        ];
+    }
+
+    /**
+     * Get dashboard widgets for the current user.
+     */
+    protected function getDashboardWidgets($user): array
+    {
+        try {
+            $widgetManager = app(\ExilonCMS\Classes\Widgets\WidgetManager::class);
+            $allWidgets = $widgetManager->getWidgets();
+
+            // Filter by user permissions
+            return array_filter($allWidgets, function ($widget) use ($user, $widgetManager) {
+                return $widgetManager->canViewWidget($widget, $user);
+            });
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get enabled plugins that have configuration
+     */
+    protected function getEnabledPluginConfigs(): array
+    {
+        $enabledPlugins = get_enabled_plugins();
+        $pluginLoader = app(\ExilonCMS\Classes\Plugin\PluginLoader::class);
+        $plugins = $pluginLoader->getPluginsMeta();
+
+        return collect($plugins)
+            ->filter(fn ($plugin) => in_array($plugin['id'], $enabledPlugins, true))
+            ->filter(fn ($plugin) => file_exists($plugin['path'].'/config/config.php'))
+            ->map(fn ($plugin) => [
+                'id' => $plugin['id'],
+                'name' => $plugin['name'],
+                'configUrl' => '/admin/plugins/'.$plugin['id'].'/config',
+            ])
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * Get navigation items from all enabled plugins
+     * Checks both PHP methods and plugin.json
+     */
+    protected function getPluginNavigation(): array
+    {
+        $enabledPlugins = get_enabled_plugins();
+        $pluginNavigation = [];
+
+        foreach ($enabledPlugins as $pluginId) {
+            $nav = plugin_get_navigation($pluginId);
+            if (! empty($nav)) {
+                $pluginNavigation[] = $this->normalizePluginNavigation($pluginId, $nav);
+            }
+        }
+
+        // Sort by position
+        usort($pluginNavigation, fn ($a, $b) => ($a['position'] ?? 100) <=> ($b['position'] ?? 100));
+
+        return $pluginNavigation;
+    }
+
+    /**
+     * Normalize plugin navigation for frontend consumption
+     */
+    protected function normalizePluginNavigation(string $pluginId, array $nav): array
+    {
+        $trans = $nav['trans'] ?? false;
+
+        return [
+            'type' => 'plugin',
+            'plugin' => $pluginId,
+            'label' => $nav['label'] ?? ucfirst($pluginId),
+            'trans' => $trans,
+            'icon' => $nav['icon'] ?? 'Plugin',
+            'position' => $nav['position'] ?? 100,
+            'items' => $this->normalizeNavItems($nav['items'] ?? [], $trans),
+        ];
+    }
+
+    /**
+     * Normalize navigation items recursively
+     */
+    protected function normalizeNavItems(array $items, bool $trans): array
+    {
+        return collect($items)->map(function ($item) use ($trans) {
+            $normalized = [
+                'label' => $item['label'] ?? '',
+                'trans' => $item['trans'] ?? $trans,
+                'href' => $item['href'] ?? null,
+                'route' => $item['route'] ?? null,
+                'permission' => $item['permission'] ?? null,
+                'icon' => $item['icon'] ?? null,
+            ];
+
+            if (isset($item['items']) && is_array($item['items'])) {
+                $normalized['items'] = $this->normalizeNavItems($item['items'], $trans);
+                $normalized['type'] = 'section';
+            } else {
+                $normalized['type'] = 'link';
+            }
+
+            return $normalized;
+        })->toArray();
+    }
+
+    /**
+     * Get header icons from all enabled plugins
+     * Checks both PHP methods and plugin.json
+     */
+    protected function getPluginHeaderIcons(): array
+    {
+        $enabledPlugins = get_enabled_plugins();
+        $pluginHeaderIcons = [];
+
+        foreach ($enabledPlugins as $pluginId) {
+            $icons = plugin_get_header_elements($pluginId);
+            if (! empty($icons)) {
+                foreach ($icons as $icon) {
+                    $pluginHeaderIcons[] = $this->normalizePluginHeaderIcon($pluginId, $icon);
+                }
+            }
+        }
+
+        // Sort by position
+        usort($pluginHeaderIcons, fn ($a, $b) => ($a['position'] ?? 100) <=> ($b['position'] ?? 100));
+
+        return $pluginHeaderIcons;
+    }
+
+    /**
+     * Normalize plugin header icon for frontend consumption
+     */
+    protected function normalizePluginHeaderIcon(string $pluginId, array $icon): array
+    {
+        return [
+            'id' => $icon['id'] ?? "{$pluginId}_{$icon['type']}",
+            'plugin' => $pluginId,
+            'type' => $icon['type'] ?? 'button',
+            'icon' => $icon['icon'] ?? 'Box',
+            'label' => $icon['label'] ?? null,
+            'ariaLabel' => $icon['aria_label'] ?? null,
+            'permission' => $icon['permission'] ?? null,
+            'position' => $icon['position'] ?? 100,
+            'component' => $icon['component'] ?? null,
+            'props' => $icon['props'] ?? [],
+            'badge' => $icon['badge'] ?? null,
         ];
     }
 

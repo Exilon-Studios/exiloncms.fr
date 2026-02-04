@@ -32,13 +32,17 @@
       "@/pages/*": ["./resources/js/pages/*"],
       "@/types/*": ["./resources/js/types/*"],
       "@/lib/*": ["./resources/js/lib/*"],
-      "@/hooks/*": ["./resources/js/hooks/*"]
+      "@/hooks/*": ["./resources/js/hooks/*"],
+      "plugins/shop/*": ["./plugins/shop/resources/js/*"],
+      "plugins/blog/*": ["./plugins/blog/resources/js/*"]
     }
   },
   "include": [
     "resources/js/**/*.ts",
     "resources/js/**/*.tsx",
-    "resources/js/**/*.d.ts"
+    "resources/js/**/*.d.ts",
+    "plugins/**/*.ts",
+    "plugins/**/*.tsx"
   ],
   "exclude": ["node_modules", "vendor"]
 }

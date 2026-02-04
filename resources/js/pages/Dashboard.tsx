@@ -4,7 +4,7 @@
  */
 
 import { Head } from '@inertiajs/react';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 import { PageProps } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,7 +24,7 @@ interface DashboardProps extends PageProps {
 
 export default function Dashboard({ stats }: DashboardProps) {
   return (
-    <AuthenticatedLayout>
+    <DashboardLayout showCart={true}>
       <Head title={trans('dashboard.title')} />
 
       <div className="space-y-6">
@@ -98,7 +98,7 @@ export default function Dashboard({ stats }: DashboardProps) {
           </Card>
         </div>
       </div>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }
 

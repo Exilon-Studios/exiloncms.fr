@@ -79,3 +79,55 @@ if (! function_exists('color_tint')) {
         return color_mix('#ffffff', $hex, $ratio);
     }
 }
+
+if (! function_exists('hex2hsl')) {
+    /**
+     * Convert a hex color to HSL format for Tailwind CSS.
+     * Returns format: "hsl(h, s%, l%)"
+     */
+    function hex2hsl(string $hex): string
+    {
+        [$r, $g, $b] = hex2rgb($hex);
+
+        $r /= 255;
+        $g /= 255;
+        $b /= 255;
+
+        $max = max($r, $g, $b);
+        $min = min($r, $g, $b);
+        $l = ($max + $min) / 2;
+
+        if ($max === $min) {
+            $h = $s = 0;
+        } else {
+            $d = $max - $min;
+            $s = $l > 0.5 ? $d / (2 - $max - $min) : $d / ($max + $min);
+
+            switch ($max) {
+                case $r:
+                    $h = (($g - $b) / $d + ($g < $b ? 6 : 0)) / 6;
+                    break;
+                case $g:
+                    $h = (($b - $r) / $d + 2) / 6;
+                    break;
+                case $b:
+                    $h = (($r - $g) / $d + 4) / 6;
+                    break;
+            }
+        }
+
+        return sprintf('%d %d%% %d%%', round($h * 360), round($s * 100), round($l * 100));
+    }
+}
+
+if (! function_exists('hex2hsl_value')) {
+    /**
+     * Convert a hex color to HSL value only (no hsl() wrapper).
+     * Returns format: "h s l" for use in CSS custom properties
+     */
+    function hex2hsl_value(string $hex): string
+    {
+        $hsl = hex2hsl($hex);
+        return str_replace('hsl(', '', str_replace(')', '', $hsl));
+    }
+}

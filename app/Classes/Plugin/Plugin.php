@@ -91,6 +91,7 @@ abstract class Plugin
         foreach ($this->getConfigFields() as $field) {
             $config[$field['name']] = $this->config($field['name'], $field['default'] ?? null);
         }
+
         return $config;
     }
 
@@ -127,6 +128,144 @@ abstract class Plugin
     public function boot(): void
     {
         // Override in plugin to register routes, views, etc.
+    }
+
+    /**
+     * Get sidebar links exported by this plugin
+     *
+     * Override this method to programmatically define sidebar links
+     * Alternatively, use plugin.json with "sidebar_links" key
+     *
+     * @return array{public: array, user: array, admin: array}
+     */
+    public function getSidebarLinks(): array
+    {
+        // By default, read from plugin.json
+        return $this->getSidebarLinksFromManifest();
+    }
+
+    /**
+     * Get widgets exported by this plugin
+     *
+     * Override this method to programmatically define widgets
+     * Alternatively, use plugin.json with "widgets" key
+     *
+     * @return array
+     */
+    public function getWidgets(): array
+    {
+        // By default, read from plugin.json
+        return $this->getWidgetsFromManifest();
+    }
+
+    /**
+     * Get header icons/elements exported by this plugin
+     *
+     * Override this method to programmatically define header elements
+     * Alternatively, use plugin.json with "header_icons" key
+     *
+     * @return array
+     */
+    public function getHeaderElements(): array
+    {
+        // By default, read from plugin.json
+        return $this->getHeaderElementsFromManifest();
+    }
+
+    /**
+     * Get navigation items for admin sidebar
+     *
+     * Override this method to programmatically define admin navigation
+     * Alternatively, use plugin.json with "admin_section" or "navigation" key
+     *
+     * @return array
+     */
+    public function getNavigation(): array
+    {
+        // By default, read from plugin.json
+        return $this->getNavigationFromManifest();
+    }
+
+    /**
+     * Read sidebar links from plugin.json manifest
+     */
+    protected function getSidebarLinksFromManifest(): array
+    {
+        $manifest = $this->getPluginManifest();
+
+        return $manifest['sidebar_links'] ?? [
+            'public' => [],
+            'user' => [],
+            'admin' => [],
+        ];
+    }
+
+    /**
+     * Read widgets from plugin.json manifest
+     */
+    protected function getWidgetsFromManifest(): array
+    {
+        $manifest = $this->getPluginManifest();
+
+        return $manifest['widgets'] ?? [];
+    }
+
+    /**
+     * Read header elements from plugin.json manifest
+     */
+    protected function getHeaderElementsFromManifest(): array
+    {
+        $manifest = $this->getPluginManifest();
+
+        return $manifest['header_icons'] ?? [];
+    }
+
+    /**
+     * Read navigation from plugin.json manifest
+     */
+    protected function getNavigationFromManifest(): array
+    {
+        $manifest = $this->getPluginManifest();
+
+        // Support new 'navigation' format
+        if (isset($manifest['navigation'])) {
+            return $manifest['navigation'];
+        }
+
+        // Support legacy 'admin_section' format
+        if (isset($manifest['admin_section'])) {
+            $section = $manifest['admin_section'];
+            return [
+                'icon' => $section['icon'] ?? 'Plugin',
+                'position' => $section['position'] ?? 100,
+                'trans' => $section['trans'] ?? false,
+                'label' => $section['label'] ?? ucfirst($this->getId()),
+                'items' => $section['items'] ?? [],
+            ];
+        }
+
+        return [];
+    }
+
+    /**
+     * Get the plugin.json manifest data
+     */
+    protected function getPluginManifest(): array
+    {
+        $manifestPath = $this->getPluginPath().'/plugin.json';
+
+        if (! File::exists($manifestPath)) {
+            return [];
+        }
+
+        $content = File::get($manifestPath);
+        $manifest = json_decode($content, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [];
+        }
+
+        return $manifest;
     }
 
     /**
@@ -199,6 +338,7 @@ abstract class Plugin
     protected function getPluginPath(): string
     {
         $reflection = new ReflectionClass($this);
+
         return dirname(dirname($reflection->getFileName()));
     }
 
@@ -296,6 +436,7 @@ abstract class Plugin
     public function getNamespace(): string
     {
         $reflection = new ReflectionClass($this);
+
         return $reflection->getNamespaceName();
     }
 }

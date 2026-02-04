@@ -33,6 +33,9 @@ class PluginListCommand extends Command
         $this->info('Installed Plugins:');
         $this->newLine();
 
+        // Get enabled plugins from file
+        $enabledPlugins = $this->getEnabledPlugins();
+
         $tableData = [];
 
         foreach ($pluginDirectories as $pluginPath) {
@@ -52,8 +55,9 @@ class PluginListCommand extends Command
             try {
                 $config = json_decode(File::get($pluginJsonPath), true);
 
-                $isLoaded = isset($config['id']) && $loader->hasPlugin($config['id']);
-                $status = $isLoaded
+                $pluginId = $config['id'] ?? null;
+                $isEnabled = $pluginId && in_array($pluginId, $enabledPlugins, true);
+                $status = $isEnabled
                     ? '<fg=green>✓ Active</fg>'
                     : '<fg=yellow>✗ Inactive</fg>';
 
@@ -82,5 +86,23 @@ class PluginListCommand extends Command
         $this->info(sprintf('Total: %d plugin(s)', count($tableData)));
 
         return self::SUCCESS;
+    }
+
+    protected function getEnabledPlugins(): array
+    {
+        $pluginsFile = base_path('plugins/plugins.json');
+
+        if (! File::exists($pluginsFile)) {
+            return [];
+        }
+
+        $content = File::get($pluginsFile);
+        $plugins = json_decode($content, true);
+
+        if (! is_array($plugins)) {
+            return [];
+        }
+
+        return array_filter($plugins, fn ($plugin) => is_string($plugin) && ! empty($plugin));
     }
 }

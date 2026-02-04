@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Pencil, Trash2, Package, GripVertical, ChevronUp, ChevronDown } from 'lucide-react';
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import { trans } from '@/lib/i18n';
 
 interface Category {
   id: number;
@@ -28,7 +29,7 @@ export default function CategoriesIndex({ categories }: CategoriesProps) {
   const [movingId, setMovingId] = useState<number | null>(null);
 
   const handleDelete = (id: number) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) return;
+    if (!confirm(trans('admin.shop.categories.delete_confirm'))) return;
 
     setDeletingId(id);
     router.delete(route('admin.shop.categories.destroy', id), {
@@ -64,21 +65,21 @@ export default function CategoriesIndex({ categories }: CategoriesProps) {
 
   return (
     <AuthenticatedLayout>
-      <Head title="Catégories - Boutique" />
+      <Head title={`${trans('admin.shop.categories.title')} - Boutique`} />
 
       <div className="space-y-6 pb-8">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Catégories</h1>
+            <h1 className="text-2xl font-bold">{trans('admin.shop.categories.title')}</h1>
             <p className="text-muted-foreground">
-              Gérez les catégories de la boutique
+              {trans('admin.shop.categories.description')}
             </p>
           </div>
           <Link href={route('admin.shop.categories.create')}>
             <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nouvelle catégorie
+              <Plus className="mr-1 h-4 w-4" />
+              {trans('admin.shop.categories.create')}
             </Button>
           </Link>
         </div>
@@ -131,7 +132,7 @@ export default function CategoriesIndex({ categories }: CategoriesProps) {
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold">{category.name}</h3>
                       <Badge variant={category.is_active ? 'default' : 'secondary'} className="text-xs">
-                        {category.is_active ? 'Actif' : 'Inactif'}
+                        {category.is_active ? trans('admin.shop.categories.status.active') : trans('admin.shop.categories.status.inactive')}
                       </Badge>
                     </div>
                     <p className="text-sm text-muted-foreground">{category.slug}</p>
@@ -144,7 +145,7 @@ export default function CategoriesIndex({ categories }: CategoriesProps) {
 
                   {/* Stats */}
                   <div className="text-sm text-muted-foreground px-4">
-                    {category.items_count} article{category.items_count > 1 ? 's' : ''}
+                    {trans('admin.shop.categories.items_count', category.items_count)}
                   </div>
 
                   {/* Actions */}
@@ -173,14 +174,14 @@ export default function CategoriesIndex({ categories }: CategoriesProps) {
           <Card>
             <CardContent className="p-12 text-center">
               <Package className="h-16 w-16 mx-auto mb-4 text-muted-foreground/30" />
-              <h3 className="text-lg font-semibold mb-2">Aucune catégorie</h3>
+              <h3 className="text-lg font-semibold mb-2">{trans('admin.shop.categories.empty.title')}</h3>
               <p className="text-muted-foreground mb-6">
-                Commencez par créer votre première catégorie.
+                {trans('admin.shop.categories.empty.description')}
               </p>
               <Link href={route('admin.shop.categories.create')}>
                 <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Créer une catégorie
+                  <Plus className="mr-1 h-4 w-4" />
+                  {trans('admin.shop.categories.empty.create_button')}
                 </Button>
               </Link>
             </CardContent>

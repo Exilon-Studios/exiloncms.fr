@@ -2,35 +2,18 @@
  * Admin Roles Edit - Edit existing role
  */
 
-import { Head, Link, router, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEvent, useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps, Role } from '@/types';
-import {
-  AdminLayout,
-  AdminLayoutHeader,
-  AdminLayoutTitle,
-  AdminLayoutActions,
-  AdminLayoutContent,
-  AdminLayoutFooter
-} from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Card, CardContent } from '@/components/ui/card';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, Save, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Trash2 } from 'lucide-react';
 import { trans } from '@/lib/i18n';
 
 interface Permission {
@@ -53,195 +36,237 @@ export default function RolesEdit({ role, permissions }: RolesEditProps) {
   const { data, setData, put, processing, errors } = useForm({
     name: role.name || '',
     icon: role.icon || '',
-    color: role.color || '#2196f3',
     is_admin: role.is_admin || false,
     permissions: role.permissions?.map(p => p.permission) || [],
   });
 
-  // Call trans() during render
-  const t = {
-    fixErrors: trans('admin.roles.edit.fix_errors'),
-    success: trans('admin.roles.edit.success'),
-    error: trans('admin.roles.edit.error'),
-    deleted: trans('admin.roles.edit.deleted', { role: role.name }),
-    deleteFailed: trans('admin.roles.edit.delete_failed'),
-    title: trans('admin.roles.edit.title', { role: role.name }),
-    description: trans('admin.roles.edit.description'),
-    delete: trans('admin.roles.edit.delete'),
-    name: trans('admin.roles.edit.name'),
-    icon: trans('admin.roles.edit.icon'),
-    iconPlaceholder: trans('admin.roles.edit.icon_placeholder'),
-    iconHelp: trans('admin.roles.edit.icon_help'),
-    color: trans('admin.roles.edit.color'),
-    permissionsTitle: trans('admin.roles.edit.permissions_title'),
-    administrator: trans('admin.roles.edit.administrator'),
-    administratorDescription: trans('admin.roles.edit.administrator_description'),
-    cancel: trans('admin.roles.edit.cancel'),
-    saving: trans('admin.roles.edit.saving'),
-    save: trans('admin.roles.edit.save'),
-    deleteTitle: trans('admin.roles.edit.delete_title'),
-    deleteDescription: trans('admin.roles.edit.delete_description'),
-  };
-
   useEffect(() => {
     if (Object.keys(errors).length > 0) {
-      toast.error(t.fixErrors);
+      toast.error(trans('admin.roles.edit.fix_errors'));
     }
   }, [errors]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     put(route('admin.roles.update', role.id), {
-      onSuccess: () => toast.success(t.success),
-      onError: () => toast.error(t.error),
+      onSuccess: () => toast.success(trans('admin.roles.edit.success')),
+      onError: () => toast.error(trans('admin.roles.edit.error')),
     });
   };
 
   const handleDelete = () => {
     router.delete(route('admin.roles.destroy', role.id), {
       onSuccess: () => {
-        toast.success(t.deleted);
+        toast.success(trans('admin.roles.index.deleted', { role: role.name }));
         setDeleteDialogOpen(false);
       },
-      onError: () => toast.error(t.deleteFailed),
+      onError: () => toast.error(trans('admin.roles.index.delete_failed')),
     });
+  };
+
+  const togglePermission = (permission: string) => {
+    if (data.permissions.includes(permission)) {
+      setData('permissions', data.permissions.filter(p => p !== permission));
+    } else {
+      const newPermissions = [...data.permissions, permission];
+
+      // If adding an admin.* permission (except admin.access), auto-check admin.access
+      if (permission.startsWith('admin.') && permission !== 'admin.access') {
+        if (!newPermissions.includes('admin.access')) {
+          newPermissions.push('admin.access');
+        }
+      }
+
+      setData('permissions', newPermissions);
+    }
+  };
+
+  // Group permissions by category
+  const permissionGroups: Record<string, string[]> = {
+    'users': Object.entries(permissions).filter(([k]) => k.startsWith('admin.users')).map(([k, v]) => k),
+    'content': Object.entries(permissions).filter(([k]) => k.startsWith('admin.pages') || k.startsWith('admin.posts') || k.startsWith('admin.images')).map(([k, v]) => k),
+    'admin': Object.entries(permissions).filter(([k]) => k.startsWith('admin.admin') || k.startsWith('admin.settings') || k.startsWith('admin.roles')).map(([k, v]) => k),
+    'other': Object.entries(permissions).filter(([k]) => !k.startsWith('admin.users') && !k.startsWith('admin.pages') && !k.startsWith('admin.posts') && !k.startsWith('admin.images') && !k.startsWith('admin.admin') && !k.startsWith('admin.settings') && !k.startsWith('admin.roles')).map(([k, v]) => k),
   };
 
   return (
     <AuthenticatedLayout>
-      <Head title={t.title} />
+      <Head title={trans('admin.roles.edit.title', { role: role.name })} />
 
-      <AdminLayout>
-        <AdminLayoutHeader>
-          <AdminLayoutTitle
-            title={t.title}
-            description={t.description}
-          />
-          <AdminLayoutActions>
-            <Button
-              variant="destructive"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              {t.delete}
-            </Button>
-          </AdminLayoutActions>
-        </AdminLayoutHeader>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href={route('admin.roles.index')}>
+              <Button variant="outline" size="icon">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                {trans('admin.roles.edit.title', { role: role.name })}
+              </h1>
+              <p className="mt-2 text-muted-foreground">
+                {data.permissions.length} {data.permissions.length > 1 ? 'permissions' : 'permission'}
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="destructive"
+            onClick={() => setDeleteDialogOpen(true)}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            {trans('admin.roles.edit.delete')}
+          </Button>
+        </div>
 
-        <AdminLayoutContent>
-          <Card>
-            <CardContent className="p-6">
-              <form onSubmit={handleSubmit} id="edit-role-form" className="space-y-6">
-                {/* Basic Information */}
-                <div className="grid gap-3 md:grid-cols-12">
-                  <div className="space-y-2 md:col-span-5">
-                    <Label htmlFor="name">{t.name}</Label>
-                    <Input
-                      id="name"
-                      type="text"
-                      value={data.name}
-                      onChange={(e) => setData('name', e.target.value)}
-                      required
-                      autoFocus
-                    />
-                    {errors.name && (
-                      <p className="text-sm text-destructive">{errors.name}</p>
-                    )}
-                  </div>
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Main Form */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Basic Information - Simplified */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Informations</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">{trans('admin.roles.edit.name')}</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={data.name}
+                    onChange={(e) => setData('name', e.target.value)}
+                    required
+                    autoFocus
+                  />
+                  {errors.name && (
+                    <p className="text-sm text-destructive">{errors.name}</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
-                  <div className="space-y-2 md:col-span-5">
-                    <Label htmlFor="icon">{t.icon}</Label>
-                    <Input
-                      id="icon"
-                      type="text"
-                      value={data.icon}
-                      onChange={(e) => setData('icon', e.target.value)}
-                      placeholder={t.iconPlaceholder}
-                    />
-                    {errors.icon && (
-                      <p className="text-sm text-destructive">{errors.icon}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground">
-                      {t.iconHelp}
+            {/* Permissions */}
+            {!data.is_admin && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">{trans('admin.roles.edit.permissions_title')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {Object.entries(permissionGroups).map(([category, perms]) => (
+                    perms.length > 0 && (
+                      <div key={category}>
+                        <h4 className="text-sm font-medium text-muted-foreground mb-3">
+                          {category === 'users' && 'Utilisateurs'}
+                          {category === 'content' && 'Contenu'}
+                          {category === 'admin' && 'Administration'}
+                          {category === 'other' && 'Autres'}
+                        </h4>
+                        <div className="space-y-2">
+                          {perms.map((permission) => (
+                            <div key={permission} className="flex items-center gap-2">
+                              <Checkbox
+                                id={`perm-${permission}`}
+                                checked={data.permissions.includes(permission)}
+                                onCheckedChange={() => togglePermission(permission)}
+                              />
+                              <Label
+                                htmlFor={`perm-${permission}`}
+                                className="cursor-pointer font-normal text-sm"
+                              >
+                                {permissions[permission]}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  ))}
+                  {errors.permissions && (
+                    <p className="text-sm text-destructive mt-2">{errors.permissions}</p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Administrator Switch */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Admin</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center gap-3">
+                  <Switch
+                    id="is_admin"
+                    checked={data.is_admin}
+                    onCheckedChange={(checked) => setData('is_admin', checked)}
+                  />
+                  <div>
+                    <Label htmlFor="is_admin" className="cursor-pointer font-medium">
+                      {trans('admin.roles.edit.administrator')}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {trans('admin.roles.edit.administrator_description')}
                     </p>
                   </div>
-
-                  <div className="space-y-2 md:col-span-2">
-                    <Label htmlFor="color">{t.color}</Label>
-                    <Input
-                      id="color"
-                      type="color"
-                      value={data.color}
-                      onChange={(e) => setData('color', e.target.value)}
-                      className="h-10 cursor-pointer"
-                      required
-                    />
-                    {errors.color && (
-                      <p className="text-sm text-destructive">{errors.color}</p>
-                    )}
-                  </div>
                 </div>
+                {errors.is_admin && (
+                  <p className="text-sm text-destructive mt-2">{errors.is_admin}</p>
+                )}
+              </CardContent>
+            </Card>
 
-                {/* Administrator Switch */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium">{t.permissionsTitle}</h3>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <Switch
-                        id="is_admin"
-                        checked={data.is_admin}
-                        onCheckedChange={(checked) => setData('is_admin', checked)}
-                      />
-                      <div>
-                        <Label htmlFor="is_admin" className="cursor-pointer font-semibold">
-                          {t.administrator}
-                        </Label>
-                        <p className="text-sm text-muted-foreground">
-                          {t.administratorDescription}
-                        </p>
-                      </div>
-                    </div>
-                    {errors.is_admin && (
-                      <p className="text-sm text-destructive">{errors.is_admin}</p>
-                    )}
-                  </div>
+            {/* Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Statistiques</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Permissions</span>
+                  <span className="font-medium">{data.permissions.length}</span>
                 </div>
-              </form>
-            </CardContent>
-          </Card>
-        </AdminLayoutContent>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Type</span>
+                  <span className="font-medium">{data.is_admin ? 'Admin' : 'Custom'}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Power</span>
+                  <span className="font-medium">{role.power}</span>
+                </div>
+              </CardContent>
+            </Card>
 
-        <AdminLayoutFooter>
-          <Link href={route('admin.roles.index')}>
-            <Button type="button" variant="outline">
-              {t.cancel}
-            </Button>
-          </Link>
-          <Button type="submit" form="edit-role-form" disabled={processing}>
-            {processing ? t.saving : t.save}
-          </Button>
-        </AdminLayoutFooter>
-      </AdminLayout>
+            {/* Actions */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex flex-col gap-3">
+                  <Button
+                    form="edit-role-form"
+                    type="submit"
+                    disabled={processing}
+                    className="w-full"
+                  >
+                    <Save className="mr-2 h-4 w-4" />
+                    {processing ? trans('admin.roles.edit.saving') : trans('admin.roles.edit.save')}
+                  </Button>
+                  <Link href={route('admin.roles.index')} className="w-full">
+                    <Button type="button" variant="outline" className="w-full">
+                      {trans('admin.roles.edit.cancel')}
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t.deleteTitle}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t.deleteDescription}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              {t.delete}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        {/* Hidden form for submit */}
+        <form onSubmit={handleSubmit} id="edit-role-form" className="hidden" />
+      </div>
     </AuthenticatedLayout>
   );
 }

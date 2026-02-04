@@ -13,8 +13,20 @@ interface HomeProps {
   posts?: Post[];
 }
 
-export default function Home({ message, siteName, server, servers, landingSettings, posts = [] }: HomeProps) {
-  const { enabledPlugins = [], theme } = usePage<PageProps>().props as any;
+/**
+ * Core Home Page
+ *
+ * This is the default home page that displays blog posts, shop section,
+ * and server information based on enabled plugins.
+ *
+ * THEME OVERRIDE: To customize this page, create a file at:
+ * themes/{your-theme}/resources/views/Home.tsx
+ *
+ * The theme override system will automatically use your theme's Home page
+ * if it exists. No configuration needed!
+ */
+function CoreHome({ message, siteName, server, servers, landingSettings, posts = [] }: HomeProps) {
+  const { enabledPlugins = [] } = usePage<PageProps>().props as any;
 
   // Check which plugins are enabled
   const isBlogEnabled = enabledPlugins.includes('blog');
@@ -24,9 +36,8 @@ export default function Home({ message, siteName, server, servers, landingSettin
     <PublicLayout showCart={isShopEnabled}>
       <Head title={trans('messages.pages.title')} />
 
-      {/* Theme-based homepage - each theme can override this */}
+      {/* Hero Section */}
       <div className="space-y-12">
-        {/* Hero Section */}
         <HeroWithSocial
           siteName={siteName}
           servers={servers}
@@ -130,4 +141,19 @@ export default function Home({ message, siteName, server, servers, landingSettin
       </div>
     </PublicLayout>
   );
+}
+
+/**
+ * Default export - Home page
+ *
+ * To override this page in a theme, create:
+ * themes/{your-theme}/resources/views/Home.tsx
+ *
+ * Example for blog theme:
+ * themes/blog/resources/views/Home.tsx
+ *
+ * The Inertia resolver will automatically use your theme's page if it exists.
+ */
+export default function Home(props: HomeProps) {
+  return <CoreHome {...props} />;
 }

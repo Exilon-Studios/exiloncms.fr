@@ -63,31 +63,47 @@
     "trans": true,
     "items": [
       {
+        "label": "shop.admin.dashboard",
+        "href": "/admin/shop",
+        "permission": "shop.manage",
+        "trans": true
+      },
+      {
         "label": "shop.admin.products",
-        "route": "admin.shop.products.index",
+        "href": "/admin/shop/items",
         "permission": "shop.manage",
         "trans": true
       },
       {
         "label": "shop.admin.categories",
-        "route": "admin.shop.categories.index",
+        "href": "/admin/shop/categories",
         "permission": "shop.manage",
         "trans": true
       },
       {
         "label": "shop.admin.orders",
-        "route": "admin.shop.orders.index",
+        "href": "/admin/shop/orders",
         "permission": "shop.manage",
         "trans": true
       },
       {
         "label": "shop.admin.payments",
-        "route": "admin.shop.payments.index",
+        "href": "/admin/shop/gateways",
         "permission": "shop.manage",
         "trans": true
       }
     ]
   },
+  "widgets": [
+    {
+      "id": "shop_stats",
+      "type": "stats_card",
+      "context": "admin",
+      "position": 30,
+      "title": "shop.widgets.stats",
+      "permission": "shop.manage"
+    }
+  ],
   "translations": {
     "en": {
       "shop": {
@@ -145,5 +161,30 @@
       "path": "@/components/shop/CartSheet",
       "description": "Panier latéral rétractable"
     }
-  }
+  },
+  "sidebar_links": {
+    "public": [],
+    "user": [
+      {
+        "label": "dashboard.visit_shop",
+        "href": "/shop",
+        "icon": "ShoppingCart",
+        "position": 40,
+        "trans": true
+      }
+    ],
+    "admin": []
+  },
+  "header_icons": [
+    {
+      "id": "cart",
+      "type": "button",
+      "icon": "ShoppingCart",
+      "aria_label": "shop.header.cart",
+      "permission": "shop.view",
+      "position": 50,
+      "badge": "cartCount",
+      "component": "ShopCartIcon"
+    }
+  ]
 }

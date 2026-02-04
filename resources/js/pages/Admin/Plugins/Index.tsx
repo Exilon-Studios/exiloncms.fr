@@ -2,8 +2,13 @@ import { Head, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { route } from 'ziggy-js';
-import { IconToggleLeft, IconToggleRight, IconTrash } from '@tabler/icons-react';
-import { clsx } from 'clsx';
+import { trans } from '@/lib/i18n';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Power, Trash2, Settings, Route, Database, FileText, Globe, Check, X } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 
 interface Plugin {
   id: string;
@@ -28,93 +33,137 @@ export default function PluginsIndex({ plugins }: Props) {
   };
 
   const deletePlugin = (pluginId: string) => {
-    if (confirm('Are you sure you want to delete this plugin? This action cannot be undone.')) {
+    if (confirm(trans('admin.plugins.delete_confirm'))) {
       router.delete(route('admin.plugins.destroy', pluginId));
     }
   };
 
+  const enabledCount = plugins.filter(p => p.enabled).length;
+  const totalCount = plugins.length;
+
   return (
     <AuthenticatedLayout>
-      <Head title="Plugins" />
+      <Head title={trans('admin.plugins.title')} />
 
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Plugins</h1>
-          <p className="text-muted-foreground mt-2">
-            Manage your plugins
-          </p>
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">{trans('admin.plugins.title')}</h1>
+            <p className="text-muted-foreground mt-2">
+              {trans('admin.plugins.description')}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-sm">
+              <Check className="h-3 w-3 mr-1 text-green-500" />
+              {enabledCount} / {totalCount} {trans('admin.plugins.enabled').toLowerCase()}
+            </Badge>
+          </div>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {/* Plugins Grid */}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {plugins.map((plugin) => (
-            <div
-              key={plugin.id}
-              className="relative rounded-lg border p-4 hover:bg-accent/50 transition-colors"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <h3 className="font-semibold">{plugin.name}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {plugin.description}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                    <span>v{plugin.version}</span>
-                    <span>•</span>
-                    <span>{plugin.author}</span>
+            <Card key={plugin.id} className={plugin.enabled ? 'border-green-200 dark:border-green-900' : ''}>
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      {plugin.name}
+                      <Badge
+                        variant={plugin.enabled ? 'default' : 'secondary'}
+                        className={plugin.enabled ? 'bg-green-500 hover:bg-green-600' : ''}
+                      >
+                        {plugin.enabled ? (
+                          <>
+                            <Check className="h-3 w-3 mr-1" />
+                            {trans('admin.plugins.enabled')}
+                          </>
+                        ) : (
+                          <>
+                            <X className="h-3 w-3 mr-1" />
+                            {trans('admin.plugins.disabled')}
+                          </>
+                        )}
+                      </Badge>
+                    </CardTitle>
+                    <CardDescription className="mt-2">{plugin.description}</CardDescription>
                   </div>
                 </div>
-                <div className={clsx(
-                  'ml-2 h-2 w-2 rounded-full',
-                  plugin.enabled ? 'bg-green-500' : 'bg-gray-300'
-                )} />
-              </div>
+              </CardHeader>
 
-              <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
-                {plugin.has_routes && <span>Routes</span>}
-                {plugin.has_admin_routes && <span>Admin</span>}
-                {plugin.has_migrations && <span>DB</span>}
-                {plugin.has_settings && <span>Settings</span>}
-              </div>
+              <CardContent className="space-y-4">
+                {/* Plugin Info */}
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span>v{plugin.version}</span>
+                  <span>•</span>
+                  <span>{plugin.author}</span>
+                </div>
 
-              <div className="mt-4 flex items-center gap-2">
-                <button
-                  onClick={() => togglePlugin(plugin.id)}
-                  className={clsx(
-                    'flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md transition-colors',
-                    plugin.enabled
-                      ? 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30'
-                      : 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/20 dark:text-green-400 dark:hover:bg-green-900/30'
+                {/* Features */}
+                <div className="flex flex-wrap gap-2">
+                  {plugin.has_routes && (
+                    <Badge variant="outline" className="text-xs">
+                      <Route className="h-3 w-3 mr-1" />
+                      {trans('admin.plugins.routes')}
+                    </Badge>
                   )}
-                >
-                  {plugin.enabled ? (
-                    <>
-                      <IconToggleLeft className="h-4 w-4" />
-                      Disable
-                    </>
-                  ) : (
-                    <>
-                      <IconToggleRight className="h-4 w-4" />
-                      Enable
-                    </>
+                  {plugin.has_admin_routes && (
+                    <Badge variant="outline" className="text-xs">
+                      <Settings className="h-3 w-3 mr-1" />
+                      Admin
+                    </Badge>
                   )}
-                </button>
+                  {plugin.has_migrations && (
+                    <Badge variant="outline" className="text-xs">
+                      <Database className="h-3 w-3 mr-1" />
+                      DB
+                    </Badge>
+                  )}
+                  {plugin.has_settings && (
+                    <Badge variant="outline" className="text-xs">
+                      <FileText className="h-3 w-3 mr-1" />
+                      {trans('admin.plugins.settings')}
+                    </Badge>
+                  )}
+                </div>
+              </CardContent>
 
-                <button
+              <CardFooter className="flex items-center justify-between gap-2 pt-0">
+                {/* Enable/Disable Switch */}
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={plugin.enabled}
+                    onCheckedChange={() => togglePlugin(plugin.id)}
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    {plugin.enabled ? trans('admin.plugins.enabled') : trans('admin.plugins.disabled')}
+                  </span>
+                </div>
+
+                {/* Delete Button */}
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => deletePlugin(plugin.id)}
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                 >
-                  <IconTrash className="h-4 w-4" />
-                  Delete
-                </button>
-              </div>
-            </div>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </CardFooter>
+            </Card>
           ))}
         </div>
 
+        {/* Empty State */}
         {plugins.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No plugins found</p>
-          </div>
+          <Card>
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <Globe className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">{trans('admin.plugins.no_plugins')}</p>
+            </CardContent>
+          </Card>
         )}
       </div>
     </AuthenticatedLayout>

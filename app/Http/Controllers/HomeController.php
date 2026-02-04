@@ -10,20 +10,40 @@ class HomeController extends Controller
 {
     /**
      * Show the application dashboard.
+     * Theme-aware - will use theme's Home page if available.
      */
     public function index()
     {
+        // Get active theme from ThemeLoader
+        $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
+        $activeTheme = $themeLoader->getActiveThemeId();
+
+        // Check if the active theme has a custom Home page
+        // Theme pages are at: themes/{theme}/resources/views/{Page}.tsx
+        $hasThemeHome = false;
+        if ($activeTheme && $activeTheme !== 'default') {
+            $themeHomePath = base_path("themes/{$activeTheme}/resources/views/Home.tsx");
+            $hasThemeHome = file_exists($themeHomePath);
+        }
+
         // Get enabled plugins for dynamic content
-        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
+        $enabledPluginsValue = setting('enabled_plugins', []);
+        if (is_string($enabledPluginsValue)) {
+            $enabledPlugins = json_decode($enabledPluginsValue, true) ?? [];
+        } elseif (is_array($enabledPluginsValue) && isset($enabledPluginsValue['enabled_plugins'])) {
+            $enabledPlugins = $enabledPluginsValue['enabled_plugins'];
+        } else {
+            $enabledPlugins = (array) $enabledPluginsValue;
+        }
 
         // Try to get posts from Blog plugin if available
         $posts = [];
         try {
             if (class_exists('ExilonCMS\Models\Post')) {
                 $posts = \ExilonCMS\Models\Post::published()
-                    ->with('author')
+                    ->with(['author', 'category'])
                     ->latest('published_at')
-                    ->take(3)
+                    ->take(6)
                     ->get();
             }
         } catch (\Exception $e) {
@@ -37,7 +57,8 @@ class HomeController extends Controller
         // Get landing page settings
         $landingSettings = LandingSetting::getAllGrouped();
 
-        return Inertia::render('Home', [
+        // Prepare common props for both core and theme pages
+        $props = [
             'message' => setting('home_message'),
             'siteName' => setting('name', 'ExilonCMS'),
             'posts' => $posts,
@@ -67,6 +88,12 @@ class HomeController extends Controller
                 'maxPlayers' => $s->getMaxPlayers(),
                 'playersPercents' => $s->getPlayersPercents(),
             ]),
-        ]);
+        ];
+
+        // Share active theme info for the frontend resolver
+        Inertia::share('activeTheme', $activeTheme);
+
+        // Always render 'Home' - the theme override is handled in app.tsx resolve
+        return Inertia::render('Home', $props);
     }
 }

@@ -40,24 +40,28 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
 
   const fetchCartItems = () => {
     setLoading(true);
-    fetch(route('cart.items'))
-      .then(response => response.json())
-      .then(data => {
-        setCartItems(data.items || []);
-        setTotal(data.total || 0);
-      })
-      .catch(() => {
+    // Use direct URL instead of route() to avoid Ziggy errors when shop plugin routes aren't loaded
+    router.get('/shop/cart/items', {}, {
+      preserveState: true,
+      preserveScroll: true,
+      onSuccess: (page: any) => {
+        setCartItems(page.props.cartItems || []);
+        setTotal(page.props.cartTotal || 0);
+        setLoading(false);
+      },
+      onError: () => {
         setCartItems([]);
         setTotal(0);
-      })
-      .finally(() => setLoading(false));
+        setLoading(false);
+      },
+    });
   };
 
   const updateQuantity = (itemId: number, newQuantity: number) => {
     if (newQuantity < 1 || newQuantity > 99) return;
     setUpdatingId(itemId);
 
-    router.post(route('cart.update', itemId), {
+    router.post(`/shop/cart/update/${itemId}`, {
       quantity: newQuantity,
       onFinish: () => {
         setUpdatingId(null);
@@ -68,7 +72,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
 
   const removeItem = (itemId: number) => {
     if (!confirm('Supprimer cet article du panier ?')) return;
-    router.delete(route('cart.remove', itemId), {
+    router.delete(`/shop/cart/remove/${itemId}`, {
       onSuccess: () => {
         fetchCartItems();
       },
@@ -195,7 +199,7 @@ export default function CartSheet({ open, onOpenChange }: CartSheetProps) {
                 size="lg"
                 onClick={() => {
                   onOpenChange(false);
-                  router.visit('/cart');
+                  router.visit('/shop/cart');
                 }}
               >
                 Voir le panier complet

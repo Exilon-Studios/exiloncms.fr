@@ -96,7 +96,7 @@ export default function UsersIndex({
           <AdminLayoutActions>
             <Link href={route('admin.users.create')}>
               <Button>
-                <UserPlus className="mr-2 h-4 w-4" />
+                <UserPlus className="mr-1 h-4 w-4" />
                 {trans('admin.users.create')}
               </Button>
             </Link>
@@ -165,7 +165,7 @@ export default function UsersIndex({
                             <p className="font-medium">{user.name}</p>
                             {user.ban && (
                               <Badge variant="destructive" className="mt-1 text-xs">
-                                <Ban className="h-3 w-3 mr-1" />
+                                <Ban className="h-3 w-3 mr-0.5" />
                                 {trans('admin.users.banned')}
                               </Badge>
                             )}
@@ -179,7 +179,7 @@ export default function UsersIndex({
                       )}
                       <TableCell>
                         <Badge variant="secondary">
-                          <Shield className="h-3 w-3 mr-1" />
+                          <Shield className="h-3 w-3 mr-0.5" />
                           {user.role.name}
                         </Badge>
                       </TableCell>
@@ -198,18 +198,18 @@ export default function UsersIndex({
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => router.visit(route('admin.users.edit', user.id))}>
-                              <Eye className="mr-2 h-4 w-4" />
+                              <Eye className="mr-1 h-4 w-4" />
                               {trans('admin.users.index.view')}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => router.visit(route('admin.users.edit', user.id))}>
-                              <Edit className="mr-2 h-4 w-4" />
+                              <Edit className="mr-1 h-4 w-4" />
                               {trans('admin.users.index.edit')}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-destructive"
                               onClick={() => confirmDelete(user.id, user.name)}
                             >
-                              <Trash2 className="mr-2 h-4 w-4" />
+                              <Trash2 className="mr-1 h-4 w-4" />
                               {trans('admin.users.index.delete')}
                             </DropdownMenuItem>
                           </DropdownMenuContent>

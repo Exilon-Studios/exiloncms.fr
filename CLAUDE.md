@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**ExilonCMS** (formerly MC-CMS V2) is a modern content management system for Minecraft and game servers, built with Laravel 12 (PHP 8.2+) and React 19 + TypeScript. The project uses Inertia.js v2 for seamless SPA-like experiences without writing an API.
+**ExilonCMS** (formerly MC-CMS V2) is a modern content management system for communities and businesses, built with Laravel 12 (PHP 8.2+) and React 19 + TypeScript. The project uses Inertia.js v2 for seamless SPA-like experiences without writing an API.
 
 **Stack:**
 - Backend: Laravel 12, PHP 8.2+, PostgreSQL (recommended) or MySQL
@@ -17,10 +17,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **High-Level Architecture:**
 - **Inertia.js** as the bridge between Laravel backend and React frontend (no API routes)
-- **Extension System** (Plugins + Themes) loaded via `ExtensionServiceProvider` with lazy loading pattern
+- **Extension System** (Plugins + Themes) using PHP 8 attributes and composer autoload
 - **Role-based permissions** with gates and policies for authorization
-- **Game integration** layer supporting Minecraft (Java/Bedrock), FiveM, Hytale, and Steam games
-- **Marketplace integration** with marketplace.exiloncms.fr for packages and extensions
+- **Game integration** layer supporting Minecraft (Java/Bedrock), FiveM, and Steam games
+- **Payment Gateway System** (Paymenter-style) for processing payments via Stripe, PayPal, etc.
 - **Standalone Installer** in `installer/` directory for web-based setup
 
 ## Development Commands
@@ -342,12 +342,12 @@ This generates a basic game class that extends `Game` and implements required me
 
 ### 5. Extension System (Plugins + Themes)
 
-ExilonCMS uses a unified extension system that handles both plugins and themes through service providers.
+ExilonCMS uses a modern PHP 8 attribute-based extension system that handles both plugins and themes.
 
 **Architecture:**
-- `ExtensionServiceProvider` (app/Providers/ExtensionServiceProvider.php) - Registers extension loaders
-- `PluginServiceProvider` (app/Extensions/Plugin/PluginServiceProvider.php) - Loads plugins via PluginLoader
+- `PluginServiceProvider` (app/Providers/PluginServiceProvider.php) - Loads plugins via PluginLoader
 - `ThemeServiceProvider` (app/Extensions/Theme/ThemeServiceProvider.php) - Loads active theme via ThemeLoader
+- `ExtensionHelper` (app/Helpers/ExtensionHelper.php) - Manages payment gateways and other extensions
 
 **Critical: Lazy Loading Pattern**
 Extensions MUST use lazy loading to avoid "Class cache does not exist" errors during `package:discover`:
@@ -382,81 +382,67 @@ public function boot(): void
 
 ### 6. Plugin System
 
-ExilonCMS uses a modular plugin architecture for extending functionality. Plugins are auto-discovered from the `plugins/` directory.
+ExilonCMS uses a modern PHP 8 attribute-based plugin architecture. Plugins are auto-discovered via composer autoload from the `plugins/` directory.
 
 **Plugin Structure:**
 ```
 plugins/
 └── blog/
-    ├── plugin.json              # Plugin metadata
     ├── composer.json            # Plugin dependencies
     ├── src/
-    │   └── BlogServiceProvider.php  # Service provider
+    │   └── Blog.php             # Main plugin class with #[PluginMeta] attribute
     ├── routes/
     │   ├── web.php              # Public routes
     │   └── admin.php            # Admin routes
     ├── database/
     │   └── migrations/          # Plugin migrations
     └── resources/
-        └── js/
-            └── pages/           # React pages for plugin
+        ├── js/
+        │   └── pages/           # React pages for plugin
+        ├── views/               # Blade views (optional)
+        └── lang/                # Translation files
 ```
 
-**plugin.json format:**
-```json
-{
-  "id": "blog",
-  "name": "Blog",
-  "version": "1.0.0",
-  "description": "Blog system with posts, categories, tags and comments",
-  "author": "ExilonCMS",
-  "namespace": "ExilonCMS\\Plugins\\Blog",
-  "service_provider": "ExilonCMS\\Plugins\\Blog\\BlogServiceProvider",
-  "dependencies": {
-    "exiloncms": ">=1.0.0"
-  },
-  "permissions": [
-    "blog.posts.create",
-    "blog.posts.edit",
-    "blog.posts.delete"
-  ],
-  "settings": {
-    "posts_per_page": {
-      "type": "integer",
-      "default": 10,
-      "label": "Posts per page"
-    }
-  }
-}
-```
-
-**Plugin Service Provider:**
+**Plugin class with PHP 8 attributes:**
 ```php
 namespace ExilonCMS\Plugins\Blog;
 
-use ExilonCMS\Models\Permission;
-use Illuminate\Support\ServiceProvider;
+use ExilonCMS\Classes\Plugin\Plugin;
+use ExilonCMS\Attributes\PluginMeta;
 
-class BlogServiceProvider extends ServiceProvider
+#[PluginMeta(
+    id: 'blog',
+    name: 'Blog',
+    version: '1.0.0',
+    description: 'Blog system with posts, categories, tags and comments',
+    author: 'ExilonCMS',
+    dependencies: [],
+    permissions: ['blog.posts.create', 'blog.posts.edit', 'blog.posts.delete']
+)]
+class Blog extends Plugin
 {
     public function boot(): void
     {
-        // Load routes
-        $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
-        $this->loadRoutesFrom(__DIR__.'/../routes/admin.php');
+        // Plugin initialization - routes/views are auto-loaded by PluginServiceProvider
+    }
 
-        // Load migrations
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-
-        // Register permissions
-        Permission::registerPermissions([
-            'blog.posts.create' => 'Create blog posts',
-            'blog.posts.edit' => 'Edit blog posts',
-            'blog.posts.delete' => 'Delete blog posts',
-        ]);
+    public function getConfigFields(): array
+    {
+        return [
+            ['name' => 'posts_per_page', 'label' => 'Posts per page', 'type' => 'integer', 'default' => 10],
+        ];
     }
 }
 ```
+
+**Plugin base class methods:**
+- `boot()` - Called every request when plugin is enabled
+- `installed()` - Called when plugin is first enabled
+- `uninstalled()` - Called when plugin is disabled
+- `upgraded(string $oldVersion)` - Called when plugin is updated
+- `getConfigFields(): array` - Define admin configuration fields
+- `config(string $key, mixed $default)` - Get plugin config from database
+- `setConfig(string $key, mixed $value)` - Set plugin config in database
 
 **Built-in Plugins:**
 - **Analytics** - Website analytics and statistics tracking
@@ -471,12 +457,59 @@ class BlogServiceProvider extends ServiceProvider
 - **Votes** - Voting system for game servers
 
 **Plugin Loading:**
-- Plugins are auto-discovered by `PluginLoader` service (`app/Services/PluginLoader.php`)
-- `PluginServiceProvider` registers all plugins on boot
+- Plugins are auto-discovered by `PluginLoader` via composer autoload classmap
+- `PluginServiceProvider` registers routes, views, migrations, and translations for enabled plugins
 - Plugin migrations are auto-registered and run with standard `php artisan migrate`
 - Plugin namespaces are auto-loaded via `composer.json` autoload configuration
+- Enabled plugins are stored in `settings` table under `enabled_plugins` key
 
-### 7. Roles & Permissions
+### 7. Payment Gateway System
+
+ExilonCMS includes a Paymenter-style payment gateway system for processing payments through multiple providers.
+
+**Architecture:**
+- `Gateway` abstract base class (`app/Classes/Extension/Gateway.php`) - Base for all payment gateways
+- `ExtensionHelper` (`app/Helpers/ExtensionHelper.php`) - Centralized gateway management
+- Gateways auto-discovered from `app/Extensions/Gateways/<Name>/` via composer autoload
+
+**Gateway methods:**
+```php
+abstract class Gateway extends Extension
+{
+    // Required: Process payment for an invoice
+    abstract public function pay(Invoice $invoice, $total);
+
+    // Optional: Handle webhook from payment provider
+    public function webhook($request) { }
+
+    // Optional: Billing agreements (recurring payments)
+    public function supportsBillingAgreements(): bool { return false; }
+    public function createBillingAgreement(User $user) { }
+    public function charge(Invoice $invoice, $total, $billingAgreement) { }
+}
+```
+
+**ExtensionHelper usage:**
+```php
+use ExilonCMS\Helpers\ExtensionHelper;
+
+// Get all gateways
+$gateways = ExtensionHelper::getExtensions('gateway');
+
+// Initiate payment
+$response = ExtensionHelper::pay($gateway, $invoice);
+
+// Handle webhook
+return ExtensionHelper::handleWebhook($gatewayName, $request);
+
+// Add payment transaction
+$transaction = ExtensionHelper::addPayment($invoice, $gateway, $amount, $fee, $transactionId);
+```
+
+**Configuration fields:**
+Gateways can define config fields by overriding `getConfig()` to return an array of field definitions for the admin panel.
+
+### 8. Roles & Permissions
 
 **Models:**
 - `User` (ExilonCMS\Models\User)
@@ -504,7 +537,58 @@ const { auth } = usePage<PageProps>().props;
 )}
 ```
 
-### 9. File Structure
+### 9. Theme System
+
+Themes support page overrides that allow complete customization of any page in the CMS.
+
+**Theme Structure:**
+```
+themes/
+└── blog/
+    ├── theme.json              # Theme metadata
+    ├── resources/
+    │   ├── css/                # Theme styles
+    │   ├── js/
+    │   │   └── pages/          # Theme page overrides
+    │   │       ├── Home.tsx    # Override home page
+    │   │       ├── Shop.tsx    # Override shop page
+    │   │       └── Blog.tsx    # Override blog page
+    │   └── views/              # Blade templates (optional)
+    └── assets/                 # Theme assets
+```
+
+**Theme Page Override Priority:**
+1. Active theme page (if exists)
+2. Plugin page (if route belongs to plugin)
+3. Core CMS page (fallback)
+
+This means you can override ANY page (core, plugin, or admin) by creating a corresponding file in your theme's `resources/js/pages/` directory.
+
+**Theme preview mode:**
+Themes can be previewed without activation by setting `preview_theme` in session:
+```php
+session(['preview_theme' => 'my-theme']);
+```
+
+**Theme metadata (theme.json):**
+```json
+{
+  "id": "blog",
+  "name": "Blog Theme",
+  "version": "1.0.0",
+  "description": "Default blog theme",
+  "author": "ExilonCMS",
+  "requires": {
+    "plugin:blog": "*"
+  },
+  "supports": ["shop", "docs"]
+}
+```
+
+**Theme activation with plugin dependencies:**
+When a theme is activated, any plugins listed in `requires` (with `plugin:` prefix) are automatically enabled.
+
+### 10. File Structure
 
 **Backend:**
 - `app/Models/` - Eloquent models
@@ -527,7 +611,7 @@ const { auth } = usePage<PageProps>().props;
 - `resources/js/lib/` - Utility functions
 - `resources/views/app.blade.php` - Root HTML wrapper (ONLY Blade file)
 
-### 10. TypeScript Configuration
+### 11. TypeScript Configuration
 
 TypeScript uses **strict mode** with:
 - `noUnusedLocals`, `noUnusedParameters`
@@ -550,7 +634,7 @@ import { PageProps } from '@/types';
 // @/hooks/*          → resources/js/hooks/*
 ```
 
-### 11. Database & Models
+### 12. Database & Models
 
 **Database:** Uses PostgreSQL by default (configurable in `.env`).
 
@@ -567,7 +651,7 @@ import { PageProps } from '@/types';
 - `HasUser`, `Loggable`, `HasImage`, `HasMarkdown`
 - `InteractsWithMoney`, `TwoFactorAuthenticatable`
 
-### 12. Settings System
+### 13. Settings System
 
 Settings are stored in the `settings` table and accessed via helper:
 
@@ -578,7 +662,7 @@ setting('site_name'); // Without default
 
 Common settings: `name`, `description`, `locale`, `timezone`, `money` (currency name).
 
-### 13. Helper Functions
+### 14. Helper Functions
 
 Available globally via `app/helpers.php`:
 
@@ -605,7 +689,7 @@ get_color(string $hex, string $type) // Extract color values
 mix_colors(string $color1, string $color2, int $percentage) // Mix two colors
 ```
 
-### 14. Frontend Libraries
+### 15. Frontend Libraries
 
 The project uses several key React libraries:
 
@@ -647,8 +731,112 @@ The project uses several key React libraries:
 12. **CRITICAL: Use ziggy-js for routes in JavaScript** - NEVER import from `vendor/tightenco/ziggy` as the vendor directory doesn't exist in CI builds. Always use `import { route } from 'ziggy-js'`
 13. **Extension lazy loading** - Extensions MUST use lazy loading in `boot()` phase, NOT `register()`. The cache service isn't available during `package:discover`, so instantiating services in `register()` will cause "Class cache does not exist" errors. Always check for package:discover and lazy load in `boot()`.
 14. **Run Pint before committing** - Code style is enforced in CI via `./vendor/bin/pint --test`. Run `./vendor/bin/pint` to auto-fix issues before pushing.
+15. **ALWAYS UPDATE CHANGELOG.md** - After ANY code change (fix, feature, refactor, chore), add an entry to `CHANGELOG.md` under today's date. Use format: `FIX:`, `FEATURE:`, `REFACTOR:`, or `CHORE:` followed by a concise description.
 
 ## Common Patterns
+
+## Common Patterns
+
+### Creating a new plugin
+
+**Using the PHP 8 attribute system:**
+
+1. **Create plugin directory structure:**
+```bash
+mkdir -p plugins/my-plugin/src
+mkdir -p plugins/my-plugin/routes
+mkdir -p plugins/my-plugin/database/migrations
+mkdir -p plugins/my-plugin/resources/js/pages
+```
+
+2. **Create plugin class** (`plugins/my-plugin/src/MyPlugin.php`):
+```php
+<?php
+
+namespace ExilonCMS\Plugins\MyPlugin;
+
+use ExilonCMS\Classes\Plugin\Plugin;
+use ExilonCMS\Attributes\PluginMeta;
+
+#[PluginMeta(
+    id: 'my-plugin',
+    name: 'My Plugin',
+    version: '1.0.0',
+    description: 'Plugin description',
+    author: 'Your Name',
+    dependencies: [],
+    permissions: ['myplugin.manage']
+)]
+class MyPlugin extends Plugin
+{
+    public function boot(): void
+    {
+        // Plugin initialization
+    }
+
+    public function getConfigFields(): array
+    {
+        return [
+            [
+                'name' => 'api_key',
+                'label' => 'API Key',
+                'type' => 'text',
+                'default' => '',
+            ],
+        ];
+    }
+}
+```
+
+3. **Update composer.json autoload** (add to `autoload.psr-4`):
+```json
+"ExilonCMS\\Plugins\\MyPlugin\\": "plugins/my-plugin/src/"
+```
+
+4. **Run composer dump-autoload:**
+```bash
+composer dump-autoload
+```
+
+5. **Enable plugin via settings:**
+```php
+// In database or via admin panel
+setting('enabled_plugins', ['blog', 'shop', 'my-plugin']);
+```
+
+### Creating a new payment gateway
+
+1. **Create gateway class** in `app/Extensions/Gateways/<Name>/<Name>.php`:
+```php
+<?php
+
+namespace ExilonCMS\Extensions\Gateways\Stripe;
+
+use ExilonCMS\Classes\Extension\Gateway;
+use ExilonCMS\Models\Invoice;
+
+class Stripe extends Gateway
+{
+    public function getConfig(): array
+    {
+        return [
+            ['name' => 'secret_key', 'label' => 'Secret Key', 'type' => 'text'],
+            ['name' => 'publishable_key', 'label' => 'Publishable Key', 'type' => 'text'],
+        ];
+    }
+
+    public function pay(Invoice $invoice, $total)
+    {
+        // Return payment view or redirect
+    }
+
+    public function webhook($request)
+    {
+        // Handle Stripe webhook
+        return response()->json(['success' => true]);
+    }
+}
+```
 
 ### Creating a new admin page
 

@@ -8,32 +8,25 @@ import { trans } from '@/lib/i18n';
 import {
   IconBrandTabler,
   IconUserBolt,
-  IconSettings,
   IconUsers,
-  IconFileText,
-  IconFile,
   IconServer,
-  IconArrowLeft,
   IconHome,
   IconShield,
   IconBan,
-  IconPhoto,
-  IconArrowsRightLeft,
   IconDownload,
-  IconCloudDownload,
   IconList,
-  IconLanguage,
   IconMenu2,
-  IconBuilding,
-  IconDatabase,
-  IconWebhook,
   IconPlug,
   IconPalette,
+  IconFileText,
+  IconSettings,
+  IconFolder,
+  IconDatabase,
 } from '@tabler/icons-react';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   const pageProps = usePage<PageProps>().props as any;
-  const { auth, settings, updatesCount = 0, enabledPlugins = [] } = pageProps;
+  const { auth, settings, updatesCount = 0, enabledPlugins = [], enabledPluginConfigs = [], pluginNavigation = [] } = pageProps;
 
   // Check if we're in admin section - hide user-facing shop links there
   const url = pageProps.url || window.location.pathname;
@@ -74,6 +67,65 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
       return true;
     });
   };
+
+  // Build plugin config links dynamically with dropdown support
+  const pluginConfigLinks = enabledPluginConfigs.map((plugin: any) => {
+    // Documentation plugin gets a dropdown menu
+    if (plugin.id === 'documentation') {
+      return {
+        label: plugin.name,
+        permission: 'admin.settings',
+        icon: (
+          <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+        ),
+        children: [
+          {
+            label: trans('admin.documentation.menu.editor'),
+            href: '/admin/editor',
+            permission: 'admin.settings',
+            icon: <IconFileText className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.documentation.menu.configuration'),
+            href: '/admin/plugins/documentation/settings',
+            permission: 'admin.settings',
+            icon: <IconSettings className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.documentation.menu.browse'),
+            href: '/admin/plugins/documentation/browse',
+            permission: 'admin.settings',
+            icon: <IconFolder className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.documentation.menu.cache'),
+            href: '/admin/plugins/documentation/cache',
+            permission: 'admin.settings',
+            icon: <IconDatabase className="h-4 w-4" />,
+          },
+        ],
+      };
+    }
+
+    // Other plugins get a simple link
+    return {
+      label: plugin.name,
+      href: plugin.configUrl,
+      permission: 'admin.settings',
+      icon: (
+        <IconPlug className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    };
+  });
+
+  // Create PLUGIN CONFIG section (shown only if plugins have config)
+  const pluginConfigSection = pluginConfigLinks.length > 0 ? [
+    {
+      type: 'section',
+      label: 'PLUGIN CONFIG',
+      children: pluginConfigLinks,
+    },
+  ] : [];
 
   // Primary navigation links - Sections rétractables
   const allPrimaryLinks = [
@@ -117,213 +169,13 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         },
       ],
     },
-    // Content Section
+    // PLUGINS & THEMES Section (grouped together)
     {
       type: 'section',
-      label: trans('admin.nav.content.heading').toUpperCase(),
+      label: 'EXTENSIONS',
       children: [
         {
-          label: trans('admin.nav.content.pages'),
-          href: '/admin/pages',
-          permission: 'admin.pages',
-          plugin: 'pages',
-          icon: (
-            <IconFile className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.content.posts'),
-          href: '/admin/posts',
-          permission: 'admin.posts',
-          plugin: 'blog',
-          icon: (
-            <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.content.images'),
-          href: '/admin/images',
-          permission: 'admin.images',
-          icon: (
-            <IconPhoto className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.content.redirects'),
-          href: '/admin/redirects',
-          permission: 'admin.redirects',
-          icon: (
-            <IconArrowsRightLeft className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-      ],
-    },
-    // Marketplace Section
-    {
-      type: 'section',
-      label: trans('admin.nav.marketplace.heading').toUpperCase(),
-      children: [
-        {
-          label: trans('admin.nav.marketplace.packages'),
-          href: '/admin/resources',
-          permission: 'admin.resources.view',
-          icon: (
-            <IconDownload className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.marketplace.pending'),
-          href: '/admin/resources/pending',
-          permission: 'admin.resources.moderate',
-          icon: (
-            <IconArrowsRightLeft className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.marketplace.sellers'),
-          href: '/admin/resources/sellers',
-          permission: 'admin.resources.moderate',
-          icon: (
-            <IconUserBolt className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.resources.external_install'),
-          href: '/admin/resources/external/install',
-          permission: 'admin.resources.settings',
-          icon: (
-            <IconCloudDownload className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-      ],
-    },
-    // PARAMÈTRES Section - Menu déroulant principal contenant tous les paramètres
-    {
-      type: 'section',
-      label: trans('admin.nav.settings.heading').toUpperCase(),
-      children: [
-        // Général - Sous-menu déroulant
-        {
-          type: 'section',
-          label: trans('admin.nav.settings.general'),
-          children: [
-            {
-              label: trans('admin.nav.settings.general_page'),
-              href: '/admin/settings/general',
-              permission: 'admin.settings',
-              icon: (
-                <IconHome className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.settings.security'),
-              href: '/admin/settings/security',
-              permission: 'admin.settings',
-              icon: (
-                <IconShield className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.settings.mail'),
-              href: '/admin/settings/mail',
-              permission: 'admin.settings',
-              icon: (
-                <IconMenu2 className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.settings.integrations'),
-              href: '/admin/settings/integrations',
-              permission: 'admin.settings',
-              icon: (
-                <IconWebhook className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.settings.maintenance'),
-              href: '/admin/settings/maintenance',
-              permission: 'admin.settings',
-              icon: (
-                <IconBan className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.settings.navbar'),
-              href: '/admin/navbar-elements',
-              permission: 'admin.navbar',
-              icon: (
-                <IconMenu2 className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.settings.servers'),
-              href: '/admin/servers',
-              permission: 'admin.servers',
-              icon: (
-                <IconServer className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-          ],
-        },
-        // LÉGAL - Sous-menu déroulant pour les pages légales
-        {
-          type: 'section',
-          label: trans('admin.nav.legal.heading'),
-          plugin: 'legal',
-          children: [
-            {
-              label: trans('admin.nav.legal.company'),
-              href: '/admin/settings/company',
-              permission: 'admin.settings',
-              icon: (
-                <IconBuilding className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.legal.terms'),
-              href: '/admin/settings/legal/terms',
-              permission: 'admin.settings',
-              icon: (
-                <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.legal.privacy'),
-              href: '/admin/settings/legal/privacy',
-              permission: 'admin.settings',
-              icon: (
-                <IconShield className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.legal.cookies'),
-              href: '/admin/settings/legal/cookies',
-              permission: 'admin.settings',
-              icon: (
-                <IconLanguage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-            {
-              label: trans('admin.nav.legal.refund'),
-              href: '/admin/settings/legal/refund',
-              permission: 'admin.settings',
-              icon: (
-                <IconArrowLeft className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-              ),
-            },
-          ],
-        },
-        // Autres items de paramètres (directement dans PARAMÈTRES)
-        {
-          label: trans('admin.nav.settings.translations'),
-          href: '/admin/translations',
-          permission: 'admin.settings',
-          icon: (
-            <IconLanguage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.settings.plugins'),
+          label: 'Plugins',
           href: '/admin/plugins',
           permission: 'admin.settings',
           icon: (
@@ -331,36 +183,66 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
           ),
         },
         {
-          label: trans('admin.nav.settings.themes'),
+          label: 'Themes',
           href: '/admin/themes',
           permission: 'admin.settings',
           icon: (
             <IconPalette className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
         },
+      ],
+    },
+    // Plugin Config section (as separate section, outside Settings)
+    ...(pluginConfigLinks.length > 0 ? [
+      {
+        type: 'section',
+        label: 'PLUGIN CONFIG',
+        children: pluginConfigLinks,
+      },
+    ] : []),
+    // CONFIGURATIONS Section - just simple links, no nested sections
+    {
+      type: 'section',
+      label: 'CONFIGURATIONS',
+      children: [
         {
-          label: trans('admin.nav.other.update'),
-          href: '/admin/updates',
-          permission: 'admin.update',
+          label: 'General',
+          href: '/admin/settings/general',
+          permission: 'admin.settings',
           icon: (
-            <IconDownload className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+            <IconHome className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
-          badge: updatesCount > 0 ? updatesCount : undefined,
         },
         {
-          label: trans('admin.nav.other.logs'),
+          label: 'Security',
+          href: '/admin/settings/security',
+          permission: 'admin.settings',
+          icon: (
+            <IconShield className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: 'Maintenance',
+          href: '/admin/settings/maintenance',
+          permission: 'admin.settings',
+          icon: (
+            <IconBan className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: 'Navbar',
+          href: '/admin/navbar-elements',
+          permission: 'admin.navbar',
+          icon: (
+            <IconMenu2 className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: 'Logs',
           href: '/admin/logs',
           permission: 'admin.logs',
           icon: (
             <IconList className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.database.title'),
-          href: '/admin/database',
-          permission: 'admin.settings',
-          icon: (
-            <IconDatabase className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
         },
       ],
@@ -370,23 +252,24 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   // Filter links based on user permissions
   const primaryLinks = filterLinks(allPrimaryLinks);
 
-  // Secondary navigation links
+  // Secondary navigation links (bottom of sidebar)
   const secondaryLinks = [
     {
-      label: trans('messages.sidebar.documentation'),
-      href: 'https://docs.exiloncms.fr/',
+      label: 'Logs',
+      href: '/admin/logs',
+      permission: 'admin.logs',
       icon: (
-        <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconList className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
-      external: true,
     },
     {
-      label: trans('messages.sidebar.official_site'),
-      href: 'https://exiloncms.fr/',
+      label: trans('admin.nav.other.update'),
+      href: '/admin/updates',
+      permission: 'admin.update',
       icon: (
-        <IconBrandTabler className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+        <IconDownload className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
-      external: true,
+      badge: updatesCount > 0 ? updatesCount : undefined,
     },
   ];
 

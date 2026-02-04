@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 import { PageProps } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -78,7 +78,7 @@ interface DashboardProps extends PageProps {
 
 export default function DashboardIndex({ user, stats, settings, dashboardCards = [], dashboardWidgets = [], dashboardSidebarWidgets = [] }: DashboardProps) {
     return (
-        <AuthenticatedLayout>
+        <DashboardLayout showCart={true}>
             <Head title={trans('dashboard.title')} />
 
             <div className="container mx-auto py-8 px-4">
@@ -291,6 +291,6 @@ export default function DashboardIndex({ user, stats, settings, dashboardCards =
                     </Card>
                 )}
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }

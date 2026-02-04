@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { Head, Link, router } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import { Plus, Edit, Trash2, Languages, FileText, Upload, Download, RefreshCw } from 'lucide-react';
+import { Plus, Edit, Trash2, Languages, FileText, Download } from 'lucide-react';
+import { trans } from '@/lib/i18n';
 
 interface TranslationEntry {
     id: number;
@@ -38,17 +39,9 @@ export default function TranslationsIndex({ translations, locales, groups, local
     };
 
     const handleDelete = (id: number) => {
-        if (confirm('Are you sure you want to delete this translation?')) {
+        if (confirm(trans('admin.translations.index.delete_confirm'))) {
             router.delete(route('admin.translations.destroy', { group: selectedGroup, key: '', locale: selectedLocale, id }));
         }
-    };
-
-    const handleSyncMarketplace = () => {
-        router.post(route('admin.translations.sync-marketplace'), {}, {
-            onSuccess: () => {
-                // Success
-            },
-        });
     };
 
     const handleExport = () => {
@@ -70,37 +63,30 @@ export default function TranslationsIndex({ translations, locales, groups, local
 
     return (
         <AuthenticatedLayout>
-            <Head title="Translations" />
+            <Head title={trans('admin.translations.index.title')} />
 
             <div className="container mx-auto px-4 py-8">
                 <div className="mb-8 flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold">Translations</h1>
+                        <h1 className="text-3xl font-bold">{trans('admin.translations.index.title')}</h1>
                         <p className="text-muted-foreground">
-                            Manage translations for all supported languages
+                            {trans('admin.translations.index.description')}
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <button
-                            onClick={handleSyncMarketplace}
-                            className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-4 py-2 hover:bg-accent"
-                        >
-                            <RefreshCw className="h-4 w-4" />
-                            Sync Marketplace
-                        </button>
                         <button
                             onClick={handleExport}
                             className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-4 py-2 hover:bg-accent"
                         >
                             <Download className="h-4 w-4" />
-                            Export
+                            {trans('admin.translations.index.export')}
                         </button>
                         <Link
                             href={route('admin.translations.create')}
                             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
                         >
                             <Plus className="h-4 w-4" />
-                            Add Translation
+                            {trans('admin.translations.index.add')}
                         </Link>
                     </div>
                 </div>
@@ -108,7 +94,7 @@ export default function TranslationsIndex({ translations, locales, groups, local
                 {/* Filters */}
                 <div className="mb-6 flex flex-wrap gap-4 rounded-lg border bg-card p-4">
                     <div className="flex-1">
-                        <label className="mb-2 block text-sm font-medium">Language</label>
+                        <label className="mb-2 block text-sm font-medium">{trans('admin.translations.index.language')}</label>
                         <select
                             value={selectedLocale}
                             onChange={(e) => handleLocaleChange(e.target.value)}
@@ -123,13 +109,13 @@ export default function TranslationsIndex({ translations, locales, groups, local
                     </div>
 
                     <div className="flex-1">
-                        <label className="mb-2 block text-sm font-medium">Group</label>
+                        <label className="mb-2 block text-sm font-medium">{trans('admin.translations.index.group')}</label>
                         <select
                             value={selectedGroup}
                             onChange={(e) => handleGroupChange(e.target.value)}
                             className="w-full rounded-lg border border-input bg-background px-4 py-2"
                         >
-                            <option value="all">All Groups</option>
+                            <option value="all">{trans('admin.translations.index.all_groups')}</option>
                             {groups.map((grp) => (
                                 <option key={grp} value={grp}>
                                     {grp}
@@ -139,12 +125,12 @@ export default function TranslationsIndex({ translations, locales, groups, local
                     </div>
 
                     <div className="flex-1">
-                        <label className="mb-2 block text-sm font-medium">Search</label>
+                        <label className="mb-2 block text-sm font-medium">{trans('admin.translations.index.search')}</label>
                         <input
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Search key or value..."
+                            placeholder={trans('admin.translations.index.search_placeholder')}
                             className="w-full rounded-lg border border-input bg-background px-4 py-2"
                         />
                     </div>
@@ -182,7 +168,7 @@ export default function TranslationsIndex({ translations, locales, groups, local
                                             className="inline-flex items-center gap-1 rounded-lg border border-input bg-background px-3 py-1 text-sm hover:bg-accent"
                                         >
                                             <Edit className="h-4 w-4" />
-                                            Edit
+                                            {trans('admin.translations.index.edit')}
                                         </Link>
                                         <button
                                             onClick={() => handleDelete(entry.id)}
@@ -200,24 +186,17 @@ export default function TranslationsIndex({ translations, locales, groups, local
                 {filteredTranslations.length === 0 && (
                     <div className="rounded-lg border bg-card p-12 text-center">
                         <Languages className="mx-auto h-12 w-12 text-muted-foreground" />
-                        <h3 className="mt-4 text-lg font-semibold">No translations found</h3>
+                        <h3 className="mt-4 text-lg font-semibold">{trans('admin.translations.index.empty_title')}</h3>
                         <p className="mt-2 text-sm text-muted-foreground">
-                            Get started by adding your first translation or syncing from the marketplace.
+                            {trans('admin.translations.index.empty_description')}
                         </p>
                         <div className="mt-4 flex justify-center gap-2">
-                            <button
-                                onClick={handleSyncMarketplace}
-                                className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-4 py-2 hover:bg-accent"
-                            >
-                                <RefreshCw className="h-4 w-4" />
-                                Sync from Marketplace
-                            </button>
                             <Link
                                 href={route('admin.translations.create')}
                                 className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/90"
                             >
                                 <Plus className="h-4 w-4" />
-                                Add Translation
+                                {trans('admin.translations.index.add')}
                             </Link>
                         </div>
                     </div>

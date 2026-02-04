@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -52,7 +52,7 @@ export default function NotificationsIndex({ notifications, pagination }: Props)
     };
 
     return (
-        <AuthenticatedLayout>
+        <DashboardLayout>
             <Head title="Notifications" />
 
             <div className="container mx-auto py-8 px-4">
@@ -188,6 +188,6 @@ export default function NotificationsIndex({ notifications, pagination }: Props)
                     </div>
                 )}
             </div>
-        </AuthenticatedLayout>
+        </DashboardLayout>
     );
 }

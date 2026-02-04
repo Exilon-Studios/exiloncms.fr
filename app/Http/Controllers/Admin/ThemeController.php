@@ -16,7 +16,16 @@ class ThemeController extends Controller
     public function index()
     {
         $themeLoader = app(\ExilonCMS\Extensions\Theme\ThemeLoader::class);
-        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
+
+        // Get enabled plugins - properly decode JSON from settings
+        $enabledPluginsValue = setting('enabled_plugins', []);
+        if (is_string($enabledPluginsValue)) {
+            $enabledPlugins = json_decode($enabledPluginsValue, true) ?? [];
+        } elseif (is_array($enabledPluginsValue) && isset($enabledPluginsValue['enabled_plugins'])) {
+            $enabledPlugins = $enabledPluginsValue['enabled_plugins'];
+        } else {
+            $enabledPlugins = (array) $enabledPluginsValue;
+        }
 
         // Get file-based themes from ThemeLoader
         $fileThemes = collect($themeLoader->getThemes())->map(fn ($theme, $id) => [
@@ -152,8 +161,17 @@ class ThemeController extends Controller
     protected function checkPluginDependencies(array $theme): array
     {
         $requires = $theme['requires'] ?? [];
-        $enabledPlugins = collect(setting('enabled_plugins', []))->toArray();
         $missingPlugins = [];
+
+        // Get enabled plugins - properly decode JSON from settings
+        $enabledPluginsValue = setting('enabled_plugins', []);
+        if (is_string($enabledPluginsValue)) {
+            $enabledPlugins = json_decode($enabledPluginsValue, true) ?? [];
+        } elseif (is_array($enabledPluginsValue) && isset($enabledPluginsValue['enabled_plugins'])) {
+            $enabledPlugins = $enabledPluginsValue['enabled_plugins'];
+        } else {
+            $enabledPlugins = (array) $enabledPluginsValue;
+        }
 
         foreach ($requires as $package => $constraint) {
             if (str_starts_with($package, 'plugin:')) {

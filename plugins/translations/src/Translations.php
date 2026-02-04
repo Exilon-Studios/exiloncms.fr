@@ -8,7 +8,7 @@ use ExilonCMS\Classes\Plugin\Plugin;
 #[PluginMeta(
     id: 'translations',
     name: 'Translations',
-    description: 'Real-time translation management with marketplace sync',
+    description: 'Real-time translation management',
     version: '1.0.0',
     author: 'ExilonCMS',
     url: 'https://exiloncms.fr',
@@ -30,21 +30,6 @@ class Translations extends Plugin
     public function getConfigFields(): array
     {
         return [
-            [
-                'name' => 'auto_sync',
-                'label' => 'Auto-sync with marketplace',
-                'type' => 'boolean',
-                'default' => true,
-                'description' => 'Automatically sync translations with marketplace',
-            ],
-            [
-                'name' => 'sync_interval',
-                'label' => 'Sync interval (seconds)',
-                'type' => 'number',
-                'default' => 3600,
-                'description' => 'Interval for automatic sync',
-                'validation' => 'integer|min:60|max:86400',
-            ],
             [
                 'name' => 'fallback_locale',
                 'label' => 'Fallback locale',

@@ -8,6 +8,7 @@ use ExilonCMS\Plugins\Blog\Models\Post;
 use ExilonCMS\Plugins\Pages\Models\Page;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\App;
 
 class NavbarElementRequest extends FormRequest
 {
@@ -43,12 +44,22 @@ class NavbarElementRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get available plugin IDs for validation
+        $pluginIds = [];
+        try {
+            $pluginLoader = App::make(\ExilonCMS\Classes\Plugin\PluginLoader::class);
+            $pluginIds = array_keys($pluginLoader->getPluginsMeta());
+        } catch (\Exception $e) {
+            // Plugin loader not available, use empty array
+            $pluginIds = [];
+        }
+
         return [
             'name' => ['required', 'string', 'max:100'],
             'icon' => ['nullable', 'string', 'max:100'],
             'type' => ['string', Rule::in(NavbarElement::types())],
             'link' => ['required_if:type,link', 'nullable', 'string', 'max:150'],
-            'plugin' => ['required_if:type,plugin', 'nullable', Rule::in(plugins()->getRouteDescriptions()->keys())],
+            'plugin' => ['required_if:type,plugin', 'nullable', Rule::in($pluginIds)],
             'page' => ['required_if:type,page', 'nullable', Rule::exists(Page::class, 'id')],
             'post' => ['required_if:type,post', 'nullable', Rule::exists(Post::class, 'id')],
             'value' => ['sometimes'],

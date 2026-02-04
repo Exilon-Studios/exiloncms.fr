@@ -154,46 +154,6 @@ class TranslationController extends Controller
         }, $filename);
     }
 
-    public function syncMarketplace(Request $request)
-    {
-        $apiKey = setting('marketplace_api_key');
-
-        if (! $apiKey) {
-            return back()->with('error', 'Please connect to marketplace first.');
-        }
-
-        try {
-            $response = Http::withToken($apiKey)
-                ->get(config('services.marketplace.url').'/api/v1/translations/sync', [
-                    'site_locale' => app()->getLocale(),
-                ]);
-
-            if (! $response->successful()) {
-                return back()->with('error', 'Failed to sync with marketplace.');
-            }
-
-            $translations = $response->json('translations', []);
-
-            $synced = 0;
-            foreach ($translations as $trans) {
-                TranslationEntry::updateOrCreate(
-                    [
-                        'locale' => $trans['locale'],
-                        'group' => $trans['group'],
-                        'key' => $trans['key'],
-                    ],
-                    ['value' => $trans['value']]
-                );
-                $synced++;
-            }
-
-            return back()->with('success', "Synced {$synced} translations from marketplace.");
-
-        } catch (\Exception $e) {
-            return back()->with('error', 'Sync failed: '.$e->getMessage());
-        }
-    }
-
     public function scanAndImport(Request $request)
     {
         $locale = $request->input('locale', app()->getLocale());

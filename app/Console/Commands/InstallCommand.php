@@ -18,8 +18,6 @@ class InstallCommand extends Command
 
     protected array $config = [];
 
-    protected array $marketplaceData = [];
-
     protected UpdateManager $updates;
 
     public function __construct(UpdateManager $updates)
@@ -31,9 +29,6 @@ class InstallCommand extends Command
     public function handle()
     {
         $this->displayHeader();
-
-        // Fetch marketplace data
-        $this->fetchMarketplaceData();
 
         // Ask questions
         $this->askBasicInfo();
@@ -66,29 +61,6 @@ class InstallCommand extends Command
         $this->line(str_repeat('=', 60)."\n");
         $this->line('Welcome to the ExilonCMS interactive installation!');
         $this->line('This wizard will guide you through the setup process.\n');
-    }
-
-    protected function fetchMarketplaceData(): void
-    {
-        $this->info('Fetching marketplace data...');
-
-        try {
-            $registryUrl = config('exiloncms.marketplace.registry_url');
-            $registryFile = config('exiloncms.marketplace.registry', 'registry.json');
-
-            $response = Http::timeout(10)->get("{$registryUrl}/{$registryFile}");
-
-            if ($response->successful()) {
-                $this->marketplaceData = $response->json();
-                $this->info('<fg=green>Marketplace data fetched successfully!</>');
-            } else {
-                $this->warn('Could not fetch marketplace data. Using defaults.');
-                $this->marketplaceData = $this->getDefaultMarketplaceData();
-            }
-        } catch (\Exception $e) {
-            $this->warn('Marketplace fetch failed: '.$e->getMessage());
-            $this->marketplaceData = $this->getDefaultMarketplaceData();
-        }
     }
 
     protected function getDefaultMarketplaceData(): array
@@ -196,7 +168,7 @@ class InstallCommand extends Command
     {
         $this->line("\n<fg=yellow;options=bold>🎨 Theme Selection</>\n");
 
-        $themes = $this->marketplaceData['themes'] ?? [];
+        $themes = $this->getDefaultMarketplaceData()['themes'] ?? [];
         $themeOptions = [];
 
         foreach ($themes as $index => $theme) {
@@ -220,7 +192,7 @@ class InstallCommand extends Command
         $this->line("\n<fg=yellow;options=bold>🔌 Plugin Selection</>\n");
         $this->info('Select the plugins you want to install (space to select, enter to continue):\n');
 
-        $plugins = $this->marketplaceData['plugins'] ?? [];
+        $plugins = $this->getDefaultMarketplaceData()['plugins'] ?? [];
         $pluginOptions = [];
 
         foreach ($plugins as $index => $plugin) {
@@ -602,169 +574,16 @@ DOCKERFILE;
     {
         // Theme
         if (! empty($this->config['selected_theme'])) {
-            $this->info("Installing theme: {$this->config['selected_theme']}");
-            $this->installTheme($this->config['selected_theme']);
+            $this->info("Theme selected: {$this->config['selected_theme']}");
+            $this->warn("  Marketplace integration has been removed. Please install themes manually.");
         }
 
         // Plugins
         if (! empty($this->config['selected_plugins'])) {
             foreach ($this->config['selected_plugins'] as $plugin) {
-                $this->info("Installing plugin: {$plugin}");
-                $this->installPlugin($plugin);
+                $this->info("Plugin available locally: {$plugin}");
+                $this->warn("  Marketplace integration has been removed. Please install plugins manually.");
             }
-        }
-    }
-
-    /**
-     * Download an extension from the marketplace.
-     */
-    protected function downloadFromMarketplace(string $type, string $id): ?string
-    {
-        $marketplaceUrl = config('exiloncms.marketplace.url', 'https://marketplace.exiloncms.com');
-
-        try {
-            $this->info("  Downloading {$type} {$id} from marketplace...");
-
-            $response = Http::timeout(120)->get("{$marketplaceUrl}/api/{$type}s/{$id}/download");
-
-            if (! $response->successful()) {
-                $this->warn("  Failed to download {$type} {$id}. HTTP {$response->status()}");
-
-                return null;
-            }
-
-            // Get download URL from response
-            $data = $response->json();
-            $downloadUrl = $data['download_url'] ?? null;
-
-            if (! $downloadUrl) {
-                $this->warn("  No download URL found for {$type} {$id}");
-
-                return null;
-            }
-
-            // Download the ZIP file
-            $zipResponse = Http::timeout(120)->get($downloadUrl);
-
-            if (! $zipResponse->successful()) {
-                $this->warn("  Failed to download ZIP file. HTTP {$zipResponse->status()}");
-
-                return null;
-            }
-
-            // Save to temp file
-            $tempDir = storage_path('app/temp');
-            File::ensureDirectoryExists($tempDir);
-
-            $zipPath = $tempDir.'/'.$id.'.zip';
-            File::put($zipPath, $zipResponse->body());
-
-            $this->info("  <fg=green>Downloaded to: {$zipPath}</>");
-
-            return $zipPath;
-
-        } catch (\Exception $e) {
-            $this->warn("  Error downloading {$type} {$id}: {$e->getMessage()}");
-
-            return null;
-        }
-    }
-
-    /**
-     * Install a theme from the marketplace.
-     */
-    protected function installTheme(string $themeId): void
-    {
-        $zipPath = $this->downloadFromMarketplace('theme', $themeId);
-
-        if (! $zipPath) {
-            $this->warn("  Skipping theme {$themeId} due to download failure");
-
-            return;
-        }
-
-        try {
-            $this->info('  Extracting theme...');
-
-            // Create themes directory
-            $themesDir = base_path('themes');
-            File::ensureDirectoryExists($themesDir);
-
-            // Extract ZIP
-            $zip = new \ZipArchive;
-            $openResult = $zip->open($zipPath);
-
-            if ($openResult !== true) {
-                $this->error("  Failed to open ZIP archive: {$openResult}");
-
-                return;
-            }
-
-            $zip->extractTo($themesDir);
-            $zip->close();
-
-            // Cleanup
-            File::delete($zipPath);
-
-            $this->info("  <fg=green>Theme {$themeId} installed successfully!</>");
-
-        } catch (\Exception $e) {
-            $this->error("  Failed to install theme: {$e->getMessage()}");
-        }
-    }
-
-    /**
-     * Install a plugin from the marketplace.
-     */
-    protected function installPlugin(string $pluginId): void
-    {
-        $zipPath = $this->downloadFromMarketplace('plugin', $pluginId);
-
-        if (! $zipPath) {
-            $this->warn("  Skipping plugin {$pluginId} due to download failure");
-
-            return;
-        }
-
-        try {
-            $this->info('  Extracting plugin...');
-
-            // Create plugins directory
-            $pluginsDir = base_path('plugins');
-            File::ensureDirectoryExists($pluginsDir);
-
-            // Extract ZIP
-            $zip = new \ZipArchive;
-            $openResult = $zip->open($zipPath);
-
-            if ($openResult !== true) {
-                $this->error("  Failed to open ZIP archive: {$openResult}");
-
-                return;
-            }
-
-            $zip->extractTo($pluginsDir);
-            $zip->close();
-
-            // Run plugin migrations if they exist
-            $pluginPath = $pluginsDir.'/'.$pluginId;
-            $migrationPath = $pluginPath.'/database/migrations';
-
-            if (File::exists($migrationPath)) {
-                $this->info('  Running plugin migrations...');
-                $this->executeCommand('php artisan migrate --force');
-            }
-
-            // Clear cache
-            $this->executeCommand('php artisan optimize:clear');
-
-            // Cleanup
-            File::delete($zipPath);
-
-            $this->info("  <fg=green>Plugin {$pluginId} installed successfully!</>");
-
-        } catch (\Exception $e) {
-            $this->error("  Failed to install plugin: {$e->getMessage()}");
         }
     }
 

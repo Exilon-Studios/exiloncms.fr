@@ -5,7 +5,7 @@
 
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { FormEvent, useState, useEffect } from 'react';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 import { PageProps, User, Role } from '@/types';
 import {
   AdminLayout,
@@ -137,7 +137,7 @@ export default function ProfileIndex({
   };
 
   return (
-    <AuthenticatedLayout>
+    <DashboardLayout>
       <Head title={trans('messages.profile.title')} />
 
       <AdminLayout>
@@ -407,6 +407,6 @@ export default function ProfileIndex({
           </div>
         </AdminLayoutContent>
       </AdminLayout>
-    </AuthenticatedLayout>
+    </DashboardLayout>
   );
 }

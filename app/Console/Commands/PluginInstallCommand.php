@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Console\Commands;
 
-use ExilonCMS\Models\PluginInstalled;
 use ExilonCMS\Classes\Plugin\PluginLoader;
+use ExilonCMS\Models\PluginInstalled;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -70,7 +70,7 @@ class PluginInstallCommand extends Command
                 return true; // For now, always pass
             });
 
-            $this->task('Registering plugin', function () use ($loader, $pluginPath) {
+            $this->task('Registering plugin', function () {
                 // Plugin is automatically discovered by PluginLoader
 
                 return true;

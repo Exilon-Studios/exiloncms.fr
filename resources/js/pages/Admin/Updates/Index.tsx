@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Download, RefreshCw, CheckCircle, AlertCircle, Info, Loader2, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
+import { trans } from '@/lib/i18n';
 
 interface UpdateProps {
   currentVersion: string;
@@ -72,7 +73,7 @@ export default function UpdatesIndex({ currentVersion, lastVersion, hasUpdate, i
   };
 
   const handleInstall = () => {
-    if (!confirm('This will update ExilonCMS to the latest version. A backup will be created automatically. Continue?')) {
+    if (!confirm(trans('admin.update.index.install_confirm_with_backup'))) {
       return;
     }
 

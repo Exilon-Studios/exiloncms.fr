@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Pencil, Trash2, Package, Star, Crown } from 'lucide-react';
 import { Link, router } from '@inertiajs/react';
 import { useState } from 'react';
+import { trans } from '@/lib/i18n';
 
 interface Item {
   id: number;
@@ -27,17 +28,16 @@ interface ItemsProps {
   items: Item[];
 }
 
-const typeLabels: Record<string, { label: string; icon: any; variant: 'default' | 'secondary' | 'outline' }> = {
-  item: { label: 'Article', icon: Package, variant: 'secondary' },
-  package: { label: 'Pack', icon: Star, variant: 'default' },
-  prestige: { label: 'Prestige', icon: Crown, variant: 'outline' },
-};
-
 export default function ItemsIndex({ items }: ItemsProps) {
+  const typeLabels: Record<string, { label: string; icon: any; variant: 'default' | 'secondary' | 'outline' }> = {
+    item: { label: trans('admin.shop.items.type.item'), icon: Package, variant: 'secondary' },
+    package: { label: trans('admin.shop.items.type.package'), icon: Star, variant: 'default' },
+    prestige: { label: trans('admin.shop.items.type.prestige'), icon: Crown, variant: 'outline' },
+  };
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const handleDelete = (id: number) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cet article ?')) return;
+    if (!confirm(trans('admin.shop.items.delete_confirm'))) return;
 
     setDeletingId(id);
     router.delete(route('admin.shop.items.destroy', id), {
@@ -47,21 +47,21 @@ export default function ItemsIndex({ items }: ItemsProps) {
 
   return (
     <AuthenticatedLayout>
-      <Head title="Articles - Boutique" />
+      <Head title={`${trans('admin.shop.items.title')} - Boutique`} />
 
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold">Articles</h1>
+            <h1 className="text-2xl font-bold">{trans('admin.shop.items.title')}</h1>
             <p className="text-muted-foreground">
-              Gérez les articles de la boutique
+              {trans('admin.shop.items.description')}
             </p>
           </div>
           <Link href={route('admin.shop.items.create')}>
             <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nouvel article
+              <Plus className="mr-1 h-4 w-4" />
+              {trans('admin.shop.items.create')}
             </Button>
           </Link>
         </div>
@@ -73,13 +73,13 @@ export default function ItemsIndex({ items }: ItemsProps) {
               <table className="w-full">
                 <thead className="border-b bg-muted/50">
                   <tr>
-                    <th className="text-left p-4 font-medium">Article</th>
-                    <th className="text-left p-4 font-medium">Catégorie</th>
-                    <th className="text-left p-4 font-medium">Type</th>
-                    <th className="text-left p-4 font-medium">Prix</th>
-                    <th className="text-left p-4 font-medium">Stock</th>
-                    <th className="text-left p-4 font-medium">Statut</th>
-                    <th className="text-right p-4 font-medium">Actions</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.shop.items.table.item')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.shop.items.table.category')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.shop.items.table.type')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.shop.items.table.price')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.shop.items.table.stock')}</th>
+                    <th className="text-left p-4 font-medium">{trans('admin.shop.items.table.status')}</th>
+                    <th className="text-right p-4 font-medium">{trans('admin.shop.items.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -123,20 +123,20 @@ export default function ItemsIndex({ items }: ItemsProps) {
                         </td>
                         <td className="p-4">
                           {item.stock === -1 ? (
-                            <Badge variant="outline">Illimité</Badge>
+                            <Badge variant="outline">{trans('admin.shop.items.stock.unlimited')}</Badge>
                           ) : item.stock > 0 ? (
                             <span className="text-sm">{item.stock}</span>
                           ) : (
-                            <Badge variant="destructive">Rupture</Badge>
+                            <Badge variant="destructive">{trans('admin.shop.items.stock.out_of_stock')}</Badge>
                           )}
                         </td>
                         <td className="p-4">
                           <div className="flex gap-1">
                             {item.is_featured && (
-                              <Badge variant="default" className="text-xs">À la une</Badge>
+                              <Badge variant="default" className="text-xs">{trans('admin.shop.items.status.featured')}</Badge>
                             )}
                             {!item.is_active && (
-                              <Badge variant="secondary" className="text-xs">Inactif</Badge>
+                              <Badge variant="secondary" className="text-xs">{trans('admin.shop.items.status.inactive')}</Badge>
                             )}
                           </div>
                         </td>
@@ -170,14 +170,14 @@ export default function ItemsIndex({ items }: ItemsProps) {
           <Card>
             <CardContent className="p-12 text-center">
               <Package className="h-16 w-16 mx-auto mb-4 text-muted-foreground/30" />
-              <h3 className="text-lg font-semibold mb-2">Aucun article</h3>
+              <h3 className="text-lg font-semibold mb-2">{trans('admin.shop.items.empty.title')}</h3>
               <p className="text-muted-foreground mb-6">
-                Commencez par créer votre premier article.
+                {trans('admin.shop.items.empty.description')}
               </p>
               <Link href={route('admin.shop.items.create')}>
                 <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Créer un article
+                  <Plus className="mr-1 h-4 w-4" />
+                  {trans('admin.shop.items.empty.create_button')}
                 </Button>
               </Link>
             </CardContent>

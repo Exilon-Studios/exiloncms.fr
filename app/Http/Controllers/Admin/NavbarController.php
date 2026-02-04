@@ -109,7 +109,7 @@ class NavbarController extends Controller
             'pages' => Page::enabled()->get(),
             'posts' => Post::published()->get(),
             'roles' => Role::orderByDesc('power')->get(),
-            'pluginRoutes' => plugins()->getRouteDescriptions(),
+            'pluginRoutes' => [],
         ]);
     }
 
@@ -153,7 +153,7 @@ class NavbarController extends Controller
             'pages' => Page::enabled()->get(),
             'posts' => Post::published()->get(),
             'roles' => Role::orderByDesc('power')->get(),
-            'pluginRoutes' => plugins()->getRouteDescriptions(),
+            'pluginRoutes' => [],
         ]);
     }
 

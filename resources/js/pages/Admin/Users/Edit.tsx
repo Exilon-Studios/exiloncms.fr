@@ -214,7 +214,7 @@ export default function UsersEdit({ user, roles }: UsersEditProps) {
                       variant="destructive"
                       onClick={() => setDeleteDialogOpen(true)}
                     >
-                      <Trash2 className="mr-2 h-4 w-4" />
+                      <Trash2 className="mr-1 h-4 w-4" />
                       {trans('admin.users.edit.delete')}
                     </Button>
                   </div>

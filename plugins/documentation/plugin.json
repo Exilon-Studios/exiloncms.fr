@@ -1,0 +1,84 @@
+{
+  "id": "documentation",
+  "name": "Documentation",
+  "version": "1.0.0",
+  "description": "Système de documentation intégré avec support multilingue et navigation automatique",
+  "author": "ExilonCMS",
+  "dependencies": [],
+  "permissions": [
+    "documentation.view",
+    "documentation.admin"
+  ],
+  "navigation": {
+    "icon": "Book",
+    "position": 100,
+    "items": [
+      {
+        "label": "Documentation",
+        "href": "/docs",
+        "permission": "documentation.view"
+      }
+    ]
+  },
+  "admin_section": {
+    "id": "documentation",
+    "label": "Documentation",
+    "icon": "Book",
+    "position": 100,
+    "items": [
+      {
+        "label": "Gestion",
+        "href": "/admin/documentation",
+        "permission": "documentation.admin"
+      },
+      {
+        "label": "Cache",
+        "href": "/admin/documentation/cache",
+        "permission": "documentation.admin"
+      }
+    ]
+  },
+  "widgets": [],
+  "events": {
+    "listen": [],
+    "dispatch": []
+  },
+  "routes": {
+    "admin": "/admin/documentation",
+    "web": "/docs"
+  },
+  "settings": {
+    "default_locale": "fr",
+    "available_locales": ["fr", "en"],
+    "cache_enabled": true,
+    "cache_duration": 3600,
+    "comments_enabled": true,
+    "search_enabled": true
+  },
+  "translations": {
+    "en": {
+      "documentation": {
+        "title": "Documentation",
+        "search": "Search documentation...",
+        "menu": "Menu",
+        "back_to_top": "Back to top",
+        "edit_page": "Edit this page",
+        "last_updated": "Last updated",
+        "reading_time": "min read",
+        "on_this_page": "On this page"
+      }
+    },
+    "fr": {
+      "documentation": {
+        "title": "Documentation",
+        "search": "Rechercher dans la documentation...",
+        "menu": "Menu",
+        "back_to_top": "Haut de page",
+        "edit_page": "Modifier cette page",
+        "last_updated": "Dernière mise à jour",
+        "reading_time": "min de lecture",
+        "on_this_page": "Sur cette page"
+      }
+    }
+  }
+}

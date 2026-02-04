@@ -8,7 +8,6 @@ use ExilonCMS\Models\Invoice;
 use ExilonCMS\Models\InvoiceTransaction;
 use ExilonCMS\Models\User;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use ReflectionClass;
 
@@ -31,6 +30,7 @@ class ExtensionHelper
 
         if ($type) {
             $type = strtolower($type);
+
             return array_filter($extensions, fn ($extension) => $extension['type'] === $type);
         }
 
@@ -47,9 +47,9 @@ class ExtensionHelper
      */
     public static function getExtension($type, $extension, $config = [])
     {
-        $class = '\\ExilonCMS\\Extensions\\' . ucfirst($type) . 's\\' . $extension . '\\' . $extension;
+        $class = '\\ExilonCMS\\Extensions\\'.ucfirst($type).'s\\'.$extension.'\\'.$extension;
 
-        if (!class_exists($class)) {
+        if (! class_exists($class)) {
             throw new \Exception("Extension \"{$class}\" not found");
         }
 
@@ -99,13 +99,13 @@ class ExtensionHelper
                 $extension->config ?? []
             );
 
-            if (!method_exists($instance, $function)) {
+            if (! method_exists($instance, $function)) {
                 throw new \Exception("Function {$function} not found");
             }
 
             return $instance->$function(...$args);
         } catch (\Exception $e) {
-            if (!$mayFail) {
+            if (! $mayFail) {
                 throw $e;
             }
             Log::warning("Extension call failed: {$e->getMessage()}");
@@ -144,7 +144,7 @@ class ExtensionHelper
                 continue;
             }
 
-            if (!file_exists($path) || !class_exists($class)) {
+            if (! file_exists($path) || ! class_exists($class)) {
                 continue;
             }
 
@@ -214,7 +214,6 @@ class ExtensionHelper
      * Initiate payment for an invoice
      *
      * @param  mixed  $gateway
-     * @param  Invoice  $invoice
      * @return mixed
      */
     public static function pay($gateway, Invoice $invoice)
@@ -357,7 +356,6 @@ class ExtensionHelper
     /**
      * Create billing agreement
      *
-     * @param  User  $user
      * @param  string  $gateway
      * @return mixed
      */
@@ -369,7 +367,6 @@ class ExtensionHelper
     /**
      * Charge billing agreement
      *
-     * @param  Invoice  $invoice
      * @param  string  $gateway
      * @param  mixed  $billingAgreement
      * @return bool
@@ -408,7 +405,7 @@ class ExtensionHelper
      */
     public static function rollbackMigrations($path)
     {
-        $migrationFiles = glob(base_path($path . '/*.php'));
+        $migrationFiles = glob(base_path($path.'/*.php'));
 
         if (empty($migrationFiles)) {
             return;

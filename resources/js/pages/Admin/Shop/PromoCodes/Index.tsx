@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/table';
 import { Plus, Trash2, Edit, Gift, Calendar, Tag } from 'lucide-react';
 import { useForm } from '@inertiajs/react';
+import { trans } from '@/lib/i18n';
 
 interface PromoCode {
   id: number;
@@ -51,6 +52,19 @@ interface Props extends PageProps {
 }
 
 export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
+  const typeLabels: Record<string, { label: string; badge: string; suffix: string }> = {
+    percentage: {
+      label: trans('admin.shop.promo_codes.type.percentage'),
+      badge: trans('admin.shop.promo_codes.type_badge.percentage'),
+      suffix: '%',
+    },
+    fixed: {
+      label: trans('admin.shop.promo_codes.type.fixed'),
+      badge: trans('admin.shop.promo_codes.type_badge.fixed'),
+      suffix: '€',
+    },
+  };
+
   const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
     code: '',
     description: '',
@@ -71,20 +85,20 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Supprimer ce code promo ?')) {
+    if (confirm(trans('admin.shop.promo_codes.delete_confirm'))) {
       router.delete(route('admin.shop.promo-codes.destroy', id));
     }
   };
 
   return (
     <AuthenticatedLayout>
-      <Head title="Codes promo - Boutique" />
+      <Head title={`${trans('admin.shop.promo_codes.title')} - Boutique`} />
 
       <AdminLayout>
         <AdminLayoutHeader>
           <AdminLayoutTitle
-            title="Codes promo"
-            description="Gérer les codes de réduction"
+            title={trans('admin.shop.promo_codes.title')}
+            description={trans('admin.shop.promo_codes.description')}
           />
         </AdminLayoutHeader>
 
@@ -94,48 +108,48 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
             <div className="border border-border rounded-lg bg-card p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Gift className="h-5 w-5" />
-                Créer un code promo
+                {trans('admin.shop.promo_codes.create')}
               </h3>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-1">Code *</label>
+                    <label className="block text-sm font-medium mb-1">{trans('admin.shop.promo_codes.form.code')} *</label>
                     <input
                       type="text"
                       value={data.code}
                       onChange={e => setData('code', e.target.value.toUpperCase())}
                       className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                      placeholder="PROMO2025"
+                      placeholder={trans('admin.shop.promo_codes.form.code_placeholder')}
                       required
                     />
                     {errors.code && <p className="text-sm text-destructive mt-1">{errors.code}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Description</label>
+                    <label className="block text-sm font-medium mb-1">{trans('admin.shop.promo_codes.form.description')}</label>
                     <input
                       type="text"
                       value={data.description}
                       onChange={e => setData('description', e.target.value)}
                       className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                      placeholder="Description du code"
+                      placeholder={trans('admin.shop.promo_codes.form.description_placeholder')}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Type *</label>
+                    <label className="block text-sm font-medium mb-1">{trans('admin.shop.promo_codes.form.type')} *</label>
                     <select
                       value={data.type}
                       onChange={e => setData('type', e.target.value)}
                       className="w-full px-3 py-2 border border-input rounded-md bg-background"
                     >
-                      <option value="percentage">Pourcentage (%)</option>
-                      <option value="fixed">Montant fixe</option>
+                      <option value="percentage">{trans('admin.shop.promo_codes.type.percentage')} (%)</option>
+                      <option value="fixed">{trans('admin.shop.promo_codes.type.fixed')}</option>
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Valeur *</label>
+                    <label className="block text-sm font-medium mb-1">{trans('admin.shop.promo_codes.form.value')} *</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -143,41 +157,41 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
                         value={data.value}
                         onChange={e => setData('value', parseFloat(e.target.value))}
                         className="flex-1 px-3 py-2 border border-input rounded-md bg-background"
-                        placeholder={data.type === 'percentage' ? '10' : '10.00'}
+                        placeholder={data.type === 'percentage' ? trans('admin.shop.promo_codes.form.value_placeholder_percentage') : trans('admin.shop.promo_codes.form.value_placeholder_fixed')}
                         required
                       />
                       <span className="text-sm text-muted-foreground">
-                        {data.type === 'percentage' ? '%' : '€'}
+                        {typeLabels[data.type].suffix}
                       </span>
                     </div>
                     {errors.value && <p className="text-sm text-destructive mt-1">{errors.value}</p>}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Montant minimum</label>
+                    <label className="block text-sm font-medium mb-1">{trans('admin.shop.promo_codes.form.min_amount')}</label>
                     <input
                       type="number"
                       step="0.01"
                       value={data.min_amount || ''}
                       onChange={e => setData('min_amount', e.target.value ? parseFloat(e.target.value) : null)}
                       className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                      placeholder="50.00"
+                      placeholder={trans('admin.shop.promo_codes.form.min_amount_placeholder')}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Utilisations max</label>
+                    <label className="block text-sm font-medium mb-1">{trans('admin.shop.promo_codes.form.max_uses')}</label>
                     <input
                       type="number"
                       value={data.max_uses || ''}
                       onChange={e => setData('max_uses', e.target.value ? parseInt(e.target.value) : null)}
                       className="w-full px-3 py-2 border border-input rounded-md bg-background"
-                      placeholder="100"
+                      placeholder={trans('admin.shop.promo_codes.form.max_uses_placeholder')}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Valide du</label>
+                    <label className="block text-sm font-medium mb-1">{trans('admin.shop.promo_codes.form.valid_from')}</label>
                     <input
                       type="date"
                       value={data.valid_from}
@@ -187,7 +201,7 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Valable jusqu'au</label>
+                    <label className="block text-sm font-medium mb-1">{trans('admin.shop.promo_codes.form.valid_until')}</label>
                     <input
                       type="date"
                       value={data.valid_until}
@@ -204,13 +218,13 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
                       onChange={e => setData('is_active', e.target.checked)}
                       className="w-4 h-4"
                     />
-                    <label htmlFor="is_active" className="text-sm font-medium">Actif</label>
+                    <label htmlFor="is_active" className="text-sm font-medium">{trans('admin.shop.promo_codes.form.is_active')}</label>
                   </div>
                 </div>
 
                 <Button type="submit" disabled={processing}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Créer le code
+                  {trans('admin.shop.promo_codes.create_button')}
                 </Button>
               </form>
             </div>
@@ -220,13 +234,13 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Valeur</TableHead>
-                    <TableHead>Utilisations</TableHead>
-                    <TableHead>Validité</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead>{trans('admin.shop.promo_codes.table.code')}</TableHead>
+                    <TableHead>{trans('admin.shop.promo_codes.table.type')}</TableHead>
+                    <TableHead>{trans('admin.shop.promo_codes.table.value')}</TableHead>
+                    <TableHead>{trans('admin.shop.promo_codes.table.used')}</TableHead>
+                    <TableHead>{trans('admin.shop.promo_codes.table.valid_until')}</TableHead>
+                    <TableHead>{trans('admin.shop.promo_codes.table.status')}</TableHead>
+                    <TableHead>{trans('admin.shop.promo_codes.table.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -243,7 +257,7 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
                       <TableCell>
                         <Badge variant="outline" className="gap-1">
                           <Tag className="h-3 w-3" />
-                          {promo.type === 'percentage' ? '%' : 'Fixe'}
+                          {typeLabels[promo.type].badge}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -257,13 +271,13 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {promo.valid_from && <p>Du: {new Date(promo.valid_from).toLocaleDateString('fr-FR')}</p>}
-                          {promo.valid_until && <p>Au: {new Date(promo.valid_until).toLocaleDateString('fr-FR')}</p>}
+                          {promo.valid_from && <p>{trans('admin.shop.promo_codes.date_from')} {new Date(promo.valid_from).toLocaleDateString('fr-FR')}</p>}
+                          {promo.valid_until && <p>{trans('admin.shop.promo_codes.date_until')} {new Date(promo.valid_until).toLocaleDateString('fr-FR')}</p>}
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant={promo.is_active ? 'default' : 'secondary'}>
-                          {promo.is_active ? 'Actif' : 'Inactif'}
+                          {promo.is_active ? trans('admin.shop.promo_codes.status.active') : trans('admin.shop.promo_codes.status.inactive')}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -292,7 +306,7 @@ export default function PromoCodesIndex({ promoCodes, pagination }: Props) {
                   {promoCodes.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                        Aucun code promo
+                        {trans('admin.shop.promo_codes.empty')}
                       </TableCell>
                     </TableRow>
                   )}

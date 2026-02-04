@@ -11,6 +11,7 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
+import { trans } from '@/lib/i18n';
 
 interface Translation {
   id: number;
@@ -49,10 +50,10 @@ export default function TranslationsIndex({
   };
 
   const handleImport = () => {
-    if (confirm('Êtes-vous sûr de vouloir importer les traductions depuis les fichiers ? Cela écrasera les traductions existantes.')) {
+    if (confirm(trans('admin.translations.index.import_confirm'))) {
       router.post(route('admin.translations.import'), { group: currentGroup, locale: currentLocale }, {
-        onSuccess: () => toast.success('Traductions importées avec succès'),
-        onError: () => toast.error('Erreur lors de l\'import'),
+        onSuccess: () => toast.success(trans('admin.translations.index.import_success')),
+        onError: () => toast.error(trans('admin.translations.index.import_error')),
       });
     }
   };
@@ -71,20 +72,20 @@ export default function TranslationsIndex({
 
     router.post(route('admin.translations.store'), formData, {
       onSuccess: () => {
-        toast.success('Traduction mise à jour');
+        toast.success(trans('admin.translations.index.update_success'));
         setEditingId(null);
       },
-      onError: () => toast.error('Erreur lors de la mise à jour'),
+      onError: () => toast.error(trans('admin.translations.index.update_error')),
     });
   };
 
   const handleDelete = (translation: Translation) => {
-    if (confirm(`Supprimer la traduction "${translation.key}" ?`)) {
+    if (confirm(trans('admin.translations.index.delete_with_key', { key: translation.key }))) {
       router.delete(
         route('admin.translations.destroy', [translation.group, translation.key, translation.locale]),
         {
-          onSuccess: () => toast.success('Traduction supprimée'),
-          onError: () => toast.error('Erreur lors de la suppression'),
+          onSuccess: () => toast.success(trans('admin.translations.index.delete_success')),
+          onError: () => toast.error(trans('admin.translations.index.delete_error')),
         }
       );
     }
@@ -92,7 +93,7 @@ export default function TranslationsIndex({
 
   const handleAddNew = () => {
     if (!newKey.trim() || !newValue.trim()) {
-      toast.error('Veuillez remplir la clé et la valeur');
+      toast.error(trans('admin.translations.index.validation_error'));
       return;
     }
 
@@ -104,23 +105,23 @@ export default function TranslationsIndex({
 
     router.post(route('admin.translations.store'), formData, {
       onSuccess: () => {
-        toast.success('Traduction ajoutée');
+        toast.success(trans('admin.translations.index.add_success'));
         setNewKey('');
         setNewValue('');
       },
-      onError: () => toast.error('Erreur lors de l\'ajout'),
+      onError: () => toast.error(trans('admin.translations.index.add_error')),
     });
   };
 
   return (
     <AuthenticatedLayout>
-      <Head title="Gestion des traductions" />
+      <Head title={trans('admin.translations.index.title')} />
 
       <div className="space-y-4 pb-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Gestion des traductions</h1>
+          <h1 className="text-3xl font-bold tracking-tight">{trans('admin.translations.index.title')}</h1>
           <p className="text-muted-foreground">
-            Gérez toutes les traductions du site, organisées par groupe et langue
+            {trans('admin.translations.index.description')}
           </p>
         </div>
 
@@ -129,13 +130,13 @@ export default function TranslationsIndex({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Globe className="h-5 w-5" />
-              Filtres
+              Filters
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4">
               <div className="flex-1">
-                <Label htmlFor="group-select">Groupe</Label>
+                <Label htmlFor="group-select">{trans('admin.translations.index.group')}</Label>
                 <Select value={currentGroup} onValueChange={handleChangeGroup}>
                   <SelectTrigger id="group-select">
                     <SelectValue />
@@ -153,7 +154,7 @@ export default function TranslationsIndex({
                 </Select>
               </div>
               <div className="flex-1">
-                <Label htmlFor="locale-select">Langue</Label>
+                <Label htmlFor="locale-select">{trans('admin.translations.index.language')}</Label>
                 <Select value={currentLocale} onValueChange={handleChangeLocale}>
                   <SelectTrigger id="locale-select">
                     <SelectValue />
@@ -174,15 +175,15 @@ export default function TranslationsIndex({
         {/* Import from file */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Importer depuis les fichiers</CardTitle>
+            <CardTitle className="text-base">Import from files</CardTitle>
             <CardDescription>
-              Importez les traductions depuis les fichiers de langue dans la base de données
+              Import translations from language files into the database
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button variant="outline" onClick={handleImport}>
               <FileDown className="mr-2 h-4 w-4" />
-              Importer {currentGroup}.{currentLocale}
+              Import {currentGroup}.{currentLocale}
             </Button>
           </CardContent>
         </Card>
@@ -192,13 +193,13 @@ export default function TranslationsIndex({
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Plus className="h-5 w-5" />
-              Ajouter une traduction
+              {trans('admin.translations.index.add')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4 items-end">
               <div className="flex-1">
-                <Label htmlFor="new-key">Clé</Label>
+                <Label htmlFor="new-key">Key</Label>
                 <Input
                   id="new-key"
                   value={newKey}
@@ -207,17 +208,17 @@ export default function TranslationsIndex({
                 />
               </div>
               <div className="flex-[2]">
-                <Label htmlFor="new-value">Valeur</Label>
+                <Label htmlFor="new-value">Value</Label>
                 <Input
                   id="new-value"
                   value={newValue}
                   onChange={(e) => setNewValue(e.target.value)}
-                  placeholder="Traduction..."
+                  placeholder="Translation..."
                 />
               </div>
               <Button onClick={handleAddNew}>
                 <Plus className="mr-2 h-4 w-4" />
-                Ajouter
+                Add
               </Button>
             </div>
           </CardContent>
@@ -227,7 +228,7 @@ export default function TranslationsIndex({
         <Card>
           <CardHeader>
             <CardTitle>
-              Traductions ({translations.length})
+              {trans('admin.translations.index.title')} ({translations.length})
             </CardTitle>
             <CardDescription>
               {currentGroup} / {currentLocale.toUpperCase()}
@@ -237,7 +238,7 @@ export default function TranslationsIndex({
             <div className="space-y-4">
               {translations.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  Aucune traduction trouvée pour ce groupe et cette langue.
+                  {trans('admin.translations.index.empty_title')}
                 </div>
               ) : (
                 translations.map((translation) => (
@@ -249,7 +250,7 @@ export default function TranslationsIndex({
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">{translation.key}</Badge>
                         {editingId === translation.id && (
-                          <Badge variant="outline">Édition</Badge>
+                          <Badge variant="outline">Editing</Badge>
                         )}
                       </div>
                       {editingId === translation.id ? (
@@ -277,7 +278,7 @@ export default function TranslationsIndex({
                             variant="ghost"
                             onClick={() => setEditingId(null)}
                           >
-                            Annuler
+                            Cancel
                           </Button>
                         </>
                       ) : (
@@ -287,7 +288,7 @@ export default function TranslationsIndex({
                             variant="outline"
                             onClick={() => handleEdit(translation)}
                           >
-                            Éditer
+                            {trans('admin.translations.index.edit')}
                           </Button>
                           <Button
                             size="sm"

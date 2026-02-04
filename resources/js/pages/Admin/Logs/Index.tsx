@@ -78,38 +78,36 @@ export default function LogsIndex({ logs, search: initialSearch }: LogsIndexProp
         </AdminLayoutHeader>
 
         <AdminLayoutContent>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Search */}
-            <div className="border border-border rounded-lg p-4 bg-card">
-              <form onSubmit={handleSearch} className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    type="text"
-                    placeholder={trans('admin.logs.index.search_placeholder')}
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-                <Button type="submit">{trans('admin.logs.index.search')}</Button>
-                {initialSearch && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setSearch('');
-                      router.get(route('admin.logs.index'));
-                    }}
-                  >
-                    {trans('admin.logs.index.clear')}
-                  </Button>
-                )}
-              </form>
-            </div>
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder={trans('admin.logs.index.search_placeholder')}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Button type="submit">{trans('admin.logs.index.search')}</Button>
+              {initialSearch && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setSearch('');
+                    router.get(route('admin.logs.index'));
+                  }}
+                >
+                  {trans('admin.logs.index.clear')}
+                </Button>
+              )}
+            </form>
 
             {/* Logs Table */}
-            <div className="border border-border rounded-lg overflow-hidden bg-card">
+            <div className="rounded-lg overflow-hidden bg-card">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -180,7 +178,7 @@ export default function LogsIndex({ logs, search: initialSearch }: LogsIndexProp
 
               {/* Pagination */}
               {logs.last_page > 1 && (
-                <div className="border-t border-border bg-muted/50 px-6 py-4">
+                <div className="bg-muted/50 px-6 py-4">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-muted-foreground">
                       {trans('admin.logs.index.showing', { from: logs.from, to: logs.to, total: logs.total })}

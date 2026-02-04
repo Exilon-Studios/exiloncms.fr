@@ -5,20 +5,18 @@ use ExilonCMS\Plugins\Blog\Http\Controllers\Public\PostController as PublicPostC
 use ExilonCMS\Plugins\Blog\Http\Controllers\Public\TagController as PublicTagController;
 use Illuminate\Support\Facades\Route;
 
-// Public blog routes
-Route::prefix('blog')->name('blog.')->group(function () {
-    Route::get('/', [PublicPostController::class, 'index'])->name('index');
-    Route::get('/{post:slug}', [PublicPostController::class, 'show'])->name('show');
+// Public blog routes (prefix is added by PluginServiceProvider)
+Route::get('/', [PublicPostController::class, 'index'])->name('index');
+Route::get('/{post:slug}', [PublicPostController::class, 'show'])->name('show');
 
-    // Category routes
-    Route::prefix('categories')->name('categories.')->group(function () {
-        Route::get('/', [PublicCategoryController::class, 'index'])->name('index');
-        Route::get('/{category:slug}', [PublicCategoryController::class, 'show'])->name('show');
-    });
+// Category routes
+Route::prefix('categories')->group(function () {
+    Route::get('/', [PublicCategoryController::class, 'index'])->name('categories.index');
+    Route::get('/{category:slug}', [PublicCategoryController::class, 'show'])->name('categories.show');
+});
 
-    // Tag routes
-    Route::prefix('tags')->name('tags.')->group(function () {
-        Route::get('/', [PublicTagController::class, 'index'])->name('index');
-        Route::get('/{tag:slug}', [PublicTagController::class, 'show'])->name('show');
-    });
+// Tag routes
+Route::prefix('tags')->group(function () {
+    Route::get('/', [PublicTagController::class, 'index'])->name('tags.index');
+    Route::get('/{tag:slug}', [PublicTagController::class, 'show'])->name('tags.show');
 });

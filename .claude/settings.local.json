@@ -177,7 +177,21 @@
       "Bash(\"app/Contracts/Plugins/NotificationHook.php\" )",
       "Bash(\"app/Contracts/Plugins/PaymentGatewayHook.php\" )",
       "Bash(\"app/Contracts/Plugins/SearchHook.php\" )",
-      "Bash(\"app/Contracts/Plugins/UserExtensionHook.php\")"
+      "Bash(\"app/Contracts/Plugins/UserExtensionHook.php\")",
+      "Bash(pnpm run dev)",
+      "Bash(do if [ -f \"$dir/config/config.php\" ])",
+      "Bash(then echo \"HAS CONFIG: $dir\")",
+      "Bash(else echo \"NO CONFIG: $dir\")",
+      "Bash(while read file)",
+      "Bash(git remote remove:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(do echo:*)",
+      "Bash(then echo \"✅ Has Home.tsx\")",
+      "Bash(else echo \"❌ Missing Home.tsx\")",
+      "Bash(sqlite3:*)",
+      "Bash(\"\\)\")",
+      "Bash(composer:*)",
+      "Bash(/usr/bin/composer:*)"
     ],
     "deny": [],
     "ask": []

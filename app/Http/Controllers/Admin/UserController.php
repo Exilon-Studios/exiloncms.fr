@@ -34,6 +34,7 @@ class UserController extends Controller
         return inertia('Admin/Users/Index', [
             'users' => $users,
             'search' => $search,
+            'total' => $users->total(),
             'canViewEmail' => $request->user()->can('admin.users.email'),
             'notificationLevels' => Notification::LEVELS,
         ]);

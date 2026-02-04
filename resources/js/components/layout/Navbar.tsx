@@ -35,8 +35,6 @@ export default function Navbar({ showCart = false, cartCount = 0, onCartOpen }: 
     <div className="w-full">
       <DesktopNav navbar={navbar} auth={auth} settings={settings} showCart={showCart} cartCount={cartCount} onCartOpen={onCartOpen} />
       <MobileNav navbar={navbar} auth={auth} settings={settings} showCart={showCart} cartCount={cartCount} onCartOpen={onCartOpen} />
-      {/* Spacer for fixed navbar */}
-      <div className="h-20 lg:h-24" />
     </div>
   );
 }
@@ -72,10 +70,13 @@ const DesktopNav = ({ navbar, auth, settings, showCart, cartCount, onCartOpen }:
     <motion.div
       onMouseLeave={() => setHovered(null)}
       className={cn(
-        "fixed top-0 left-0 right-0 z-[60] flex flex-row items-center justify-between py-6 lg:flex",
+        "w-full flex flex-row items-center justify-between py-6 lg:flex",
         navbarStyle === 'transparent' ? "backdrop-blur-md bg-transparent" : "bg-background/95 backdrop-blur-sm border-b"
       )}
       style={navbarBackground ? { backgroundColor: navbarBackground } : undefined}
+      initial={false}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.2 }}
     >
       {/* Container to match content width */}
       <div className="container mx-auto px-4 md:px-6 max-w-7xl flex items-center justify-between">
@@ -174,8 +175,9 @@ const MobileNav = ({ navbar, auth, settings, showCart, cartCount, onCartOpen }: 
 
   return (
     <motion.div
+      initial={false}
       animate={{ borderRadius: open ? "0" : "0" }}
-      className="fixed top-0 left-0 right-0 z-[60] flex w-full flex-col items-center justify-between backdrop-blur-md bg-transparent py-4 lg:hidden"
+      className="w-full flex flex-col items-center justify-between backdrop-blur-md bg-transparent py-4 lg:hidden"
     >
       {/* Container to match content width */}
       <div className="container mx-auto px-4 md:px-6 max-w-7xl flex w-full flex-col items-center justify-between">

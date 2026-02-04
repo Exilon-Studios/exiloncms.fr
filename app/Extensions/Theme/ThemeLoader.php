@@ -20,6 +20,7 @@ class ThemeLoader
         $this->activeThemeId = Cache::get('active_theme', function () {
             $defaultTheme = 'blog';
             Cache::forever('active_theme', $defaultTheme);
+
             return $defaultTheme;
         });
     }

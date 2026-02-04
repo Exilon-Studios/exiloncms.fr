@@ -29,6 +29,7 @@ Thumbs.db
 
 # Internal docs (keep private)
 /docs/
+/.claude/
 C:Users*
 nul
 

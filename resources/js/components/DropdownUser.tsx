@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { cn } from "@/lib/utils";
 import { trans } from "@/lib/i18n";
 import {
@@ -10,9 +10,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
-import { IconUser, IconLayoutDashboard, IconShieldCheck, IconLogout, IconPalette } from '@tabler/icons-react';
+import { IconUser, IconLayoutDashboard, IconShieldCheck, IconLogout, IconPalette, IconLanguage } from '@tabler/icons-react';
 import { ThemeModal } from "./theme-modal";
+import { PageProps } from '@/types';
 
 interface DropdownUserProps {
   user: {
@@ -32,12 +36,25 @@ interface DropdownUserProps {
 
 export function DropdownUser({ user, align = "end", className }: DropdownUserProps) {
   const [themeModalOpen, setThemeModalOpen] = useState(false);
+  const { settings } = usePage<PageProps>().props;
 
   const handleLogout = () => {
     router.post('/logout');
   };
 
+  const handleLocaleChange = (locale: string) => {
+    router.post('/locale', { locale }, {
+      preserveState: true,
+      preserveScroll: true,
+    });
+  };
+
   const isAdmin = user.hasAdminAccess || user.role?.is_admin || false;
+
+  // Get current locale from settings (shared by HandleInertiaRequests)
+  const getCurrentLocale = () => {
+    return settings?.locale || document.documentElement.lang || 'en';
+  };
 
   // Use Minecraft skin if available, otherwise fallback to avatar or initials
   const avatarUrl = user.avatar || `https://mc-heads.net/avatar/${user.name}/64`;
@@ -71,7 +88,7 @@ export function DropdownUser({ user, align = "end", className }: DropdownUserPro
           </div>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 z-[100]" align={align}>
+      <DropdownMenuContent className="w-56 z-[70]" align={align}>
         <DropdownMenuLabel>
           <div className="flex flex-col">
             <span className="font-medium">{user.name}</span>
@@ -100,6 +117,32 @@ export function DropdownUser({ user, align = "end", className }: DropdownUserPro
           <IconPalette className="mr-2 h-4 w-4" />
           <span>{trans('messages.user.theme')}</span>
         </DropdownMenuItem>
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <IconLanguage className="mr-2 h-4 w-4" />
+            <span>{trans('messages.user.language') || 'Language'}</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent>
+            <DropdownMenuItem onClick={() => handleLocaleChange('en')}>
+              <span className={cn(
+                "flex items-center gap-2 w-full",
+                getCurrentLocale() === 'en' ? 'text-foreground' : 'text-muted-foreground'
+              )}>
+                🇺🇸 English
+                {getCurrentLocale() === 'en' && <span className="ml-auto text-xs">✓</span>}
+              </span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleLocaleChange('fr')}>
+              <span className={cn(
+                "flex items-center gap-2 w-full",
+                getCurrentLocale() === 'fr' ? 'text-foreground' : 'text-muted-foreground'
+              )}>
+                🇫🇷 Français
+                {getCurrentLocale() === 'fr' && <span className="ml-auto text-xs">✓</span>}
+              </span>
+            </DropdownMenuItem>
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
           <IconLogout className="mr-2 h-4 w-4" />

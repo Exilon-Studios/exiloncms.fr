@@ -5,6 +5,767 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.72] - 2026-02-04
+
+### Fixed
+- **Translation placeholders**: Fixed trans() function to support {placeholder} format in addition to :placeholder
+  - Onboarding page now correctly displays step counts and percentages
+  - Fixed "Step {current}/{total}" and "{percent}% complete" display issues
+- **Plugin status detection**: Plugins now correctly read enabled status from plugins.json file
+  - Cache clearing issue fixed - plugins now show correct enabled/disabled status
+  - Documentation plugin now properly shows as enabled
+- **Plugin page styling**: Completely redesigned Admin/Plugins/Index page with shadcn/ui
+  - Modern card-based layout with Switch component for enable/disable
+  - Badge indicators for plugin status and features (Routes, Admin, DB, Settings)
+  - Added stats counter showing enabled/total plugins
+  - Fixed translation function import (useTrans → trans from types)
+  - Removed redundant "Configure" button (config links are in sidebar)
+- **Plugin config link**: Fixed settings link for documentation plugin
+  - Now correctly routes to /admin/plugins/documentation/settings instead of generic config
+- **Route conflict resolution**: Documentation plugin config route changed from /config to /settings
+  - Avoids conflict with generic plugin config route at /admin/plugins/{plugin}/config
+- **Layout consistency**: Fixed admin pages layout to use consistent spacing
+  - Dashboard page now uses AuthenticatedLayout padding instead of custom container
+  - All admin pages now use same layout structure for consistent title/content alignment
+  - Logs page styling matches Users page (removed extra borders)
+  - Bans page styling matches Users page (removed extra borders, added translations)
+- **BlockNote editor integration**: Fixed multiple bugs in BlockNoteEditor component
+  - Editor now properly uses useCreateBlockNote hook instead of direct instantiation
+  - Fixed loadFileIntoEditor function signature (removed incorrect async wrapper)
+  - Fixed parseMarkdownToBlocks function with proper inline helper for pushCurrentBlock
+  - Updated blocksToMarkdown to handle BlockNote's block structure correctly
+  - Folder icons now use ChevronDown/ChevronRight from lucide-react
+
+### Changed
+- **Admin sidebar reorganization**:
+  - Removed Content section (Pages, Posts, Images, Redirects - will be plugins)
+  - Renamed "SETTINGS" to "CONFIGURATIONS"
+  - Moved Navbar inside CONFIGURATIONS section
+  - Moved Logs to secondary links (above Updates)
+  - Removed Documentation link from sidebar
+  - Removed plugin config links from EXTENSIONS section (only in PLUGIN CONFIG)
+- **Plugin navigation**: Documentation plugin now has dropdown menu in PLUGIN CONFIG section
+  - Dropdown includes: Éditeur (with icon), Configuration (with icon), Parcourir (with icon), Cache (with icon)
+  - Dropdown items have left border line with dots for visual hierarchy
+  - Other plugins with single config show as direct links
+  - Sidebar now supports individual link dropdowns with icons (not just sections)
+- **Onboarding checklist card**: Improved design with clickable entire card
+  - Removed redundant "View all →" button
+  - Added badge showing remaining steps count
+  - Better hover effects and visual feedback
+- **Translations**: All text now uses translations (no hardcoded French/English)
+  - Documentation menu items (editor, configuration, browse, cache)
+  - Bans page translations (description, user, reason, banned_by, date, status, etc.)
+  - Dashboard quick actions translations (users management, settings & appearance)
+  - Documentation plugin pages (index, browse, cache, editor)
+
+### Added
+- **Documentation plugin pages**: Complete admin interface for documentation management
+  - Index page (/admin/plugins/documentation) with stats and quick actions
+  - Browse page (/admin/plugins/documentation/browse) to navigate documentation files
+  - Cache page (/admin/plugins/documentation/cache) for cache management
+  - Editor page (/admin/editor) for creating/editing documentation pages
+  - Config page (/admin/plugins/documentation/settings) for plugin settings
+- **Sidebar dropdown support**: Individual links can now have dropdown menus with children and icons
+  - Used for Documentation plugin with multiple config options
+  - Persists expanded/collapsed state in localStorage
+  - Smooth animations with framer-motion
+  - Left border line with dots for visual hierarchy
+
+## [1.3.71] - 2026-02-04
+
+### Added
+- **Documentation plugin**: Complete documentation system with multi-language support
+  - Created plugin documentation configuration file (config/config.php)
+  - Added admin routes under `/admin/plugins/documentation` submenu
+  - Added middleware DocumentationEnabled to check if plugin is active
+  - Created DocumentationServiceProvider to register plugin middleware
+  - Added developer documentation pages (plugins, themes, API reference)
+  - Added installation, configuration, and usage documentation in French
+  - Documentation now only accessible when plugin is enabled
+- **Documentation admin pages with shadcn/ui components**:
+  - Configuration page with tabs (General, Display, Features, GitHub)
+  - Markdown editor with preview functionality
+  - Browse page with collapsible categories
+  - Index page with stats cards and quick actions
+- **Generic plugin configuration page**: Created `Admin/Plugins/Config/Edit.tsx`
+  - Works with all plugins using `getConfigFields()` method
+  - Supports multiple field types: text, boolean, select, number, textarea
+  - Auto-generates form from plugin config fields
+  - Handles validation and saving to database
+
+### Fixed
+- **Plugin helpers loading issue**: Merged `app/helpers/plugins.php` into `app/helpers/plugin.php`
+  - Functions were not available due to incorrect autoload order
+  - `get_enabled_plugins()`, `save_enabled_plugins()`, `is_plugin_enabled()` now properly available
+  - Removed duplicate file and updated composer.json
+- **Missing plugin config page**: Created generic configuration page for all plugins
+  - Previously only specific config pages worked
+  - Now all plugins can use `getConfigFields()` method
+
+### Changed
+- Updated admin routes for documentation to use `/admin/plugins/documentation` prefix
+- Registered DocumentationServiceProvider in config/app.php
+- Replaced Tabler icons with Lucide React icons across documentation admin pages
+- All documentation admin pages now use shadcn/ui components for consistent styling
+  - Created plugin documentation configuration file (config/config.php)
+  - Added admin routes under `/admin/plugins/documentation` submenu
+  - Created configuration page for documentation plugin settings
+  - Added middleware DocumentationEnabled to check if plugin is active
+  - Created DocumentationServiceProvider to register plugin middleware
+  - Added developer documentation pages (plugins, themes, API reference)
+  - Added installation, configuration, and usage documentation in French
+  - Documentation now only accessible when plugin is enabled
+
+### Changed
+- Updated admin routes for documentation to use `/admin/plugins/documentation` prefix
+- Registered DocumentationServiceProvider in config/app.php
+
+## [1.3.70] - 2026-02-04
+
+### Changed
+- **Modular plugin system (Paymenter-inspired)**: Plugins now export their own functionality
+  - Plugins can export via PHP methods OR plugin.json (both supported)
+  - Added Plugin base methods: getSidebarLinks(), getWidgets(), getHeaderElements(), getNavigation()
+  - Methods read from plugin.json by default, can be overridden in plugin classes
+  - Added helper functions: getPublicSidebarLinks(), getUserSidebarLinks(), getAdminSidebarLinks()
+  - Added helper functions: getUserWidgets(), getAdminWidgets(), getSidebarHeaderElements()
+  - Added helper functions: getWidgets(), getSidebarLinks() for generic access
+  - Added plugin instance helpers: get_plugin_instance(), plugin_get_sidebar_links(), plugin_get_widgets(), plugin_get_header_elements(), plugin_get_navigation()
+  - Plugins declare sidebar_links in plugin.json for different contexts (public, user, admin)
+  - Removed hardcoded plugin checks from PublicLayout, BlogLayout, DashboardLayout
+  - Removed showCart prop dependency on enabledPlugins in layouts
+  - DashboardLayout now uses userSidebarLinks from plugins dynamically
+  - Admin Dashboard now uses dashboardWidgets from plugins instead of hardcoded checks
+  - Added icon mapping in DashboardLayout for plugin-declared icons (ShoppingCart, etc.)
+  - Shop plugin updated with sidebar_links configuration for user dashboard
+  - Shop widgets updated with context attribute (user/admin/both)
+  - HandleInertiaRequests shares publicSidebarLinks, userSidebarLinks, adminSidebarLinks
+  - HandleInertiaRequests shares userWidgets, adminWidgets with frontend
+  - HandleInertiaRequests now uses plugin_get_navigation() and plugin_get_header_elements() which check both PHP and JSON
+- **Plugin storage system**: Migrated from database-based to file-based storage (inspired by Azuriom)
+  - Plugins now stored in `plugins/plugins.json` instead of database `enabled_plugins` setting
+  - Fixes persistent issue where plugin activation state was being reset during Laravel boot
+  - Updated PluginServiceProvider to read from file instead of database
+  - Updated plugin commands (enable, disable, list) to use file-based storage
+  - Updated PluginController to use file-based storage for web UI
+  - Created `app/helpers/plugins.php` with get_enabled_plugins(), save_enabled_plugins(), is_plugin_enabled()
+- **Modular plugin header icons system**: Plugins can now declare header icons via plugin.json
+  - Plugins declare `header_icons` in their plugin.json manifest
+  - Created PluginHeaderIcons React component to dynamically render plugin header icons
+  - Added plugin_header_icons() helper to read icons from plugin manifests
+  - Added getPluginHeaderIcons() in HandleInertiaRequests to share header icons with frontend
+  - Updated Shop plugin.json to declare cart icon with badge, permission, and position
+  - SidebarLayout now uses PluginHeaderIcons instead of hardcoded cart button
+  - Cart button only shows when Shop plugin is enabled (via permission check)
+  - Account balance displayed next to user name in header
+- **Onboarding checklist**: Improved UI and translations
+  - Now shows only first uncompleted step instead of 2 (reduces card height)
+  - Added translation keys for "View all" and "See X more steps"
+  - Updated trans() helper to support positional placeholders {0}, {1}, etc.
+  - French and English translations added for new keys
+- **Navigation translations**: Added missing translations for admin navigation
+  - `admin.nav.users.heading`: "Gestion des utilisateurs" / "Users"
+  - `admin.nav.users.manage_members`: "Gérer les membres" / "Manage Members"
+  - `admin.nav.users.permissions_roles`: "Permissions & rôles" / "Permissions & Roles"
+  - `admin.nav.settings.heading`: "Paramètres & Apparence" / "Settings & Appearance"
+  - `admin.nav.settings.site_config`: "Configuration du site" / "Site Configuration"
+  - `admin.nav.settings.appearance`: "Apparence du site" / "Site Appearance"
+
+## [1.3.69] - 2026-02-03
+
+### Added
+- **Documentation plugin**: Integrated documentation system with multilingual support
+  - Reads markdown files from /docs directory (FR, EN locales)
+  - Automatic navigation based on folder structure
+  - Full-text search across all documentation
+  - Table of contents generation from markdown headings
+  - Caching system for better performance
+  - Admin interface for managing documentation files
+  - Components: DocumentationViewer, DocSidebar, DocSearch, DocTableOfContents
+  - Routes: /docs/* for public docs, /admin/documentation/* for management
+  - Helper files: app/helpers/plugin.php, app/helpers/hooks.php
+- **Helper functions**: Added plugin and hooks helper files
+  - plugin_manifest(), plugin_navigation(), plugin_widgets(), plugin_events()
+  - hook_model_created/updated/deleted(), hook_auth_login/logout/registered()
+  - hook_event(), dispatch_event(), register_model_observers()
+- **Cleanup**: Removed unnecessary files from root directory
+  - Removed build artifacts: exiloncms.zip, exiloncms-installer-*.zip
+  - Removed unused files: pnpm-lock.yaml, routes.txt, nul
+  - Confirmed: No Bootstrap CSS dependency (uses Tailwind + shadcn/ui)
+
+## [1.3.68] - 2026-02-03
+
+### Added
+- **Dashboard widgets system**: Plugins can declare widgets for admin dashboard
+  - WidgetManager class manages widget discovery, permissions, and user layouts
+  - DashboardWidgetController provides API endpoints for widget data
+  - HandleInertiaRequests shares dashboardWidgets with frontend
+  - Widgets support positions (main, sidebar), permissions, and custom components
+  - Users can customize their dashboard layout
+  - Routes: /admin/widgets/* for widget management
+- **Plugin ZIP import system**: Full plugin installation via ZIP file upload
+  - PluginImportController handles validation, extraction, and installation
+  - Supports plugin.json manifest or #[PluginMeta] attribute detection
+  - Auto-registers composer autoload namespaces for new plugins
+  - Automatic migration execution on import
+  - Optional auto-enable after import
+  - Backup functionality before deletion
+  - Routes: GET /admin/plugins/import, POST /admin/plugins/import, GET /admin/plugins/backups
+- **Dynamic navigation system**: Plugins can now declare admin sidebar navigation via plugin.json
+  - HandleInertiaRequests shares pluginNavigation with frontend
+  - NavigationController provides API endpoint for navigation data
+  - Supports nested navigation items with permissions and icons
+  - Plugins are sorted by position attribute
+- **Comprehensive event hooks system**: Created app/helpers/hooks.php for event hooks
+  - Model events: hook_model_created/updated/deleted() for any Eloquent model
+  - Auth events: hook_auth_login/logout/registered()
+  - Navigation hooks: hook_navigation_dashboard(), hook_navigation_account_dropdown()
+  - CMS events: settings.updated, plugin.enabled/disabled, theme.activated
+  - Generic helpers: hook_event(), dispatch_event(), has_event_listeners()
+  - register_model_observers() to integrate Laravel model events with hook system
+- **Generic plugin config controller**: Created PluginConfigController for automatic plugin configuration UI
+  - Uses getConfigFields() method from Plugin base class to generate config forms
+  - Supports multiple field types: text, number, boolean, array, json, etc.
+  - Type-specific value processing for each field type
+  - Routes: GET/POST /admin/plugins/{plugin}/config, DELETE /admin/plugins/{plugin}/config/clear
+- **EventDispatcher system**: Created centralized event system for plugins
+  - New app/Events/EventDispatcher.php for plugin event management
+  - Methods: listen(), dispatch(), forget(), hasListeners(), flush(), registerPluginListeners()
+  - Plugins can now listen to and dispatch events via plugin.json manifest
+  - PluginServiceProvider automatically registers event listeners from manifests
+  - Helper function: register_plugin_event_listeners()
+- **Plugin manifest system**: Added plugin.json manifest support for plugins
+  - Created app/helpers/plugin.php with helper functions for reading plugin manifests
+  - Functions: plugin_manifest(), plugin_navigation(), plugin_widgets(), plugin_events(), plugin_routes_config()
+  - Supports both new 'navigation' format and legacy 'admin_section' format
+  - Shop plugin.json updated with widgets and admin_section using href instead of route
+- **Shop plugin manifest updates**: Added widgets configuration and fixed admin navigation links
+  - Changed from route-based to href-based navigation links for better compatibility
+  - Added shop_stats widget for dashboard
+
+### Fixed
+- **Shop plugin routes**: Removed duplicate /shop prefix from admin routes
+  - PluginServiceProvider already adds 'admin/plugins/shop' prefix
+  - Routes were generating /admin/plugins/shop/shop/ instead of /admin/plugins/shop/
+  - All admin routes now start from / (relative) for proper prefix handling
+- **Plugin activation persistence**: Fixed PluginServiceProvider to properly handle enabled_plugins array
+  - The Setting model already handles JSON encoding/decoding via $jsonEncoded array
+  - Removed redundant JSON decoding logic that was causing plugin state to not persist
+  - Simplified loadPlugins() to use flatten()->filter()->unique()->values() pattern
+
+## [1.3.67] - 2026-02-03
+
+### Fixed
+- **Remaining hardcoded strings in Admin pages**: Completed translation cleanup for all remaining hardcoded confirm/alert messages
+  - Updated Onboarding/Index.tsx with admin.onboarding.* translation keys
+  - Updated Notifications/Index.tsx with admin.notifications.* translation keys
+  - Updated Translations/Index.tsx with admin.translations.index.* translation keys
+  - Updated Updates/Index.tsx with admin.update.index.install_confirm_with_backup key
+  - Updated Shop/PromoCodes/Index.tsx with admin.shop.promo_codes.* translation keys
+  - Added complete FR and EN translations for onboarding, notifications, promo_codes modules
+
+## [1.3.66] - 2026-02-03
+
+### Fixed
+- **Database page hardcoded strings**: Replaced all hardcoded French confirm/alert messages with trans() calls
+  - Updated Database/Index.tsx to use trans() from @/lib/i18n instead of useTrans() hook
+  - Added missing database translation keys (restore_confirm, restore_success, delete_backup_confirm, import_success, optimize_confirm, optimize_success, truncate_confirm, truncate_success)
+  - Added complete database section to EN admin.php translations
+
+## [1.3.65] - 2026-02-03
+
+### Fixed
+- **Shop pages hardcoded strings**: Replaced all hardcoded French strings with trans() calls
+  - Updated Items/Index.tsx with admin.shop.items.* translation keys
+  - Updated Categories/Index.tsx with admin.shop.categories.* translation keys
+  - Added items_count pluralization support
+  - Added complete FR and EN translations for shop module
+
+## [1.3.64] - 2026-02-03
+
+### Fixed
+- **Translations plugin hardcoded strings**: Replaced all hardcoded English strings with trans() calls
+  - Added missing translation keys to FR and EN admin.php (admin.translations.index.*)
+  - Removed orphaned handleSyncMarketplace function reference
+  - Removed unused RefreshCw icon import
+- **Translation cleanup**: Removed unused marketplace 'resources' translation keys from FR and EN admin.php
+
+## [1.3.63] - 2026-02-03
+
+### Removed
+- **Marketplace translations plugin integration**: Removed marketplace sync from Translations plugin
+  - Removed `syncMarketplace()` method from TranslationController
+  - Removed marketplace sync button from Translations/Index.tsx
+  - Removed auto-sync and sync_interval config fields from Translations plugin
+  - Updated plugin description to remove marketplace references
+
+### Fixed
+- **Documentation**: Updated CLAUDE.md to remove marketplace integration references
+
+## [1.3.62] - 2026-02-03
+
+### Removed
+- **Marketplace sidebar navigation**: Removed marketplace section from admin sidebar
+  - Removed marketplace heading, packages, pending, and sellers links from AuthenticatedLayout
+  - Removed marketplace translations from FR and EN admin.php (nav section and themes section)
+
+- **Marketplace installer integration**: Removed marketplace integration from InstallCommand
+  - Removed `fetchMarketplaceData()` and `$marketplaceData` property
+  - Removed `downloadFromMarketplace()`, `installTheme()`, and `installPlugin()` methods
+  - Removed `marketplace_url` from config/installer.php
+  - Installer now uses local/default themes and plugins only
+
+## [1.3.61] - 2026-02-03
+
+### Fixed
+- **Users page translations**: Added missing `admin.users.index.view` and `admin.users.index.edit` keys in FR
+- **Button icon spacing**: Reduced icon-to-text spacing from `mr-2` to `mr-1` for tighter, cleaner buttons
+- **Badge icon spacing**: Reduced badge icon spacing from `mr-1` to `mr-0.5` for compact badges
+
+## [1.3.60] - 2026-02-03
+
+### Removed
+- **Marketplace module**: Completely removed marketplace integration from CMS core
+  - Removed MarketplaceController, ResourceController, ResourceInstallController
+  - Removed marketplace routes (web and admin)
+  - Removed marketplace translations (resources.php, marketplace.php)
+  - Removed marketplace_sso_redirect() helper function
+  - Removed marketplaceUrl from shared Inertia props
+  - Removed marketplace configuration from config/services.php and config/exiloncms.php
+  - Removed marketplace feature flag from config
+  - Deleted Admin/Resources pages directory
+  - Deleted marketplace-registry.json configuration file
+
+## [1.3.59] - 2026-02-03
+
+### Fixed
+- **Onboarding checklist translations**: Added complete i18n support for admin onboarding in FR and EN
+- **Onboarding checklist styling**: Updated to use Card component matching dashboard client design
+- **Onboarding skip confirmation**: Added missing `skip_confirm` translation key
+
+### Changed
+- **OnboardingChecklist component**: Now uses `trans()` for all text content with proper translation keys
+- **Onboarding layout**: Changed from custom div wrapper to shadcn/ui Card component for consistency
+- **Admin Dashboard layout**: Now uses same structure as client dashboard (removed AdminLayout wrapper)
+  - Header matches dashboard client style
+  - Direct Card layout without AdminLayout/AdminLayoutHeader/AdminLayoutContent wrappers
+  - Consistent spacing with `space-y-6`
+
+## [1.3.58] - 2026-02-01
+
+### Added
+- **Vorix theme**: Modern digital agency theme with light/dark mode switcher
+  - Theme switcher component with animated sun/moon toggle
+  - Mega menu navigation with thumbnail previews
+  - ScrollToTop button with smooth animation
+  - Animated counter component for statistics
+  - Hero carousel with Framer Motion
+  - Service cards with hover effects and parallax
+  - Testimonial slider component
+  - 3 Home page variants
+
+- **Wion theme**: Creative digital agency theme with particle effects
+  - Particle background component with canvas-based animation
+  - Portfolio grid with category filtering and hover effects
+  - GSAP-style animations converted to Framer Motion
+  - Multiple homepage layouts
+  - Video hero component support
+  - Service tabs component
+  - About page variations (3 layouts)
+
+## [1.3.57] - 2026-02-01
+
+### Added
+- **Hostinkar theme**: Complete professional web hosting theme with modern design
+  - 4 Home page variants (Classic Hero, Modern Split, Minimal Design, Enterprise Focus)
+  - Core components: HeroSection, HostingPlans, FeaturesSection, TestimonialCarousel, ServicesSection, DomainSearch, MegaMenu
+  - Bootstrap to Tailwind CSS conversion with shadcn/ui components
+  - Framer Motion animations replacing AOS
+  - Configuration system for choosing home variants and enabling/disabling sections
+  - TypeScript support with proper type definitions
+  - Custom CSS with theme variables for colors and animations
+  - Responsive design with mobile-first approach
+
+### Fixed
+- **Blog routes 404**: Fixed PluginServiceProvider route loading by wrapping `require` in proper callback function
+- **JSON-encoded plugin IDs**: Fixed enabled_plugins setting returning JSON-encoded strings instead of array
+- **Laravel 12 Route::group()**: Removed outer Route::group() wrapper from blog routes to match Laravel 12 API
+
+### Changed
+- **Blog theme home page**: Simplified to only Hero, Articles récents, Newsletter, and Footer
+  - Removed Features, FeaturesCards, FAQ, Contact, Feedbacks sections
+  - Newsletter (BookACall component) now appears after articles
+
+## [1.3.56] - 2026-02-01
+
+### Fixed
+- **Blog routes 404**: Removed duplicate `blog` prefix from plugin routes - PluginServiceProvider already adds prefix, causing /blog/blog/... URLs
+- **Translations system**: All blog components now use `trans()` for dynamic translations instead of hardcoded text
+- **Button spacing**: Fixed huge gap between icon and text in newsletter button by removing absolute positioning
+- **Language detection**: Fixed language selector not showing correct selection
+
+### Added
+- **Blog translations**: Added complete translation keys for blog in fr/messages.php and en/messages.php
+  - Hero, Features, FeaturesCards, FAQ, Contact, Newsletter
+  - Blog pages (Index, Show) translations
+
+## [1.3.55] - 2026-02-01
+
+### Fixed
+- **Language selector detection**: Now correctly reads locale from settings.shared instead of document.lang
+- **Navbar positioning**: Removed `fixed` position, navbar now scrolls with content as requested
+
+## [1.3.54] - 2026-02-01
+
+### Added
+- **Language selector in user dropdown**: Users can now switch between English (en) and French (fr) directly from the dropdown menu
+  - Added LocaleController with /locale route
+  - Updated SetLocale middleware to check session for user preference
+  - Added DropdownMenuSub with language options in DropdownUser
+
+### Changed
+- **Blog theme layout**: Hero stays at max-w-screen-2xl, but "Articles récents" section reverts to max-w-7xl
+
+### Fixed
+- **Navbar scroll issue**: Added `initial={false}` to Framer Motion motion.div to prevent unwanted animations that could cause navbar scroll
+- **Dropdown language sub-menu**: Properly displays current language with checkmark
+
+## [1.3.53] - 2026-02-01
+
+### Changed
+- **Blog theme layout width**: Increased from max-w-7xl to max-w-screen-2xl for more content space
+
+### Fixed
+- **Cart button visibility**: Set showCart=false on blog theme home since shop plugin is not fully functional
+- **NavbarElementRequest PHP error**: Fixed undefined function plugins() by using PluginLoader directly
+
+## [1.3.52] - 2026-02-01
+
+### Fixed
+- **Hero component**: Removed SocialMediaCard element that didn't fit blog theme
+- **Hero colors**: Replaced hardcoded emerald colors with CMS variables
+  - Banner: `bg-emerald-500/50` → `bg-primary/50`
+  - Button: `border-emerald-700 bg-gradient-to-b from-emerald-500 to-brand` → `border-primary/70 bg-gradient-to-b from-primary to-secondary`
+
+## [1.3.51] - 2026-02-01
+
+### Changed
+- **Acernity template text transformed for blog theme**: All hiring/recruitment themed text replaced with blog-focused content
+  - Hero: "Share stories. Connect with readers worldwide."
+  - Features: "Go from idea to published"
+  - FeaturesCards: "Powerful search", "Lightning-fast editor", "Auto-save"
+  - FAQData: Blog-focused questions and answers
+  - Contact: "Readers love us" and blog community text
+- **Blog theme Home page layout**: Removed unnecessary sections (ProductPreview, Grids, MapSection, Pricing)
+  - Kept: Hero, Features, FeaturesCards, Featured Post, Blog Grid, Feedbacks, FAQSection, Contact
+  - All sections now use max-w-7xl container width
+- **BookACall component**: Replaced "Book a call" with "Subscribe" for newsletter
+  - Removed "Powered by Aceternity" footer text
+- **FeaturesCards**: Increased width from max-w-4xl to max-w-7xl
+
+### Added
+- **Blog Index page** (resources/js/pages/Blog/Index.tsx): Lists all blog posts with pagination
+- **Blog Show page** (resources/js/pages/Blog/Show.tsx): Displays single blog post with comments and related posts
+- **Newsletter signup section** in Blog Index page
+
+### Fixed
+- **Blog plugin 404 error**: Created missing Blog/Index and Blog/Show pages
+  - Blog routes now work correctly at /blog and /blog/{slug}
+
+## [1.3.50] - 2026-01-31
+
+### Added
+- **Complete Acernity playful-marketing template recreation for blog theme**
+  - Hero section with floating cards, background dots pattern, animated text
+  - Features section with Badge header
+  - FeaturesCards with ProfileSearch, SymbolsSpeed, CloudIcon (using CMS primary color)
+  - ProductPreview with gradient background and floating IconBoxHero elements
+  - Grids section with IconBoxHero, Analytics, social media cards, and ChartCard
+  - MapSection with WorldMap, AnimatedCounter, and Checks components
+  - Pricing section with 3 tiers (Hobby, Starter/Featured, Pro) using exact template structure
+  - FAQSection with Accordion component and IconBoxHero decoration
+  - Feedbacks section with testimonial cards and video banner
+  - Contact section with social proof avatars and BookACall form
+- **Acernity UI Components**:
+  - Logo - Lightning bolt SVG with CMS primary color
+  - IconBoxHero - Floating logo box with gradient and shadow
+  - Analytics - Calendar card with meeting items
+  - SocialMediaCard - Social media integration card with emoji placeholders
+  - PaperPinCard - Interview cards with avatars and dots menu
+  - Hero - Main hero with floating decorative elements and animated words
+  - Features - Section header with Badge
+  - Header - Reusable section header component
+  - ContentCard - Title and description card component
+  - ChartCard - Time tracker chart with graph bars
+  - Checks - Feature checkmarks with hover animation
+  - Grids - Complex grid layout with cards and charts
+  - Pricing - Three-tier pricing with featured plan decoration
+  - FAQSection - Accordion FAQ with IconBoxHero
+  - MapSection - World map with AnimatedCounter
+  - Feedbacks - Testimonial grid with video banner
+  - Contact - Social proof avatars with BookACall
+- **Supporting Components**:
+  - WorldMap - SVG map with animated path lines and avatar dots
+  - Accordion - Radix UI accordion with custom styling
+  - AnimatedCounter - Counter using motion/react hooks
+  - BookACall - Email input with gradient button
+  - Avatar - Dicebear avatar component
+  - Badge - Styled badge with shadow
+  - Icons - Dots, Twitter, Linkedin, Github, Facebook, Instagram, HorizontalDots, InfoIcon, SandWatch, CheckIcon, GithubIcon
+- **Data utilities**:
+  - aceternity-data.ts with graphData, FAQData, WorldMapDotsData, WorldMapAvatarsData, transition, variants, cardVariants
+
+### Changed
+- **Blog theme Home page**: Now uses complete Acernity playful-marketing template structure
+  - Hero → Features → FeaturesCards → ProductPreview → Header → Grids → MapSection → Pricing → Feedbacks → FAQSection → Contact
+  - All colors replaced with CMS variables (hsl(var(--primary)), hsl(var(--secondary)), etc.)
+
+## [1.3.49] - 2026-01-31
+
+### Fixed
+- **Import statements in blog theme Home page**: Changed to default imports for Acernity components
+  - BlogHero, Header, FeaturesCards, ProductPreview use default exports
+
+## [1.3.48] - 2026-01-31
+
+### Changed
+- **Blog Theme Home Page - Complete Acernity UI Template**: Full redesign with all template sections
+  - Features section with Header and FeaturesCards (lucide-react icons: Search, Zap, Cloud)
+  - ProductPreview section with gradient background and floating decorative elements
+  - Pricing section with 3 tiers (Hobby, Starter, Pro) using CMS colors
+  - FAQ section with Accordion component
+  - Feedback/Testimonials section with avatar cards
+  - Contact section with social proof avatars
+  - Stats section with icons (Users, Globe, Clock)
+  - All sections use CMS primary/secondary colors via CSS variables
+- **Acernity UI Components Added**:
+  - Header component - Section header with badge
+  - FeaturesCards component - Feature grid with lucide-react icons
+  - ProductPreview component - Product showcase with gradient
+  - Icons file - CheckIcon, ProfileSearch, SymbolsSpeed, CloudIcon with CMS colors
+- **DashboardLayout Sidebar Fix**: Added documentation icon (FileText) and official site link (BrandTabler)
+- **Profile and Notifications pages**: Now use DashboardLayout instead of AuthenticatedLayout
+
+### Fixed
+- **User-facing sidebar consistency**: Documentation icon changed from Home to FileText
+- **Missing official site link**: Added to user sidebar like admin sidebar
+- **Profile and Notifications pages**: No admin sections on user-facing pages
+
+## [1.3.47] - 2026-01-31
+
+### Fixed
+- **Profile and Notifications pages**: Now use DashboardLayout instead of AuthenticatedLayout
+  - No admin sections (USERS, CONTENT, MARKETPLACE, SETTINGS) on user-facing pages
+  - Consistent user-facing sidebar across /dashboard, /profile, /notifications
+
+## [1.3.46] - 2026-01-31
+
+### Changed
+- **Dashboard Layout with Sidebar**: Added sidebar to /dashboard page
+  - Uses SidebarLayout component with collapsible sidebar
+  - Simplified navigation (Dashboard, Profile, Notifications, Shop if enabled)
+  - NO admin sections (USERS, CONTENT, MARKETPLACE, SETTINGS)
+  - User-facing only - admin sections remain on /admin pages
+- **Acernity UI Components**: Added Badge and Header components
+  - Badge component with shadow and border for section labels
+  - Header component for section titles with badge support
+  - Uses CMS border colors instead of hardcoded values
+
+### Fixed
+- **Dashboard sidebar issue**: Dashboard now has sidebar without admin sections
+- **DashboardLayout import fix**: Correctly uses DashboardLayout instead of AuthenticatedLayout
+
+## [1.3.45] - 2026-01-31
+
+### Changed
+- **Blog Theme - Complete Acernity UI template integration**
+  - Exact copy of playful-marketing template structure with CMS colors
+  - Navbar separated from Hero section (using BlogThemeLayout)
+  - Hero with radial dot grid background (10px spacing)
+  - Floating decorative elements (IconBoxHero, Analytics, PaperPinCard)
+  - Word-by-word animation on hero title
+  - Banner component showing posts count
+  - All template colors replaced with CMS primary/secondary variables
+  - Categories section with Acernity-style cards
+  - Newsletter section with rounded-[3rem] and dot pattern background
+- **Blog Theme Layout Fix**: Created BlogThemeLayout for proper full-width hero
+  - Hero now displays at full width with proper padding
+  - Content sections use max-w-6xl container for proper readability
+  - White background for better hero contrast
+  - Fixed theme Home page path: themes/blog/resources/views/Home.tsx
+- **Admin Sidebar Reorganization**: Restructured Settings navigation
+  - SYSTEM section moved to end of Settings
+  - Updates moved from EXTENSIONS to SYSTEM section
+  - EXTENSIONS now only contains Plugins
+- **Dashboard Layout Separation**: Fixed /dashboard to use user-facing layout
+  - /dashboard now uses DashboardLayout without admin sidebar
+  - Clean header with basic navigation (Dashboard, Profile, Cart, User menu)
+  - Admin pages remain with full AdminLayout and sidebar navigation
+
+### Fixed
+- **Dashboard layout issue**: Dashboard/Index.tsx now correctly uses DashboardLayout instead of AuthenticatedLayout
+- **Theme page resolution**: Fixed HomeController to check correct theme views path
+- **User dropdown z-index**: Adjusted dropdown z-index to prevent layout shift (z-[70])
+- **Users page total variable**: UserController now passes total count for translation
+- **Plugins toggle redirect**: Changed back() to redirect()->route() for proper Inertia page refresh
+
+## [1.3.44] - 2026-01-31
+
+### Changed
+- **Blog Theme - Acernity UI Template**: Complete redesign matching playful-marketing template
+  - Removed diagonal grid background from site-wide layout
+  - Navbar now integrated into Hero section (no fixed positioning, no blur)
+  - Radial dot grid background instead of diagonal cross pattern
+  - Floating decorative elements (IconBoxHero, Analytics, PaperPinCard) positioned absolutely
+  - Word-by-word text animation matching original template
+  - Banner component showing posts count with calendar icon
+- **Categories Section Redesign**: Modern card-based layout
+  - Larger category cards with icon badges
+  - Gradient color indicators for each category
+  - Hover effects with shadow and border color change
+- **Newsletter Section**: Clean white design with subtle dot pattern background
+
+## [1.3.43] - 2026-01-31
+
+### Fixed
+- **Theme System for Inertia.js**: Fixed theme page override system with simple views-based approach
+  - Theme pages now use Laravel views convention: `themes/{theme}/resources/views/{Page}.tsx`
+  - Inertia resolver automatically checks active theme first, then falls back to core pages
+  - ALL pages can now be overridden by themes (Home, Blog, Shop, etc.)
+  - Preview mode works correctly via session-based `preview_theme`
+- **Theme Colors from CMS**: Complete Tailwind-based theming system
+  - Primary/secondary colors from CMS settings (`primary_color`, `secondary_color`)
+  - Colors injected as HSL values in `app.blade.php` for Tailwind compatibility
+  - Fixed "default" color handling - now properly falls back to blue/violet
+  - Auto-adjusts foreground color using `color_contrast()` helper
+  - Added `hex2hsl()` and `hex2hsl_value()` helper functions to `app/color_helpers.php`
+- **Acernity UI Integration**: Added modern UI components library
+  - Installed `@aceternity/ui` and `framer-motion` for modern animations
+  - Created Acernity-style components in `resources/js/components/aceternity/`
+  - BlogHero component with animated diagonal grid background and floating elements
+  - BlogPostCard component with hover animations and CMS colors
+  - FeaturedBlogPost component for large featured article display
+  - All components use CMS primary/secondary colors via Tailwind classes
+- **blog theme**: Complete rewrite with Acernity UI design
+  - Hero section with animated background, floating shapes, and smooth fade-in animations
+  - Featured post with gradient background pattern
+  - Categories section with gradient cards
+  - Newsletter section with gradient background and pattern
+  - All hardcoded colors replaced with `from-primary to-secondary` gradients
+- **Diagonal Grid Background**: Applied to entire site via PublicLayout
+  - Cross-line pattern using CSS gradients with 40px spacing
+  - Applied globally to all public pages
+
+### Available Tailwind classes for CMS colors:
+- `bg-primary` / `text-primary-foreground` - Primary color with auto-contrast text
+- `text-primary` - Primary color for links and accents
+- `bg-primary/10` / `bg-secondary/5` - Opacity variants for backgrounds
+- `from-primary to-secondary` - Gradient backgrounds
+- `hover:shadow-primary/25` - Shadow colored by primary
+
+## [1.3.42] - 2026-01-31
+
+### Changed
+- **CLAUDE.md Documentation Updates**
+  - Updated project overview to reflect general-purpose CMS (not just Minecraft)
+  - Updated plugin system documentation to reflect PHP 8 attribute-based system (#[PluginMeta])
+  - Removed outdated plugin.json format examples
+  - Added Payment Gateway System documentation (Paymenter-style architecture)
+  - Added Theme System documentation with page override priority and preview mode
+  - Added "Creating a new plugin" and "Creating a new payment gateway" patterns
+  - Added changelog update requirement to Important Notes section
+
+## [1.3.41] - 2026-01-30
+
+### Added
+- **Dynamic Plugin Config in Sidebar**: Enabled plugins with config now appear in Settings → PLUGIN CONFIG
+  - Automatically shows plugin configuration links (Blog, Shop, Notifications, etc.)
+  - Shared data `enabledPluginConfigs` provides plugin list to frontend
+  - Configure button removed from plugins page - now in sidebar for consistency
+- **Content Section in Sidebar**: New content management section
+  - Pages, Posts (Blog), Images, Redirects links grouped together
+  - Clean separation of content management from other admin functions
+- **Theme Override System**: Now works correctly like Paymenter
+  - HomeController checks if active theme has custom Home page
+  - Renders theme-specific page (e.g., `themes/blog/Home`) when available
+  - Falls back to core page when theme has no override
+  - Inertia app.tsx updated to resolve theme pages dynamically
+
+### Fixed
+- **Theme Validation**: Fixed JSON decoding of `enabled_plugins` setting
+  - Properly handles JSON string, array, and nested formats
+  - Theme activation now correctly detects enabled plugins (shop, blog, etc.)
+  - Fixed both `index()` and `checkPluginDependencies()` methods
+- **Cart Routes Error**: Fixed Ziggy error `route 'cart.items' not found`
+  - CartSheet now uses direct URLs instead of Ziggy routes
+  - Changed from `fetch(route('cart.items'))` to `router.get('/shop/cart/items')`
+  - All cart routes now work properly when shop plugin is enabled
+- **Settings Sidebar Reorganization**: Consolidated settings into logical groups
+  - General: Site-wide settings
+  - System: Security, Maintenance, Logs (grouped)
+  - Appearance: Navbar, Themes (grouped)
+  - Extensions: Plugins, Updates (grouped)
+  - Plugin Config: Shows only enabled plugins with config (dynamic)
+
+### Changed
+- **Plugins Index Page**: Removed Configure button
+  - Plugins with settings now show "Configuration available in Settings → Plugin Config"
+  - Cleaner UI with only Enable/Disable and Delete buttons
+  - All plugin configuration now centralized in sidebar under Settings
+
+## [1.3.40] - 2026-01-30
+
+### Fixed
+- **Plugin Config Page Styling**: Updated to use shadcn/ui components for consistency
+  - Replaced basic Tailwind classes with shadcn/ui (Card, Button, Input, Switch, Select, Checkbox, Textarea)
+  - Now matches the visual style of other admin pages (Posts, Users, etc.)
+  - Added proper back button with icon, badges for version/author
+- **Plugin Config Translations**: Added French and English translations
+  - All strings now use trans() helper for i18n support
+  - Translations added to `resources/lang/en/admin.php` and `resources/lang/fr/admin.php`
+  - Keys: `admin.plugins.configure.*`
+- **Blog Admin Routes Documentation**: Clarified blog admin route locations
+  - Posts: `/admin/posts`
+  - Categories: `/admin/blog/categories`
+  - Tags: `/admin/blog/tags`
+  - Comments: `/admin/blog/comments`
+
+## [1.3.39] - 2026-01-30
+
+### Fixed
+- **Plugin Config Page**: Created missing Admin/Plugins/Config page for plugin configuration
+  - Added route `POST admin/plugins/{plugin}/config` for saving configuration
+  - Added `update()` method to PluginController to save settings
+- **Theme Validation**: Fixed theme plugin validation logic
+  - Added JSON decoding for `enabled_plugins` setting in ThemeController
+  - Fixed `checkPluginDependencies()` and `getMissingPlugins()` methods
+  - Theme activation now correctly checks enabled plugins
+- **Shop Plugin Routes**: Fixed shop plugin `/shop` route returning 404
+  - Changed route prefix from `/plugins/{pluginId}` to just `/{pluginId}` in PluginServiceProvider
+  - Shop routes now correctly load at `/shop` instead of `/plugins/shop`
+- **Vite Module Resolution**: Fixed Vite build errors from theme import resolution
+  - Simplified Home.tsx to remove complex theme override system
+  - Theme override system will be re-implemented in future update with proper module resolution
+- **Plugin Types**: Created centralized type definitions for plugins
+  - Added `plugins/shop/resources/js/types/index.ts` with all shop-related types
+  - All shop pages now use centralized types for maintainability
+
+### Added
+- **Plugin Config Files**: Added configuration for all plugins that were missing it
+  - Analytics: tracking options, data retention, custom tracking code
+  - Docs: search, comments, TOC generation, breadcrumbs
+  - Legal: page toggles, cookie banner, company info
+  - Pages: search, author display, comments
+  - Releases: RSS, download counts, auto-notify, markdown
+  - Translations: auto-detect, language switcher, user contributions
+  - Votes: cooldown, rewards, reminders, voting sites
+- **Shop Plugin Pages**: Created React pages for shop functionality
+  - Shop/Index: Category listing page
+  - Shop/Category: Category detail with items
+  - Shop/Item: Product detail page
+  - Cart/Items: Shopping cart page
+
 ## [1.3.38] - 2026-01-30
 
 ### Fixed
