@@ -190,7 +190,7 @@ export default function Footer() {
                   <MapPin className="w-5 h-5" />
                   <span>123 Business St, Suite 100, City, State 12345</span>
                 </motion.div>
-              </motion.div>
+              </div>
 
               {/* Social Links */}
               <motion.div
