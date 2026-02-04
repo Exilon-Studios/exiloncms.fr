@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { useInView } from 'react-intersection-observer';
+import { useEffect, useRef, useState } from 'react';
+import { motion, useInView } from 'framer-motion';
 
 interface AnimatedCounterProps {
   value: number;
@@ -22,10 +21,8 @@ export default function AnimatedCounter({
   decimals = 0
 }: AnimatedCounterProps) {
   const [count, setCount] = useState(0);
-  const { ref, inView } = useInView({
-    threshold: 0.5,
-    triggerOnce: true
-  });
+  const ref = useRef(null);
+  const inView = useInView(ref, { amount: 0.5, once: true });
 
   useEffect(() => {
     if (!inView) return;
