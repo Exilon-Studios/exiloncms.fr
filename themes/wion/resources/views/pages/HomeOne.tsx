@@ -423,7 +423,7 @@ function CTASection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl text-gray-600 dark:text-gray-300 mb-8"
           >
-            {trans('wion.cta.subtitle', 'Let's bring your vision to life with creative excellence')}
+            {trans('wion.cta.subtitle', "Let's bring your vision to life with creative excellence")}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 50 }}
