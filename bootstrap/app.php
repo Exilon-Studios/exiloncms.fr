@@ -5,8 +5,8 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 // Load plugin helpers (must be loaded before PluginServiceProvider)
-require_once __DIR__.'/../app/helpers/plugin.php';
-require_once __DIR__.'/../app/helpers/hooks.php';
+require_once __DIR__.'/../app/Helpers/plugin.php';
+require_once __DIR__.'/../app/Helpers/hooks.php';
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withProviders([
