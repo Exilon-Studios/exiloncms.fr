@@ -7,14 +7,8 @@ import { Head } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import BlogThemeLayout from '@/layouts/BlogLayout';
-import { Hero } from '@/components/aceternity/Hero';
-import Features from '@/components/aceternity/Features';
-import FeaturesCards from '@/components/aceternity/FeaturesCards';
-import { BlogGrid } from '@/components/aceternity/BlogPostCard';
-import Feedbacks from '@/components/aceternity/Feedbacks';
-import FAQSection from '@/components/aceternity/FAQSection';
-import Contact from '@/components/aceternity/Contact';
-import { Pagination } from '@/components/ui/pagination';
+import { Link } from '@inertiajs/react';
+import { Calendar, User, ArrowRight } from 'lucide-react';
 
 interface BlogPost {
   id: number;
@@ -76,7 +70,54 @@ export default function BlogIndex({ posts }: BlogIndexProps) {
             Affichage de {posts.from} à {posts.to} sur {posts.total} articles
           </p>
         </div>
-        <BlogGrid posts={posts.data} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.data.map((post) => (
+            <Link
+              key={post.id}
+              href={route('blog.show', { slug: post.slug })}
+              className="group block"
+            >
+              <article className="h-full bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-all">
+                {post.featured_image && (
+                  <div className="aspect-video w-full overflow-hidden">
+                    <img
+                      src={post.featured_image}
+                      alt={post.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
+                <div className="p-6">
+                  {post.category && (
+                    <span className="text-xs font-medium text-primary mb-2 block">
+                      {post.category.name}
+                    </span>
+                  )}
+                  <h3 className="text-xl font-bold mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                    {post.title}
+                  </h3>
+                  {post.excerpt && (
+                    <p className="text-muted-foreground mb-4 line-clamp-3 text-sm">
+                      {post.excerpt}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <User className="h-3 w-3" />
+                      {post.author?.name}
+                    </div>
+                    {post.published_at && (
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(post.published_at).toLocaleDateString('fr-FR')}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </article>
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Pagination */}
