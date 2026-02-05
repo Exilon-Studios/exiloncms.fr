@@ -43,4 +43,5 @@ Route::name('admin.plugins.documentation.')->group(function () {
 
     // Locale management
     Route::post('/create-locale', [AdminDocumentationController::class, 'createLocale'])->name('create-locale');
+    Route::post('/duplicate-locale', [AdminDocumentationController::class, 'duplicateLocale'])->name('duplicate-locale');
 });

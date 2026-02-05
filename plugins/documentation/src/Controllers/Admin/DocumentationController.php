@@ -554,4 +554,53 @@ class DocumentationController
             'locale' => $locale,
         ]);
     }
+
+    /**
+     * Duplicate locale (language) from another language
+     */
+    public function duplicateLocale(Request $request)
+    {
+        $request->validate([
+            'source_locale' => 'required|string|min:2|max:10',
+            'target_locale' => 'required|string|min:2|max:10|different:source_locale',
+        ]);
+
+        $sourceLocale = strtolower($request->input('source_locale'));
+        $targetLocale = strtolower($request->input('target_locale'));
+
+        $sourcePath = base_path('docs/'.$sourceLocale);
+        $targetPath = base_path('docs/'.$targetLocale);
+
+        // Check if source locale exists
+        if (! File::exists($sourcePath)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('admin.documentation.messages.source_locale_not_found'),
+            ], 400);
+        }
+
+        // Check if target locale already exists
+        if (File::exists($targetPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => __('admin.documentation.messages.locale_exists'),
+            ], 400);
+        }
+
+        // Copy all files from source to target
+        File::copyDirectory($sourcePath, $targetPath);
+
+        // Clear cache for target locale
+        $this->cache->setLocale($targetLocale)->clearLocale($targetLocale);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('admin.documentation.messages.locale_duplicated', [
+                'source' => $sourceLocale,
+                'target' => $targetLocale,
+            ]),
+            'source_locale' => $sourceLocale,
+            'target_locale' => $targetLocale,
+        ]);
+    }
 }

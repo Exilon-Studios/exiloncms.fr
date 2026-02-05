@@ -241,6 +241,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
   // Language creation modal
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [newLocaleCode, setNewLocaleCode] = useState('');
+  const [duplicateFromLocale, setDuplicateFromLocale] = useState('');
   const [isCreatingLocale, setIsCreatingLocale] = useState(false);
 
   // Inline editing state
@@ -571,12 +572,22 @@ export default function DocumentationEditor({ locale, availableLocales, categori
     setIsCreatingLocale(true);
 
     try {
-      await router.post(route('admin.plugins.documentation.create-locale'), {
-        locale: newLocaleCode.toLowerCase(),
-      });
+      if (duplicateFromLocale) {
+        // Duplicate from existing locale
+        await router.post(route('admin.plugins.documentation.duplicate-locale'), {
+          source_locale: duplicateFromLocale,
+          target_locale: newLocaleCode.toLowerCase(),
+        });
+      } else {
+        // Create empty locale
+        await router.post(route('admin.plugins.documentation.create-locale'), {
+          locale: newLocaleCode.toLowerCase(),
+        });
+      }
 
       setShowLanguageModal(false);
       setNewLocaleCode('');
+      setDuplicateFromLocale('');
 
       // Reload page to show new locale
       window.location.href = route('admin.plugins.documentation.browse', { locale: newLocaleCode.toLowerCase() });
@@ -895,7 +906,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
             onClick={() => deleteNode(contextMenu.node!)}
           >
             <Trash2 className="h-4 w-4" />
-            {trans('admin.documentation.editor.delete')}
+            Delete
           </button>
         </div>
       )}
@@ -1011,11 +1022,31 @@ export default function DocumentationEditor({ locale, availableLocales, categori
                 Examples: en (English), es (Español), de (Deutsch), it (Italiano)
               </p>
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="duplicate-from">{trans('admin.documentation.locales.duplicate_from')}</Label>
+              <Select value={duplicateFromLocale} onValueChange={setDuplicateFromLocale}>
+                <SelectTrigger>
+                  <SelectValue placeholder={trans('admin.documentation.locales.duplicate_from_placeholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">{trans('admin.documentation.locales.create_empty')}</SelectItem>
+                  {availableLocales.map((loc) => (
+                    <SelectItem key={loc} value={loc}>
+                      {getLanguageName(loc)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                {trans('admin.documentation.locales.copy_from_hint')}
+              </p>
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setShowLanguageModal(false);
               setNewLocaleCode('');
+              setDuplicateFromLocale('');
             }}>
               {trans('admin.documentation.editor.cancel')}
             </Button>

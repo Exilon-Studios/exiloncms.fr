@@ -5,6 +5,16 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.87] - 2026-02-05
+
+### Added
+- **Language duplication feature**: Added ability to duplicate documentation from one language to another
+  - "Duplicate from" selector in language creation modal
+  - Copies entire folder structure and files from source locale
+  - Avoids recreating structure manually - just need to translate
+  - Backend route `admin.plugins.documentation.duplicate-locale`
+  - Translation keys for duplication messages
+
 ## [1.3.86] - 2026-02-05
 
 ### Added
