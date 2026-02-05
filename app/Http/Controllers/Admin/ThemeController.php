@@ -123,12 +123,7 @@ class ThemeController extends Controller
                 // File-based theme - use ThemeLoader
                 $theme = $themeLoader->getTheme($themeId);
 
-                // Check plugin dependencies before activation
-                $missingPlugins = $this->checkPluginDependencies($theme);
-                if (! empty($missingPlugins)) {
-                    return back()->with('error', 'This theme requires the following plugins to be enabled: '.implode(', ', $missingPlugins).'. Please enable them first.');
-                }
-
+                // Plugin dependencies check removed - themes can be activated without required plugins
                 $themeLoader->activateTheme($themeId);
             } else {
                 // Database theme - use model
