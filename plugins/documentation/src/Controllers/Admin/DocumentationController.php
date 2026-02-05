@@ -269,6 +269,52 @@ class DocumentationController
     }
 
     /**
+     * Store a new category (folder)
+     */
+    public function storeCategory(Request $request)
+    {
+        $request->validate([
+            'locale' => 'required|string',
+            'name' => 'required|string|min:1|max:255',
+            'slug' => 'required|string|min:1|max:255|regex:/^[a-z0-9-]+$/',
+        ]);
+
+        $locale = $request->input('locale');
+        $name = $request->input('name');
+        $slug = strtolower($request->input('slug'));
+
+        $categoryPath = base_path("docs/{$locale}/{$slug}");
+
+        // Check if category already exists
+        if (File::exists($categoryPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category already exists',
+            ], 400);
+        }
+
+        // Create category directory
+        File::makeDirectory($categoryPath, 0755, true);
+
+        // Create an index.md file with basic frontmatter
+        $indexContent = "---\ntitle: \"{$name}\"\ndescription: \"\"\norder: 999\n---\n\n# {$name}\n\n";
+        File::put($categoryPath.'/index.md', $indexContent);
+
+        // Clear cache
+        $this->cache->setLocale($locale)->clearLocale($locale);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Category created successfully',
+            'category' => [
+                'id' => $slug,
+                'title' => $name,
+                'slug' => $slug,
+            ],
+        ]);
+    }
+
+    /**
      * Delete a page
      */
     public function destroy(Request $request, string $locale, string $category, string $page)

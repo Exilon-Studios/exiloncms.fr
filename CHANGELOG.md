@@ -5,6 +5,37 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.85] - 2026-02-05
+
+### Added
+- **Documentation category/folder creation**: Added ability to create new categories from IDE editor
+  - New "New Folder" button in sidebar with FolderPlus icon
+  - Modal for entering folder name and slug
+  - Backend route `admin.plugins.documentation.category.store` for creating categories
+  - Creates category directory with index.md file
+- **Safe migration helpers**: Added `app/Helpers/migration.php` with safe migration functions
+  - `safe_drop_if_exists()` - checks if table has data before dropping
+  - `safe_modify_table()` - modifies tables without dropping them
+  - Prevents accidental data loss during migrations
+- **Visual folder distinction**: Folder icons now use Folder/FolderOpen based on expansion state
+  - Expanded folders show FolderOpen icon
+  - Collapsed folders show Folder icon
+  - Files show FileText icon
+  - File count displays "X pages" using translation
+
+### Changed
+- **Documentation translations**: Fixed translation system to use proper `trans()` function
+  - All hardcoded ternary operators replaced with `trans('admin.documentation.editor.*')` calls
+  - Added new translation keys: `new_file`, `new_folder`, `new_page`, `folder_name`, `folder_slug`, `unsaved`, etc.
+  - Translations properly loaded from core admin.php (not plugin-specific)
+  - Both EN and FR translations updated
+
+### Fixed
+- **Translation system in Documentation Editor**: Fixed hardcoded translations
+  - Was using `{locale === 'fr' ? '...' : '...'}` ternary operators
+  - Now uses proper `{trans('admin.documentation.editor.key')}` pattern
+  - Follows core CMS translation conventions
+
 ## [1.3.84] - 2026-02-05
 
 ### Fixed

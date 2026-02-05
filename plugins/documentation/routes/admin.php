@@ -19,6 +19,9 @@ Route::name('admin.plugins.documentation.')->group(function () {
     // Create new page (from IDE)
     Route::post('/', [AdminDocumentationController::class, 'store'])->name('store');
 
+    // Create new category/folder
+    Route::post('/category', [AdminDocumentationController::class, 'storeCategory'])->name('category.store');
+
     // Delete page
     Route::delete('/{locale}/{category}/{page}', [AdminDocumentationController::class, 'destroy'])
         ->name('destroy');

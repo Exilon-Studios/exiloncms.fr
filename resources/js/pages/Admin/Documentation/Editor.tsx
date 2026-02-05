@@ -8,12 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { FileText, Folder, Save, Eye, ChevronRight, File, FileCode, Plus, X } from 'lucide-react';
+import { FileText, Folder, FolderOpen, Save, Eye, ChevronRight, File, FileCode, Plus, X, Home, FolderPlus } from 'lucide-react';
 import { useState, FormEvent } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { route } from 'ziggy-js';
+import { trans } from '@/lib/i18n';
 
 interface Props {
   locale: string;
@@ -31,20 +32,20 @@ interface FileNode {
 
 // Dynamic locale labels
 const LOCALE_LABELS: Record<string, string> = {
-  fr: 'Français',
-  en: 'English',
-  es: 'Español',
-  de: 'Deutsch',
-  it: 'Italiano',
-  pt: 'Português',
-  nl: 'Nederlands',
-  pl: 'Polski',
-  ru: 'Русский',
-  zh: '中文',
-  ja: '日本語',
-  ko: '한국어',
-  ar: 'العربية',
-  tr: 'Türkçe',
+  fr: 'FR',
+  en: 'EN',
+  es: 'ES',
+  de: 'DE',
+  it: 'IT',
+  pt: 'PT',
+  nl: 'NL',
+  pl: 'PL',
+  ru: 'RU',
+  zh: 'CN',
+  ja: 'JP',
+  ko: 'KO',
+  ar: 'AR',
+  tr: 'TR',
 };
 
 export default function DocumentationEditor({ locale, availableLocales, categories }: Props) {
@@ -54,9 +55,13 @@ export default function DocumentationEditor({ locale, availableLocales, categori
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [showNewFileModal, setShowNewFileModal] = useState(false);
+  const [showNewFolderModal, setShowNewFolderModal] = useState(false);
   const [newFileName, setNewFileName] = useState('');
   const [newFileCategory, setNewFileCategory] = useState('');
+  const [newFolderName, setNewFolderName] = useState('');
+  const [newFolderSlug, setNewFolderSlug] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
 
   const toggleFolder = (path: string) => {
     const newExpanded = new Set(expandedFolders);
@@ -112,10 +117,14 @@ export default function DocumentationEditor({ locale, availableLocales, categori
                   expandedFolders.has(node.path) ? 'rotate-90' : ''
                 }`}
               />
-              <Folder className="h-4 w-4 text-blue-500" />
+              {expandedFolders.has(node.path) ? (
+                <FolderOpen className="h-4 w-4 text-blue-500" />
+              ) : (
+                <Folder className="h-4 w-4 text-blue-500" />
+              )}
               <span className="text-sm font-medium">{node.name}</span>
               <span className="text-xs text-muted-foreground ml-auto">
-                {node.children?.length || 0} files
+                {node.children?.length || 0} {trans('admin.documentation.pages')}
               </span>
             </div>
             {expandedFolders.has(node.path) && node.children && (
@@ -206,7 +215,6 @@ export default function DocumentationEditor({ locale, availableLocales, categori
       const slug = newFileName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const filePath = `${newFileCategory}/${slug}`;
 
-      // Create with default content
       await router.post(route('admin.plugins.documentation.store'), {
         locale,
         category: newFileCategory,
@@ -229,38 +237,51 @@ export default function DocumentationEditor({ locale, availableLocales, categori
     router.get(route('admin.plugins.documentation.browse', { locale: newLocale }));
   };
 
+  const createNewFolder = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!newFolderName || !newFolderSlug) return;
+
+    setIsCreatingFolder(true);
+
+    try {
+      await router.post(route('admin.plugins.documentation.category.store'), {
+        locale,
+        name: newFolderName,
+        slug: newFolderSlug,
+      });
+
+      setShowNewFolderModal(false);
+      setNewFolderName('');
+      setNewFolderSlug('');
+      window.location.reload();
+    } catch (error) {
+      console.error('Failed to create folder:', error);
+      setIsCreatingFolder(false);
+    }
+  };
+
   return (
     <>
-      <Head title={`Documentation Editor (${locale.toUpperCase()})`} />
+      <Head title={`${trans('admin.documentation.editor.title')} (${locale.toUpperCase()})`} />
 
       {/* Full-screen IDE layout */}
       <div className="h-screen flex flex-col bg-background">
         {/* Top Header Bar */}
         <div className="h-14 border-b border-border bg-background px-4 flex items-center justify-between">
-          {/* Left: Back + Title + Locale */}
+          {/* Left: Back + Title */}
           <div className="flex items-center gap-4">
             <Link href={route('admin.plugins.documentation.index')}>
               <Button variant="ghost" size="sm">
-                ← Back
+                <Home className="h-4 w-4 mr-2" />
+                {trans('admin.documentation.editor.back_to_admin')}
               </Button>
             </Link>
 
             <div className="h-6 w-px bg-border"></div>
 
-            <h1 className="text-sm font-semibold">Documentation</h1>
-
-            <Select value={locale} onValueChange={changeLocale}>
-              <SelectTrigger className="w-32 h-8">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {availableLocales.map((loc) => (
-                  <SelectItem key={loc} value={loc}>
-                    {loc.toUpperCase()}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <h1 className="text-sm font-semibold">
+              {trans('admin.documentation.title')}
+            </h1>
           </div>
 
           {/* Right: Actions */}
@@ -268,7 +289,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
             {selectedFile && (
               <>
                 {hasUnsavedChanges && (
-                  <span className="text-xs text-orange-500">● Unsaved</span>
+                  <span className="text-xs text-orange-500">● {trans('admin.documentation.editor.unsaved')}</span>
                 )}
                 <Button
                   variant="outline"
@@ -278,7 +299,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
                   className="h-8"
                 >
                   <Save className="h-4 w-4 mr-2" />
-                  {isSaving ? 'Saving...' : 'Save'}
+                  {isSaving ? trans('admin.documentation.editor.saving') : trans('admin.documentation.editor.save')}
                 </Button>
                 <Button
                   variant="outline"
@@ -293,7 +314,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
                   className="h-8"
                 >
                   <Eye className="h-4 w-4 mr-2" />
-                  Preview
+                  {trans('admin.documentation.editor.preview')}
                 </Button>
               </>
             )}
@@ -304,19 +325,47 @@ export default function DocumentationEditor({ locale, availableLocales, categori
         <div className="flex-1 flex overflow-hidden">
           {/* Left Sidebar - File Tree (280px) */}
           <div className="w-[280px] border-r border-border flex flex-col bg-muted/30">
+            {/* Locale Selector */}
+            <div className="p-3 border-b border-border">
+              <Select value={locale} onValueChange={changeLocale}>
+                <SelectTrigger className="w-full h-9">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableLocales.map((loc) => (
+                    <SelectItem key={loc} value={loc}>
+                      {loc.toUpperCase()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* File Tree Header */}
             <div className="p-3 border-b border-border flex items-center justify-between">
               <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-                Files
+                {trans('admin.documentation.editor.files')}
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 px-2"
-                onClick={() => setShowNewFileModal(true)}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setShowNewFolderModal(true)}
+                  title={trans('admin.documentation.editor.new_folder')}
+                >
+                  <FolderPlus className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2"
+                  onClick={() => setShowNewFileModal(true)}
+                  title={trans('admin.documentation.editor.new_file')}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* File Tree */}
@@ -326,7 +375,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
               ) : (
                 <div className="text-center py-8 text-muted-foreground text-sm">
                   <FileCode className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  No files found
+                  {trans('admin.documentation.editor.no_files')}
                 </div>
               )}
             </div>
@@ -354,7 +403,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
                       setFileContent(e.target.value);
                       setHasUnsavedChanges(true);
                     }}
-                    placeholder="# Markdown content"
+                    placeholder={`# ${trans('admin.documentation.editor.markdown_placeholder')}`}
                     className="w-full h-full font-mono text-sm p-4 border-0 rounded-none resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   />
                 </div>
@@ -363,19 +412,30 @@ export default function DocumentationEditor({ locale, availableLocales, categori
               <div className="h-full flex items-center justify-center text-muted-foreground">
                 <div className="text-center">
                   <FileCode className="h-16 w-16 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-semibold mb-2">Select a file to edit</p>
-                  <p className="text-sm text-muted-foreground">
-                    Choose a file from the file tree or create a new one
+                  <p className="text-lg font-semibold mb-2">
+                    {trans('admin.documentation.editor.select_file')}
                   </p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-4"
-                    onClick={() => setShowNewFileModal(true)}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    New File
-                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    {trans('admin.documentation.editor.select_file_hint')}
+                  </p>
+                  <div className="flex items-center justify-center gap-2 mt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowNewFolderModal(true)}
+                    >
+                      <FolderPlus className="h-4 w-4 mr-2" />
+                      {trans('admin.documentation.editor.new_folder')}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowNewFileModal(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      {trans('admin.documentation.editor.new_file')}
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
@@ -388,7 +448,9 @@ export default function DocumentationEditor({ locale, availableLocales, categori
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-background rounded-lg shadow-lg w-full max-w-md p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Create New Page</h2>
+              <h2 className="text-lg font-semibold">
+                {trans('admin.documentation.editor.new_page')}
+              </h2>
               <Button
                 variant="ghost"
                 size="sm"
@@ -400,18 +462,22 @@ export default function DocumentationEditor({ locale, availableLocales, categori
 
             <form onSubmit={createNewFile} className="space-y-4">
               <div>
-                <Label htmlFor="fileName">Page Title</Label>
+                <Label htmlFor="fileName">
+                  {trans('admin.documentation.editor.page_name')}
+                </Label>
                 <Input
                   id="fileName"
                   value={newFileName}
                   onChange={(e) => setNewFileName(e.target.value)}
-                  placeholder="My Page"
+                  placeholder={trans('admin.documentation.editor.title_placeholder')}
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="fileCategory">Category</Label>
+                <Label htmlFor="fileCategory">
+                  {trans('admin.documentation.editor.category')}
+                </Label>
                 <select
                   id="fileCategory"
                   value={newFileCategory}
@@ -419,7 +485,9 @@ export default function DocumentationEditor({ locale, availableLocales, categori
                   className="w-full px-3 py-2 rounded-md border border-input bg-background"
                   required
                 >
-                  <option value="">Select a category</option>
+                  <option value="">
+                    {trans('admin.documentation.editor.select_category')}
+                  </option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                       {cat.title}
@@ -434,10 +502,71 @@ export default function DocumentationEditor({ locale, availableLocales, categori
                   variant="outline"
                   onClick={() => setShowNewFileModal(false)}
                 >
-                  Cancel
+                  {trans('admin.documentation.editor.cancel')}
                 </Button>
                 <Button type="submit" disabled={isCreating || !newFileName || !newFileCategory}>
-                  {isCreating ? 'Creating...' : 'Create'}
+                  {isCreating ? trans('admin.documentation.editor.creating') : trans('admin.documentation.editor.create')}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* New Folder Modal */}
+      {showNewFolderModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-background rounded-lg shadow-lg w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">
+                {trans('admin.documentation.editor.new_folder')}
+              </h2>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowNewFolderModal(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+
+            <form onSubmit={createNewFolder} className="space-y-4">
+              <div>
+                <Label htmlFor="folderName">
+                  {trans('admin.documentation.editor.folder_name')}
+                </Label>
+                <Input
+                  id="folderName"
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  placeholder={trans('admin.documentation.editor.folder_name_placeholder')}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="folderSlug">
+                  {trans('admin.documentation.editor.folder_slug')}
+                </Label>
+                <Input
+                  id="folderSlug"
+                  value={newFolderSlug}
+                  onChange={(e) => setNewFolderSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-'))}
+                  placeholder={trans('admin.documentation.editor.folder_slug_placeholder')}
+                  required
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowNewFolderModal(false)}
+                >
+                  {trans('admin.documentation.editor.cancel')}
+                </Button>
+                <Button type="submit" disabled={isCreatingFolder || !newFolderName || !newFolderSlug}>
+                  {isCreatingFolder ? trans('admin.documentation.editor.creating') : trans('admin.documentation.editor.create')}
                 </Button>
               </div>
             </form>

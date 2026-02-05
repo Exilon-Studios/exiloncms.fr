@@ -651,6 +651,70 @@ import { PageProps } from '@/types';
 - `HasUser`, `Loggable`, `HasImage`, `HasMarkdown`
 - `InteractsWithMoney`, `TwoFactorAuthenticatable`
 
+### Database Migrations
+
+**CRITICAL: Migration Safety Rules** 🔴
+
+**NEVER use destructive operations in migrations:**
+- ❌ `Schema::dropIfExists()` - Destroys data if table exists
+- ❌ `DROP TABLE` - Direct SQL table deletion
+- ❌ `TRUNCATE` - Clears all data
+- ❌ `DELETE without WHERE` - Deletes all rows
+
+**USE safe helpers instead:**
+```php
+// Check if table exists before modifying
+Schema::hasTable('users'); // bool
+
+// Safe table modification (create or modify)
+safe_modify_table('users', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->text('description')->nullable();
+});
+
+// Add column only if it doesn't exist
+Schema::table('users', function (Blueprint $table) {
+    if (!Schema::hasColumn('users', 'new_column')) {
+        $table->string('new_column')->nullable();
+    }
+});
+```
+
+**For plugin migrations:**
+- Plugins MUST use additive migrations only
+- Check for existence before adding columns
+- NEVER drop core tables
+- Plugin data tables should be created with `Schema::create()` (not `dropIfExists`)
+
+**Safe migration pattern:**
+```php
+// ✅ GOOD - Check before creating
+Schema::create('my_table', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+});
+
+// Or better - use Schema::hasTable() check
+if (!Schema::hasTable('my_table')) {
+    Schema::create('my_table', function (Blueprint $table) {
+        $table->id();
+        $table->string('name');
+    });
+}
+
+// ❌ BAD - Destroys data
+Schema::dropIfExists('my_table');
+Schema::create('my_table', function (Blueprint $table) {
+    // ...
+});
+```
+
+**UpdateManager behavior during updates:**
+- Runs `php artisan migrate --force` automatically
+- **Your data will be LOST** if migrations use `dropIfExists()`
+- Always backup before updating!
+
 ### 13. Settings System
 
 Settings are stored in the `settings` table and accessed via helper:
