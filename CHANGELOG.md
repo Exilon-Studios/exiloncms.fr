@@ -5,6 +5,20 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.75] - 2026-02-05
+
+### Fixed
+- **Documentation plugin pages**: Created missing React pages for documentation admin
+  - Added `Admin/Plugins/Documentation/Config.tsx` for plugin settings
+  - Added `Admin/Documentation/Create.tsx` for creating new docs pages
+  - Added `Admin/Documentation/Edit.tsx` for editing docs pages
+  - Moved Browse.tsx, Cache.tsx, Index.tsx to correct locations
+- **Missing UI components**: Created `Collapsible` component using @radix-ui/react-collapsible
+- **Translations**: Replaced hardcoded text with `trans()` calls in Updates page
+  - Added `admin.updates.up_to_date` and `admin.updates.latest_version` translation keys
+  - Both English and French translations included
+- **Icons**: Fixed `IconRefreshCw` import error (replaced with `IconRefresh`)
+
 ## [1.3.74] - 2026-02-05
 
 ### Fixed
