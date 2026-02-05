@@ -67,7 +67,7 @@
         "files": [
             "app/color_helpers.php",
             "app/helpers.php",
-            "app/helpers/migration.php"
+            "app/Helpers/migration.php"
         ]
     },
     "autoload-dev": {
