@@ -5,6 +5,13 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.74] - 2026-02-05
+
+### Fixed
+- **Rebuild release**: v1.3.73 release was created before recent commits were pushed
+  - All fixes from v1.3.73 are now properly included in this release
+  - Includes documentation routes fix, editor link fix, and update section removal
+
 ## [1.3.73] - 2026-02-05
 
 ### Fixed
