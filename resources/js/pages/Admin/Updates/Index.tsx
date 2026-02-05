@@ -220,27 +220,17 @@ export default function UpdatesIndex({ currentVersion, lastVersion, hasUpdate, i
 
         <Card>
           <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="h-8 w-8 text-green-500" />
-                  <div>
-                    <h3 className="font-semibold">Up to Date</h3>
-                    <p className="text-sm text-muted-foreground">
-                      You're running the latest version of ExilonCMS
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  onClick={handleFetch}
-                  variant="outline"
-                  disabled={progress.step !== 'idle'}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${progress.step === 'idle' ? '' : 'animate-spin'}`} />
-                  Check Again
-                </Button>
+            <div className="flex items-center gap-3">
+              <CheckCircle className="h-8 w-8 text-green-500" />
+              <div>
+                <h3 className="font-semibold">Up to Date</h3>
+                <p className="text-sm text-muted-foreground">
+                  You're running the latest version of ExilonCMS
+                </p>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </AuthenticatedLayout>
   );
