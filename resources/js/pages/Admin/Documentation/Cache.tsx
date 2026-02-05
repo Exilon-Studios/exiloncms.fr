@@ -1,7 +1,7 @@
 import { Head, usePage, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
-import { IconDatabase, IconRefreshCw, IconTrash, IconCheck } from '@tabler/icons-react';
+import { IconDatabase, IconRefresh, IconTrash, IconCheck } from '@tabler/icons-react';
 import { useState } from 'react';
 
 interface Props {
@@ -125,7 +125,7 @@ export default function DocumentationCache({ stats }: Props) {
             disabled={warming}
             className="p-4 border rounded-lg hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
           >
-            <IconRefreshCw className="h-5 w-5" />
+            <IconRefresh className="h-5 w-5" />
             <div className="text-left">
               <p className="font-medium">Précharger le cache</p>
               <p className="text-sm text-muted-foreground">
