@@ -5,6 +5,57 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.86] - 2026-02-05
+
+### Added
+- **Documentation language creation**: Added ability to create new languages directly from documentation editor
+  - New "Add Language" button in locale selector
+  - Modal for entering language code (e.g., en, es, de)
+  - Automatically creates locale directory with default category
+- **Full language names in selector**: Language selector now shows full names instead of codes
+  - Français instead of FR
+  - English instead of EN
+  - Supports all common languages with proper display names
+- **Context menu for files/folders**: Right-click context menu for documentation items
+  - Create new file in folder
+  - Rename files and folders
+  - Delete files and folders with confirmation
+  - Red styled delete option
+- **Drag-and-drop support**: Basic drag-and-drop support for file tree using @dnd-kit
+  - Files and folders can be dragged (move logic pending backend implementation)
+  - Visual feedback during drag operation
+- **Language name translations**: Added comprehensive language name mappings
+  - Support for 11 common languages (fr, en, es, de, it, pt, ru, zh, ja, ko, ar)
+  - Easy to extend with additional languages
+
+### Changed
+- **Documentation routes**: Fixed route prefix issue causing 404 errors
+  - Removed duplicate prefix('docs') from documentation web routes
+  - Routes now correctly accessible at /documentation/* instead of /documentation/docs/*
+  - Public documentation now works at /documentation/{locale}/{category}/{page}
+- **Hardcoded toast messages**: All controller messages now use translations
+  - Page updated/created/deleted messages
+  - Cache cleared/warmed messages
+  - Category/locale creation messages
+  - All messages now properly translated via __('admin.documentation.messages.*')
+
+### Fixed
+- **React error #308**: Fixed i18n system to handle calls outside React context
+  - `trans()` function now falls back to `transStatic()` when called outside components
+  - Prevents crash when `usePage()` hook cannot be used
+  - Updates page now works without errors
+- **Documentation controller translations**: Replaced all hardcoded French text with translations
+  - Cache warmed message now uses parameter replacement
+  - All success/error messages use __() helper
+  - Added missing translation keys to EN and FR admin.php files
+- **Back to Admin and Preview buttons**: Fixed navigation buttons in documentation editor
+  - Back to Admin button now correctly routes to admin.plugins.documentation.index
+  - Preview button opens documentation in new tab at correct URL
+- **Folder deletion**: Implemented recursive folder deletion
+  - Deletes all files in folder before removing folder
+  - Shows confirmation dialog with folder name
+  - Properly cleans up index.md file
+
 ## [1.3.85] - 2026-02-05
 
 ### Added

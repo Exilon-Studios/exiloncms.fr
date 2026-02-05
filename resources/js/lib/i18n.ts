@@ -87,12 +87,18 @@ export function transStatic(key: string, replacements?: Record<string, string | 
 /**
  * Translation helper for use inside React components
  * Uses the usePage hook to access current page props
+ * Falls back to transStatic if called outside React context
  */
 export function trans(key: string, replacements?: Record<string, string | number> | string[]): string {
-  const { props } = usePage();
-  const translations = props.trans as Record<string, any>;
-  const value = getTranslation(translations, key);
-  return applyReplacements(value, replacements);
+  try {
+    const { props } = usePage();
+    const translations = props.trans as Record<string, any>;
+    const value = getTranslation(translations, key);
+    return applyReplacements(value, replacements);
+  } catch (error) {
+    // Called outside React context, use static version
+    return transStatic(key, replacements);
+  }
 }
 
 /**

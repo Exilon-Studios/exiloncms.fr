@@ -4,7 +4,8 @@ use ExilonCMS\Plugins\Documentation\Controllers\DocumentationController;
 use Illuminate\Support\Facades\Route;
 
 // Documentation routes - middleware pour vérifier si le plugin est activé
-Route::middleware(['documentation.enabled'])->prefix('docs')->name('docs.')->group(function () {
+// Note: PluginServiceProvider automatically adds prefix based on plugin ID (e.g., /documentation)
+Route::middleware(['documentation.enabled'])->name('docs.')->group(function () {
     // Index page
     Route::get('/', [DocumentationController::class, 'index'])->name('index');
 
@@ -27,8 +28,3 @@ Route::middleware(['documentation.enabled'])->prefix('docs')->name('docs.')->gro
     Route::get('/search/{locale?}', [DocumentationController::class, 'search'])
         ->name('search');
 });
-
-// Default locale redirect
-Route::get('/docs/{locale}', function ($locale) {
-    return redirect()->route('docs.index', ['locale' => $locale]);
-})->name('docs.locale');

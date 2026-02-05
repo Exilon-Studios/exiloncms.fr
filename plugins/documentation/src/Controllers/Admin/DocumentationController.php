@@ -204,7 +204,7 @@ class DocumentationController
         $this->cache->setLocale($locale)->clearPage($locale, $category, $page);
 
         return redirect()->back()
-            ->with('success', 'Page mise à jour avec succès.');
+            ->with('success', __('admin.documentation.messages.page_updated'));
     }
 
     /**
@@ -242,7 +242,7 @@ class DocumentationController
 
         if (File::exists($pagePath)) {
             return redirect()->back()
-                ->with('error', 'Cette page existe déjà.');
+                ->with('error', __('admin.documentation.messages.page_exists'));
         }
 
         // Create directory if not exists
@@ -265,7 +265,7 @@ class DocumentationController
         $this->cache->setLocale($locale)->clearLocale($locale);
 
         return redirect()->route('admin.plugins.documentation.browse', ['locale' => $locale])
-            ->with('success', 'Page créée avec succès.');
+            ->with('success', __('admin.documentation.messages.page_created'));
     }
 
     /**
@@ -289,7 +289,7 @@ class DocumentationController
         if (File::exists($categoryPath)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Category already exists',
+                'message' => __('admin.documentation.messages.category_exists'),
             ], 400);
         }
 
@@ -305,7 +305,7 @@ class DocumentationController
 
         return response()->json([
             'success' => true,
-            'message' => 'Category created successfully',
+            'message' => __('admin.documentation.messages.category_created'),
             'category' => [
                 'id' => $slug,
                 'title' => $name,
@@ -323,7 +323,7 @@ class DocumentationController
 
         if (! File::exists($pagePath)) {
             return redirect()->back()
-                ->with('error', 'Page non trouvée.');
+                ->with('error', __('admin.documentation.messages.file_not_found'));
         }
 
         File::delete($pagePath);
@@ -332,7 +332,7 @@ class DocumentationController
         $this->cache->setLocale($locale)->clearPage($locale, $category, $page);
 
         return redirect()->back()
-            ->with('success', 'Page supprimée avec succès.');
+            ->with('success', __('admin.documentation.messages.page_deleted'));
     }
 
     /**
@@ -353,7 +353,7 @@ class DocumentationController
         $this->cache->clear();
 
         return redirect()->back()
-            ->with('success', 'Cache vidé avec succès.');
+            ->with('success', __('admin.documentation.messages.cache_cleared'));
     }
 
     /**
@@ -364,7 +364,11 @@ class DocumentationController
         $stats = $this->cache->warm();
 
         return redirect()->back()
-            ->with('success', "Cache préchargé : {$stats['locales']} locales, {$stats['categories']} catégories, {$stats['pages']} pages.");
+            ->with('success', __('admin.documentation.messages.cache_warmed', [
+                'locales' => $stats['locales'],
+                'categories' => $stats['categories'],
+                'pages' => $stats['pages'],
+            ]));
     }
 
     /**
@@ -529,7 +533,7 @@ class DocumentationController
         if (File::exists($docsPath)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Locale already exists',
+                'message' => __('admin.documentation.messages.locale_exists'),
             ], 400);
         }
 
@@ -546,7 +550,7 @@ class DocumentationController
 
         return response()->json([
             'success' => true,
-            'message' => 'Locale created successfully',
+            'message' => __('admin.documentation.messages.locale_created'),
             'locale' => $locale,
         ]);
     }
