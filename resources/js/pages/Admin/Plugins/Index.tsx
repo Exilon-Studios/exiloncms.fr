@@ -69,15 +69,7 @@ export default function PluginsIndex({ plugins }: Props) {
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-lg flex items-center gap-2">
-                      {plugin.name}
-                      <Badge
-                        variant={plugin.enabled ? 'default' : 'secondary'}
-                        className={plugin.enabled ? 'bg-green-500 hover:bg-green-600' : ''}
-                      >
-                        {plugin.enabled ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-                      </Badge>
-                    </CardTitle>
+                    <CardTitle className="text-lg">{plugin.name}</CardTitle>
                     <CardDescription className="mt-2">{plugin.description}</CardDescription>
                   </div>
                 </div>
