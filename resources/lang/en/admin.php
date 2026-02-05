@@ -903,6 +903,8 @@ return [
         ],
         'updates' => [
             'installed' => 'Updates installed',
+            'up_to_date' => 'Up to date',
+            'latest_version' => 'You\'re running the latest version of ExilonCMS',
         ],
         'plugins' => [
             'enabled' => 'Plugin enabled',

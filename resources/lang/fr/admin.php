@@ -478,6 +478,8 @@ return [
         ],
         'updates' => [
             'installed' => 'Mises à jour installées',
+            'up_to_date' => 'À jour',
+            'latest_version' => 'Vous utilisez la dernière version d\'ExilonCMS',
         ],
     ],
     'bans' => [
