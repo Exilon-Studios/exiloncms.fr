@@ -5,6 +5,18 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.79] - 2026-02-05
+
+### Fixed
+- **Default theme visible**: Added default core theme to themes list in admin
+  - Theme now appears in /admin/themes page as "Core Theme"
+  - Shows as "Theme par défaut d'ExilonCMS" with current CMS version
+  - Properly marked as active when selected
+- **Documentation routes**: Fixed route names for documentation plugin
+  - Changed from `plugins.documentation.*` to `admin.plugins.documentation.*`
+  - Fixes Ziggy route errors when accessing documentation admin pages
+  - All documentation admin pages now work correctly (index, settings, browse, create, edit, cache)
+
 ## [1.3.78] - 2026-02-05
 
 ### Changed
