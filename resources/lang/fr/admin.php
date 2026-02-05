@@ -998,6 +998,7 @@ return [
             'cancel' => 'Annuler',
             'create' => 'Créer',
             'creating' => 'Création...',
+            'delete' => 'Supprimer',
         ],
         'messages' => [
             'page_updated' => 'Page mise à jour avec succès.',

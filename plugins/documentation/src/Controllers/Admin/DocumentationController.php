@@ -310,6 +310,7 @@ class DocumentationController
                 'id' => $slug,
                 'title' => $name,
                 'slug' => $slug,
+                'pages' => [],
             ],
         ]);
     }
@@ -376,15 +377,24 @@ class DocumentationController
      */
     public function fileTree(Request $request, string $locale = 'fr')
     {
-        $docsPath = base_path('docs/'.$locale);
+        try {
+            $docsPath = base_path('docs/'.$locale);
 
-        if (! File::exists($docsPath)) {
-            return response()->json(['tree' => []]);
+            if (! File::exists($docsPath)) {
+                return response()->json(['tree' => []]);
+            }
+
+            $tree = $this->buildFileTree($docsPath, $locale);
+
+            return response()->json(['tree' => $tree]);
+        } catch (\Exception $e) {
+            \Log::error('Failed to build file tree: '.$e->getMessage(), [
+                'locale' => $locale,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json(['tree' => []], 200);
         }
-
-        $tree = $this->buildFileTree($docsPath, $locale);
-
-        return response()->json(['tree' => $tree]);
     }
 
     /**
@@ -406,10 +416,20 @@ class DocumentationController
             $name = basename($directory);
             $relativeName = $relativePath ? $relativePath.'/'.$name : $name;
 
+            // Try to read title from index.md
+            $title = $name; // Default to folder name
+            $indexPath = $directory.'/index.md';
+            if (File::exists($indexPath)) {
+                $content = File::get($indexPath);
+                $frontmatter = $this->reader->parseFrontmatter($content);
+                $title = $frontmatter['title'] ?? $name;
+            }
+
             $items[] = [
                 'type' => 'directory',
-                'name' => $name,
+                'name' => $title, // Use title from index.md
                 'path' => $relativeName,
+                'title' => $title, // Add title field for consistency
                 'children' => $this->buildFileTree($directory, $locale, $relativeName),
             ];
         }

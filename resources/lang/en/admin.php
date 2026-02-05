@@ -1462,6 +1462,7 @@ return [
             'cancel' => 'Cancel',
             'create' => 'Create',
             'creating' => 'Creating...',
+            'delete' => 'Delete',
         ],
         'messages' => [
             'page_updated' => 'Page updated successfully.',

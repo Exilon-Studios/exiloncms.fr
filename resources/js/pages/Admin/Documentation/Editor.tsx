@@ -228,7 +228,8 @@ export default function DocumentationEditor({ locale, availableLocales, categori
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
-  const [categories, setCategories] = useState(initialCategories);
+  // Ensure categories is always an array
+  const [categories, setCategories] = useState(Array.isArray(initialCategories) ? initialCategories : []);
 
   // New file/folder modals
   const [showNewFolderModal, setShowNewFolderModal] = useState(false);
@@ -288,18 +289,22 @@ export default function DocumentationEditor({ locale, availableLocales, categori
       const response = await fetch(route('admin.plugins.documentation.tree', { locale: locale || 'fr' }));
       if (response.ok) {
         const data = await response.json();
-        const newCategories = data.tree.map((node: any) => ({
+        // Ensure tree is an array
+        const tree = Array.isArray(data.tree) ? data.tree : [];
+        const newCategories = tree.map((node: any) => ({
           id: node.path,
-          title: node.name,
-          pages: node.children?.map((child: any) => ({
+          title: node.title || node.name,
+          pages: Array.isArray(node.children) ? node.children.map((child: any) => ({
             slug: child.slug || child.name.replace('.md', ''),
             title: child.title || child.name.replace('.md', ''),
-          })) || [],
+          })) : [],
         }));
         setCategories(newCategories);
       }
     } catch (error) {
       console.error('Failed to reload categories:', error);
+      // Set empty array on error to prevent crashes
+      setCategories([]);
     }
   }, [locale]);
 
@@ -523,16 +528,30 @@ export default function DocumentationEditor({ locale, availableLocales, categori
     try {
       const slug = fileName.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-      await router.post(route('admin.plugins.documentation.store'), {
-        locale,
-        category: parentPath,
-        filename: slug,
-        title: fileName,
-        content: `# ${fileName}\n\nWrite your content here.`,
+      const response = await fetch(route('admin.plugins.documentation.store'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || ''
+        },
+        body: JSON.stringify({
+          locale,
+          category: parentPath,
+          filename: slug,
+          title: fileName,
+          content: `# ${fileName}\n\nWrite your content here.`,
+        }),
       });
 
-      await reloadCategories();
-      setExpandedFolders(prev => new Set([...prev, parentPath]));
+      if (response.ok) {
+        setShowNewFileModal(false);
+        setNewFileName('');
+        setSelectedFolderForFile(null);
+        await reloadCategories();
+        setExpandedFolders(prev => new Set([...prev, parentPath]));
+      } else {
+        console.error('Failed to create file');
+      }
 
     } catch (error) {
       console.error('Failed to create file:', error);
@@ -547,17 +566,30 @@ export default function DocumentationEditor({ locale, availableLocales, categori
     setIsCreating(true);
 
     try {
-      await router.post(route('admin.plugins.documentation.category.store'), {
-        locale,
-        name: newFolderName,
-        slug: newFolderSlug,
+      const response = await fetch(route('admin.plugins.documentation.category.store'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || ''
+        },
+        body: JSON.stringify({
+          locale,
+          name: newFolderName,
+          slug: newFolderSlug,
+        }),
       });
 
-      setShowNewFolderModal(false);
-      setNewFolderName('');
-      setNewFolderSlug('');
+      const data = await response.json();
 
-      await reloadCategories();
+      if (response.ok && data.success) {
+        setShowNewFolderModal(false);
+        setNewFolderName('');
+        setNewFolderSlug('');
+        await reloadCategories();
+      } else {
+        // Show error
+        console.error('Failed to create folder:', data.message);
+      }
 
     } catch (error) {
       console.error('Failed to create folder:', error);
@@ -906,7 +938,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
             onClick={() => deleteNode(contextMenu.node!)}
           >
             <Trash2 className="h-4 w-4" />
-            Delete
+            {trans('admin.documentation.editor.delete')}
           </button>
         </div>
       )}
@@ -1024,12 +1056,12 @@ export default function DocumentationEditor({ locale, availableLocales, categori
             </div>
             <div className="space-y-2">
               <Label htmlFor="duplicate-from">{trans('admin.documentation.locales.duplicate_from')}</Label>
-              <Select value={duplicateFromLocale} onValueChange={setDuplicateFromLocale}>
+              <Select value={duplicateFromLocale || 'none'} onValueChange={(val) => setDuplicateFromLocale(val === 'none' ? '' : val)}>
                 <SelectTrigger>
                   <SelectValue placeholder={trans('admin.documentation.locales.duplicate_from_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">{trans('admin.documentation.locales.create_empty')}</SelectItem>
+                  <SelectItem value="none">{trans('admin.documentation.locales.create_empty')}</SelectItem>
                   {availableLocales.map((loc) => (
                     <SelectItem key={loc} value={loc}>
                       {getLanguageName(loc)}

@@ -5,6 +5,34 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.88] - 2026-02-05
+
+### Fixed
+- **Select.Item empty value error**: Fixed language duplication dropdown using empty string value
+  - Changed from empty string to "none" value for Create empty option
+  - Properly handles Select.Item value requirements
+- **Folder creation JSON response**: Fixed folder creation returning plain JSON instead of handling response properly
+  - Changed from router.post to fetch for proper JSON handling
+  - Modal now closes correctly after folder creation
+- **Folder name display**: Fixed folder names showing slug instead of title
+  - Backend now reads title from index.md frontmatter
+  - Folders display proper human-readable names (e.g., "Getting Started" instead of "getting-started")
+  - Added title field to directory tree nodes
+- **t.map is not a function error**: Fixed error when clicking on empty folders or loading file tree
+  - Added array type checking for categories prop
+  - Ensured categories is always initialized as array
+  - Added fallback for missing or malformed data
+- **500 Internal Server Error on tree endpoint**: Added error handling and logging
+  - Wrapped fileTree method in try-catch
+  - Returns empty array on error instead of crashing
+  - Logs error details for debugging
+- **Hardcoded translations**: Removed hardcoded "Delete" text in context menu
+  - Now uses trans('admin.documentation.editor.delete')
+  - Added missing translation keys in FR and EN
+- **Editor link in navbar**: Removed Editor link from Documentation dropdown menu
+  - Menu now only shows: Browse, Configuration, Cache
+  - Cleaner navigation without redundant links
+
 ## [1.3.87] - 2026-02-05
 
 ### Added

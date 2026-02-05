@@ -80,22 +80,16 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         ),
         children: [
           {
-            label: trans('admin.documentation.menu.editor'),
-            href: '/admin/plugins/documentation/create',
+            label: trans('admin.documentation.menu.browse'),
+            href: '/admin/plugins/documentation/browse',
             permission: 'admin.settings',
-            icon: <IconFileText className="h-4 w-4" />,
+            icon: <IconFolder className="h-4 w-4" />,
           },
           {
             label: trans('admin.documentation.menu.configuration'),
             href: '/admin/plugins/documentation/settings',
             permission: 'admin.settings',
             icon: <IconSettings className="h-4 w-4" />,
-          },
-          {
-            label: trans('admin.documentation.menu.browse'),
-            href: '/admin/plugins/documentation/browse',
-            permission: 'admin.settings',
-            icon: <IconFolder className="h-4 w-4" />,
           },
           {
             label: trans('admin.documentation.menu.cache'),
