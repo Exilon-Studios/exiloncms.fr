@@ -42,6 +42,21 @@ class ThemeController extends Controller
             'type_label' => 'File Theme',
         ])->values();
 
+        // Add default theme (built into core, no folder needed)
+        $themes->prepend([
+            'id' => 'default',
+            'name' => 'Default',
+            'slug' => 'default',
+            'description' => 'Theme par défaut d\'ExilonCMS',
+            'version' => app()->version(),
+            'author' => 'ExilonCMS',
+            'thumbnail' => null,
+            'is_active' => $themeLoader->isActive('default'),
+            'is_enabled' => true,
+            'type' => 'core',
+            'type_label' => 'Core Theme',
+        ]);
+
         return Inertia::render('Admin/Themes/Index', [
             'themes' => $themes,
         ]);

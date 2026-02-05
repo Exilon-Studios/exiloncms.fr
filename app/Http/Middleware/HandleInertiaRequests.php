@@ -123,6 +123,7 @@ class HandleInertiaRequests extends Middleware
             // Share available updates count for admin users
             'updatesCount' => $user && $user->hasAdminAccess() ? $this->getUpdatesCount() : 0,
             // Share enabled plugins for conditional UI rendering
+            // Share enabled plugins for conditional UI rendering
             'enabledPlugins' => get_enabled_plugins(),
             // Share enabled plugins with config for sidebar
             'enabledPluginConfigs' => $this->getEnabledPluginConfigs(),

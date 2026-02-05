@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 // Admin documentation management
 // Routes are already prefixed with /admin/plugins/documentation by PluginServiceProvider
-Route::name('plugins.documentation.')->group(function () {
+Route::name('admin.plugins.documentation.')->group(function () {
     // Dashboard
     Route::get('/', [AdminDocumentationController::class, 'index'])->name('index');
 
