@@ -5,6 +5,14 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.84] - 2026-02-05
+
+### Fixed
+- **Version mismatch**: Updated composer.json and package.json to v1.3.84
+  - Previous version was stuck at 1.3.70 in composer.json
+  - Version now correctly reflects current release
+  - Update system reads version from composer.json via ExilonCMS::version()
+
 ## [1.3.83] - 2026-02-05
 
 ### Added
