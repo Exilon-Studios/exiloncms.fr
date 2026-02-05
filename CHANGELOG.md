@@ -5,6 +5,15 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.78] - 2026-02-05
+
+### Changed
+- **Plugin cards UI**: Cleaned up plugin display in admin panel
+  - Removed status Badge from plugin names (no more Check/X icons)
+  - Removed status text next to Enable/Disable switch
+  - Cleaner, more minimal design with just name, description, and toggle
+  - Plugin status now shown only through border color and toggle position
+
 ## [1.3.77] - 2026-02-05
 
 ### Fixed
