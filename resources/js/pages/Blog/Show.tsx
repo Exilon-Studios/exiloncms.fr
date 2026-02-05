@@ -6,7 +6,7 @@
 import { Head } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import BlogThemeLayout from '@/layouts/BlogLayout';
+import PublicLayout from '@/layouts/PublicLayout';
 import { Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, User, Tag, MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -60,7 +60,7 @@ export default function BlogShow({ post, relatedPosts = [] }: BlogShowProps) {
   };
 
   return (
-    <BlogThemeLayout showCart={false}>
+    <PublicLayout>
       <Head title={post.title} />
 
       <article className="w-full max-w-4xl mx-auto px-4 py-8">
@@ -205,6 +205,6 @@ export default function BlogShow({ post, relatedPosts = [] }: BlogShowProps) {
           </div>
         </section>
       )}
-    </BlogThemeLayout>
+    </PublicLayout>
   );
 }
