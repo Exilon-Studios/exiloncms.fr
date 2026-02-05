@@ -9,6 +9,7 @@ import { trans } from '@/lib/i18n';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { route } from 'ziggy-js';
 
 interface Props {
   locale: string;
@@ -24,9 +25,8 @@ interface FileNode {
   slug?: string;
 }
 
-export default function DocumentationBrowse({ locale, availableLocales, categories }: Props) {
+export default function DocumentationEditor({ locale, availableLocales, categories }: Props) {
   const { settings } = usePage<PageProps>().props;
-  const { trans } = useTrans();
 
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [fileContent, setFileContent] = useState('');

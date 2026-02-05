@@ -27,7 +27,7 @@
     "position": 100,
     "items": [
       {
-        "label": "Editor",
+        "label": "Browse",
         "href": "/admin/plugins/documentation/browse",
         "permission": "documentation.admin"
       },

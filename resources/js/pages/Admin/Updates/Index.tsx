@@ -38,15 +38,15 @@ export default function UpdatesIndex({ currentVersion, lastVersion, hasUpdate, i
   const [error, setError] = useState<string>('');
 
   const handleFetch = () => {
-    setProgress({ step: 'idle', message: 'Checking for updates...', progress: 0 });
-    router.get(route('admin.update.fetch'), {}, {
+    setProgress({ step: 'idle', message: trans('admin.update.checking'), progress: 0 });
+    router.post(route('admin.update.fetch'), {}, {
       onSuccess: () => {
         setProgress({ step: 'idle', message: '', progress: 0 });
         window.location.reload();
       },
       onError: (errors) => {
-        setProgress({ step: 'error', message: 'Failed to check for updates', progress: 0 });
-        setError(Object.values(errors)[0]?.toString() || 'Unknown error');
+        setProgress({ step: 'error', message: trans('admin.update.check_failed'), progress: 0 });
+        setError(Object.values(errors)[0]?.toString() || trans('admin.update.unknown_error'));
       },
     });
   };
