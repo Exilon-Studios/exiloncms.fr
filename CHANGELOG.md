@@ -5,6 +5,19 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.89] - 2026-02-05
+
+### Fixed
+- **Update detection not working**: Fixed "Check for updates" not finding new releases
+  - Added `clearstatcache()` to getVersionFromComposer() to clear PHP stat cache
+  - Added comprehensive logging to UpdateManager for debugging
+  - Logs current version, latest version, and comparison result
+  - Logs GitHub API fetch results and errors
+- **Better update debugging**: Added detailed logging throughout update check process
+  - Logs repo being queried, current version, and fetched release tag
+  - Logs version comparison result
+  - Logs update availability when found
+
 ## [1.3.88] - 2026-02-05
 
 ### Fixed

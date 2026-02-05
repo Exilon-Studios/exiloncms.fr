@@ -27,6 +27,11 @@ class ExilonCMS
             return '0.0.0';
         }
 
+        // Clear stat cache to ensure we get the latest file modification time
+        if (function_exists('clearstatcache')) {
+            clearstatcache();
+        }
+
         $composer = json_decode(file_get_contents($composerPath), true);
 
         return $composer['version'] ?? '0.0.0';

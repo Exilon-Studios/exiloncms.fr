@@ -49,15 +49,21 @@ class UpdateManager
     {
         if ($forceRefresh) {
             Cache::forget($this->cacheKey);
+            Log::info('Force refresh requested for updates check');
         }
 
-        return Cache::remember($this->cacheKey, $this->cacheTtl, function () {
+        $result = Cache::remember($this->cacheKey, $this->cacheTtl, function () {
             try {
                 $githubToken = env('GITHUB_TOKEN');
                 $headers = [];
                 if ($githubToken) {
                     $headers['Authorization'] = "Bearer {$githubToken}";
                 }
+
+                Log::info('Fetching latest release from GitHub', [
+                    'repo' => $this->repo,
+                    'current_version' => $this->currentVersion,
+                ]);
 
                 $response = Http::withHeaders($headers)
                     ->timeout(10)
@@ -81,8 +87,20 @@ class UpdateManager
 
                 $latestVersion = $this->normalizeVersion($release['tag_name']);
 
+                Log::info('GitHub release fetched', [
+                    'tag' => $release['tag_name'],
+                    'version' => $latestVersion,
+                    'current' => $this->currentVersion,
+                ]);
+
                 // Compare versions
                 $hasUpdate = version_compare($latestVersion, $this->currentVersion, '>');
+
+                Log::info('Version comparison', [
+                    'current' => $this->currentVersion,
+                    'latest' => $latestVersion,
+                    'has_update' => $hasUpdate,
+                ]);
 
                 $update = null;
                 if ($hasUpdate) {
@@ -112,6 +130,11 @@ class UpdateManager
                         'size' => $zipAsset['size'] ?? 0,
                         'php_version' => $this->extractPhpVersion($release['body'] ?? ''),
                     ];
+
+                    Log::info('Update available', [
+                        'version' => $latestVersion,
+                        'download_url' => $zipAsset['browser_download_url'] ?? null,
+                    ]);
                 }
 
                 return [
@@ -124,6 +147,7 @@ class UpdateManager
             } catch (\Exception $e) {
                 Log::error('Failed to check for updates', [
                     'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
                 ]);
 
                 return [
@@ -133,6 +157,17 @@ class UpdateManager
                 ];
             }
         });
+
+        // Always log the result
+        Log::info('Update check result', [
+            'force_refresh' => $forceRefresh,
+            'success' => $result['success'],
+            'has_update' => $result['has_update'] ?? false,
+            'current_version' => $result['current_version'] ?? 'unknown',
+            'latest_version' => $result['latest_version'] ?? 'unknown',
+        ]);
+
+        return $result;
     }
 
     /**
