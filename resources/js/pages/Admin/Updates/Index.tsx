@@ -223,9 +223,9 @@ export default function UpdatesIndex({ currentVersion, lastVersion, hasUpdate, i
             <div className="flex items-center gap-3">
               <CheckCircle className="h-8 w-8 text-green-500" />
               <div>
-                <h3 className="font-semibold">{trans('admin.updates.up_to_date')}</h3>
+                <h3 className="font-semibold">{trans('admin.update.up_to_date')}</h3>
                 <p className="text-sm text-muted-foreground">
-                  {trans('admin.updates.latest_version')}
+                  {trans('admin.update.latest_version')}
                 </p>
               </div>
             </div>

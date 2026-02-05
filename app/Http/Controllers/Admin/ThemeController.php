@@ -28,7 +28,7 @@ class ThemeController extends Controller
         }
 
         // Get file-based themes from ThemeLoader
-        $fileThemes = collect($themeLoader->getThemes())->map(fn ($theme, $id) => [
+        $themes = collect($themeLoader->getThemes())->map(fn ($theme, $id) => [
             'id' => $id, // Use the theme ID from loader
             'name' => $theme['name'],
             'slug' => $theme['id'],
@@ -38,33 +38,9 @@ class ThemeController extends Controller
             'thumbnail' => $theme['screenshot'] ?? null,
             'is_active' => $themeLoader->isActive($theme['id']),
             'is_enabled' => true, // File themes are always enabled
-            'type' => 'file', // Mark as file-based theme
+            'type' => 'file',
             'type_label' => 'File Theme',
-            'requires_plugins' => $this->getRequiredPlugins($theme['requires'] ?? []),
-            'missing_plugins' => $this->getMissingPlugins($theme['requires'] ?? [], $enabledPlugins),
         ])->values();
-
-        // Get database themes (if any), excluding ones that conflict with file-based themes
-        $fileThemeIds = $fileThemes->pluck('slug')->toArray();
-        $dbThemes = Theme::all()
-            ->filter(fn ($theme) => ! in_array($theme->slug, $fileThemeIds))
-            ->map(fn ($theme) => [
-                'id' => $theme->id,
-                'name' => $theme->name,
-                'slug' => $theme->slug,
-                'description' => $theme->description,
-                'version' => $theme->version,
-                'author' => $theme->author,
-                'thumbnail' => $theme->thumbnail,
-                'is_active' => $theme->is_active,
-                'is_enabled' => $theme->is_enabled,
-                'type' => $theme->type,
-                'type_label' => $theme->getTypeLabel(),
-                'requires_plugins' => [],
-                'missing_plugins' => [],
-            ]);
-
-        $themes = $fileThemes->concat($dbThemes);
 
         return Inertia::render('Admin/Themes/Index', [
             'themes' => $themes,

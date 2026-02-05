@@ -237,14 +237,6 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             <IconMenu2 className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
           ),
         },
-        {
-          label: 'Logs',
-          href: '/admin/logs',
-          permission: 'admin.logs',
-          icon: (
-            <IconList className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
       ],
     },
   ];
