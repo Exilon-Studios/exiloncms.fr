@@ -5,6 +5,21 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.76] - 2026-02-05
+
+### Changed
+- **Theme system**: Implemented true file-based theme discovery
+  - Removed all bundled themes (ecommerce, gaming, saazy) from themes/ directory
+  - Themes are now only discovered if they exist as folders in themes/ with valid theme.json
+  - Default theme is built into core, doesn't need a folder
+  - Automatic cache cleanup when theme doesn't exist on disk anymore
+  - Updated ThemeLoader to use 'default' as fallback instead of non-existent 'blog' theme
+
+### Fixed
+- **Translation keys**: Fixed missing translation keys for Updates page
+  - Added `admin.update.up_to_date` and `admin.update.latest_version` keys
+  - Keys were added to both English and French translation files
+
 ## [1.3.75] - 2026-02-05
 
 ### Fixed
