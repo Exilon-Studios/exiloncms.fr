@@ -54,6 +54,7 @@ if (! function_exists('safe_modify_table')) {
         if (! Schema::hasTable($tableName)) {
             // Table doesn't exist, create it from scratch
             Schema::create($tableName, $callback);
+
             return;
         }
 
