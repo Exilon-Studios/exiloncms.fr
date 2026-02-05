@@ -3,8 +3,9 @@
 use ExilonCMS\Plugins\Documentation\Controllers\Admin\DocumentationController as AdminDocumentationController;
 use Illuminate\Support\Facades\Route;
 
-// Admin documentation management - sous-menu de Plugins
-Route::prefix('documentation')->name('plugins.documentation.')->group(function () {
+// Admin documentation management
+// Routes are already prefixed with /admin/plugins/documentation by PluginServiceProvider
+Route::name('plugins.documentation.')->group(function () {
     // Dashboard
     Route::get('/', [AdminDocumentationController::class, 'index'])->name('index');
 
