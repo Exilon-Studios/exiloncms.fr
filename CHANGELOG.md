@@ -33,6 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Blog layout**: Fixed Blog/Index.tsx to use PublicLayout instead of deleted BlogLayout
   - Added missing `route` import from ziggy-js
   - Replaced Feedbacks, FAQSection, and Contact components with placeholders
+- **Blog show page**: Fixed Blog/Show.tsx to use PublicLayout instead of deleted BlogLayout
+- **Sidebar component**: Removed missing PluginHeaderIcons component import
+  - Component was a placeholder for plugin-specific header icons (shop cart, etc.)
+  - Can be re-added later when plugin system is more mature
 - **Plugin status detection**: Plugins now correctly read enabled status from plugins.json file
   - Cache clearing issue fixed - plugins now show correct enabled/disabled status
   - Documentation plugin now properly shows as enabled
