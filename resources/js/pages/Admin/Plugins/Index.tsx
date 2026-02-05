@@ -75,17 +75,7 @@ export default function PluginsIndex({ plugins }: Props) {
                         variant={plugin.enabled ? 'default' : 'secondary'}
                         className={plugin.enabled ? 'bg-green-500 hover:bg-green-600' : ''}
                       >
-                        {plugin.enabled ? (
-                          <>
-                            <Check className="h-3 w-3 mr-1" />
-                            {trans('admin.plugins.enabled')}
-                          </>
-                        ) : (
-                          <>
-                            <X className="h-3 w-3 mr-1" />
-                            {trans('admin.plugins.disabled')}
-                          </>
-                        )}
+                        {plugin.enabled ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
                       </Badge>
                     </CardTitle>
                     <CardDescription className="mt-2">{plugin.description}</CardDescription>
@@ -132,15 +122,10 @@ export default function PluginsIndex({ plugins }: Props) {
 
               <CardFooter className="flex items-center justify-between gap-2 pt-0">
                 {/* Enable/Disable Switch */}
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={plugin.enabled}
-                    onCheckedChange={() => togglePlugin(plugin.id)}
-                  />
-                  <span className="text-sm text-muted-foreground">
-                    {plugin.enabled ? trans('admin.plugins.enabled') : trans('admin.plugins.disabled')}
-                  </span>
-                </div>
+                <Switch
+                  checked={plugin.enabled}
+                  onCheckedChange={() => togglePlugin(plugin.id)}
+                />
 
                 {/* Delete Button */}
                 <Button
