@@ -5,6 +5,14 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.73] - 2026-02-05
+
+### Fixed
+- **Installer GitHub repository**: Fixed incorrect GitHub repository name in installer
+  - Changed from `Exilon-Studios/ExilonCMS` to `Exilon-Studios/exiloncms.fr`
+  - Installer can now properly fetch latest release information from GitHub API
+  - Fixes 404 error when downloading CMS through web installer
+
 ## [1.3.72] - 2026-02-04
 
 ### Fixed
