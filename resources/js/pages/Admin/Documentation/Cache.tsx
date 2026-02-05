@@ -3,9 +3,10 @@ import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Database, RefreshCw, Trash2, Check, ArrowLeft } from 'lucide-react';
+import { Database, RefreshCw, Trash2, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { route } from 'ziggy-js';
+import { trans } from '@/lib/i18n';
 
 interface CacheStats {
   enabled?: boolean;
@@ -25,17 +26,11 @@ export default function DocumentationCache({ stats }: Props) {
   const { settings } = usePage<PageProps>().props;
   const [clearing, setClearing] = useState(false);
   const [warming, setWarming] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const handleClearCache = async () => {
     setClearing(true);
-    setMessage(null);
-
     try {
       await router.post(route('admin.plugins.documentation.cache.clear'));
-      setMessage({ type: 'success', text: 'Cache vidé avec succès.' });
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Erreur lors du vidage du cache.' });
     } finally {
       setClearing(false);
     }
@@ -43,13 +38,8 @@ export default function DocumentationCache({ stats }: Props) {
 
   const handleWarmCache = async () => {
     setWarming(true);
-    setMessage(null);
-
     try {
       await router.post(route('admin.plugins.documentation.cache.warm'));
-      setMessage({ type: 'success', text: 'Cache préchargé avec succès.' });
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Erreur lors du préchargement du cache.' });
     } finally {
       setWarming(false);
     }
@@ -59,7 +49,7 @@ export default function DocumentationCache({ stats }: Props) {
 
   return (
     <AuthenticatedLayout>
-      <Head title="Documentation Cache" />
+      <Head title={trans('admin.documentation.cache.title')} />
 
       <div className="container mx-auto py-6 px-4">
         {/* Header */}
@@ -67,33 +57,15 @@ export default function DocumentationCache({ stats }: Props) {
           <Link href={route('admin.plugins.documentation.index')}>
             <Button variant="ghost" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
+              {trans('admin.documentation.editor.back')}
             </Button>
           </Link>
 
-          <h1 className="text-2xl font-bold mt-4">Documentation Cache</h1>
+          <h1 className="text-2xl font-bold mt-4">{trans('admin.documentation.cache.title')}</h1>
           <p className="text-muted-foreground">
-            Manage documentation cache for better performance
+            {trans('admin.documentation.cache.description')}
           </p>
         </div>
-
-        {/* Message */}
-        {message && (
-          <div
-            className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
-              message.type === 'success'
-                ? 'bg-green-50 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-400'
-                : 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-400'
-            }`}
-          >
-            {message.type === 'success' ? (
-              <Check className="h-5 w-5" />
-            ) : (
-              <Trash2 className="h-5 w-5" />
-            )}
-            <span>{message.text}</span>
-          </div>
-        )}
 
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
@@ -101,9 +73,9 @@ export default function DocumentationCache({ stats }: Props) {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Status</p>
+                  <p className="text-sm text-muted-foreground">{trans('admin.documentation.cache.stats.status')}</p>
                   <p className="text-2xl font-bold mt-1">
-                    {safeStats.enabled ? 'Enabled' : 'Disabled'}
+                    {safeStats.enabled ? trans('admin.documentation.cache.stats.enabled') : trans('admin.documentation.cache.stats.disabled')}
                   </p>
                 </div>
                 <Database className="h-8 w-8 text-primary opacity-50" />
@@ -113,21 +85,21 @@ export default function DocumentationCache({ stats }: Props) {
 
           <Card>
             <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">Duration</p>
+              <p className="text-sm text-muted-foreground">{trans('admin.documentation.cache.stats.duration')}</p>
               <p className="text-2xl font-bold mt-1">{safeStats.duration || 0}s</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">Cached Pages</p>
+              <p className="text-sm text-muted-foreground">{trans('admin.documentation.cache.stats.total_cached')}</p>
               <p className="text-2xl font-bold mt-1">{safeStats.total_pages || 0}</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">Locales</p>
+              <p className="text-sm text-muted-foreground">{trans('admin.documentation.cache.stats.total_locales')}</p>
               <p className="text-2xl font-bold mt-1">{safeStats.total_locales || 0}</p>
             </CardContent>
           </Card>
@@ -136,9 +108,9 @@ export default function DocumentationCache({ stats }: Props) {
         {/* Actions */}
         <Card>
           <CardHeader>
-            <CardTitle>Actions</CardTitle>
+            <CardTitle>{trans('admin.documentation.cache.actions.clear.title')}</CardTitle>
             <CardDescription>
-              Manage documentation cache
+              {trans('admin.documentation.cache.actions.clear.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -151,9 +123,9 @@ export default function DocumentationCache({ stats }: Props) {
               >
                 <Trash2 className="h-5 w-5 mr-3" />
                 <div className="text-left">
-                  <p className="font-medium">Clear Cache</p>
+                  <p className="font-medium">{trans('admin.documentation.cache.actions.clear.button')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Remove all cached data
+                    {trans('admin.documentation.cache.actions.clear.title')}
                   </p>
                 </div>
               </Button>
@@ -164,11 +136,11 @@ export default function DocumentationCache({ stats }: Props) {
                 variant="outline"
                 className="h-auto p-4 justify-start"
               >
-                <RefreshCw className="h-5 w-5 mr-3" />
+                <RefreshCw className={`h-5 w-5 mr-3 ${warming ? 'animate-spin' : ''}`} />
                 <div className="text-left">
-                  <p className="font-medium">Warm Cache</p>
+                  <p className="font-medium">{trans('admin.documentation.cache.actions.warm.button')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Preload all pages into cache
+                    {trans('admin.documentation.cache.actions.warm.title')}
                   </p>
                 </div>
               </Button>
@@ -179,10 +151,9 @@ export default function DocumentationCache({ stats }: Props) {
         {/* Info */}
         <Card className="mt-6">
           <CardContent className="pt-6">
-            <h3 className="font-semibold mb-2">About Cache</h3>
+            <h3 className="font-semibold mb-2">{trans('admin.documentation.cache.about.title')}</h3>
             <p className="text-sm text-muted-foreground">
-              Documentation cache stores processed pages and navigation for better performance.
-              Cache is automatically invalidated when pages are modified.
+              {trans('admin.documentation.cache.about.description')}
             </p>
           </CardContent>
         </Card>

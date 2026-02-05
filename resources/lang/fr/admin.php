@@ -904,16 +904,20 @@ return [
         'menu' => [
             'editor' => 'Éditeur',
             'configuration' => 'Configuration',
-            'browse' => 'Parcourir',
+            'browse' => 'Éditeur',
             'cache' => 'Cache',
         ],
         'stats' => [
             'total_pages' => 'Pages totales',
-            'categories' => 'Catégories',
-            'locales' => 'Langues',
-            'cached' => 'En cache',
+            'total_categories' => 'Catégories totales',
+            'total_locales' => 'Langues totales',
+            'cached_pages' => 'Pages en cache',
         ],
+        'quick_actions' => 'Actions rapides',
         'actions' => [
+            'browse_description' => 'Parcourir et gérer les fichiers de documentation',
+            'config_description' => 'Configurer les paramètres de documentation',
+            'cache_description' => 'Gérer le cache de la documentation',
             'editor' => [
                 'title' => 'Éditeur de documentation',
                 'description' => 'Créer et modifier les pages de documentation',
@@ -934,8 +938,13 @@ return [
             'description' => 'Gérer le cache de la documentation',
             'confirm_clear' => 'Êtes-vous sûr de vouloir vider le cache ?',
             'stats' => [
+                'status' => 'Statut',
+                'enabled' => 'Activé',
+                'disabled' => 'Désactivé',
+                'duration' => 'Durée',
                 'total_cached' => 'Pages en cache',
                 'total_size' => 'Taille totale',
+                'total_locales' => 'Langues',
                 'oldest' => 'Plus ancien',
                 'newest' => 'Plus récent',
             ],
@@ -955,6 +964,10 @@ return [
             ],
             'recent' => [
                 'title' => 'Pages récemment mises en cache',
+            ],
+            'about' => [
+                'title' => 'À propos du cache',
+                'description' => 'Le cache de documentation stocke les pages traitées et la navigation pour de meilleures performances. Le cache est automatiquement invalidé lorsque les pages sont modifiées.',
             ],
         ],
         'editor' => [

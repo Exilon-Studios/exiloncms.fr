@@ -5,6 +5,25 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.90] - 2026-02-05
+
+### Fixed
+- **Documentation Cache page hardcoded French text**: Removed hardcoded "Cache préchargé avec succès" messages
+  - Now uses translation system for all text
+  - Removed duplicate message display (relies on toast notifications)
+  - Added trans() calls for all UI text
+- **Site Setup card hover effect**: Removed hover effect from Quick Access Panel buttons in onboarding
+- **Back to admin button**: Fixed documentation editor back button pointing to correct route
+- **Documentation Index page missing**: Created Admin/Plugins/Documentation/Index.tsx page
+  - Displays documentation statistics (pages, categories, locales, cache)
+  - Added quick action cards for Browse, Configuration, and Cache
+- **Plugin Config Edit page missing**: Created Admin/Plugins/Config/Edit.tsx for generic plugin configuration
+  - Supports text, textarea, number, select, checkbox, boolean field types
+  - Properly handles field validation and error display
+- **Composer autoload**: Added plugin.php and hooks.php to autoload files array
+- **Shop plugin enabled**: Added shop to enabled plugins list
+- **Translation keys added**: Added missing translation keys for documentation stats and actions
+
 ## [1.3.89] - 2026-02-05
 
 ### Fixed

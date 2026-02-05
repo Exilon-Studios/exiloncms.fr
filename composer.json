@@ -11,7 +11,7 @@
         "docs": "https://exiloncms.fr/docs"
     },
     "license": "GPL-3.0-or-later",
-    "version": "1.3.89",
+    "version": "1.3.90",
     "require": {
         "php": "^8.2",
         "ext-json": "*",
@@ -67,7 +67,9 @@
         "files": [
             "app/color_helpers.php",
             "app/helpers.php",
-            "app/Helpers/migration.php"
+            "app/Helpers/migration.php",
+            "app/Helpers/plugin.php",
+            "app/Helpers/hooks.php"
         ]
     },
     "autoload-dev": {

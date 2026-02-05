@@ -733,7 +733,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
         <div className="h-14 border-b border-border bg-background px-4 flex items-center justify-between">
           {/* Left: Back + Title */}
           <div className="flex items-center gap-4">
-            <Link href={route('admin.plugins.documentation.index')}>
+            <Link href={route('admin.plugins.documentation.browse')}>
               <Button variant="ghost" size="sm">
                 <Home className="h-4 w-4 mr-2" />
                 {trans('admin.documentation.editor.back_to_admin')}

@@ -1065,6 +1065,24 @@ return [
             'cancel' => 'Cancel',
             'saved' => 'Configuration saved successfully',
         ],
+        'configure' => [
+            'title' => 'Configure :name',
+            'back_to_plugins' => 'Back to Plugins',
+            'settings' => 'Settings',
+            'settings_description' => 'Configure the plugin settings below',
+            'save' => 'Save Configuration',
+            'saving' => 'Saving...',
+            'cancel' => 'Cancel',
+            'saved' => 'Configuration saved successfully',
+            'config_saved' => 'Configuration saved successfully',
+            'config_cleared' => 'Configuration cleared successfully',
+            'config' => 'Configuration',
+            'config_description' => 'Configure plugin settings',
+        ],
+        'config' => 'Configuration',
+        'config_description' => 'Configuration',
+        'config_saved' => 'Configuration saved successfully',
+        'config_cleared' => 'Configuration cleared successfully',
     ],
 
     // ==================== NOTIFICATIONS ====================
@@ -1373,11 +1391,15 @@ return [
         ],
         'stats' => [
             'total_pages' => 'Total pages',
-            'categories' => 'Categories',
-            'locales' => 'Languages',
-            'cached' => 'Cached',
+            'total_categories' => 'Total categories',
+            'total_locales' => 'Total languages',
+            'cached_pages' => 'Cached pages',
         ],
+        'quick_actions' => 'Quick Actions',
         'actions' => [
+            'browse_description' => 'Browse and manage documentation files',
+            'config_description' => 'Configure documentation settings',
+            'cache_description' => 'Manage documentation cache',
             'editor' => [
                 'title' => 'Documentation Editor',
                 'description' => 'Create and edit documentation pages',
@@ -1398,8 +1420,13 @@ return [
             'description' => 'Manage documentation cache',
             'confirm_clear' => 'Are you sure you want to clear the cache?',
             'stats' => [
+                'status' => 'Status',
+                'enabled' => 'Enabled',
+                'disabled' => 'Disabled',
+                'duration' => 'Duration',
                 'total_cached' => 'Cached pages',
                 'total_size' => 'Total size',
+                'total_locales' => 'Locales',
                 'oldest' => 'Oldest',
                 'newest' => 'Newest',
             ],
@@ -1419,6 +1446,10 @@ return [
             ],
             'recent' => [
                 'title' => 'Recently cached pages',
+            ],
+            'about' => [
+                'title' => 'About cache',
+                'description' => 'Documentation cache stores processed pages and navigation for better performance. Cache is automatically invalidated when pages are modified.',
             ],
         ],
         'editor' => [

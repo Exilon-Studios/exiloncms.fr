@@ -264,7 +264,7 @@ export default function OnboardingIndex({
                 <button
                   key={step.key}
                   onClick={() => router.get(route('admin.onboarding.index', { step: step.key }))}
-                  className="flex items-center gap-3 p-3 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors text-left"
+                  className="flex items-center gap-3 p-3 bg-card border border-border rounded-lg text-left"
                 >
                   <span className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground">
                     {step.importance}
