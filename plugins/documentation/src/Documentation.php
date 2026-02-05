@@ -29,10 +29,7 @@ class Documentation extends Plugin
                 'label' => 'Langue par défaut',
                 'type' => 'select',
                 'default' => 'fr',
-                'options' => [
-                    'fr' => 'Français',
-                    'en' => 'English',
-                ],
+                'options' => [], // Will be populated dynamically from available locales
             ],
             [
                 'name' => 'cache_enabled',

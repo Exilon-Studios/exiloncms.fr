@@ -1,13 +1,14 @@
-import { Head, usePage, Link } from '@inertiajs/react';
+import { Head, usePage, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { FileText, Folder, Edit, ExternalLink, ArrowLeft, FileJson } from 'lucide-react';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { FileText, Folder, Edit, ArrowLeft, FileJson, Save, Eye, ChevronRight, File, FileCode } from 'lucide-react';
 import { useState } from 'react';
-import { useTrans } from '@/lib/i18n';
+import { trans } from '@/lib/i18n';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 interface Props {
   locale: string;
@@ -15,159 +16,305 @@ interface Props {
   categories: any[];
 }
 
+interface FileNode {
+  name: string;
+  path: string;
+  type: 'file' | 'directory';
+  children?: FileNode[];
+  slug?: string;
+}
+
 export default function DocumentationBrowse({ locale, availableLocales, categories }: Props) {
   const { settings } = usePage<PageProps>().props;
-  const trans = useTrans();
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
+  const { trans } = useTrans();
 
-  const toggleCategory = (categoryId: string) => {
-    const newExpanded = new Set(expandedCategories);
-    if (newExpanded.has(categoryId)) {
-      newExpanded.delete(categoryId);
+  const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
+  const [fileContent, setFileContent] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+
+  const toggleFolder = (path: string) => {
+    const newExpanded = new Set(expandedFolders);
+    if (newExpanded.has(path)) {
+      newExpanded.delete(path);
     } else {
-      newExpanded.add(categoryId);
+      newExpanded.add(path);
     }
-    setExpandedCategories(newExpanded);
+    setExpandedFolders(newExpanded);
+  };
+
+  const buildFileTree = (categories: any[]): FileNode[] => {
+    const tree: FileNode[] = [];
+
+    categories.forEach((category) => {
+      const categoryNode: FileNode = {
+        name: category.title,
+        path: category.id,
+        type: 'directory',
+        children: [],
+      };
+
+      if (category.pages && category.pages.length > 0) {
+        categoryNode.children = category.pages.map((page: any) => ({
+          name: page.title,
+          path: `${category.id}/${page.slug}`,
+          type: 'file' as const,
+          slug: page.slug,
+        }));
+      }
+
+      tree.push(categoryNode);
+    });
+
+    return tree;
+  };
+
+  const fileTree = buildFileTree(categories);
+
+  const renderFileTree = (nodes: FileNode[], level = 0): React.ReactNode => {
+    return nodes.map((node) => (
+      <div key={node.path}>
+        {node.type === 'directory' ? (
+          <div>
+            <div
+              className={`flex items-center gap-2 py-2 px-${2 + level * 4} hover:bg-accent/50 rounded cursor-pointer transition-colors ${
+                selectedFile?.path === node.path ? 'bg-accent' : ''
+              }`}
+              onClick={() => toggleFolder(node.path)}
+            >
+              <ChevronRight
+                className={`h-4 w-4 transition-transform ${
+                  expandedFolders.has(node.path) ? 'rotate-90' : ''
+                }`}
+              />
+              <Folder className="h-4 w-4 text-blue-500" />
+              <span className="text-sm font-medium">{node.name}</span>
+              <span className="text-xs text-muted-foreground ml-2">
+                {node.children?.length || 0} files
+              </span>
+            </div>
+            {expandedFolders.has(node.path) && node.children && (
+              <div className="ml-4">
+                {renderFileTree(node.children, level + 1)}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div
+            className={`flex items-center gap-2 py-2 px-${2 + level * 4} hover:bg-accent/50 rounded cursor-pointer transition-colors ${
+              selectedFile?.path === node.path ? 'bg-accent' : ''
+            }`}
+            onClick={() => loadFile(node)}
+          >
+            <span className="w-4"></span>
+            <FileText className="h-4 w-4 text-gray-500" />
+            <span className="text-sm">{node.name}</span>
+          </div>
+        )}
+      </div>
+    ));
+  };
+
+  const loadFile = async (file: FileNode) => {
+    if (hasUnsavedChanges) {
+      if (!confirm('You have unsaved changes. Do you want to continue?')) {
+        return;
+      }
+    }
+
+    setSelectedFile(file);
+    setHasUnsavedChanges(false);
+
+    // Load file content
+    try {
+      const response = await fetch(route('admin.plugins.documentation.file-content'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '' },
+        body: JSON.stringify({ locale, path: file.path }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFileContent(data.content || '');
+      }
+    } catch (error) {
+      console.error('Failed to load file:', error);
+    }
+  };
+
+  const saveFile = async () => {
+    if (!selectedFile) return;
+
+    setIsSaving(true);
+
+    try {
+      await router.post(route('admin.plugins.documentation.save-content'), {
+        locale,
+        path: selectedFile.path,
+        content: fileContent,
+      }, {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => {
+          setHasUnsavedChanges(false);
+          setIsSaving(false);
+        },
+        onError: () => {
+          setIsSaving(false);
+        },
+      });
+    } catch (error) {
+      console.error('Failed to save file:', error);
+      setIsSaving(false);
+    }
+  };
+
+  const discardChanges = () => {
+    if (selectedFile) {
+      loadFile(selectedFile);
+    }
+    setHasUnsavedChanges(false);
   };
 
   return (
     <AuthenticatedLayout>
-      <Head title={`Browse Documentation (${locale.toUpperCase()}) - ${settings.name}`} />
+      <Head title={`Documentation Editor (${locale.toUpperCase()}) - ${settings.name}`} />
 
-      <div className="space-y-6 p-8">
+      {/* Full-height IDE layout */}
+      <div className="h-[calc(100vh-4rem)] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href={route('admin.plugins.documentation.index')}>
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Documentation / {locale.toUpperCase()}</h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                Browse and edit documentation pages
+        <div className="border-b border-border bg-background/95 backdrop-blur px-4 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href={route('admin.plugins.documentation.index')}>
+                <Button variant="ghost" size="sm">
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
+                </Button>
+              </Link>
+
+              <h1 className="text-lg font-semibold">
+                Documentation Editor
+              </h1>
+
+              <span className="text-sm text-muted-foreground">
+                {locale.toUpperCase()}
+              </span>
+            </div>
+
+            {selectedFile && (
+              <div className="flex items-center gap-2">
+                {hasUnsavedChanges && (
+                  <span className="text-xs text-orange-500">Unsaved changes</span>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={discardChanges}
+                  disabled={isSaving}
+                >
+                  Discard
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={saveFile}
+                  disabled={isSaving || !hasUnsavedChanges}
+                >
+                  <Save className="h-4 w-4 mr-2" />
+                  {isSaving ? 'Saving...' : 'Save'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  as={Link}
+                  href={route('docs.page', {
+                    locale,
+                    category: selectedFile.path.split('/')[0],
+                    page: selectedFile.slug ?? selectedFile.path.split('/').slice(1).join('/'),
+                  })}
+                  target="_blank"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Preview
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Main content area */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left Sidebar - File Tree (250px) */}
+          <div className="w-[280px] border-r border-border overflow-y-auto p-2">
+            <div className="mb-4">
+              <h2 className="text-sm font-semibold text-muted-foreground px-2">FILES</h2>
+            </div>
+            {fileTree.length > 0 ? (
+              renderFileTree(fileTree)
+            ) : (
+              <div className="text-center py-8 text-muted-foreground text-sm">
+                <FileJson className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                No documentation files found
+              </div>
+            )}
+          </div>
+
+          {/* Middle - Changes List (flex-1, max 400px) */}
+          <div className="flex-1 max-w-[400px] border-r border-border overflow-y-auto">
+            <div className="p-4 border-b border-border">
+              <h2 className="text-sm font-semibold text-muted-foreground">CHANGES</h2>
+            </div>
+            <div className="p-4">
+              <p className="text-sm text-muted-foreground text-center">
+                No changes yet
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {availableLocales.map((loc) => (
-              <Link
-                key={loc}
-                href={route('admin.plugins.documentation.browse', { locale: loc })}
-              >
-                <Button
-                  variant={locale === loc ? 'default' : 'outline'}
-                  size="sm"
-                >
-                  {loc.toUpperCase()}
-                </Button>
-              </Link>
-            ))}
+          {/* Right - Editor (flex-1) */}
+          <div className="flex-1 overflow-y-auto">
+            {selectedFile ? (
+              <div className="h-full flex flex-col p-4">
+                <div className="mb-4">
+                  <h2 className="text-sm font-semibold text-muted-foreground mb-2">
+                    {selectedFile.name}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedFile.path}
+                  </p>
+                </div>
+
+                <div className="flex-1 flex flex-col">
+                  <Label htmlFor="content" className="sr-only">
+                    Content
+                  </Label>
+                  <Textarea
+                    id="content"
+                    value={fileContent}
+                    onChange={(e) => {
+                      setFileContent(e.target.value);
+                      setHasUnsavedChanges(true);
+                    }}
+                    placeholder="# Markdown content"
+                    className="flex-1 font-mono text-sm min-h-[400px] p-4 border border-input rounded-md resize-y"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="h-full flex items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <FileCode className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg font-semibold mb-2">Select a file to edit</p>
+                  <p className="text-sm">
+                    Choose a file from the file tree on the left
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* Categories */}
-        {categories.length > 0 ? (
-          <div className="space-y-4">
-            {categories.map((category) => (
-              <Card key={category.id}>
-                <Collapsible
-                  open={expandedCategories.has(category.id)}
-                  onOpenChange={() => toggleCategory(category.id)}
-                >
-                  <CollapsibleTrigger className="w-full">
-                    <CardHeader className="hover:bg-accent/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Folder className="h-5 w-5 text-primary" />
-                          <div className="text-left">
-                            <CardTitle className="text-lg">{category.title}</CardTitle>
-                            <CardDescription>
-                              {category.pages?.length || 0} pages
-                            </CardDescription>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Link
-                            href={route('docs.page', { locale, category: category.slug, page: 'index' })}
-                            target="_blank"
-                          >
-                            <Button variant="ghost" size="sm">
-                              <ExternalLink className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </CollapsibleTrigger>
-
-                  <CollapsibleContent>
-                    <CardContent className="pt-0">
-                      {category.pages && category.pages.length > 0 ? (
-                        <div className="divide-y">
-                          {category.pages.map((page) => (
-                            <div
-                              key={page.id}
-                              className="flex items-center justify-between py-3 hover:bg-accent/50 px-4 -mx-4 rounded-md transition-colors"
-                            >
-                              <div className="flex items-center gap-3">
-                                <FileText className="h-4 w-4 text-muted-foreground" />
-                                <span className="font-medium">{page.title}</span>
-                                {page.badge && (
-                                  <Badge variant="secondary">{page.badge}</Badge>
-                                )}
-                              </div>
-
-                              <div className="flex items-center gap-2">
-                                <Link
-                                  href={route('docs.page', { locale, category: category.slug, page: page.slug })}
-                                  target="_blank"
-                                >
-                                  <Button variant="ghost" size="sm">
-                                    <ExternalLink className="h-4 w-4" />
-                                  </Button>
-                                </Link>
-                                <Link
-                                  href={route('admin.plugins.documentation.edit', {
-                                    locale,
-                                    category: category.slug,
-                                    page: page.slug,
-                                  })}
-                                >
-                                  <Button variant="ghost" size="sm">
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                </Link>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-8 text-muted-foreground text-sm">
-                          No pages in this category
-                        </div>
-                      )}
-                    </CardContent>
-                  </CollapsibleContent>
-                </Collapsible>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <FileJson className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">{trans('admin.documentation.no_docs_found')}</p>
-              <p className="text-sm text-muted-foreground mt-2">
-                {trans('admin.documentation.create_files_hint').replace(':path', `/docs/${locale}/`)}
-              </p>
-            </CardContent>
-          </Card>
-        )}
       </div>
     </AuthenticatedLayout>
-  );
+);
 }

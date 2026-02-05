@@ -5,6 +5,43 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.80] - 2026-02-05
+
+### Added
+- **IDE-style documentation editor backend**: Added file-content and save-content routes
+  - POST /admin/plugins/documentation/file-content - Load file content for editing
+  - POST /admin/plugins/documentation/save-content - Save file content to disk
+  - Auto-creates directories if they don't exist
+  - Clears cache after saving files
+- **Documentation Config page**: Created configuration page for documentation plugin
+  - Locale selector with dynamic options from available languages
+  - Language management section showing all available locales
+  - Add new language functionality with auto-creation of directory structure
+  - Creates default category "getting-started" with index.md file
+- **FileNode interface**: Added slug property for proper file identification
+- **Locale management**: POST /admin/plugins/documentation/create-locale endpoint
+  - Creates new locale directory in docs/
+  - Creates default getting-started category with welcome page
+  - Validates locale code (2-10 characters)
+
+### Fixed
+- **Documentation Browse page**: Fixed route() usage in loadFile function
+  - Separated URL generation from fetch options
+  - Added CSRF token to POST request headers
+- **useTrans hook usage**: Fixed destructuring in Browse.tsx
+  - Changed from `const trans = useTrans()` to `const { trans } = useTrans()`
+- **Preview route**: Fixed subcategory handling in preview URL
+  - Uses correct page path for nested categories (category/subcategory/page)
+  - Falls back to slug or path without .md extension
+- **Config route**: Updated controller to return availableLocales
+  - Config page now receives list of available languages
+  - Select options populated dynamically instead of hardcoded
+
+### Changed
+- **Documentation plugin**: Removed hardcoded locale options from getConfigFields()
+  - Options now populated dynamically from available locales
+  - Supports adding new languages through admin interface
+
 ## [1.3.79] - 2026-02-05
 
 ### Fixed

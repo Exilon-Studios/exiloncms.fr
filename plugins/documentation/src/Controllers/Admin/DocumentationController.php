@@ -72,6 +72,7 @@ class DocumentationController
         return Inertia::render('Admin/Plugins/Documentation/Config', [
             'config' => $config,
             'settings' => $settings,
+            'availableLocales' => $this->reader->getAvailableLocales(),
         ]);
     }
 
@@ -393,5 +394,114 @@ class DocumentationController
         }
 
         return $items;
+    }
+
+    /**
+     * Get file content for editing (IDE-style editor)
+     */
+    public function fileContent(Request $request)
+    {
+        $request->validate([
+            'locale' => 'required|string',
+            'path' => 'required|string',
+        ]);
+
+        $locale = $request->input('locale');
+        $path = $request->input('path');
+
+        $filePath = base_path("docs/{$locale}/{$path}.md");
+
+        if (! File::exists($filePath)) {
+            return response()->json([
+                'content' => '',
+                'error' => 'File not found',
+            ], 404);
+        }
+
+        $content = File::get($filePath);
+
+        return response()->json([
+            'content' => $content,
+            'path' => $path,
+        ]);
+    }
+
+    /**
+     * Save file content (IDE-style editor)
+     */
+    public function saveContent(Request $request)
+    {
+        $request->validate([
+            'locale' => 'required|string',
+            'path' => 'required|string',
+            'content' => 'required|string',
+        ]);
+
+        $locale = $request->input('locale');
+        $path = $request->input('path');
+        $content = $request->input('content');
+
+        $filePath = base_path("docs/{$locale}/{$path}.md");
+
+        // Create directory if not exists
+        $directory = dirname($filePath);
+        if (! File::exists($directory)) {
+            File::makeDirectory($directory, 0755, true);
+        }
+
+        // Save file
+        File::put($filePath, $content);
+
+        // Extract category and page from path for cache clearing
+        $pathParts = explode('/', $path);
+        $category = $pathParts[0] ?? null;
+        $page = str_replace('.md', '', $pathParts[count($pathParts) - 1] ?? null);
+
+        if ($category && $page) {
+            $this->cache->setLocale($locale)->clearPage($locale, $category, $page);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'File saved successfully',
+        ]);
+    }
+
+    /**
+     * Create a new locale (language)
+     */
+    public function createLocale(Request $request)
+    {
+        $request->validate([
+            'locale' => 'required|string|min:2|max:10',
+        ]);
+
+        $locale = strtolower($request->input('locale'));
+        $docsPath = base_path('docs/'.$locale);
+
+        // Check if locale already exists
+        if (File::exists($docsPath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Locale already exists',
+            ], 400);
+        }
+
+        // Create locale directory
+        File::makeDirectory($docsPath, 0755, true);
+
+        // Create default category
+        $defaultCategoryPath = $docsPath.'/getting-started';
+        File::makeDirectory($defaultCategoryPath, 0755, true);
+
+        // Create index.md file
+        $indexContent = "---\ntitle: \"Bienvenue\"\ndescription: \"Page d'accueil\"\norder: 1\n---\n\n# Bienvenue\n\nCeci est la page d'accueil de la documentation en {$locale}.\n";
+        File::put($defaultCategoryPath.'/index.md', $indexContent);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Locale created successfully',
+            'locale' => $locale,
+        ]);
     }
 }

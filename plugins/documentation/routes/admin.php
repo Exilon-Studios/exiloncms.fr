@@ -40,4 +40,11 @@ Route::name('admin.plugins.documentation.')->group(function () {
         Route::post('/clear', [AdminDocumentationController::class, 'clearCache'])->name('clear');
         Route::post('/warm', [AdminDocumentationController::class, 'warmCache'])->name('warm');
     });
+
+    // IDE editor routes
+    Route::post('/file-content', [AdminDocumentationController::class, 'fileContent'])->name('file-content');
+    Route::post('/save-content', [AdminDocumentationController::class, 'saveContent'])->name('save-content');
+
+    // Locale management
+    Route::post('/create-locale', [AdminDocumentationController::class, 'createLocale'])->name('create-locale');
 });
