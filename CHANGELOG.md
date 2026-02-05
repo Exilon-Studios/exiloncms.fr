@@ -23,11 +23,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Cleaned up admin routes (removed resources, extension updates routes)
   - Removed unused npm packages (@uploadthing/*, motion duplicate)
 - **Legacy plugin cleanup**: Removed old docs plugin, replaced with new documentation plugin
+- **Problematic themes**: Deleted themes with broken imports (hostinkar, vorix, wion, blog)
+  - Theme cache cleared to reset to default theme (ecommerce)
 
 ### Fixed
 - **Translation placeholders**: Fixed trans() function to support {placeholder} format in addition to :placeholder
   - Onboarding page now correctly displays step counts and percentages
   - Fixed "Step {current}/{total}" and "{percent}% complete" display issues
+- **Blog layout**: Fixed Blog/Index.tsx to use PublicLayout instead of deleted BlogLayout
+  - Added missing `route` import from ziggy-js
+  - Replaced Feedbacks, FAQSection, and Contact components with placeholders
 - **Plugin status detection**: Plugins now correctly read enabled status from plugins.json file
   - Cache clearing issue fixed - plugins now show correct enabled/disabled status
   - Documentation plugin now properly shows as enabled
