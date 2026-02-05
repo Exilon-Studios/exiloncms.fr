@@ -28,7 +28,6 @@ import {
 import { DropdownUser } from "@/components/DropdownUser";
 import { usePage } from "@inertiajs/react";
 import { NotificationDropdown } from "@/components/admin/NotificationDropdown";
-import { PluginHeaderIcons } from "@/components/plugin/PluginHeaderIcons";
 
 interface Links {
   label: string;
@@ -591,9 +590,6 @@ export function SidebarLayout({
 
                   {/* Notifications dropdown */}
                   <NotificationDropdown unreadCount={unreadNotificationsCount} />
-
-                  {/* Plugin header icons (Shop cart, etc.) */}
-                  <PluginHeaderIcons />
                 </>
               )}
             </div>
