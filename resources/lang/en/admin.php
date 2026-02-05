@@ -820,7 +820,8 @@ return [
         'not_downloaded' => 'Update not downloaded yet',
         'downloaded' => 'Update downloaded successfully',
         'installed' => 'Update installed successfully',
-        'up_to_date' => 'Your system is up to date',
+        'up_to_date' => 'Up to date',
+        'latest_version' => 'You\'re running the latest version of ExilonCMS',
         'index' => [
             'title' => 'Updates',
             'description' => 'Check and install system updates',

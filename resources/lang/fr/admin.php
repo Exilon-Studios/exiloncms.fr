@@ -116,6 +116,8 @@ return [
         'installed' => 'Mise à jour installée avec succès',
         'has_update' => 'Nouvelle version disponible',
         'update' => 'Une nouvelle version :last-version est disponible. Votre version est :version.',
+        'up_to_date' => 'À jour',
+        'latest_version' => 'Vous utilisez la dernière version d\'ExilonCMS',
         'index' => [
             'title' => 'Mises à jour',
             'description' => 'Vérifier et installer les mises à jour du système',

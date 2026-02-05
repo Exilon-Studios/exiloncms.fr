@@ -16,13 +16,22 @@ class ThemeLoader
     public function __construct()
     {
         $this->discoverThemes();
-        // Set blog as default theme if none is set
-        $this->activeThemeId = Cache::get('active_theme', function () {
-            $defaultTheme = 'blog';
-            Cache::forever('active_theme', $defaultTheme);
 
-            return $defaultTheme;
-        });
+        // Get active theme from cache, with fallback to default
+        $cachedTheme = Cache::get('active_theme');
+
+        // If cached theme doesn't exist on disk, clear cache and use default
+        if ($cachedTheme && $cachedTheme !== 'default' && !isset($this->themes[$cachedTheme])) {
+            Cache::forget('active_theme');
+            $cachedTheme = null;
+        }
+
+        $this->activeThemeId = $cachedTheme ?? 'default';
+
+        // Ensure default theme is cached
+        if (!Cache::get('active_theme')) {
+            Cache::forever('active_theme', 'default');
+        }
     }
 
     /**
@@ -105,7 +114,6 @@ class ThemeLoader
                 'name' => 'Default',
                 'description' => 'Theme par défaut d\'ExilonCMS',
                 'version' => app()->version(),
-                'active' => true,
             ];
         }
 
@@ -114,17 +122,16 @@ class ThemeLoader
             return $this->themes[$this->activeThemeId];
         }
 
-        // Fall back to blog theme
-        if (isset($this->themes['blog'])) {
-            // Update cache to use blog as default
-            Cache::forever('active_theme', 'blog');
-            $this->activeThemeId = 'blog';
+        // Active theme doesn't exist, fall back to default
+        Cache::forever('active_theme', 'default');
+        $this->activeThemeId = 'default';
 
-            return $this->themes['blog'];
-        }
-
-        // No theme available
-        return null;
+        return [
+            'id' => 'default',
+            'name' => 'Default',
+            'description' => 'Theme par défaut d\'ExilonCMS',
+            'version' => app()->version(),
+        ];
     }
 
     /**
