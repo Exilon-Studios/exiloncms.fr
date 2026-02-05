@@ -6,9 +6,10 @@
 import { Head } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
-import BlogThemeLayout from '@/layouts/BlogLayout';
+import PublicLayout from '@/layouts/PublicLayout';
 import { Link } from '@inertiajs/react';
 import { Calendar, User, ArrowRight } from 'lucide-react';
+import { route } from 'ziggy-js';
 
 interface BlogPost {
   id: number;
@@ -48,7 +49,7 @@ interface BlogIndexProps {
 
 export default function BlogIndex({ posts }: BlogIndexProps) {
   return (
-    <BlogThemeLayout showCart={false}>
+    <PublicLayout>
       <Head title="Blog" />
 
       {/* Hero Section - simplified for blog listing */}
@@ -180,19 +181,25 @@ export default function BlogIndex({ posts }: BlogIndexProps) {
       </div>
 
       {/* Feedbacks Section */}
-      <div className="w-full">
-        <Feedbacks />
+      <div className="w-full max-w-7xl mx-auto px-4 py-16">
+        <p className="text-center text-muted-foreground">
+          Feedbacks section placeholder
+        </p>
       </div>
 
       {/* FAQ Section */}
-      <div className="w-full max-w-7xl mx-auto px-4">
-        <FAQSection />
+      <div className="w-full max-w-7xl mx-auto px-4 py-16">
+        <p className="text-center text-muted-foreground">
+          FAQ section placeholder
+        </p>
       </div>
 
       {/* Contact */}
-      <div className="w-full">
-        <Contact />
+      <div className="w-full max-w-7xl mx-auto px-4 py-16">
+        <p className="text-center text-muted-foreground">
+          Contact section placeholder
+        </p>
       </div>
-    </BlogThemeLayout>
+    </PublicLayout>
   );
 }
