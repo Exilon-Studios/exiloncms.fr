@@ -21,7 +21,7 @@ class ThemeLoader
         $cachedTheme = Cache::get('active_theme');
 
         // If cached theme doesn't exist on disk, clear cache and use default
-        if ($cachedTheme && $cachedTheme !== 'default' && !isset($this->themes[$cachedTheme])) {
+        if ($cachedTheme && $cachedTheme !== 'default' && ! isset($this->themes[$cachedTheme])) {
             Cache::forget('active_theme');
             $cachedTheme = null;
         }
@@ -29,7 +29,7 @@ class ThemeLoader
         $this->activeThemeId = $cachedTheme ?? 'default';
 
         // Ensure default theme is cached
-        if (!Cache::get('active_theme')) {
+        if (! Cache::get('active_theme')) {
             Cache::forever('active_theme', 'default');
         }
     }
