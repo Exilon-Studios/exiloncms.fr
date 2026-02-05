@@ -294,7 +294,7 @@ if (array_get($_SERVER, 'HTTP_X_REQUESTED_WITH') === 'XMLHttpRequest'
 
         if ($action === 'download') {
             // Get the latest release from GitHub
-            $githubRepo = 'Exilon-Studios/ExilonCMS';
+            $githubRepo = 'Exilon-Studios/exiloncms.fr';
             $githubApiUrl = 'https://api.github.com/repos/'.$githubRepo.'/releases/latest';
 
             $json = read_url($githubApiUrl);
