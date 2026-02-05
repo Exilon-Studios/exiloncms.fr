@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Changed from `Exilon-Studios/ExilonCMS` to `Exilon-Studios/exiloncms.fr`
   - Installer can now properly fetch latest release information from GitHub API
   - Fixes 404 error when downloading CMS through web installer
+- **Documentation plugin routes**: Removed duplicate prefix in admin routes
+  - Routes were `/admin/plugins/documentation/documentation/...` instead of `/admin/plugins/documentation/...`
+  - Fixed settings, browse, and cache routes to work correctly
+- **Documentation editor link**: Updated menu link to point to plugin create page
+  - Changed from `/admin/editor` (placeholder) to `/admin/plugins/documentation/create`
+  - Removes confusing BlockNote placeholder message
+- **Update notifications**: Removed "Update Available" section from admin dashboard
+  - Simplifies admin interface after manual update installation
+  - Updates page now shows "Up to Date" message directly
 
 ## [1.3.72] - 2026-02-04
 
