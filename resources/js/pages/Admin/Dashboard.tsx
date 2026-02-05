@@ -122,22 +122,6 @@ export default function Dashboard({
           </Card>
         )}
 
-        {newVersion && (
-          <Card className="mb-6 border-primary">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-3">
-                <Info className="h-5 w-5 text-primary mt-0.5" />
-                <div>
-                  <p className="font-semibold text-primary">{trans('admin.update.has_update')}</p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {trans('admin.update.update', { 'last-version': newVersion, version: '' })}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Quick Actions Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
           {/* Onboarding Card */}

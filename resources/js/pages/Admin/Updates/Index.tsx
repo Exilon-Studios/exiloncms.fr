@@ -218,86 +218,9 @@ export default function UpdatesIndex({ currentVersion, lastVersion, hasUpdate, i
           </CardHeader>
         </Card>
 
-        {/* Update Available */}
-        {hasUpdate && lastVersion ? (
-          <Card className="border-primary">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-primary" />
-                Update Available
-                <Badge variant="secondary" className="ml-2">
-                  {lastVersion.tag_name}
-                </Badge>
-              </CardTitle>
-              <CardDescription>
-                Published {new Date(lastVersion.published_at).toLocaleDateString()}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {lastVersion.body && (
-                <div className="prose prose-sm max-w-none dark:prose-invert">
-                  <h4 className="font-semibold">What's New</h4>
-                  <div
-                    className="bg-muted p-4 rounded-lg text-sm max-h-64 overflow-y-auto"
-                    dangerouslySetInnerHTML={{ __html: lastVersion.body.replace(/\n/g, '<br>') }}
-                  />
-                </div>
-              )}
-
-              {/* Action Buttons */}
-              <div className="flex flex-wrap gap-3">
-                <Button
-                  onClick={handleFetch}
-                  variant="outline"
-                  disabled={progress.step !== 'idle'}
-                >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${progress.step === 'idle' ? '' : 'animate-spin'}`} />
-                  Check Again
-                </Button>
-
-                {!isDownloaded ? (
-                  <Button
-                    onClick={handleDownload}
-                    disabled={progress.step !== 'idle'}
-                    className="bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Update
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleInstall}
-                    disabled={progress.step !== 'idle'}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Install Update
-                  </Button>
-                )}
-              </div>
-
-              {/* Warning */}
-              {!isDownloaded && (
-                <div className="flex items-start gap-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                  <Info className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-                  <div className="text-sm text-blue-500">
-                    <p className="font-semibold mb-1">Before installing:</p>
-                    <ul className="list-disc list-inside space-y-1 text-xs">
-                      <li>A backup will be created automatically</li>
-                      <li>Database will not be affected</li>
-                      <li>.env file will be preserved</li>
-                      <li>Uploaded files will be preserved</li>
-                      <li>Process may take several minutes</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="h-8 w-8 text-green-500" />
                   <div>
@@ -318,7 +241,6 @@ export default function UpdatesIndex({ currentVersion, lastVersion, hasUpdate, i
               </div>
             </CardContent>
           </Card>
-        )}
       </div>
     </AuthenticatedLayout>
   );
