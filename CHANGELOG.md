@@ -5,6 +5,32 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.83] - 2026-02-05
+
+### Added
+- **Full-screen IDE editor for documentation**: Complete rewrite as full-screen editor
+  - No sidebar/header, just Back button and Preview
+  - Language selector in header that switches files dynamically
+  - New file creation directly from modal in IDE
+  - Removed CHANGES column - cleaner 2-column layout
+- **New file creation modal**: Create pages directly from IDE
+  - Select category and enter page title
+  - Auto-generates slug from title
+  - Creates with default markdown content
+
+### Changed
+- **Documentation browse page**: Now uses full-screen layout
+  - Removed AuthenticatedLayout wrapper
+  - Header is minimal with Back, Documentation title, Locale selector, Save, Preview
+  - File tree sidebar (280px) + Editor (flex-1)
+  - Total height with h-screen instead of calc()
+
+### Removed
+- **Documentation Create.tsx page**: No longer needed
+- **Documentation Edit.tsx page**: No longer needed
+- **Documentation create/edit routes**: Consolidated into IDE editor
+- **CHANGES column**: Removed from IDE layout for cleaner interface
+
 ## [1.3.81] - 2026-02-05
 
 ### Added

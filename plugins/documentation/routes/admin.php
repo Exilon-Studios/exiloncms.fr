@@ -13,18 +13,11 @@ Route::name('admin.plugins.documentation.')->group(function () {
     Route::get('/settings', [AdminDocumentationController::class, 'config'])->name('config');
     Route::put('/settings', [AdminDocumentationController::class, 'updateConfig'])->name('config.update');
 
-    // Browse documentation files
+    // Browse documentation files (IDE editor)
     Route::get('/browse/{locale?}', [AdminDocumentationController::class, 'browse'])->name('browse');
 
-    // Create new page
-    Route::get('/create', [AdminDocumentationController::class, 'create'])->name('create');
+    // Create new page (from IDE)
     Route::post('/', [AdminDocumentationController::class, 'store'])->name('store');
-
-    // Edit documentation page
-    Route::get('/edit/{locale}/{category}/{page}', [AdminDocumentationController::class, 'edit'])
-        ->name('edit');
-    Route::put('/edit/{locale}/{category}/{page}', [AdminDocumentationController::class, 'update'])
-        ->name('update');
 
     // Delete page
     Route::delete('/{locale}/{category}/{page}', [AdminDocumentationController::class, 'destroy'])
