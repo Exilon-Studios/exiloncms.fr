@@ -5,6 +5,20 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.77] - 2026-02-05
+
+### Fixed
+- **Translation keys path**: Fixed admin.updates → admin.update in Updates page
+  - Changed trans() calls to use correct singular 'admin.update' path
+  - Text now displays correctly instead of showing translation keys
+- **Database themes removed**: Removed database themes from ThemeController
+  - Only file-based themes (from themes/ directory) are now shown in admin
+  - No more Gaming/Blog/Ecommerce themes appearing from database
+- **Sidebar cleanup**: Removed Logs link from Settings section
+  - Logs still accessible via bottom of sidebar
+- **Missing imports**: Added Link import in Documentation/Cache.tsx
+  - Fixes "Link is not defined" error when viewing cache page
+
 ## [1.3.76] - 2026-02-05
 
 ### Changed
