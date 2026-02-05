@@ -207,15 +207,26 @@ export default function UpdatesIndex({ currentVersion, lastVersion, hasUpdate, i
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Current Version</span>
+              <span>{trans('admin.update.current_version')}</span>
               <Badge variant="outline" className="text-lg px-3 py-1">
                 {currentVersion}
               </Badge>
             </CardTitle>
             <CardDescription>
-              Currently running version
+              {trans('admin.update.current_version_description')}
             </CardDescription>
           </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleFetch}
+              variant="outline"
+              disabled={progress.step === 'downloading' || progress.step === 'installing'}
+              className="w-full"
+            >
+              <RefreshCw className="h-4 w-4 mr-2" />
+              {trans('admin.update.check_button')}
+            </Button>
+          </CardContent>
         </Card>
 
         <Card>

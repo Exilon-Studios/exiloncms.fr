@@ -1,15 +1,24 @@
 import { Head, usePage, router, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
 import { PageProps } from '@/types';
-import { IconDatabase, IconRefresh, IconTrash, IconCheck } from '@tabler/icons-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Database, RefreshCw, Trash2, Check, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
+import { route } from 'ziggy-js';
+
+interface CacheStats {
+  enabled?: boolean;
+  duration?: number;
+  locale?: string;
+  total_pages?: number;
+  total_categories?: number;
+  total_locales?: number;
+  last_cleared?: string;
+}
 
 interface Props {
-  stats: {
-    enabled: boolean;
-    duration: number;
-    locale: string;
-  };
+  stats?: CacheStats | null;
 }
 
 export default function DocumentationCache({ stats }: Props) {
@@ -23,7 +32,7 @@ export default function DocumentationCache({ stats }: Props) {
     setMessage(null);
 
     try {
-      const response = await router.post('/admin/documentation/cache/clear');
+      await router.post(route('admin.plugins.documentation.cache.clear'));
       setMessage({ type: 'success', text: 'Cache vidé avec succès.' });
     } catch (error) {
       setMessage({ type: 'error', text: 'Erreur lors du vidage du cache.' });
@@ -37,8 +46,8 @@ export default function DocumentationCache({ stats }: Props) {
     setMessage(null);
 
     try {
-      const response = await router.post('/admin/documentation/cache/warm');
-      setMessage({ type: 'success', text: response.data.props.flash?.success || 'Cache préchargé avec succès.' });
+      await router.post(route('admin.plugins.documentation.cache.warm'));
+      setMessage({ type: 'success', text: 'Cache préchargé avec succès.' });
     } catch (error) {
       setMessage({ type: 'error', text: 'Erreur lors du préchargement du cache.' });
     } finally {
@@ -46,104 +55,137 @@ export default function DocumentationCache({ stats }: Props) {
     }
   };
 
+  const safeStats = stats || {};
+
   return (
     <AuthenticatedLayout>
-      <Head>
-        <title>Gestion Cache Documentation - {settings.name}</title>
-      </Head>
+      <Head title="Documentation Cache" />
 
-      <div className="mb-6">
-        <Link href="/admin/documentation" className="text-muted-foreground hover:text-foreground">
-          ← Retour
-        </Link>
-      </div>
+      <div className="container mx-auto py-6 px-4">
+        {/* Header */}
+        <div className="mb-6">
+          <Link href={route('admin.plugins.documentation.index')}>
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+          </Link>
 
-      <h1 className="text-2xl font-bold mb-6">Gestion du Cache</h1>
-
-      {/* Stats */}
-      <div className="grid md:grid-cols-3 gap-4 mb-8">
-        <div className="p-4 border rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">Statut</span>
-            <IconDatabase className="h-5 w-5 text-primary" />
-          </div>
-          <p className="text-lg font-semibold">
-            {stats.enabled ? 'Activé' : 'Désactivé'}
+          <h1 className="text-2xl font-bold mt-4">Documentation Cache</h1>
+          <p className="text-muted-foreground">
+            Manage documentation cache for better performance
           </p>
         </div>
 
-        <div className="p-4 border rounded-lg">
-          <span className="text-sm text-muted-foreground">Durée</span>
-          <p className="text-lg font-semibold">{stats.duration}s</p>
-        </div>
-
-        <div className="p-4 border rounded-lg">
-          <span className="text-sm text-muted-foreground">Locale actuelle</span>
-          <p className="text-lg font-semibold">{stats.locale.toUpperCase()}</p>
-        </div>
-      </div>
-
-      {/* Message */}
-      {message && (
-        <div
-          className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
-          }`}
-        >
-          {message.type === 'success' ? (
-            <IconCheck className="h-5 w-5" />
-          ) : (
-            <IconTrash className="h-5 w-5" />
-          )}
-          <span>{message.text}</span>
-        </div>
-      )}
-
-      {/* Actions */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold">Actions</h2>
-
-        <div className="grid md:grid-cols-2 gap-4">
-          <button
-            onClick={handleClearCache}
-            disabled={clearing}
-            className="p-4 border rounded-lg hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+        {/* Message */}
+        {message && (
+          <div
+            className={`mb-6 p-4 rounded-lg flex items-center gap-3 ${
+              message.type === 'success'
+                ? 'bg-green-50 text-green-800 border border-green-200 dark:bg-green-900/20 dark:text-green-400'
+                : 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-400'
+            }`}
           >
-            <IconTrash className="h-5 w-5" />
-            <div className="text-left">
-              <p className="font-medium">Vider le cache</p>
-              <p className="text-sm text-muted-foreground">
-                Supprimer toutes les données mises en cache
-              </p>
-            </div>
-          </button>
+            {message.type === 'success' ? (
+              <Check className="h-5 w-5" />
+            ) : (
+              <Trash2 className="h-5 w-5" />
+            )}
+            <span>{message.text}</span>
+          </div>
+        )}
 
-          <button
-            onClick={handleWarmCache}
-            disabled={warming}
-            className="p-4 border rounded-lg hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
-          >
-            <IconRefresh className="h-5 w-5" />
-            <div className="text-left">
-              <p className="font-medium">Précharger le cache</p>
-              <p className="text-sm text-muted-foreground">
-                Charger toutes les pages en cache
-              </p>
-            </div>
-          </button>
+        {/* Stats */}
+        <div className="grid md:grid-cols-4 gap-4 mb-8">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Status</p>
+                  <p className="text-2xl font-bold mt-1">
+                    {safeStats.enabled ? 'Enabled' : 'Disabled'}
+                  </p>
+                </div>
+                <Database className="h-8 w-8 text-primary opacity-50" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-sm text-muted-foreground">Duration</p>
+              <p className="text-2xl font-bold mt-1">{safeStats.duration || 0}s</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-sm text-muted-foreground">Cached Pages</p>
+              <p className="text-2xl font-bold mt-1">{safeStats.total_pages || 0}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <p className="text-sm text-muted-foreground">Locales</p>
+              <p className="text-2xl font-bold mt-1">{safeStats.total_locales || 0}</p>
+            </CardContent>
+          </Card>
         </div>
-      </div>
 
-      {/* Info */}
-      <div className="mt-8 p-4 bg-muted/50 rounded-lg">
-        <h3 className="font-semibold mb-2">À propos du cache</h3>
-        <p className="text-sm text-muted-foreground">
-          Le cache de la documentation stocke les pages traitées et la navigation
-          pour améliorer les performances. Le cache est automatiquement invalidé
-          lors de la modification d'une page.
-        </p>
+        {/* Actions */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Actions</CardTitle>
+            <CardDescription>
+              Manage documentation cache
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Button
+                onClick={handleClearCache}
+                disabled={clearing}
+                variant="outline"
+                className="h-auto p-4 justify-start"
+              >
+                <Trash2 className="h-5 w-5 mr-3" />
+                <div className="text-left">
+                  <p className="font-medium">Clear Cache</p>
+                  <p className="text-sm text-muted-foreground">
+                    Remove all cached data
+                  </p>
+                </div>
+              </Button>
+
+              <Button
+                onClick={handleWarmCache}
+                disabled={warming}
+                variant="outline"
+                className="h-auto p-4 justify-start"
+              >
+                <RefreshCw className="h-5 w-5 mr-3" />
+                <div className="text-left">
+                  <p className="font-medium">Warm Cache</p>
+                  <p className="text-sm text-muted-foreground">
+                    Preload all pages into cache
+                  </p>
+                </div>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Info */}
+        <Card className="mt-6">
+          <CardContent className="pt-6">
+            <h3 className="font-semibold mb-2">About Cache</h3>
+            <p className="text-sm text-muted-foreground">
+              Documentation cache stores processed pages and navigation for better performance.
+              Cache is automatically invalidated when pages are modified.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </AuthenticatedLayout>
   );

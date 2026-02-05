@@ -5,6 +5,37 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.81] - 2026-02-05
+
+### Added
+- **Check for updates button**: Added button to manually check for updates on Updates page
+  - Button appears in Current Version card
+  - Calls admin.update.fetch route to refresh update status
+
+### Changed
+- **Documentation navigation**: Reorganized admin section links
+  - Renamed "Browse" to "Editor" in navigation
+  - "Editor" is now first link (IDE-style editor)
+  - Updated links to use correct route paths
+  - Settings link moved to second position
+- **Documentation page rename**: Browse.tsx renamed to Editor.tsx
+  - Controller updated to render Admin/Documentation/Editor
+  - Route names remain the same for backwards compatibility
+
+### Fixed
+- **Documentation Cache page**: Fixed "Cannot convert undefined or null to object" error
+  - Added null/undefined checks for stats prop
+  - Changed to use safeStats with default empty object
+  - Used lucide-react icons instead of @tabler/icons-react
+  - Updated to use Card components for consistent styling
+- **Documentation Config page**: Fixed locale selector using Input instead of Select
+  - Updated Config.tsx with proper Select component
+  - Added Switch component for boolean fields
+  - Added availableLocales prop from controller
+  - Dynamic locale options from available locales
+- **Update page translations**: Added translation keys for update buttons
+  - admin.update.current_version, current_version_description, check_button
+
 ## [1.3.80] - 2026-02-05
 
 ### Added

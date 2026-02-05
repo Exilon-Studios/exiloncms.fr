@@ -27,13 +27,18 @@
     "position": 100,
     "items": [
       {
-        "label": "Gestion",
-        "href": "/admin/documentation",
+        "label": "Editor",
+        "href": "/admin/plugins/documentation/browse",
+        "permission": "documentation.admin"
+      },
+      {
+        "label": "Settings",
+        "href": "/admin/plugins/documentation/settings",
         "permission": "documentation.admin"
       },
       {
         "label": "Cache",
-        "href": "/admin/documentation/cache",
+        "href": "/admin/plugins/documentation/cache",
         "permission": "documentation.admin"
       }
     ]

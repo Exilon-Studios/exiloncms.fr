@@ -125,13 +125,13 @@ class DocumentationController
     }
 
     /**
-     * Browse documentation files
+     * Browse documentation files (Editor)
      */
     public function browse(Request $request, string $locale = 'fr')
     {
         $categories = $this->reader->getCategories($locale);
 
-        return Inertia::render('Admin/Documentation/Browse', [
+        return Inertia::render('Admin/Documentation/Editor', [
             'locale' => $locale,
             'availableLocales' => $this->reader->getAvailableLocales(),
             'categories' => $categories,
@@ -264,7 +264,7 @@ class DocumentationController
         // Clear cache
         $this->cache->setLocale($locale)->clearLocale($locale);
 
-        return redirect()->route('admin.documentation.browse', ['locale' => $locale])
+        return redirect()->route('admin.plugins.documentation.browse', ['locale' => $locale])
             ->with('success', 'Page créée avec succès.');
     }
 
