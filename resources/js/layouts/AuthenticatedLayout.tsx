@@ -81,7 +81,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         children: [
           {
             label: trans('admin.documentation.menu.editor'),
-            href: '/admin/editor',
+            href: '/admin/plugins/documentation/create',
             permission: 'admin.settings',
             icon: <IconFileText className="h-4 w-4" />,
           },
