@@ -1,96 +1,65 @@
 {
   "id": "shop",
   "name": "Shop",
-  "version": "1.0.0",
-  "description": "Système de boutique pour ExilonCMS - Permet aux utilisateurs d'acheter des items avec leur monnaie virtuelle",
+  "version": "2.0.0",
+  "description": "Système de boutique complet pour ExilonCMS",
   "author": "ExilonCMS",
-  "url": "https://exiloncms.fr",
-  "namespace": "ExilonCMS\\Plugins\\Shop",
-  "service_provider": "ExilonCMS\\Plugins\\Shop\\Providers\\ShopServiceProvider",
-  "dependencies": {
-    "exiloncms": ">=1.0.0",
-    "translations": ">=1.0.0"
-  },
-  "navbar_items": [
-    {
-      "label": "shop.nav.shop",
-      "route": "shop.index",
-      "icon": "ShoppingCart",
-      "position": 20,
-      "trans": true
-    }
+  "dependencies": [],
+  "permissions": [
+    "shop.view",
+    "shop.admin",
+    "shop.items.manage",
+    "shop.categories.manage",
+    "shop.orders.manage",
+    "shop.purchases"
   ],
-  "footer_links": {
-    "shop.footer.category": [
+  "navigation": {
+    "icon": "ShoppingCart",
+    "position": 20,
+    "items": [
       {
-        "label": "shop.footer.view_shop",
-        "route": "shop.index",
-        "position": 10,
-        "trans": true
+        "label": "shop.nav.shop",
+        "href": "/shop",
+        "permission": "shop.view"
       },
       {
-        "label": "shop.footer.my_orders",
-        "route": "shop.orders",
-        "position": 20,
-        "permission": "auth",
-        "trans": true
+        "label": "shop.nav.orders",
+        "href": "/shop/orders",
+        "permission": "shop.purchases",
+        "auth": true
       }
     ]
-  },
-  "pages": {
-    "shop": {
-      "title": "shop.pages.shop",
-      "description": "shop.pages.shop_description",
-      "route": "shop.index",
-      "layout": "public",
-      "show_in_navbar": true,
-      "trans": true
-    },
-    "orders": {
-      "title": "shop.pages.orders",
-      "description": "shop.pages.orders_description",
-      "route": "shop.orders",
-      "layout": "auth",
-      "permission": "auth",
-      "trans": true
-    }
   },
   "admin_section": {
     "id": "shop",
     "label": "shop.admin.section",
     "icon": "ShoppingCart",
     "position": 30,
-    "trans": true,
     "items": [
       {
         "label": "shop.admin.dashboard",
         "href": "/admin/shop",
-        "permission": "shop.manage",
-        "trans": true
+        "permission": "shop.admin"
       },
       {
-        "label": "shop.admin.products",
+        "label": "shop.admin.items",
         "href": "/admin/shop/items",
-        "permission": "shop.manage",
-        "trans": true
+        "permission": "shop.items.manage"
       },
       {
         "label": "shop.admin.categories",
         "href": "/admin/shop/categories",
-        "permission": "shop.manage",
-        "trans": true
+        "permission": "shop.categories.manage"
       },
       {
         "label": "shop.admin.orders",
         "href": "/admin/shop/orders",
-        "permission": "shop.manage",
-        "trans": true
+        "permission": "shop.orders.manage"
       },
       {
-        "label": "shop.admin.payments",
-        "href": "/admin/shop/gateways",
-        "permission": "shop.manage",
-        "trans": true
+        "label": "shop.admin.settings",
+        "href": "/admin/shop/settings",
+        "permission": "shop.admin"
       }
     ]
   },
@@ -101,90 +70,75 @@
       "context": "admin",
       "position": 30,
       "title": "shop.widgets.stats",
-      "permission": "shop.manage"
+      "permission": "shop.admin"
     }
   ],
+  "events": {
+    "listen": [],
+    "dispatch": []
+  },
+  "routes": {
+    "admin": "/admin/shop",
+    "web": "/shop"
+  },
   "translations": {
     "en": {
       "shop": {
         "nav": {
-          "shop": "Shop"
-        },
-        "footer": {
-          "category": "Shop",
-          "view_shop": "View Shop",
-          "my_orders": "My Orders"
-        },
-        "pages": {
           "shop": "Shop",
-          "shop_description": "Browse and purchase items from our store",
-          "orders": "My Orders",
-          "orders_description": "View your order history"
+          "orders": "My Orders"
         },
         "admin": {
           "section": "Shop",
-          "products": "Products",
+          "dashboard": "Dashboard",
+          "items": "Items",
           "categories": "Categories",
           "orders": "Orders",
-          "payments": "Payments"
+          "settings": "Settings"
+        },
+        "widgets": {
+          "stats": "Shop Statistics"
+        },
+        "pages": {
+          "title": "Shop",
+          "description": "Browse and purchase items from our store"
+        },
+        "dashboard": {
+          "total_items": "Total Items",
+          "total_orders": "Total Orders",
+          "total_revenue": "Total Revenue",
+          "pending_orders": "Pending Orders"
         }
       }
     },
     "fr": {
       "shop": {
         "nav": {
-          "shop": "Boutique"
-        },
-        "footer": {
-          "category": "Boutique",
-          "view_shop": "Voir la boutique",
-          "my_orders": "Mes commandes"
-        },
-        "pages": {
           "shop": "Boutique",
-          "shop_description": "Parcourez et achetez des items depuis notre boutique",
-          "orders": "Mes commandes",
-          "orders_description": "Voir l'historique de vos commandes"
+          "orders": "Mes commandes"
         },
         "admin": {
           "section": "Boutique",
-          "products": "Produits",
+          "dashboard": "Tableau de bord",
+          "items": "Articles",
           "categories": "Catégories",
           "orders": "Commandes",
-          "payments": "Paiements"
+          "settings": "Paramètres"
+        },
+        "widgets": {
+          "stats": "Statistiques Boutique"
+        },
+        "pages": {
+          "title": "Boutique",
+          "description": "Parcourez et achetez des items depuis notre boutique"
+        },
+        "dashboard": {
+          "total_items": "Total articles",
+          "total_orders": "Total commandes",
+          "total_revenue": "Total revenus",
+          "pending_orders": "Commandes en attente"
         }
       }
     }
-  },
-  "components": {
-    "CartSheet": {
-      "path": "@/components/shop/CartSheet",
-      "description": "Panier latéral rétractable"
-    }
-  },
-  "sidebar_links": {
-    "public": [],
-    "user": [
-      {
-        "label": "dashboard.visit_shop",
-        "href": "/shop",
-        "icon": "ShoppingCart",
-        "position": 40,
-        "trans": true
-      }
-    ],
-    "admin": []
-  },
-  "header_icons": [
-    {
-      "id": "cart",
-      "type": "button",
-      "icon": "ShoppingCart",
-      "aria_label": "shop.header.cart",
-      "permission": "shop.view",
-      "position": 50,
-      "badge": "cartCount",
-      "component": "ShopCartIcon"
-    }
-  ]
+  }
 }

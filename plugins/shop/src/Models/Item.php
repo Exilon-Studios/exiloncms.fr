@@ -2,94 +2,78 @@
 
 namespace ExilonCMS\Plugins\Shop\Models;
 
+use ExilonCMS\Models\Traits\HasImage;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Item represents a purchasable item in the shop.
+ * @property int $id
+ * @property string $name
+ * @property string $description
+ * @property float $price
+ * @property int $stock
+ * @property int $category_id
+ * @property string|null $image
+ * @property bool $is_active
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \ExilonCMS\Plugins\Shop\Models\Category $category
  */
 class Item extends Model
 {
+    use HasFactory;
+    use HasImage;
+
+    protected $table = 'shop_items';
+
     protected $fillable = [
-        'category_id',
         'name',
         'description',
         'price',
+        'stock',
+        'category_id',
         'image',
-        'type',
-        'commands',
-        'give_item',
-        'role_id',
         'is_active',
-        'order',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
+        'price' => 'float',
+        'stock' => 'integer',
         'is_active' => 'boolean',
-        'commands' => 'array',
-        'give_item' => 'boolean',
     ];
 
-    /**
-     * Item types.
-     */
-    public const TYPE_ITEM = 'item';
-
-    public const TYPE_RANK = 'rank';
-
-    public const TYPE_CURRENCY = 'currency';
-
-    public const TYPE_COMMAND = 'command';
-
-    public const TYPE_CUSTOM = 'custom';
-
-    /**
-     * Get the category of the item.
-     */
-    public function category(): BelongsTo
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }
 
-    /**
-     * Get the order items for this item.
-     */
-    public function orderItems(): HasMany
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    /**
-     * Get the payment items for this item.
-     */
-    public function paymentItems(): HasMany
+    protected string $imageKey = 'image';
+
+    public function isInStock(): bool
     {
-        return $this->hasMany(PaymentItem::class);
+        return $this->stock > 0;
     }
 
-    /**
-     * Scope to get only active items.
-     */
-    public function scopeActive($query)
+    public function getFormattedPriceAttribute(): string
     {
-        return $query->where('is_active', true);
-    }
+        $currency = setting('plugin.shop.currency', 'EUR');
+        $symbols = [
+            'EUR' => '€',
+            'USD' => '$',
+            'GBP' => '£',
+            'CAD' => 'C$',
+        ];
 
-    /**
-     * Scope to get items by category.
-     */
-    public function scopeByCategory($query, $categoryId)
-    {
-        return $query->where('category_id', $categoryId);
-    }
-
-    /**
-     * Scope to get ordered items.
-     */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order')->orderBy('name');
+        return number_format($this->price, 2).($symbols[$currency] ?? '€');
     }
 }

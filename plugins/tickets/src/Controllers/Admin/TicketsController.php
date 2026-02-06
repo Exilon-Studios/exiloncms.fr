@@ -1,43 +1,44 @@
 <?php
 
-namespace ExilonCMS\Plugins\Shop\Controllers\Admin;
+namespace ExilonCMS\Plugins\Tickets\Controllers\Admin;
 
-use ExilonCMS\Plugins\Shop\Models\Item;
-use ExilonCMS\Plugins\Shop\Models\Category;
+use ExilonCMS\Plugins\Tickets\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class ShopController
+class TicketsController
 {
     public function index()
     {
         $stats = [
-            'total_items' => Item::count(),
-            'total_orders' => \ExilonCMS\Plugins\Shop\Models\Order::count(),
-            'total_revenue' => \ExilonCMS\Plugins\Shop\Models\Order::completed()->sum('total'),
-            'pending_orders' => \ExilonCMS\Plugins\Shop\Models\Order::pending()->count(),
+            'total_tickets' => Ticket::count(),
+            'open_tickets' => Ticket::open()->count(),
+            'pending_tickets' => Ticket::pending()->count(),
+            'closed_tickets' => Ticket::closed()->count(),
         ];
 
-        $categories = Category::orderBy('position')->get();
+        $tickets = Ticket::with(['user', 'category'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
 
-        return Inertia::render('Admin/Shop/Index', [
+        return Inertia::render('Admin/Tickets/Index', [
             'stats' => $stats,
-            'categories' => $categories,
+            'tickets' => $tickets,
         ]);
     }
 
     public function settings(Request $request)
     {
-        $configFile = base_path('plugins/shop/config/config.php');
+        $configFile = base_path('plugins/tickets/config/config.php');
         $config = file_exists($configFile) ? require $configFile : [];
 
         $settings = [];
         foreach ($config as $key => $field) {
-            $settingKey = "shop.{$key}";
+            $settingKey = "tickets.{$key}";
             $settings[$key] = setting($settingKey, $field['default'] ?? null);
         }
 
-        return Inertia::render('Admin/Shop/Settings', [
+        return Inertia::render('Admin/Tickets/Settings', [
             'config' => $config,
             'settings' => $settings,
         ]);
@@ -45,10 +46,10 @@ class ShopController
 
     public function updateSettings(Request $request)
     {
-        $plugin = app(\ExilonCMS\Classes\Plugin\PluginLoader::class)->getPlugin('shop');
+        $plugin = app(\ExilonCMS\Classes\Plugin\PluginLoader::class)->getPlugin('tickets');
 
         if (!$plugin) {
-            return redirect()->back()->with('error', 'Shop plugin not found.');
+            return redirect()->back()->with('error', 'Tickets plugin not found.');
         }
 
         $configFields = collect($plugin->getConfigFields())->keyBy('name');
@@ -59,7 +60,7 @@ class ShopController
             }
 
             $field = $configFields->get($key);
-            $settingKey = "plugin.shop.{$key}";
+            $settingKey = "plugin.tickets.{$key}";
 
             $processedValue = match ($field['type'] ?? 'text') {
                 'boolean', 'toggle' => (bool) $value,

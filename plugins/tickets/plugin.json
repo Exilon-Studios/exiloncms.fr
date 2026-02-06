@@ -1,0 +1,93 @@
+{
+  "id": "tickets",
+  "name": "Tickets",
+  "version": "2.0.0",
+  "description": "Système de tickets de support pour ExilonCMS",
+  "author": "ExilonCMS",
+  "dependencies": [],
+  "permissions": [
+    "tickets.view",
+    "tickets.admin",
+    "tickets.create",
+    "tickets.respond"
+  ],
+  "navigation": {
+    "icon": "MessageSquare",
+    "position": 25,
+    "items": [
+      {
+        "label": "tickets.nav.tickets",
+        "href": "/tickets",
+        "permission": "tickets.view",
+        "auth": true
+      }
+    ]
+  },
+  "admin_section": {
+    "id": "tickets",
+    "label": "tickets.admin.section",
+    "icon": "MessageSquare",
+    "position": 40,
+    "items": [
+      {
+        "label": "tickets.admin.dashboard",
+        "href": "/admin/tickets",
+        "permission": "tickets.admin"
+      },
+      {
+        "label": "tickets.admin.categories",
+        "href": "/admin/tickets/categories",
+        "permission": "tickets.admin"
+      },
+      {
+        "label": "tickets.admin.settings",
+        "href": "/admin/tickets/settings",
+        "permission": "tickets.admin"
+      }
+    ]
+  },
+  "widgets": [
+    {
+      "id": "tickets_stats",
+      "type": "stats_card",
+      "context": "admin",
+      "position": 40,
+      "title": "tickets.widgets.stats",
+      "permission": "tickets.admin"
+    }
+  ],
+  "translations": {
+    "en": {
+      "tickets": {
+        "nav": {
+          "tickets": "Tickets"
+        },
+        "admin": {
+          "section": "Tickets",
+          "dashboard": "Dashboard",
+          "categories": "Categories",
+          "settings": "Settings"
+        },
+        "widgets": {
+          "stats": "Support Tickets"
+        }
+      }
+    },
+    "fr": {
+      "tickets": {
+        "nav": {
+          "tickets": "Tickets"
+        },
+        "admin": {
+          "section": "Tickets",
+          "dashboard": "Tableau de bord",
+          "categories": "Catégories",
+          "settings": "Paramètres"
+        },
+        "widgets": {
+          "stats": "Tickets Support"
+        }
+      }
+    }
+  }
+}

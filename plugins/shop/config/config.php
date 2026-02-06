@@ -1,47 +1,69 @@
 <?php
 
 return [
-    'currency_name' => [
-        'type' => 'text',
-        'label' => 'Currency Name',
-        'description' => 'The name of your virtual currency (e.g., Coins, Points, Credits)',
-        'default' => 'Coins',
+    'currency' => [
+        'type' => 'select',
+        'label' => 'Currency',
+        'description' => 'Currency used in the shop',
+        'default' => 'EUR',
+        'options' => [
+            'EUR' => 'Euro (€)',
+            'USD' => 'Dollar ($)',
+            'GBP' => 'Pound (£)',
+            'CAD' => 'Canadian Dollar (C$)',
+        ],
     ],
 
-    'currency_symbol' => [
-        'type' => 'text',
-        'label' => 'Currency Symbol',
-        'description' => 'The symbol displayed before amounts (e.g., $, €, £)',
-        'default' => '$',
-    ],
-
-    'enable_shop' => [
+    'enable_guest_checkout' => [
         'type' => 'boolean',
-        'label' => 'Enable Shop',
-        'description' => 'Enable or disable the shop functionality',
+        'label' => 'Enable Guest Checkout',
+        'description' => 'Allow unauthenticated users to place orders',
+        'default' => false,
+    ],
+
+    'enable_stock_management' => [
+        'type' => 'boolean',
+        'label' => 'Enable Stock Management',
+        'description' => 'Track product stock levels',
         'default' => true,
+    ],
+
+    'enable_tax' => [
+        'type' => 'boolean',
+        'label' => 'Enable Tax',
+        'description' => 'Calculate and apply taxes to orders',
+        'default' => false,
+    ],
+
+    'tax_rate' => [
+        'type' => 'number',
+        'label' => 'Tax Rate (%)',
+        'description' => 'Tax percentage to apply',
+        'default' => 20,
+        'min' => 0,
+        'max' => 100,
     ],
 
     'items_per_page' => [
         'type' => 'number',
-        'label' => 'Items per Page',
-        'description' => 'Number of items to display per page in the shop',
+        'label' => 'Items Per Page',
+        'description' => 'Number of items to display per page',
         'default' => 12,
         'min' => 6,
-        'max' => 48,
+        'max' => 50,
     ],
 
-    'enable_featured_items' => [
+    'enable_reviews' => [
         'type' => 'boolean',
-        'label' => 'Enable Featured Items',
-        'description' => 'Show a section for featured items on the shop page',
+        'label' => 'Enable Reviews',
+        'description' => 'Allow users to review products',
         'default' => true,
     ],
 
-    'auto_deliver' => [
+    'auto_approve_reviews' => [
         'type' => 'boolean',
-        'label' => 'Auto-Delivery',
-        'description' => 'Automatically deliver items after purchase (if supported by game server)',
+        'label' => 'Auto-approve Reviews',
+        'description' => 'Reviews are published without moderation',
         'default' => false,
     ],
 ];

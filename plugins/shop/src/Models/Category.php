@@ -3,48 +3,35 @@
 namespace ExilonCMS\Plugins\Shop\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
- * Category represents a shop category for organizing items.
+ * @property int $id
+ * @property string $name
+ * @property string|null $description
+ * @property int $position
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Illuminate\Support\Collection|\ExilonCMS\Plugins\Shop\Models\Item[] $items
  */
 class Category extends Model
 {
+    use HasFactory;
+
+    protected $table = 'shop_categories';
+
     protected $fillable = [
         'name',
         'description',
-        'icon',
-        'color',
-        'order',
-        'is_active',
+        'position',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'order' => 'integer',
+        'position' => 'integer',
     ];
 
-    /**
-     * Get the items in this category.
-     */
-    public function items(): HasMany
+    public function items()
     {
-        return $this->hasMany(Item::class);
-    }
-
-    /**
-     * Scope to get only active categories.
-     */
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-
-    /**
-     * Scope to get ordered categories.
-     */
-    public function scopeOrdered($query)
-    {
-        return $query->orderBy('order')->orderBy('name');
+        return $this->hasMany(Item::class)->orderBy('name');
     }
 }

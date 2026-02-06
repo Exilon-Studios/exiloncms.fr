@@ -8,19 +8,28 @@ use ExilonCMS\Classes\Plugin\Plugin;
 #[PluginMeta(
     id: 'shop',
     name: 'Shop',
-    version: '2.0.0',
-    description: 'Système de boutique complet pour ExilonCMS',
+    description: 'Système de boutique pour ExilonCMS - Permet aux utilisateurs d\'acheter des items avec leur monnaie virtuelle',
+    version: '1.0.0',
     author: 'ExilonCMS',
-    dependencies: [],
-    permissions: ['shop.view', 'shop.admin', 'shop.items.manage', 'shop.categories.manage', 'shop.orders.manage', 'shop.purchases']
+    url: 'https://exiloncms.fr',
+    dependencies: [
+        'exiloncms' => '>=1.0.0',
+        'translations' => '>=1.0.0',
+    ],
+    permissions: [
+        'shop.manage',
+        'shop.products.create',
+        'shop.products.edit',
+        'shop.products.delete',
+        'shop.orders.view',
+        'shop.payments.manage',
+    ],
 )]
 class Shop extends Plugin
 {
-    public function boot(): void
-    {
-        // Routes, views, and migrations are auto-loaded by PluginLoader
-    }
-
+    /**
+     * Get plugin configuration fields for admin panel
+     */
     public function getConfigFields(): array
     {
         return [
@@ -59,5 +68,14 @@ class Shop extends Plugin
                 'description' => 'Calculer et appliquer les taxes sur les commandes',
             ],
         ];
+    }
+
+    /**
+     * Boot the plugin
+     */
+    public function boot(): void
+    {
+        // Routes, views, and migrations are auto-loaded by PluginLoader
+        // Add custom boot logic here if needed
     }
 }
