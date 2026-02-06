@@ -21,7 +21,7 @@ import { renderIcon } from '@/lib/navigation-icons';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   const pageProps = usePage<PageProps>().props as any;
-  const { auth, settings, updatesCount = 0, enabledPlugins = [], enabledPluginConfigs = [], pluginNavigation = [] } = pageProps;
+  const { auth, settings, updatesCount = 0, enabledPlugins = [], pluginNavigation = [] } = pageProps;
 
   // Helper function to check if user has a specific permission
   const can = (permission: string): boolean => {
@@ -136,7 +136,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         },
       ],
     },
-    // Extensions Section (Plugins & Themes)
+  // Extensions Section (Plugins & Themes)
     {
       type: 'section',
       label: 'EXTENSIONS',
@@ -160,8 +160,14 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
       ],
     },
     // Dynamic plugin navigation from plugin.json manifests
-    ...buildPluginNavigationItems,
-    // CONFIGURATIONS Section - just simple links, no nested sections
+    ...pluginNavigation,
+    // PLUGIN CONFIG Section - unified section for all plugin dropdowns
+    {
+      type: 'section',
+      label: 'PLUGIN CONFIG',
+      children: pluginNavigation,
+    },
+  // CONFIGURATIONS Section - just simple links, no nested sections
     {
       type: 'section',
       label: 'CONFIGURATIONS',
