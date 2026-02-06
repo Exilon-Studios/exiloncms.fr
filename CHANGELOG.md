@@ -5,6 +5,17 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.94] - 2026-02-06
+
+### Fixed
+- **Plugin service provider visibility**: Changed getPluginManifest() to public
+  - Allows PluginServiceProvider to access plugin manifest data
+  - Fixes "Call to protected method" error on wizard page
+  - Required for route prefix configuration from plugin.json
+- **Orphan code in DocumentationController**: Removed duplicate return statement
+  - Fixed syntax error causing parse failures
+  - Resolves CI build failures from Laravel Pint
+
 ## [1.3.93] - 2026-02-06
 
 ### Fixed
