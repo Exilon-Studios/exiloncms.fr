@@ -152,9 +152,6 @@ class DocumentationController
             ->with('success', 'Configuration saved successfully.');
     }
 
-        return redirect()->back()->with('success', 'Configuration updated successfully.');
-    }
-
     /**
      * Process a field value based on its type.
      */

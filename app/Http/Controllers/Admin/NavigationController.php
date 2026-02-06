@@ -162,6 +162,7 @@ class NavigationController extends Controller
                 $nav = $manifest['navigation'];
                 $nav['plugin'] = $pluginId;
                 $navigation[] = $nav;
+
                 continue;
             }
 
@@ -216,6 +217,7 @@ class NavigationController extends Controller
         usort($merged, function ($a, $b) {
             $posA = $a['position'] ?? 100;
             $posB = $b['position'] ?? 100;
+
             return $posA <=> $posB;
         });
 
