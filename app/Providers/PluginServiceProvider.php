@@ -93,10 +93,12 @@ class PluginServiceProvider extends ServiceProvider
             }
 
             // Load routes - use plugin ID as prefix (e.g., /shop, /blog)
+            // Plugins can override this by setting a route_prefix in their config
             if ($plugin->hasRoutes()) {
                 $routesPath = $plugin->getRoutesPath();
+                $routePrefix = $this->getPluginRoutePrefix($pluginId, $plugin);
                 Route::middleware(['web'])
-                    ->prefix($pluginId)
+                    ->prefix($routePrefix)
                     ->group(function () use ($plugin, $routesPath) {
                         require $routesPath;
                     });
@@ -130,5 +132,34 @@ class PluginServiceProvider extends ServiceProvider
 
         // Boot all enabled plugins (call their boot() method)
         $this->loader->bootPlugins($enabledPlugins);
+    }
+
+    /**
+     * Get the route prefix for a plugin.
+     * Checks plugin manifest first, then database setting, otherwise uses plugin ID.
+     */
+    protected function getPluginRoutePrefix(string $pluginId, $plugin): string
+    {
+        // Check plugin manifest for route configuration
+        $manifest = $plugin->getPluginManifest();
+        $webRoute = $manifest['routes']['web'] ?? null;
+
+        if ($webRoute && is_string($webRoute)) {
+            // If it's a simple string (not starting with /), use it as prefix
+            if (! str_starts_with($webRoute, '/')) {
+                return $webRoute;
+            }
+        }
+
+        // Check if plugin has a route_prefix setting in database
+        $configKey = "plugin.{$pluginId}.route_prefix";
+        $customPrefix = setting($configKey);
+
+        if ($customPrefix && is_string($customPrefix) && ! empty($customPrefix)) {
+            return trim($customPrefix, '/');
+        }
+
+        // Default to plugin ID
+        return $pluginId;
     }
 }

@@ -91,6 +91,7 @@ class PluginConfigController extends Controller
         $validatedData = $request->validate($validationRules);
 
         // Save each setting
+        $routePrefixChanged = false;
         foreach ($request->input('settings', []) as $key => $value) {
             if (! $configFields->has($key)) {
                 continue;
@@ -99,6 +100,14 @@ class PluginConfigController extends Controller
             $field = $configFields->get($key);
             $settingKey = "plugin.{$plugin}.{$key}";
 
+            // Check if route_prefix is changing
+            if ($key === 'route_prefix') {
+                $oldValue = setting($settingKey);
+                if ($oldValue !== $value) {
+                    $routePrefixChanged = true;
+                }
+            }
+
             // Process value based on field type
             $processedValue = $this->processFieldValue($value, $field);
 
@@ -106,6 +115,12 @@ class PluginConfigController extends Controller
                 ['name' => $settingKey],
                 ['value' => $processedValue]
             );
+        }
+
+        // If route_prefix changed, clear route cache to trigger rebuild
+        if ($routePrefixChanged) {
+            \Illuminate\Support\Facades\Cache::forget('admin.navigation');
+            \Illuminate\Support\Facades\Cache::forget('plugin.routes');
         }
 
         return redirect()->back()

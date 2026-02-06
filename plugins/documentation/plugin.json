@@ -49,10 +49,12 @@
     "dispatch": []
   },
   "routes": {
-    "admin": "/admin/documentation",
-    "web": "/docs"
+    "admin": "/admin/plugins/documentation",
+    "web": "docs",
+    "web_prefix_configurable": true
   },
   "settings": {
+    "route_prefix": "docs",
     "default_locale": "fr",
     "available_locales": ["fr", "en"],
     "cache_enabled": true,

@@ -62,10 +62,19 @@ class DocumentationController
         $configFile = base_path('plugins/documentation/config/config.php');
         $config = File::exists($configFile) ? require $configFile : [];
 
+        // Add route_prefix field dynamically
+        $config['route_prefix'] = [
+            'type' => 'text',
+            'label' => 'Route Prefix',
+            'description' => 'Base URL path for documentation (e.g., "docs" or "documentation"). URLs will be like /docs/getting-started',
+            'default' => 'docs',
+            'validation' => 'required|regex:/^[a-z0-9-]+$/',
+        ];
+
         // Get current values from settings
         $settings = [];
         foreach ($config as $key => $field) {
-            $settingKey = "documentation.{$key}";
+            $settingKey = "plugin.documentation.{$key}";
             $settings[$key] = setting($settingKey, $field['default'] ?? null);
         }
 
@@ -81,13 +90,28 @@ class DocumentationController
      */
     public function updateConfig(Request $request)
     {
-        $plugin = app(\ExilonCMS\Classes\Plugin\PluginLoader::class)->getPlugin('documentation');
+        $plugin = app(\ExilonCMS\Classes\Plugin\Plugin\PluginLoader::class)->getPlugin('documentation');
 
         if (! $plugin) {
             return redirect()->back()->with('error', 'Documentation plugin not found.');
         }
 
-        $configFields = collect($plugin->getConfigFields())->keyBy('name');
+        // Get config from plugin config file
+        $configFile = base_path('plugins/documentation/config/config.php');
+        $config = File::exists($configFile) ? require $configFile : [];
+
+        // Add route_prefix field dynamically
+        $config['route_prefix'] = [
+            'type' => 'text',
+            'label' => 'Route Prefix',
+            'description' => 'Base URL path for documentation (e.g., "docs" or "documentation"). URLs will be like /docs/getting-started',
+            'default' => 'docs',
+            'validation' => 'required|regex:/^[a-z0-9-]+$/',
+        ];
+
+        $configFields = collect($config)->keyBy('name');
+
+        $routePrefixChanged = false;
 
         // Save each setting
         foreach ($request->all() as $key => $value) {
@@ -98,6 +122,14 @@ class DocumentationController
             $field = $configFields->get($key);
             $settingKey = "plugin.documentation.{$key}";
 
+            // Check if route_prefix is changing
+            if ($key === 'route_prefix') {
+                $oldValue = setting($settingKey);
+                if ($oldValue !== $value) {
+                    $routePrefixChanged = true;
+                }
+            }
+
             // Process value based on field type
             $processedValue = $this->processFieldValue($value, $field);
 
@@ -106,6 +138,19 @@ class DocumentationController
                 ['value' => is_array($processedValue) ? json_encode($processedValue) : $processedValue]
             );
         }
+
+        // Clear cache when configuration changes
+        $this->cache->clearLocale($this->reader->getAvailableLocales());
+
+        // If route_prefix changed, show warning that routes need to be rebuilt
+        if ($routePrefixChanged) {
+            return redirect()->back()
+                ->with('success', 'Configuration saved. Route prefix has been changed. Clear route cache if needed.');
+        }
+
+        return redirect()->back()
+            ->with('success', 'Configuration saved successfully.');
+    }
 
         return redirect()->back()->with('success', 'Configuration updated successfully.');
     }

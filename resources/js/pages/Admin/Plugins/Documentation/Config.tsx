@@ -204,7 +204,14 @@ export default function DocumentationConfig({ config, settings, availableLocales
             <form onSubmit={handleSubmit} className="space-y-6">
               {Object.entries(config).map(([key, field]) => (
                 <div key={key} className="space-y-2">
-                  <Label htmlFor={key}>{field.label}</Label>
+                  <Label htmlFor={key} className="flex items-center gap-2">
+                    {field.label}
+                    {key === 'route_prefix' && (
+                      <span className="text-xs px-2 py-0.5 bg-amber-500/10 text-amber-600 rounded">
+                        Requires cache clear to take effect
+                      </span>
+                    )}
+                  </Label>
 
                   {field.type === 'boolean' && (
                     <div className="flex items-center space-x-2">
@@ -260,7 +267,14 @@ export default function DocumentationConfig({ config, settings, availableLocales
                 </div>
               ))}
 
-              <div className="flex justify-end pt-4">
+              <div className="flex justify-end pt-4 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.post(route('admin.plugins.documentation.cache.clear'))}
+                >
+                  Clear Cache
+                </Button>
                 <Button type="submit">
                   <Save className="h-4 w-4 mr-2" />
                   Save Configuration

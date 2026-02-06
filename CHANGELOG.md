@@ -5,6 +5,23 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.92] - 2026-02-05
+
+### Added
+- **Configurable documentation route prefix**: Documentation plugin can now use custom base path
+  - Added `route_prefix` setting to documentation plugin configuration
+  - Can choose between `/docs`, `/documentation`, or any custom path
+  - Route prefix is read from plugin.json manifest, database setting, or defaults to plugin ID
+  - PluginServiceProvider checks all three sources in order of priority
+  - Navigation cache is cleared when route_prefix is changed
+  - URLs will be like `/docs/getting-started` or `/documentation/getting-started`
+
+### Changed
+- **Documentation plugin configuration**: Added route_prefix option to plugin config
+  - Plugin.json updated with configurable web route prefix
+  - Settings form now includes route_prefix field with validation
+  - Route prefix must be lowercase alphanumeric with hyphens only
+
 ## [1.3.91] - 2026-02-05
 
 ### Added

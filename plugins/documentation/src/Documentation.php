@@ -25,6 +25,14 @@ class Documentation extends Plugin
     {
         return [
             [
+                'name' => 'route_prefix',
+                'label' => 'Préfixe de route',
+                'type' => 'text',
+                'default' => 'docs',
+                'description' => 'Chemin de base pour la documentation (ex: "docs" ou "documentation"). Ne pas mettre de slash au début.',
+                'validation' => 'required|regex:/^[a-z0-9-]+$/',
+            ],
+            [
                 'name' => 'default_locale',
                 'label' => 'Langue par défaut',
                 'type' => 'select',
