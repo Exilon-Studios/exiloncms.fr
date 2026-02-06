@@ -28,17 +28,35 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // Create admin user
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
-            [
+        // Create admin user with configurable email
+        $adminEmail = env('ADMIN_EMAIL', 'admin@example.com');
+
+        // Check if admin already exists with the same email to avoid duplicates
+        $existingAdmin = User::where('email', $adminEmail)->first();
+        if (!$existingAdmin) {
+            $admin = User::create([
+                'email' => $adminEmail,
                 'name' => 'Admin',
-                'password' => Hash::make('password'),
+                'password' => Hash::make('admin123'),
                 'role_id' => $adminRole->id,
                 'email_verified_at' => now(),
                 'password_changed_at' => now(),
-            ]
-        );
+            ]);
+        }
+
+        // Fallback: create with admin@example.com if no env set
+        if (!$existingAdmin) {
+            $admin = User::firstOrCreate(
+                ['email' => 'admin@example.com'],
+                [
+                    'name' => 'Admin',
+                    'password' => Hash::make('password'),
+                    'role_id' => $adminRole->id,
+                    'email_verified_at' => now(),
+                    'password_changed_at' => now(),
+                ]
+            );
+        }
 
         // Create all permissions for admin role
         if ($adminRole->permissions()->count() === 0) {
