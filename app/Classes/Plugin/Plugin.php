@@ -245,7 +245,7 @@ abstract class Plugin
     /**
      * Get the plugin.json manifest data
      */
-    protected function getPluginManifest(): array
+    public function getPluginManifest(): array
     {
         $manifestPath = $this->getPluginPath().'/plugin.json';
 
