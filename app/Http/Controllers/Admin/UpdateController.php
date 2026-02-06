@@ -35,7 +35,7 @@ class UpdateController extends Controller
 
     public function fetch()
     {
-        $response = to_route('admin.update.index');
+        $response = redirect()->route('admin.update.index');
 
         try {
             // Force fetch updates from GitHub

@@ -19,6 +19,8 @@ class DocumentationEnabled
         // Vérifier si le plugin documentation est activé
         $enabledPlugins = setting('enabled_plugins', []);
 
+        \Log::info('DocumentationEnabled middleware - enabled_plugins:', ['plugins' => $enabledPlugins]);
+
         if (! in_array('documentation', $enabledPlugins, true)) {
             // Si le plugin n'est pas activé, rediriger vers l'accueil ou retourner 404
             if ($request->expectsJson()) {

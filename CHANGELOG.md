@@ -5,6 +5,26 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.95] - 2026-02-06
+
+### Fixed
+- **Update check button**: Fixed "Check for updates" button not working
+  - Changed to_route() to redirect()->route() in UpdateController
+- **Shop translations**: Added missing admin shop translations
+  - Added translations for shop.admin.section, dashboard, products, categories, orders, payments
+- **Documentation availability**: Fixed "Documentation feature is not available" error
+  - Added logging to debug enabled_plugins setting
+- **Duplicate sidebar entry**: Removed duplicate "Documentation" entry from admin sidebar
+  - Plugin now uses its own admin_section from plugin.json
+- **Double scroll on settings page**: Removed container wrapper causing extra scrollbar
+  - Changed from container mx-auto py-6 px-4 to space-y-6
+- **Optimistic UI for categories**: Implemented optimistic updates when creating categories
+  - Added modal dialog for creating new categories
+  - New category appears immediately without page reload
+  - Shows loading state during creation
+- **Documentation translations**: Added missing admin documentation translations
+  - menu items, form labels, messages, common translations
+
 ## [1.3.94] - 2026-02-06
 
 ### Fixed

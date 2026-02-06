@@ -117,7 +117,7 @@ export default function DocumentationConfig({ config, settings, availableLocales
     <AuthenticatedLayout>
       <Head title="Documentation Configuration" />
 
-      <div className="container mx-auto py-6 px-4">
+      <div className="space-y-6">
         {/* Header */}
         <div className="mb-6">
           <Link href={route('admin.plugins.documentation.index')}>

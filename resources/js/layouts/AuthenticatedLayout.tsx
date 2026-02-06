@@ -16,10 +16,6 @@ import {
   IconMenu2,
   IconPlug,
   IconPalette,
-  IconFileText,
-  IconSettings,
-  IconFolder,
-  IconDatabase,
 } from '@tabler/icons-react';
 import { renderIcon } from '@/lib/navigation-icons';
 
@@ -95,40 +91,8 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     });
   }, [pluginNavigation]);
 
-  // Build plugin config links dynamically with dropdown support
+  // Build plugin config links dynamically
   const pluginConfigLinks = enabledPluginConfigs.map((plugin: any) => {
-    // Documentation plugin gets a dropdown menu
-    if (plugin.id === 'documentation') {
-      return {
-        label: plugin.name,
-        permission: 'admin.settings',
-        icon: (
-          <IconFileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-        ),
-        children: [
-          {
-            label: trans('admin.documentation.menu.browse'),
-            href: '/admin/plugins/documentation/browse',
-            permission: 'admin.settings',
-            icon: <IconFolder className="h-4 w-4" />,
-          },
-          {
-            label: trans('admin.documentation.menu.configuration'),
-            href: '/admin/plugins/documentation/settings',
-            permission: 'admin.settings',
-            icon: <IconSettings className="h-4 w-4" />,
-          },
-          {
-            label: trans('admin.documentation.menu.cache'),
-            href: '/admin/plugins/documentation/cache',
-            permission: 'admin.settings',
-            icon: <IconDatabase className="h-4 w-4" />,
-          },
-        ],
-      };
-    }
-
-    // Other plugins get a simple link
     return {
       label: plugin.name,
       href: plugin.configUrl,

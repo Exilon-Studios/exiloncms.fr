@@ -583,6 +583,14 @@ return [
         ],
     ],
     'shop' => [
+        'admin' => [
+            'section' => 'Boutique',
+            'dashboard' => 'Tableau de bord',
+            'products' => 'Produits',
+            'categories' => 'Catégories',
+            'orders' => 'Commandes',
+            'payments' => 'Paiements',
+        ],
         'items' => [
             'title' => 'Articles',
             'description' => 'Gérez les articles de la boutique',
@@ -888,9 +896,27 @@ return [
         ],
     ],
 
+    'common' => [
+        'cancel' => 'Annuler',
+        'create' => 'Créer',
+        'creating' => 'Création...',
+    ],
     'documentation' => [
         'title' => 'Documentation',
         'description' => 'Gérer la documentation du site',
+        'menu' => [
+            'browse' => 'Parcourir',
+            'configuration' => 'Configuration',
+            'cache' => 'Cache',
+        ],
+        'new_category' => 'Nouvelle catégorie',
+        'create_category' => 'Créer une catégorie',
+        'create_category_description' => 'Créer une nouvelle catégorie de documentation',
+        'name' => 'Nom',
+        'slug' => 'Slug',
+        'no_docs_found' => 'Aucune documentation trouvée',
+        'create_files_hint' => 'Créez des fichiers dans :path',
+    ],
         'no_docs_found' => 'Aucune documentation trouvée pour cette langue.',
         'create_files_hint' => 'Créez des fichiers markdown dans :path',
         'create_page' => 'Créer une page',
