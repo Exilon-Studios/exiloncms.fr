@@ -170,14 +170,6 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     },
     // Dynamic plugin navigation from plugin.json manifests
     ...buildPluginNavigationItems,
-    // Plugin Config section (as separate section, outside Settings)
-    ...(pluginConfigLinks.length > 0 ? [
-      {
-        type: 'section',
-        label: 'PLUGIN CONFIG',
-        children: pluginConfigLinks,
-      },
-    ] : []),
     // CONFIGURATIONS Section - just simple links, no nested sections
     {
       type: 'section',
