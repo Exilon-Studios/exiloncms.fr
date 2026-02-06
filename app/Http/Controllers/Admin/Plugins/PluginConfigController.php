@@ -117,10 +117,9 @@ class PluginConfigController extends Controller
             );
         }
 
-        // If route_prefix changed, clear route cache to trigger rebuild
+        // If route_prefix changed, clear plugin route cache
         if ($routePrefixChanged) {
-            \Illuminate\Support\Facades\Cache::forget('admin.navigation');
-            \Illuminate\Support\Facades\Cache::forget('plugin.routes');
+            \Illuminate\Support\Facades\Cache::forget("plugin.{$plugin}.route_prefix");
         }
 
         return redirect()->back()

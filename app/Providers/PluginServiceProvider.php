@@ -137,29 +137,39 @@ class PluginServiceProvider extends ServiceProvider
     /**
      * Get the route prefix for a plugin.
      * Checks plugin manifest first, then database setting, otherwise uses plugin ID.
+     * Results are cached for performance.
      */
     protected function getPluginRoutePrefix(string $pluginId, $plugin): string
     {
-        // Check plugin manifest for route configuration
-        $manifest = $plugin->getPluginManifest();
-        $webRoute = $manifest['routes']['web'] ?? null;
+        $cacheKey = "plugin.{$pluginId}.route_prefix";
 
-        if ($webRoute && is_string($webRoute)) {
-            // If it's a simple string (not starting with /), use it as prefix
-            if (! str_starts_with($webRoute, '/')) {
-                return $webRoute;
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($pluginId, $plugin) {
+            // Check plugin manifest for route configuration
+            $manifest = $plugin->getPluginManifest();
+            $webRoute = $manifest['routes']['web'] ?? null;
+
+            if ($webRoute && is_string($webRoute) && ! str_starts_with($webRoute, '/')) {
+                // Use manifest value as default
+                $manifestPrefix = $webRoute;
+            } else {
+                $manifestPrefix = null;
             }
-        }
 
-        // Check if plugin has a route_prefix setting in database
-        $configKey = "plugin.{$pluginId}.route_prefix";
-        $customPrefix = setting($configKey);
+            // Check if plugin has a route_prefix setting in database (can override manifest)
+            $configKey = "plugin.{$pluginId}.route_prefix";
+            $dbPrefix = setting($configKey);
 
-        if ($customPrefix && is_string($customPrefix) && ! empty($customPrefix)) {
-            return trim($customPrefix, '/');
-        }
+            // Priority: DB setting > manifest > plugin ID
+            if ($dbPrefix && is_string($dbPrefix) && ! empty($dbPrefix)) {
+                return trim($dbPrefix, '/');
+            }
 
-        // Default to plugin ID
-        return $pluginId;
+            if ($manifestPrefix && is_string($manifestPrefix) && ! empty($manifestPrefix)) {
+                return $manifestPrefix;
+            }
+
+            // Default to plugin ID
+            return $pluginId;
+        });
     }
 }
