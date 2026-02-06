@@ -1,5 +1,5 @@
 import { PropsWithChildren, useMemo } from 'react';
-import { usePage, router } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { SidebarLayout } from '@/components/admin/Sidebar';
 import { Toaster } from 'sonner';
@@ -7,9 +7,7 @@ import FlashMessages from '@/components/FlashMessages';
 import { trans } from '@/lib/i18n';
 import {
   IconBrandTabler,
-  IconUserBolt,
   IconUsers,
-  IconServer,
   IconHome,
   IconShield,
   IconBan,
@@ -28,10 +26,6 @@ import { renderIcon } from '@/lib/navigation-icons';
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   const pageProps = usePage<PageProps>().props as any;
   const { auth, settings, updatesCount = 0, enabledPlugins = [], enabledPluginConfigs = [], pluginNavigation = [] } = pageProps;
-
-  // Check if we're in admin section - hide user-facing shop links there
-  const url = pageProps.url || window.location.pathname;
-  const isAdminSection = url.startsWith('/admin');
 
   // Helper function to check if user has a specific permission
   const can = (permission: string): boolean => {
@@ -145,15 +139,6 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     };
   });
 
-  // Create PLUGIN CONFIG section (shown only if plugins have config)
-  const pluginConfigSection = pluginConfigLinks.length > 0 ? [
-    {
-      type: 'section',
-      label: 'PLUGIN CONFIG',
-      children: pluginConfigLinks,
-    },
-  ] : [];
-
   // Primary navigation links - Sections rétractables
   const allPrimaryLinks = [
     // Dashboard
@@ -196,7 +181,7 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         },
       ],
     },
-    // PLUGINS & THEMES Section (grouped together)
+    // Extensions Section (Plugins & Themes)
     {
       type: 'section',
       label: 'EXTENSIONS',
@@ -221,60 +206,6 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     },
     // Dynamic plugin navigation from plugin.json manifests
     ...buildPluginNavigationItems,
-    // Plugin Config section (as separate section, outside Settings)
-    {
-      type: 'section',
-      label: trans('admin.nav.users.heading').toUpperCase(),
-      children: [
-        {
-          label: trans('admin.nav.users.users'),
-          href: '/admin/users',
-          permission: 'admin.users',
-          icon: (
-            <IconUsers className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.users.roles'),
-          href: '/admin/roles',
-          permission: 'admin.roles',
-          icon: (
-            <IconShield className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: trans('admin.nav.users.bans'),
-          href: '/admin/bans',
-          permission: 'admin.users',
-          icon: (
-            <IconBan className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-      ],
-    },
-    // PLUGINS & THEMES Section (grouped together)
-    {
-      type: 'section',
-      label: 'EXTENSIONS',
-      children: [
-        {
-          label: 'Plugins',
-          href: '/admin/plugins',
-          permission: 'admin.settings',
-          icon: (
-            <IconPlug className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-        {
-          label: 'Themes',
-          href: '/admin/themes',
-          permission: 'admin.settings',
-          icon: (
-            <IconPalette className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-          ),
-        },
-      ],
-    },
     // Plugin Config section (as separate section, outside Settings)
     ...(pluginConfigLinks.length > 0 ? [
       {
@@ -364,10 +295,8 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
         }}
         siteName={settings.name || 'ExilonCMS'}
       >
-        <div className="flex flex-1 flex-col">
-          <div className="flex-1 px-6 md:px-8 pt-6 md:pt-8 pb-8">
-            {children}
-          </div>
+        <div className="px-6 md:px-8 pt-6 md:pt-8 pb-8">
+          {children}
         </div>
       </SidebarLayout>
     </div>

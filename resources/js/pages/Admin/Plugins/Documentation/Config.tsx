@@ -51,8 +51,8 @@ const LOCALE_LABELS: Record<string, string> = {
 };
 
 export default function DocumentationConfig({ config, settings, availableLocales = ['fr', 'en'] }: Props) {
-  const { settings: globalSettings } = usePage<PageProps>().props;
-  const { trans } = usePage<PageProps>().props.trans?.admin?.plugins?.documentation || {};
+  const pageProps = usePage<PageProps>().props;
+  const trans = (pageProps.trans as any)?.admin?.plugins?.documentation || {};
   const [newLocale, setNewLocale] = useState('');
   const [isCreatingLocale, setIsCreatingLocale] = useState(false);
 
@@ -63,9 +63,9 @@ export default function DocumentationConfig({ config, settings, availableLocales
 
     Object.keys(config).forEach((key) => {
       const field = config[key];
-      if (field.type === 'boolean') {
+      if (field && field.type === 'boolean') {
         data[key] = formData.get(`${key}_checkbox`) === 'on';
-      } else {
+      } else if (field) {
         data[key] = formData.get(key);
       }
     });

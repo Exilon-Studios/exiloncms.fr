@@ -5,6 +5,36 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.93] - 2026-02-06
+
+### Fixed
+- **Double scroll in admin pages**: Removed nested flex containers causing double scrollbar
+  - Removed flex wrapper around children in AuthenticatedLayout
+  - Scroll now handled properly by SidebarLayout's overflow-y-auto container
+- **Documentation browse back button**: Fixed non-functional back button
+  - Added missing `route` import from ziggy-js in Browse.tsx
+  - Back button now correctly navigates to documentation index
+- **Navigation icons compatibility**: Fixed icon imports for @tabler/icons-react v3
+  - Replaced deprecated IconRefreshCw with IconRefresh
+  - Removed non-existent icons (IconUnlock, IconImage, IconDownloadCloud, etc.)
+  - Added IconPhoto as replacement for IconImage
+  - Fixed imports for Book icon used in documentation plugin
+- **Documentation Config page**: Fixed TypeScript errors
+  - Fixed trans property access in DocumentationConfig component
+  - Added type safety for config field iteration
+
+### Added
+- **Context7 MCP integration**: Added MCP Context7 configuration for AI documentation search
+  - Created opencode.jsonc with Context7 MCP server configuration
+  - Added CONTEXT7_API_KEY environment variable
+- **AGENTS.md**: Created coding guidelines for agentic coding agents
+  - Build, test, and lint commands
+  - Code style guidelines (PSR-12 PHP, TypeScript strict mode)
+  - Import patterns and naming conventions
+  - Database migration safety rules
+  - Inertia.js integration patterns
+  - Extension system (plugins & themes) guidelines
+
 ## [1.3.92] - 2026-02-05
 
 ### Added
