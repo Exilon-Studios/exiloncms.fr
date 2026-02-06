@@ -10,6 +10,7 @@ use ExilonCMS\Http\Controllers\Admin\Documentation\DocumentationController;
 use ExilonCMS\Http\Controllers\Admin\IntegrationsController;
 use ExilonCMS\Http\Controllers\Admin\LanguageController;
 use ExilonCMS\Http\Controllers\Admin\NavbarController;
+use ExilonCMS\Http\Controllers\Admin\NavigationController;
 use ExilonCMS\Http\Controllers\Admin\NotificationManagerController;
 use ExilonCMS\Http\Controllers\Admin\OnboardingController;
 use ExilonCMS\Http\Controllers\Admin\PluginController;
@@ -82,6 +83,12 @@ Route::prefix('plugins')->name('plugins.')->middleware('can:admin.settings')->gr
     Route::post('/{plugin}/config', [PluginConfigController::class, 'update'])->name('update');
     Route::delete('/{plugin}/config', [PluginConfigController::class, 'clear'])->name('config.clear');
     Route::delete('/{plugin}', [PluginImportController::class, 'destroy'])->name('destroy');
+});
+
+// Dynamic Navigation API
+Route::prefix('navigation')->name('navigation.')->middleware('can:admin.settings')->group(function () {
+    Route::get('/api', [NavigationController::class, 'api'])->name('api');
+    Route::post('/cache/clear', [NavigationController::class, 'clearCache'])->name('cache.clear');
 });
 
 Route::prefix('settings')->name('settings.')->middleware('can:admin.settings')->group(function () {

@@ -5,6 +5,28 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.91] - 2026-02-05
+
+### Added
+- **Dynamic navigation system**: Plugins can now declare navigation in plugin.json
+  - Created NavigationController for building navigation from plugin manifests
+  - Plugins declare navigation via `admin_section` or `navigation` key in plugin.json
+  - Navigation is cached for performance and automatically rebuilt on plugin changes
+  - Added navigation icons helper library for dynamic icon rendering
+  - AuthenticatedLayout now integrates plugin navigation dynamically
+  - Icons are rendered dynamically from plugin manifest icon names
+- **Navigation cache clear route**: Added POST /admin/navigation/cache/clear to rebuild navigation
+
+### Changed
+- **Navigation architecture**: Moved from hardcoded to plugin-driven navigation
+  - Core navigation items still defined in AuthenticatedLayout
+  - Plugin navigation items injected dynamically from plugin.json
+  - Navigation is sorted by position values from manifests
+
+### Fixed
+- **Shop plugin routes**: Enabled shop plugin in plugins.json
+- **Plugin helpers autoload**: Added plugin.php and hooks.php to composer autoload files
+
 ## [1.3.90] - 2026-02-05
 
 ### Fixed

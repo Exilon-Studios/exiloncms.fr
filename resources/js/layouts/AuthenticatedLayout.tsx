@@ -1,4 +1,4 @@
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useMemo } from 'react';
 import { usePage, router } from '@inertiajs/react';
 import { PageProps } from '@/types';
 import { SidebarLayout } from '@/components/admin/Sidebar';
@@ -23,6 +23,7 @@ import {
   IconFolder,
   IconDatabase,
 } from '@tabler/icons-react';
+import { renderIcon } from '@/lib/navigation-icons';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
   const pageProps = usePage<PageProps>().props as any;
@@ -67,6 +68,38 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
       return true;
     });
   };
+
+  // Convert plugin navigation items to sidebar format
+  const buildPluginNavigationItems = useMemo(() => {
+    return pluginNavigation.map((pluginNav: any) => {
+      const item: any = {
+        id: pluginNav.id || pluginNav.plugin,
+        label: pluginNav.trans ? trans(`admin.plugins.${pluginNav.plugin}.admin.section`) : pluginNav.label,
+        permission: pluginNav.permission || 'admin.settings',
+        icon: renderIcon(pluginNav.icon, 'h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200'),
+        plugin: pluginNav.plugin,
+        position: pluginNav.position || 100,
+      };
+
+      // If plugin navigation has children (sub-items)
+      if (pluginNav.items && pluginNav.items.length > 0) {
+        item.type = 'section';
+        item.label = pluginNav.trans ? trans(`admin.plugins.${pluginNav.plugin}.admin.section`) : pluginNav.label;
+        item.children = pluginNav.items.map((child: any, index: number) => ({
+          id: child.id || `${pluginNav.plugin}.${index}`,
+          label: child.trans ? trans(child.label) : child.label,
+          href: child.href,
+          permission: child.permission || 'admin.settings',
+          icon: child.icon ? renderIcon(child.icon, 'h-4 w-4') : undefined,
+          position: child.position || index * 10,
+        }));
+      } else if (pluginNav.href) {
+        item.href = pluginNav.href;
+      }
+
+      return item;
+    });
+  }, [pluginNavigation]);
 
   // Build plugin config links dynamically with dropdown support
   const pluginConfigLinks = enabledPluginConfigs.map((plugin: any) => {
@@ -133,6 +166,62 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
       ),
     },
     // Users Section
+    {
+      type: 'section',
+      label: trans('admin.nav.users.heading').toUpperCase(),
+      children: [
+        {
+          label: trans('admin.nav.users.users'),
+          href: '/admin/users',
+          permission: 'admin.users',
+          icon: (
+            <IconUsers className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: trans('admin.nav.users.roles'),
+          href: '/admin/roles',
+          permission: 'admin.roles',
+          icon: (
+            <IconShield className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: trans('admin.nav.users.bans'),
+          href: '/admin/bans',
+          permission: 'admin.users',
+          icon: (
+            <IconBan className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+      ],
+    },
+    // PLUGINS & THEMES Section (grouped together)
+    {
+      type: 'section',
+      label: 'EXTENSIONS',
+      children: [
+        {
+          label: 'Plugins',
+          href: '/admin/plugins',
+          permission: 'admin.settings',
+          icon: (
+            <IconPlug className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+        {
+          label: 'Themes',
+          href: '/admin/themes',
+          permission: 'admin.settings',
+          icon: (
+            <IconPalette className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+          ),
+        },
+      ],
+    },
+    // Dynamic plugin navigation from plugin.json manifests
+    ...buildPluginNavigationItems,
+    // Plugin Config section (as separate section, outside Settings)
     {
       type: 'section',
       label: trans('admin.nav.users.heading').toUpperCase(),
