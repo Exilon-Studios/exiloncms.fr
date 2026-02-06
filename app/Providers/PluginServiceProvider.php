@@ -146,26 +146,26 @@ class PluginServiceProvider extends ServiceProvider
         return \Illuminate\Support\Facades\Cache::remember($cacheKey, 3600, function () use ($pluginId, $plugin) {
             // Check plugin manifest for route configuration
             $manifest = $plugin->getPluginManifest();
-            $webRoute = $manifest['routes']['web'] ?? null;
 
-            if ($webRoute && is_string($webRoute) && ! str_starts_with($webRoute, '/')) {
-                // Use manifest value as default
-                $manifestPrefix = $webRoute;
-            } else {
-                $manifestPrefix = null;
+            // Try 'routes.web' first (new format)
+            if (isset($manifest['routes']['web']) && is_string($manifest['routes']['web'])) {
+                $webRoute = $manifest['routes']['web'];
+                if (! str_starts_with($webRoute, '/')) {
+                    return $webRoute;
+                }
+            }
+
+            // Try 'settings.route_prefix' (legacy format in manifest)
+            if (isset($manifest['settings']['route_prefix']) && is_string($manifest['settings']['route_prefix'])) {
+                return $manifest['settings']['route_prefix'];
             }
 
             // Check if plugin has a route_prefix setting in database (can override manifest)
             $configKey = "plugin.{$pluginId}.route_prefix";
             $dbPrefix = setting($configKey);
 
-            // Priority: DB setting > manifest > plugin ID
             if ($dbPrefix && is_string($dbPrefix) && ! empty($dbPrefix)) {
                 return trim($dbPrefix, '/');
-            }
-
-            if ($manifestPrefix && is_string($manifestPrefix) && ! empty($manifestPrefix)) {
-                return $manifestPrefix;
             }
 
             // Default to plugin ID
