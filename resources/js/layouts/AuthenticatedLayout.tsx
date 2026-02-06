@@ -91,17 +91,8 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
     });
   }, [pluginNavigation]);
 
-  // Build plugin config links dynamically
-  const pluginConfigLinks = enabledPluginConfigs.map((plugin: any) => {
-    return {
-      label: plugin.name,
-      href: plugin.configUrl,
-      permission: 'admin.settings',
-      icon: (
-        <IconPlug className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
-      ),
-    };
-  });
+  // Plugin navigation is now handled by buildPluginNavigationItems
+  // from plugin.json admin_section, so we don't need pluginConfigLinks
 
   // Primary navigation links - Sections rétractables
   const allPrimaryLinks = [
