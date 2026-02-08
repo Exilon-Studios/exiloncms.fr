@@ -101,7 +101,7 @@ jobs:
           touch database/database.sqlite
 
       - name: Run migrations
-        run: php artisan migrate:fresh --seed --force
+        run: php artisan migrate:fresh --force
 
       - name: Test plugin loading
         run: php artisan plugin:list

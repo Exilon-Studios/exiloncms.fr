@@ -166,7 +166,7 @@ jobs:
           cat > release_notes.md << EOF
           ## 🚀 ExilonCMS ${{ steps.get_version.outputs.version }}
 
-          📖 [Documentation](https://exiloncms.fr/docs/installation) | 📝 [Changelog](https://github.com/Exilon-Studios/ExilonCMS/blob/main/CHANGELOG.md) | 📄 [README](https://github.com/Exilon-Studios/ExilonCMS/blob/main/README.md)
+          📖 [Documentation](https://exiloncms.fr/docs/installation) | 📝 [Changelog](https://github.com/Exilon-Studios/exiloncms.fr/blob/main/CHANGELOG.md) | 📄 [README](https://github.com/Exilon-Studios/exiloncms.fr/blob/main/README.md)
 
           ### Quick Start
           - **Standalone Installer**: Download \`exiloncms-installer-${{ steps.get_version.outputs.version }}.zip\` below, extract, and access \`install.php\` in your browser

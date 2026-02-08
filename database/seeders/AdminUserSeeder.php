@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use ExilonCMS\Models\Permission;
 use ExilonCMS\Models\Role;
-use ExilonCMS\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -15,9 +14,8 @@ class AdminUserSeeder extends Seeder
     /**
      * Run the database seeds.
      *
-     * NOTE: The admin user is NOT created here anymore.
-     * It should be created during installation via the web installer
-     * or using `php artisan user:create --admin`.
+     * Creates admin role and permissions.
+     * Admin user MUST be created via web installer or `php artisan user:create --admin`.
      */
     public function run(): void
     {

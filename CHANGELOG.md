@@ -5,6 +5,17 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-02-08
+
+### Fixed
+- **Installer admin account creation**: Removed automatic admin user creation from AdminUserSeeder
+  - Admin account MUST be created via web installer or `php artisan user:create --admin`
+  - Fixes login issues where installer-created account couldn't be used
+- **GitHub release URLs**: Fixed repository URLs in release notes
+  - Changed from ExilonCMS to exiloncms.fr
+  - README and Changelog links now point to correct repository
+- **CI plugin loading test**: Removed --seed flag to avoid seeder issues
+
 ## [1.3.99] - 2026-02-08
 
 ### Fixed
