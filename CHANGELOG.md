@@ -5,6 +5,14 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.4] - 2026-02-08
+
+### Fixed
+- **Shop plugin table dependencies**: Added table existence checks in ShopController
+  - Orders, shop_items, and shop_categories tables now checked before queries
+  - Fixes "no such table" errors when Shop plugin migrations haven't run
+  - Dashboard returns 0 for missing tables instead of crashing
+
 ## [1.4.3] - 2026-02-08
 
 ### Fixed

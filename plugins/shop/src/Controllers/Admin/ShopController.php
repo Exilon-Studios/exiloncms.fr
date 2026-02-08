@@ -5,6 +5,7 @@ namespace ExilonCMS\Plugins\Shop\Controllers\Admin;
 use ExilonCMS\Plugins\Shop\Models\Category;
 use ExilonCMS\Plugins\Shop\Models\Item;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class ShopController
@@ -12,13 +13,13 @@ class ShopController
     public function index()
     {
         $stats = [
-            'total_items' => Item::count(),
-            'total_orders' => \ExilonCMS\Plugins\Shop\Models\Order::count(),
-            'total_revenue' => \ExilonCMS\Plugins\Shop\Models\Order::completed()->sum('total'),
-            'pending_orders' => \ExilonCMS\Plugins\Shop\Models\Order::pending()->count(),
+            'total_items' => Schema::hasTable('shop_items') ? Item::count() : 0,
+            'total_orders' => Schema::hasTable('orders') ? \ExilonCMS\Plugins\Shop\Models\Order::count() : 0,
+            'total_revenue' => Schema::hasTable('orders') ? \ExilonCMS\Plugins\Shop\Models\Order::completed()->sum('total') ?? 0 : 0,
+            'pending_orders' => Schema::hasTable('orders') ? \ExilonCMS\Plugins\Shop\Models\Order::pending()->count() : 0,
         ];
 
-        $categories = Category::orderBy('position')->get();
+        $categories = Schema::hasTable('shop_categories') ? Category::orderBy('position')->get() : collect();
 
         return Inertia::render('Admin/Shop/Index', [
             'stats' => $stats,
