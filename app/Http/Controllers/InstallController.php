@@ -895,7 +895,7 @@ class InstallController extends Controller
             // Create permissions for admin role if needed
             if ($adminRole->permissions()->count() === 0) {
                 foreach (\ExilonCMS\Models\Permission::permissions() as $permission) {
-                    \ExilonCMS\Models\Permission::create([
+                    $adminRole->permissions()->create([
                         'permission' => $permission,
                         'role_id' => $adminRole->id,
                     ]);

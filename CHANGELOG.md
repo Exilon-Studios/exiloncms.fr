@@ -5,6 +5,13 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.2] - 2026-02-08
+
+### Fixed
+- **Permission creation during installation**: Added role_id to Permission model fillable attributes
+  - Fixes "NOT NULL constraint failed: permissions.role_id" error
+  - Admin permissions can now be created during web installation
+
 ## [1.4.1] - 2026-02-08
 
 ### Fixed
