@@ -25,23 +25,23 @@
   },
   "admin_section": {
     "id": "tickets",
-    "label": "tickets.admin.section",
-    "icon": "MessageSquare",
+    "label": "Tickets",
+    "icon": "Message",
     "position": 40,
     "items": [
       {
-        "label": "tickets.admin.dashboard",
-        "href": "/admin/tickets",
+        "label": "Dashboard",
+        "href": "/admin/plugins/tickets",
         "permission": "tickets.admin"
       },
       {
-        "label": "tickets.admin.categories",
-        "href": "/admin/tickets/categories",
+        "label": "Categories",
+        "href": "/admin/plugins/tickets/categories",
         "permission": "tickets.admin"
       },
       {
-        "label": "tickets.admin.settings",
-        "href": "/admin/tickets/settings",
+        "label": "Settings",
+        "href": "/admin/plugins/tickets/settings",
         "permission": "tickets.admin"
       }
     ]
@@ -56,6 +56,14 @@
       "permission": "tickets.admin"
     }
   ],
+  "events": {
+    "listen": [],
+    "dispatch": []
+  },
+  "routes": {
+    "admin": "/admin/plugins/tickets",
+    "web": "/tickets"
+  },
   "translations": {
     "en": {
       "tickets": {

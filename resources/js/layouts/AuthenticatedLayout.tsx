@@ -22,6 +22,8 @@ import {
   IconSettings,
   IconFolder,
   IconDatabase,
+  IconShoppingCart,
+  IconMessage,
 } from '@tabler/icons-react';
 
 export default function AuthenticatedLayout({ children }: PropsWithChildren) {
@@ -96,6 +98,80 @@ export default function AuthenticatedLayout({ children }: PropsWithChildren) {
             href: '/admin/plugins/documentation/cache',
             permission: 'admin.settings',
             icon: <IconDatabase className="h-4 w-4" />,
+          },
+        ],
+      };
+    }
+
+    // Shop plugin gets a dropdown menu
+    if (plugin.id === 'shop') {
+      return {
+        label: plugin.name,
+        permission: 'shop.admin',
+        icon: (
+          <IconShoppingCart className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+        ),
+        children: [
+          {
+            label: trans('admin.shop.menu.dashboard'),
+            href: '/admin/plugins/shop',
+            permission: 'shop.admin',
+            icon: <IconBrandTabler className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.shop.menu.items'),
+            href: '/admin/plugins/shop/items',
+            permission: 'shop.items.manage',
+            icon: <IconList className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.shop.menu.categories'),
+            href: '/admin/plugins/shop/categories',
+            permission: 'shop.categories.manage',
+            icon: <IconFolder className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.shop.menu.orders'),
+            href: '/admin/plugins/shop/orders',
+            permission: 'shop.orders.manage',
+            icon: <IconFileText className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.shop.menu.settings'),
+            href: '/admin/plugins/shop/settings',
+            permission: 'shop.admin',
+            icon: <IconSettings className="h-4 w-4" />,
+          },
+        ],
+      };
+    }
+
+    // Tickets plugin gets a dropdown menu
+    if (plugin.id === 'tickets') {
+      return {
+        label: plugin.name,
+        permission: 'tickets.admin',
+        icon: (
+          <IconMessage className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+        ),
+        children: [
+          {
+            label: trans('admin.tickets.menu.dashboard'),
+            href: '/admin/plugins/tickets',
+            permission: 'tickets.admin',
+            icon: <IconBrandTabler className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.tickets.menu.categories'),
+            href: '/admin/plugins/tickets/categories',
+            permission: 'tickets.admin',
+            icon: <IconFolder className="h-4 w-4" />,
+          },
+          {
+            label: trans('admin.tickets.menu.settings'),
+            href: '/admin/plugins/tickets/settings',
+            permission: 'tickets.admin',
+            icon: <IconSettings className="h-4 w-4" />,
           },
         ],
       };

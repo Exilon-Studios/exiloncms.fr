@@ -3,8 +3,8 @@
 namespace ExilonCMS\Plugins\Shop\Models;
 
 use ExilonCMS\Models\Traits\HasImage;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property int $id

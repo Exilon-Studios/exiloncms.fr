@@ -5,6 +5,190 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.91] - 2026-02-07
+
+### Fixed
+- **Documentation content saving and metadata**: Complete editor rewrite
+  - **Content preservation**: Content now saves correctly and persists after page reload
+  - **Metadata separation**: Added dedicated right sidebar for file metadata editing
+  - **YAML frontmatter parsing**: Implemented proper frontmatter parsing and preservation
+  - **Title/filename separation**: Editing content no longer affects the filename or title
+  - **Markdown conversion**: Completely rewrote markdown-to-HTML and HTML-to-markdown converters
+    - Added `parseFrontmatter()` function to extract YAML frontmatter
+    - Added `buildFrontmatter()` function to reconstruct YAML frontmatter
+    - Updated `markdownToHtml()` to return both html and frontmatter separately
+    - Updated `htmlToMarkdown()` to accept frontmatter parameter for preservation
+  - **Metadata sidebar features**:
+    - Title editing
+    - Description editing
+    - Order (for sorting)
+    - Icon (for display)
+    - Badge (for display labels)
+    - Draft checkbox
+    - Save button integrated in sidebar
+    - Toggle button in editor header to show/hide metadata sidebar
+- **Documentation page error**: Fixed "Cannot convert undefined or null to object" in Head component
+  - Added comprehensive null safety checks throughout DocumentationViewer component
+  - Fixed `page.frontmatter`, `page.content`, `settings`, and navigation props
+  - Added default values for all optional props (locale, availableLocales, navigation, breadcrumb, etc.)
+  - Prev/Next navigation now safely handles missing adjacent items
+- **Tickets plugin not showing in admin**: Added Tickets to composer.json autoload
+  - Tickets plugin was missing from `autoload.psr-4` section in composer.json
+  - Added `"ExilonCMS\\Plugins\\Tickets\\": "plugins/tickets/src/"` to autoload
+  - Plugin now appears correctly in `/admin/plugins` page
+- **DocSidebar error**: Fixed `navigation.slice(...).takeWhile is not a function`
+  - Replaced non-existent `takeWhile()` method with proper JavaScript filter loop
+  - Added null/undefined safety for navigation prop
+  - Fixed imports: replaced `useRouter` with `usePage` (Inertia.js v2 compatibility)
+  - Added missing `IconExternalLink` import
+- **Shop and Tickets plugin controllers**: Created missing controller classes
+  - Created `Shop/Controllers/OrderController.php` with checkout and order management methods
+  - Created `Tickets/Controllers/TicketsController.php` with ticket creation and viewing methods
+  - Fixed route list errors caused by missing controllers
+- **Shop and Tickets plugin configurations**: Fixed plugin.json files with correct admin paths
+  - Updated Shop plugin to use `/admin/plugins/shop/*` paths (was `/admin/shop/*`)
+  - Updated Tickets plugin to use `/admin/plugins/tickets/*` paths (was `/admin/tickets/*`)
+  - Added `routes` section to both plugins with proper admin/web paths
+  - Added `events` section with empty listeners/dispatchers
+- **Shop and Tickets admin pages**: Fixed AuthenticatedLayout wrapper issues
+  - All Shop pages (Index, Items, Categories, Orders, Settings) now properly wrapped with AuthenticatedLayout
+  - All Tickets pages (Index, Categories, Settings) now properly wrapped with AuthenticatedLayout
+  - Fixed closing tags (was `</div>` instead of `</AuthenticatedLayout>`)
+  - Admin sidebar now displays correctly on all Shop and Tickets pages
+- **Documentation editor breadcrumb**: Fixed duplicate paths in editor header
+  - Now shows cleaner breadcrumb: "category name → page name" instead of full path
+  - For files: shows category (folder) and page name separated by chevron
+  - For folders: shows just folder name
+- **Slug preview for folders**: Fixed duplicate path in preview URL
+  - Folders now use `docs.locale.category` route (e.g., `/docs/fr/utilisation`)
+  - Files use `docs.locale.page` route (e.g., `/docs/fr/utilisation/page`)
+  - Preview URL in modal now correct for both types
+- **Shop Index routes**: Fixed hardcoded paths to use route() helper
+  - Quick Actions now use `route('admin.plugins.shop.items.index')` etc.
+  - Imported `route` from `ziggy-js` instead of using hardcoded paths
+- **Documentation public routes**: Fixed `/docs` routes returning 404/500 errors
+  - Root `/docs` now redirects to default locale (e.g., `/docs/fr`)
+  - Added `docs.locale.index` route for locale-specific index pages
+  - Fixed route names from `docs.page` to `docs.locale.page`
+  - Documentation pages now render correctly with proper props handling
+- **File delete functionality**: Fixed delete operation showing JSON in modal
+  - Changed `deleteByPath` endpoint to return Inertia redirect instead of JSON
+  - Delete operations now show toast notifications properly
+  - Removed confirmation dialog - deletes immediately with toast feedback
+- **Shop admin routes**: Fixed shop links pointing to wrong URLs
+  - Updated AuthenticatedLayout to use `/admin/plugins/shop/*` instead of `/admin/shop/*`
+  - Updated Tickets plugin links similarly
+  - Shop Index now uses `route()` instead of hardcoded paths
+- **Documentation save**: Fixed save content returning JSON instead of redirect
+  - `saveContent` method now returns redirect with flash message
+- **Delete refresh issue**: Fixed tree not refreshing after delete
+  - Removed manual `reloadCategories()` call - let Inertia handle redirect
+  - Clear selected file state before delete to ensure clean state
+- **YAML frontmatter parsing**: Fixed quotes being included in parsed values
+  - `DocumentationReader::parseFrontmatter()` now strips quotes from string values
+  - File/folder titles no longer display with quotes
+- **DocumentationViewer imports**: Fixed incorrect import paths
+  - Fixed `remark` and `remarkHtml` imports - replaced with `remarkGfm`
+  - Fixed relative import path in Page.tsx component
+  - Removed unused `useRouter` import from DocSidebar
+- **Syntax error in DocSidebar**: Fixed JSX ternary operator syntax
+- **Documentation Index props**: Added null checks and default values
+  - Categories display even when empty (shows placeholder message)
+  - Proper handling of undefined props
+
+### Added
+- **Notion-style WYSIWYG Editor**: Replaced markdown editor with TipTap editor
+  - Real-time formatting preview (no split view needed)
+  - Toolbar with: Bold, Italic, Strikethrough, Code, Headings, Lists, Quotes, Links, Undo/Redo
+  - Clean Notion-like editing experience
+  - Markdown-to-HTML and HTML-to-Markdown conversion for file storage
+  - Created `resources/js/lib/markdown.ts` with conversion utilities
+  - Created `resources/js/components/editor/tiptap-editor.tsx` component
+- **Shop plugin pages**: Created placeholder admin pages
+  - Items page (`Admin/Shop/Items.tsx`) with empty state
+  - Categories page (`Admin/Shop/Categories.tsx`) with empty state
+  - Orders page (`Admin/Shop/Orders.tsx`) with empty state
+  - Settings page (`Admin/Shop/Settings.tsx`) with form fields
+- **Tickets plugin pages**: Created placeholder admin pages
+  - Index page (`Admin/Tickets/Index.tsx`) with stats grid
+  - Categories page (`Admin/Tickets/Categories.tsx`) with empty state
+  - Settings page (`Admin/Tickets/Settings.tsx`) with form fields
+- **Documentation plugin pages**: Created wrapper pages in main resources directory
+  - `resources/js/pages/Documentation/Index.tsx`
+  - `resources/js/pages/Documentation/Page.tsx`
+  - Resolves Inertia page not found errors
+- **Shop Order model**: Created `Order` model for Shop plugin
+  - Relationships with User and Item models
+  - Scopes: completed, pending, processing, cancelled
+  - Migration for orders and order_items tables
+- **Translation keys**: Added missing translation keys
+  - `admin.documentation.editor.wysiwyg_placeholder`
+  - `admin.documentation.messages.file_saved`
+  - `admin.documentation.messages.folder_deleted`
+  - `admin.documentation.messages.folder_not_found`
+
+### Changed
+- **Documentation editor**: Removed preview toggle buttons
+  - Removed `showPreview` and `isPreviewOnly` state variables
+  - No longer shows `## #` markdown syntax - only formatted text
+  - Full WYSIWYG experience like Notion
+- **Shop admin routes**: Simplified to use existing ShopController
+  - All routes temporarily use `index` method until full controllers are implemented
+  - Route names changed to `admin.plugins.shop.*` pattern
+- **Tickets admin routes**: Simplified to use existing TicketsController
+  - Routes prefixed with `admin.plugins.tickets.*`
+  - Controller handles missing tables gracefully
+- **Documentation delete API**: New endpoint for deleting by path
+  - `POST /admin/plugins/documentation/delete` handles both files and folders
+  - Works with nested file structures
+- **Removed confirmation dialogs**: Delete operations happen immediately
+  - No more confirm() dialogs - deletes with toast feedback only
+  - Updated Tickets plugin links similarly
+- **Documentation save**: Fixed save content returning JSON instead of redirect
+  - `saveContent` method now returns redirect with flash message
+
+### Added
+- **Notion-style WYSIWYG Editor**: Replaced markdown editor with TipTap editor
+  - Real-time formatting preview (no split view needed)
+  - Toolbar with: Bold, Italic, Strikethrough, Code, Headings, Lists, Quotes, Links, Undo/Redo
+  - Clean Notion-like editing experience
+  - Markdown-to-HTML and HTML-to-Markdown conversion for file storage
+- **Markdown utility library**: Created `resources/js/lib/markdown.ts`
+  - `markdownToHtml()`: Converts markdown to HTML for TipTap
+  - `htmlToMarkdown()`: Converts HTML back to markdown for storage
+- **Shop plugin pages**: Created placeholder admin pages
+  - Items page with empty state
+  - Categories page with empty state
+  - Orders page with empty state
+  - Settings page (re-exports from plugin)
+- **Documentation plugin pages**: Created wrapper pages in main resources directory
+  - `resources/js/pages/Documentation/Index.tsx`
+  - `resources/js/pages/Documentation/Page.tsx`
+  - Resolves Inertia page not found errors
+- **Shop Order model**: Created `Order` model for Shop plugin
+  - Relationships with User and Item models
+  - Scopes: completed, pending, processing, cancelled
+- **Translation keys**: Added missing translation keys
+  - `admin.documentation.editor.wysiwyg_placeholder`
+  - `admin.documentation.messages.file_saved`
+  - `admin.documentation.messages.folder_deleted`
+  - `admin.documentation.messages.folder_not_found`
+
+### Changed
+- **Documentation editor**: Removed preview toggle buttons
+  - Removed `showPreview` and `isPreviewOnly` state variables
+  - No longer shows `## #` markdown syntax - only formatted text
+  - Full WYSIWYG experience like Notion
+- **Shop admin routes**: Simplified to use existing ShopController
+  - All routes temporarily use `index` method until full controllers are implemented
+  - Route names changed to `admin.plugins.shop.*` pattern
+- **Documentation delete API**: New endpoint for deleting by path
+  - `POST /admin/plugins/documentation/delete` handles both files and folders
+  - Works with nested file structures
+- **Translations**: Added menu translations for Shop and Tickets plugins
+  - French: menu items for shop and tickets in resources/lang/fr/admin.php
+  - English: menu items for shop and tickets in resources/lang/en/admin.php
+
 ## [1.3.89] - 2026-02-05
 
 ### Fixed

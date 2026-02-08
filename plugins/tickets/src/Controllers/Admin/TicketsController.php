@@ -2,7 +2,6 @@
 
 namespace ExilonCMS\Plugins\Tickets\Controllers\Admin;
 
-use ExilonCMS\Plugins\Tickets\Models\Ticket;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,19 +10,26 @@ class TicketsController
     public function index()
     {
         $stats = [
-            'total_tickets' => Ticket::count(),
-            'open_tickets' => Ticket::open()->count(),
-            'pending_tickets' => Ticket::pending()->count(),
-            'closed_tickets' => Ticket::closed()->count(),
+            'total_tickets' => 0,
+            'open_tickets' => 0,
+            'pending_tickets' => 0,
+            'closed_tickets' => 0,
         ];
 
-        $tickets = Ticket::with(['user', 'category'])
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        try {
+            $ticketModel = class_exists('ExilonCMS\Plugins\Tickets\Models\Ticket')
+                ? new \ExilonCMS\Plugins\Tickets\Models\Ticket
+                : null;
+
+            if ($ticketModel && method_exists($ticketModel, 'count')) {
+                $stats['total_tickets'] = $ticketModel::count();
+            }
+        } catch (\Exception $e) {
+            // Table might not exist, use defaults
+        }
 
         return Inertia::render('Admin/Tickets/Index', [
             'stats' => $stats,
-            'tickets' => $tickets,
         ]);
     }
 
@@ -48,14 +54,14 @@ class TicketsController
     {
         $plugin = app(\ExilonCMS\Classes\Plugin\PluginLoader::class)->getPlugin('tickets');
 
-        if (!$plugin) {
+        if (! $plugin) {
             return redirect()->back()->with('error', 'Tickets plugin not found.');
         }
 
         $configFields = collect($plugin->getConfigFields())->keyBy('name');
 
         foreach ($request->all() as $key => $value) {
-            if (!$configFields->has($key)) {
+            if (! $configFields->has($key)) {
                 continue;
             }
 

@@ -43,12 +43,21 @@ class DocumentationController
         $cacheStats = $this->cache->getStats();
         $cachedPages = $cacheStats['total_pages'] ?? 0;
 
-        return Inertia::render('Admin/Plugins/Documentation/Index', [
-            'stats' => [
-                'total_pages' => $totalPages,
-                'total_categories' => $totalCategories,
-                'total_locales' => $totalLocales,
-                'cached_pages' => $cachedPages,
+        return Inertia::render('Admin/Documentation/Index', [
+            'locales' => $locales,
+            'stats' => collect($locales)->mapWithKeys(function ($locale) {
+                $categories = $this->reader->getCategories($locale);
+                $pages = 0;
+                foreach ($categories as $category) {
+                    $pages += count($category['pages'] ?? []);
+                }
+
+                return [$locale => ['categories' => count($categories), 'pages' => $pages]];
+            })->toArray(),
+            'cacheStats' => [
+                'enabled' => setting('documentation.cache_enabled', true),
+                'duration' => setting('documentation.cache_duration', 3600),
+                'locale' => setting('documentation.default_locale', 'fr'),
             ],
         ]);
     }
@@ -531,10 +540,58 @@ class DocumentationController
             $this->cache->setLocale($locale)->clearPage($locale, $category, $page);
         }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'File saved successfully',
+        // Return success with flash message for Inertia
+        return redirect()->back()
+            ->with('success', __('admin.documentation.messages.file_saved'));
+    }
+
+    /**
+     * Delete a file or folder by path
+     */
+    public function deleteByPath(Request $request)
+    {
+        $request->validate([
+            'locale' => 'required|string',
+            'path' => 'required|string',
+            'type' => 'required|in:file,directory',
         ]);
+
+        $locale = $request->input('locale');
+        $path = $request->input('path');
+        $type = $request->input('type');
+
+        if ($type === 'file') {
+            $filePath = base_path("docs/{$locale}/{$path}.md");
+
+            if (! File::exists($filePath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('admin.documentation.messages.file_not_found'),
+                ], 404);
+            }
+
+            File::delete($filePath);
+        } else {
+            // Directory - delete recursively
+            $dirPath = base_path("docs/{$locale}/{$path}");
+
+            if (! File::exists($dirPath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('admin.documentation.messages.folder_not_found'),
+                ], 404);
+            }
+
+            File::deleteDirectory($dirPath);
+        }
+
+        // Clear cache for this locale
+        $this->cache->setLocale($locale)->clearLocale($locale);
+
+        return redirect()->back()
+            ->with('success', $type === 'file'
+                ? __('admin.documentation.messages.page_deleted')
+                : __('admin.documentation.messages.folder_deleted'));
     }
 
     /**
@@ -621,6 +678,41 @@ class DocumentationController
             ]),
             'source_locale' => $sourceLocale,
             'target_locale' => $targetLocale,
+        ]);
+    }
+
+    /**
+     * Reorder documentation items (categories and pages)
+     * Saves order information to a JSON file for each locale
+     */
+    public function reorder(Request $request)
+    {
+        $locale = $request->input('locale', 'fr');
+        $order = $request->input('order', []);
+
+        if (empty($order)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No order data provided',
+            ], 400);
+        }
+
+        // Save order to a JSON file in the docs directory
+        $orderPath = base_path('docs/'.$locale.'/.order.json');
+
+        // Ensure directory exists
+        if (! File::exists(dirname($orderPath))) {
+            File::makeDirectory(dirname($orderPath), 0755, true);
+        }
+
+        File::put($orderPath, json_encode($order, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+        // Clear cache for this locale
+        $this->cache->setLocale($locale)->clearLocale($locale);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order saved successfully',
         ]);
     }
 }

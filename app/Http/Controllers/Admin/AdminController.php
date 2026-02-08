@@ -6,7 +6,6 @@ use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\Image;
 use ExilonCMS\Models\User;
-use ExilonCMS\Plugins\Blog\Models\Post;
 use ExilonCMS\Plugins\Pages\Models\Page;
 use ExilonCMS\Support\Charts;
 use Illuminate\Contracts\Foundation\Application;
@@ -34,11 +33,17 @@ class AdminController extends Controller
         $newVersion = $updates->hasUpdates() ? $updateList[0] ?? null : null;
         $userCount = User::whereNull('deleted_at')->count();
 
+        // Count posts only if Blog plugin is available
+        $totalPosts = 0;
+        if (class_exists('ExilonCMS\Plugins\Blog\Models\Post')) {
+            $totalPosts = \ExilonCMS\Plugins\Blog\Models\Post::count();
+        }
+
         return inertia('Admin/Dashboard', [
             'secure' => $request->secure() || ! $this->app->isProduction(),
             'stats' => [
                 'totalUsers' => $userCount,
-                'totalPosts' => Post::count(),
+                'totalPosts' => $totalPosts,
                 'totalPages' => Page::count(),
                 'totalImages' => Image::count(),
             ],

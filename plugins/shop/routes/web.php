@@ -1,8 +1,8 @@
 <?php
 
-use ExilonCMS\Plugins\Shop\Controllers\ShopController;
 use ExilonCMS\Plugins\Shop\Controllers\CartController;
 use ExilonCMS\Plugins\Shop\Controllers\OrderController;
+use ExilonCMS\Plugins\Shop\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 
 // Shop public routes

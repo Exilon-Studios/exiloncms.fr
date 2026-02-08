@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Plugins\Shop\Controllers\Admin;
 
-use ExilonCMS\Plugins\Shop\Models\Item;
 use ExilonCMS\Plugins\Shop\Models\Category;
+use ExilonCMS\Plugins\Shop\Models\Item;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -47,14 +47,14 @@ class ShopController
     {
         $plugin = app(\ExilonCMS\Classes\Plugin\PluginLoader::class)->getPlugin('shop');
 
-        if (!$plugin) {
+        if (! $plugin) {
             return redirect()->back()->with('error', 'Shop plugin not found.');
         }
 
         $configFields = collect($plugin->getConfigFields())->keyBy('name');
 
         foreach ($request->all() as $key => $value) {
-            if (!$configFields->has($key)) {
+            if (! $configFields->has($key)) {
                 continue;
             }
 

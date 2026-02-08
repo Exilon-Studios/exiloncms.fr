@@ -30,6 +30,10 @@ Route::name('admin.plugins.documentation.')->group(function () {
     Route::get('/tree/{locale?}', [AdminDocumentationController::class, 'fileTree'])
         ->name('tree');
 
+    // Reorder items (categories and pages)
+    Route::post('/reorder', [AdminDocumentationController::class, 'reorder'])
+        ->name('reorder');
+
     // Cache management
     Route::prefix('cache')->name('cache.')->group(function () {
         Route::get('/', [AdminDocumentationController::class, 'cache'])->name('index');
@@ -44,4 +48,7 @@ Route::name('admin.plugins.documentation.')->group(function () {
     // Locale management
     Route::post('/create-locale', [AdminDocumentationController::class, 'createLocale'])->name('create-locale');
     Route::post('/duplicate-locale', [AdminDocumentationController::class, 'duplicateLocale'])->name('duplicate-locale');
+
+    // Delete file/folder by path
+    Route::post('/delete', [AdminDocumentationController::class, 'deleteByPath'])->name('delete');
 });

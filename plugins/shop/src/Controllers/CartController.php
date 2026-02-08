@@ -27,7 +27,7 @@ class CartController
         ]);
 
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login')->with('error', 'You must be logged in to add items to cart.');
         }
 
@@ -51,7 +51,7 @@ class CartController
     public function remove($id)
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 
@@ -67,7 +67,7 @@ class CartController
     public function clear()
     {
         $user = Auth::user();
-        if (!$user) {
+        if (! $user) {
             return redirect()->route('login');
         }
 

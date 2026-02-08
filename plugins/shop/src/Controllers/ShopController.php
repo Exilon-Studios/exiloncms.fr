@@ -2,8 +2,8 @@
 
 namespace ExilonCMS\Plugins\Shop\Controllers;
 
-use ExilonCMS\Plugins\Shop\Models\Item;
 use ExilonCMS\Plugins\Shop\Models\Category;
+use ExilonCMS\Plugins\Shop\Models\Item;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 

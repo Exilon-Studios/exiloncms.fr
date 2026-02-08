@@ -1,7 +1,7 @@
 <?php
 
-use ExilonCMS\Plugins\Tickets\Controllers\TicketsController;
 use ExilonCMS\Plugins\Tickets\Controllers\Admin\TicketsController as AdminTicketsController;
+use ExilonCMS\Plugins\Tickets\Controllers\TicketsController;
 use Illuminate\Support\Facades\Route;
 
 // Tickets public routes

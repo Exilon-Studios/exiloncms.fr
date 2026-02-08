@@ -1,6 +1,13 @@
 <?php
 
 return [
+    'route_slug' => [
+        'type' => 'text',
+        'label' => 'Route Slug',
+        'description' => 'URL path for documentation (e.g., "docs" or "documentation"). Leave empty to use plugin ID.',
+        'default' => 'docs',
+    ],
+
     'default_locale' => [
         'type' => 'select',
         'label' => 'Default Locale',

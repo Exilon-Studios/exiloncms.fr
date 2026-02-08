@@ -1267,6 +1267,22 @@ return [
             'date_from' => 'From:',
             'date_until' => 'Until:',
         ],
+        'menu' => [
+            'dashboard' => 'Dashboard',
+            'items' => 'Items',
+            'categories' => 'Categories',
+            'orders' => 'Orders',
+            'settings' => 'Settings',
+        ],
+    ],
+
+    // ==================== TICKETS ====================
+    'tickets' => [
+        'menu' => [
+            'dashboard' => 'Dashboard',
+            'categories' => 'Categories',
+            'settings' => 'Settings',
+        ],
     ],
 
     // ==================== TRANSLATIONS ====================
@@ -1435,6 +1451,7 @@ return [
             'markdown' => 'Markdown content',
             'markdown_description' => 'Write your documentation in Markdown',
             'markdown_placeholder' => 'Title\n\nYour content here...',
+            'wysiwyg_placeholder' => 'Start writing your documentation...',
             'frontmatter' => 'Metadata',
             'title' => 'Title',
             'title_placeholder' => 'My page',
@@ -1468,6 +1485,9 @@ return [
             'page_updated' => 'Page updated successfully.',
             'page_created' => 'Page created successfully.',
             'page_deleted' => 'Page deleted successfully.',
+            'file_saved' => 'File saved successfully.',
+            'folder_deleted' => 'Folder deleted successfully.',
+            'folder_not_found' => 'Folder not found',
             'cache_cleared' => 'Cache cleared successfully.',
             'cache_warmed' => 'Cache warmed: :locales locales, :categories categories, :pages pages.',
             'category_exists' => 'This category already exists.',

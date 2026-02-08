@@ -1,15 +1,14 @@
-import { Link, useRouter } from '@inertiajs/react';
-import { IconChevronRight, IconFolder, IconFileText } from '@tabler/icons-react';
-import { useState } from 'react';
+import { Link, usePage } from '@inertiajs/react';
+import { IconChevronRight, IconFolder, IconFileText, IconExternalLink } from '@tabler/icons-react';
+import { useState, useMemo } from 'react';
 
 interface DocSidebarProps {
-  navigation: any[];
+  navigation: any[] | undefined;
   currentPage: string;
   onClose?: () => void;
 }
 
-export default function DocSidebar({ navigation, currentPage, onClose }: DocSidebarProps) {
-  const router = useRouter();
+export default function DocSidebar({ navigation = [], currentPage, onClose }: DocSidebarProps) {
   const [openSections, setOpenSections] = useState<Set<string>>(new Set());
 
   const toggleSection = (id: string) => {
@@ -51,7 +50,16 @@ export default function DocSidebar({ navigation, currentPage, onClose }: DocSide
         {navigation.map((item, index) => {
           if (item.type === 'header') {
             const isOpen = openSections.has(item.title);
-            const sectionItems = navigation.slice(index + 1).takeWhile((i) => i.type !== 'header');
+            // Find all items until next header (using filter instead of takeWhile)
+            const sectionItems = useMemo(() => {
+              const afterIndex = index + 1;
+              const items = [];
+              for (let i = afterIndex; i < navigation.length; i++) {
+                if (navigation[i].type === 'header') break;
+                items.push(navigation[i]);
+              }
+              return items;
+            }, [navigation, index]);
 
             return (
               <div key={index}>
@@ -126,8 +134,8 @@ interface NavLinkProps {
 }
 
 function NavLink({ item, currentPage, onClick }: NavLinkProps) {
-  const router = useRouter();
-  const isActive = item.slug === currentPage || router.page?.props?.page?.slug === item.slug;
+  const page = usePage();
+  const isActive = item.slug === currentPage || page.props?.page?.slug === item.slug;
 
   return (
     <Link
@@ -141,7 +149,7 @@ function NavLink({ item, currentPage, onClick }: NavLinkProps) {
     >
       {item.icon && (
         <span className="flex-shrink-0">
-          {item.icon === 'Folder' ? <IconFolder className="h-4 w-4" : <IconFileText className="h-4 w-4" />}
+          {item.icon === 'Folder' ? <IconFolder className="h-4 w-4" /> : <IconFileText className="h-4 w-4" />}
         </span>
       )}
       <span className={item.indent ? 'text-muted-foreground' : ''}>{item.title}</span>

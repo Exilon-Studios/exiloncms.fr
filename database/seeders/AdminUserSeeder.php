@@ -33,7 +33,7 @@ class AdminUserSeeder extends Seeder
 
         // Check if admin already exists with the same email to avoid duplicates
         $existingAdmin = User::where('email', $adminEmail)->first();
-        if (!$existingAdmin) {
+        if (! $existingAdmin) {
             $admin = User::create([
                 'email' => $adminEmail,
                 'name' => 'Admin',
@@ -45,7 +45,7 @@ class AdminUserSeeder extends Seeder
         }
 
         // Fallback: create with admin@example.com if no env set
-        if (!$existingAdmin) {
+        if (! $existingAdmin) {
             $admin = User::firstOrCreate(
                 ['email' => 'admin@example.com'],
                 [

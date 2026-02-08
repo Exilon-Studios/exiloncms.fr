@@ -4,7 +4,7 @@ import { PageProps } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Folder, Edit, ExternalLink, ArrowLeft, FileJson } from 'lucide-react';
+import { FileText, Folder, Edit, ExternalLink, ArrowLeft, FileJson, Home, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/accordion';
 import { useState } from 'react';
 import { useTrans } from '@/lib/i18n';
@@ -35,21 +35,27 @@ export default function DocumentationBrowse({ locale, availableLocales, categori
       <Head title={`Browse Documentation (${locale.toUpperCase()}) - ${settings.name}`} />
 
       <div className="space-y-6 p-8">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+          <Link href="/admin/plugins" className="hover:text-foreground flex items-center gap-1">
+            <Home className="h-4 w-4" />
+            Plugins
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <Link href={route('admin.plugins.documentation.index')} className="hover:text-foreground flex items-center gap-1">
+            {trans('admin.documentation.title')}
+          </Link>
+          <ChevronRight className="h-4 w-4" />
+          <span className="text-foreground font-medium">{locale.toUpperCase()}</span>
+        </nav>
+
         {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href={route('admin.plugins.documentation.index')}>
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">Documentation / {locale.toUpperCase()}</h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                Browse and edit documentation pages
-              </p>
-            </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Documentation / {locale.toUpperCase()}</h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {trans('admin.documentation.browse.description')}
+            </p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -91,14 +97,14 @@ export default function DocumentationBrowse({ locale, availableLocales, categori
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Link
-                            href={route('docs.page', { locale, category: category.slug, page: 'index' })}
-                            target="_blank"
-                          >
-                            <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" asChild>
+                            <Link
+                              href={route('docs.page', { locale, category: category.slug, page: 'index' })}
+                              target="_blank"
+                            >
                               <ExternalLink className="h-4 w-4" />
-                            </Button>
-                          </Link>
+                            </Link>
+                          </Button>
                         </div>
                       </div>
                     </CardHeader>
@@ -122,25 +128,25 @@ export default function DocumentationBrowse({ locale, availableLocales, categori
                               </div>
 
                               <div className="flex items-center gap-2">
-                                <Link
-                                  href={route('docs.page', { locale, category: category.slug, page: page.slug })}
-                                  target="_blank"
-                                >
-                                  <Button variant="ghost" size="sm">
+                                <Button variant="ghost" size="sm" asChild>
+                                  <Link
+                                    href={route('docs.page', { locale, category: category.slug, page: page.slug })}
+                                    target="_blank"
+                                  >
                                     <ExternalLink className="h-4 w-4" />
-                                  </Button>
-                                </Link>
-                                <Link
-                                  href={route('admin.plugins.documentation.edit', {
-                                    locale,
-                                    category: category.slug,
-                                    page: page.slug,
-                                  })}
-                                >
-                                  <Button variant="ghost" size="sm">
+                                  </Link>
+                                </Button>
+                                <Button variant="ghost" size="sm" asChild>
+                                  <Link
+                                    href={route('admin.plugins.documentation.edit', {
+                                      locale,
+                                      category: category.slug,
+                                      page: page.slug,
+                                    })}
+                                  >
                                     <Edit className="h-4 w-4" />
-                                  </Button>
-                                </Link>
+                                  </Link>
+                                </Button>
                               </div>
                             </div>
                           ))}

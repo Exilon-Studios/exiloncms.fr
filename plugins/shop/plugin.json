@@ -32,33 +32,33 @@
   },
   "admin_section": {
     "id": "shop",
-    "label": "shop.admin.section",
+    "label": "Shop",
     "icon": "ShoppingCart",
     "position": 30,
     "items": [
       {
-        "label": "shop.admin.dashboard",
-        "href": "/admin/shop",
+        "label": "Dashboard",
+        "href": "/admin/plugins/shop",
         "permission": "shop.admin"
       },
       {
-        "label": "shop.admin.items",
-        "href": "/admin/shop/items",
+        "label": "Items",
+        "href": "/admin/plugins/shop/items",
         "permission": "shop.items.manage"
       },
       {
-        "label": "shop.admin.categories",
-        "href": "/admin/shop/categories",
+        "label": "Categories",
+        "href": "/admin/plugins/shop/categories",
         "permission": "shop.categories.manage"
       },
       {
-        "label": "shop.admin.orders",
-        "href": "/admin/shop/orders",
+        "label": "Orders",
+        "href": "/admin/plugins/shop/orders",
         "permission": "shop.orders.manage"
       },
       {
-        "label": "shop.admin.settings",
-        "href": "/admin/shop/settings",
+        "label": "Settings",
+        "href": "/admin/plugins/shop/settings",
         "permission": "shop.admin"
       }
     ]
@@ -78,7 +78,7 @@
     "dispatch": []
   },
   "routes": {
-    "admin": "/admin/shop",
+    "admin": "/admin/plugins/shop",
     "web": "/shop"
   },
   "translations": {

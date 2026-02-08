@@ -13,9 +13,8 @@ import { PageProps } from '@/types';
 import DocSidebar from './DocSidebar';
 import DocSearch from './DocSearch';
 import DocTableOfContents from './DocTableOfContents';
-import {remark} from 'remark';
-import {remarkHtml} from 'remark-html';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface DocumentationPageProps {
   locale: string;
@@ -40,28 +39,32 @@ interface DocumentationPageProps {
 }
 
 export default function DocumentationViewer({
-  locale,
-  availableLocales,
-  navigation,
-  flatNavigation,
-  breadcrumb,
+  locale = 'fr',
+  availableLocales = ['fr', 'en'],
+  navigation = [],
+  flatNavigation = [],
+  breadcrumb = [],
   page,
-  tableOfContents,
-  adjacent,
-}: DocumentationPageProps) {
+  tableOfContents = [],
+  adjacent = { prev: null, next: null },
+}: Partial<DocumentationPageProps>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
   const { settings } = usePage<PageProps>().props;
 
   // Convert markdown to HTML
-  const markdownHtml = page.content;
+  const markdownHtml = page?.content || '';
+
+  const pageTitle = page?.frontmatter?.title || 'Documentation';
+  const siteName = settings?.name || 'ExilonCMS';
+  const pageDescription = page?.frontmatter?.description;
 
   return (
-    <div className={settings.darkTheme ? 'dark' : ''}>
+    <div className={settings?.darkTheme ? 'dark' : ''}>
       <Head>
-        <title>{page.frontmatter.title || 'Documentation'} - {settings.name}</title>
-        <meta name="description" content={page.frontmatter.description || ''} />
+        <title>{pageTitle} - {siteName}</title>
+        {pageDescription && <meta name="description" content={pageDescription} />}
       </Head>
 
       <div className="min-h-screen bg-background">
@@ -83,7 +86,7 @@ export default function DocumentationViewer({
 
               {/* Locale switcher */}
               <div className="hidden sm:flex items-center gap-1 ml-4">
-                {availableLocales.map((loc) => (
+                {(availableLocales || []).map((loc) => (
                   <Link
                     key={loc}
                     href={`/docs/${loc}`}
@@ -123,8 +126,8 @@ export default function DocumentationViewer({
             `}
           >
             <DocSidebar
-              navigation={flatNavigation}
-              currentPage={page.slug}
+              navigation={flatNavigation || []}
+              currentPage={page?.slug || ''}
               onClose={() => setSidebarOpen(false)}
             />
           </aside>
@@ -141,7 +144,7 @@ export default function DocumentationViewer({
           <main className="flex-1 min-w-0">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-sm text-muted-foreground py-4 px-4 lg:px-6 overflow-x-auto">
-              {breadcrumb.map((item, index) => (
+              {(breadcrumb || []).map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
                   {index > 0 && <IconChevronRight className="h-4 w-4" />}
                   {item.href ? (
@@ -159,12 +162,12 @@ export default function DocumentationViewer({
               {/* Page header */}
               <div className="mb-8">
                 <h1 className="text-3xl font-bold tracking-tight">
-                  {page.frontmatter.title || 'Untitled'}
+                  {page?.frontmatter?.title || 'Untitled'}
                 </h1>
 
-                {(page.frontmatter.description || page.reading_time) && (
+                {(page?.frontmatter?.description || page?.reading_time) && (
                   <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-muted-foreground">
-                    {page.frontmatter.description && (
+                    {page.frontmatter?.description && (
                       <p>{page.frontmatter.description}</p>
                     )}
                     {page.reading_time && (
@@ -177,7 +180,7 @@ export default function DocumentationViewer({
               {/* Content */}
               <article className="prose prose-slate dark:prose-invert max-w-none">
                 <ReactMarkdown
-                  remarkPlugins={[remark, [remarkHtml, {sanitize: false}]]}
+                  remarkPlugins={[remarkGfm]}
                   components={{
                     h1: ({node, ...props}) => <h1 className="scroll-m-20 text-3xl font-bold tracking-tight" {...props} />,
                     h2: ({node, ...props}) => (
@@ -220,9 +223,9 @@ export default function DocumentationViewer({
               </article>
 
               {/* Prev/Next navigation */}
-              {(adjacent.prev || adjacent.next) && (
+              {(adjacent?.prev || adjacent?.next) && (
                 <div className="mt-12 flex justify-between gap-4 pt-8 border-t">
-                  {adjacent.prev ? (
+                  {adjacent?.prev ? (
                     <Link
                       href={`/docs/${locale}/${adjacent.prev.category_slug}/${adjacent.prev.slug}`}
                       className="flex items-center gap-2 group max-w-[50%]"
@@ -237,7 +240,7 @@ export default function DocumentationViewer({
                     <div />
                   )}
 
-                  {adjacent.next ? (
+                  {adjacent?.next ? (
                     <Link
                       href={`/docs/${locale}/${adjacent.next.category_slug}/${adjacent.next.slug}`}
                       className="flex items-center gap-2 group max-w-[50%] ml-auto text-right"
@@ -257,10 +260,10 @@ export default function DocumentationViewer({
           </main>
 
           {/* Table of Contents sidebar (desktop) */}
-          {tableOfContents.length > 0 && (
+          {(tableOfContents?.length || 0) > 0 && (
             <aside className="hidden xl:block w-64 shrink-0">
               <div className="sticky top-14 px-4 py-6">
-                <DocTableOfContents headings={tableOfContents} />
+                <DocTableOfContents headings={tableOfContents || []} />
               </div>
             </aside>
           )}

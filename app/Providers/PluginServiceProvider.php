@@ -93,10 +93,19 @@ class PluginServiceProvider extends ServiceProvider
             }
 
             // Load routes - use plugin ID as prefix (e.g., /shop, /blog)
+            // Or use configured route_slug for documentation plugin
+            $routePrefix = $pluginId;
+            if ($pluginId === 'documentation') {
+                $customSlug = setting('documentation.route_slug', 'docs');
+                if (! empty($customSlug)) {
+                    $routePrefix = $customSlug;
+                }
+            }
+
             if ($plugin->hasRoutes()) {
                 $routesPath = $plugin->getRoutesPath();
                 Route::middleware(['web'])
-                    ->prefix($pluginId)
+                    ->prefix($routePrefix)
                     ->group(function () use ($plugin, $routesPath) {
                         require $routesPath;
                     });

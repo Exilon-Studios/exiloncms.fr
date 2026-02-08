@@ -10,6 +10,9 @@ module.exports = {
         './resources/**/*.ts',
         './resources/**/*.tsx',
     ],
+    plugins: [
+        require('@tailwindcss/typography'),
+    ],
     theme: {
         extend: {
             colors: {

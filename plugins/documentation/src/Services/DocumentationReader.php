@@ -282,6 +282,11 @@ class DocumentationReader
                     $key = $match[1];
                     $value = trim($match[2]);
 
+                    // Strip quotes from string values
+                    if (preg_match('/^(["\'])(.*)\1$/', $value, $quoteMatch)) {
+                        $value = $quoteMatch[2];
+                    }
+
                     // Handle different value types
                     if (strtolower($value) === 'true') {
                         $value = true;

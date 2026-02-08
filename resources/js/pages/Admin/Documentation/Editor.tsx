@@ -19,7 +19,6 @@ import {
 } from '@/components/ui/dialog';
 import { FileText, Folder, FolderOpen, Save, Eye, ChevronRight, File, FileCode, Home, FolderPlus, Trash2, Plus, MoreVertical, Loader2, Globe, Languages, FileEdit } from 'lucide-react';
 import { useState, FormEvent, useEffect, useCallback, useRef } from 'react';
-import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { route } from 'ziggy-js';
@@ -27,6 +26,8 @@ import { trans } from '@/lib/i18n';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import TiptapEditor from '@/components/editor/tiptap-editor';
+import { markdownToHtml, htmlToMarkdown, parseFrontmatter, buildFrontmatter } from '@/lib/markdown';
 
 interface Props {
   locale: string;
@@ -178,7 +179,7 @@ function SortableItem({
           </div>
           {expandedFolders.has(nodePath) && node.children && (
             <div className="ml-4">
-              {renderChildren(node, level + 1, nodePath)}
+              {renderChildren(node.children, level + 1, nodePath)}
             </div>
           )}
         </div>
@@ -225,9 +226,11 @@ function SortableItem({
 export default function DocumentationEditor({ locale, availableLocales, categories: initialCategories }: Props) {
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [fileContent, setFileContent] = useState('');
+  const [frontmatter, setFrontmatter] = useState<Record<string, any>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+  const [showMetadataSidebar, setShowMetadataSidebar] = useState(false);
   // Ensure categories is always an array
   const [categories, setCategories] = useState(Array.isArray(initialCategories) ? initialCategories : []);
 
@@ -244,6 +247,15 @@ export default function DocumentationEditor({ locale, availableLocales, categori
   const [newLocaleCode, setNewLocaleCode] = useState('');
   const [duplicateFromLocale, setDuplicateFromLocale] = useState('');
   const [isCreatingLocale, setIsCreatingLocale] = useState(false);
+
+  // Slug editing modal
+  const [showSlugModal, setShowSlugModal] = useState(false);
+  const [slugEditNode, setSlugEditNode] = useState<FileNode | null>(null);
+  const [newSlugValue, setNewSlugValue] = useState('');
+  const [isSavingSlug, setIsSavingSlug] = useState(false);
+
+  // File tree state for drag & drop reordering
+  const [fileTree, setFileTree] = useState<FileNode[]>([]);
 
   // Inline editing state
   const [editingNode, setEditingNode] = useState<EditingState>({
@@ -262,9 +274,13 @@ export default function DocumentationEditor({ locale, availableLocales, categori
 
   const editorRef = useRef<HTMLDivElement>(null);
 
-  // Drag and drop sensors
+  // Drag and drop sensors - only left click and hold to drag
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Only start dragging after moving 5px
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -300,13 +316,26 @@ export default function DocumentationEditor({ locale, availableLocales, categori
           })) : [],
         }));
         setCategories(newCategories);
+        // Set fileTree directly from raw tree
+        setFileTree(tree);
       }
     } catch (error) {
       console.error('Failed to reload categories:', error);
       // Set empty array on error to prevent crashes
       setCategories([]);
+      setFileTree([]);
     }
   }, [locale]);
+
+  // Initialize fileTree when categories change
+  useEffect(() => {
+    if (categories.length > 0) {
+      const tree = buildFileTree(categories);
+      setFileTree(tree);
+    } else {
+      setFileTree([]);
+    }
+  }, [categories]);
 
   const toggleFolder = (path: string) => {
     const newExpanded = new Set(expandedFolders);
@@ -346,7 +375,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
     return tree;
   };
 
-  const fileTree = buildFileTree(categories);
+  // Use fileTree state for rendering
   const flatFileIds = fileTree.flatMap(node => {
     const ids = [node.id!];
     if (node.children) {
@@ -367,12 +396,93 @@ export default function DocumentationEditor({ locale, availableLocales, categori
     });
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
-    if (over && active.id !== over.id) {
-      // TODO: Implement file/folder move logic
-      console.log('Move from', active.id, 'to', over.id);
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    // Find the active and over items in the tree
+    const findItem = (nodes: FileNode[], id: string): { item: FileNode | null, parent: FileNode | null, index: number } => {
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        if (node.path === id) {
+          return { item: node, parent: null, index: i };
+        }
+        if (node.children) {
+          for (let j = 0; j < node.children.length; j++) {
+            if (node.children[j].path === id) {
+              return { item: node.children[j], parent: node, index: j };
+            }
+          }
+        }
+      }
+      return { item: null, parent: null, index: -1 };
+    };
+
+    const activeResult = findItem(fileTree, active.id);
+    const overResult = findItem(fileTree, over.id);
+
+    if (activeResult.item && overResult.item) {
+      // Create new tree with reordered items
+      const moveItem = (nodes: FileNode[], fromIndex: number, toIndex: number, parent: FileNode | null): FileNode[] => {
+        const newNodes = [...nodes];
+        const [removed] = newNodes.splice(fromIndex, 1);
+        newNodes.splice(toIndex, 0, removed);
+        return newNodes;
+      };
+
+      if (activeResult.parent === overResult.parent) {
+        // Reordering within the same parent
+        if (activeResult.parent) {
+          const newChildren = moveItem(
+            activeResult.parent.children!,
+            activeResult.index,
+            overResult.index,
+            activeResult.parent
+          );
+          // Update the parent
+          setFileTree(prev => prev.map(node => {
+            if (node.path === activeResult.parent.path) {
+              return { ...node, children: newChildren };
+            }
+            return node;
+          }));
+        } else {
+          // Reordering root level
+          const newTree = moveItem(fileTree, activeResult.index, overResult.index, null);
+          setFileTree(newTree);
+        }
+      }
+
+      // Save order to backend
+      try {
+        const order = fileTree.map(node => ({
+          type: 'category',
+          path: node.path,
+          name: node.title || node.name,
+          children: node.children?.map(child => ({
+            type: 'page',
+            path: child.path,
+            name: child.title || child.name,
+          })) || [],
+        }));
+
+        await fetch(route('admin.plugins.documentation.reorder'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || ''
+          },
+          body: JSON.stringify({
+            locale,
+            order,
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to save order:', error);
+      }
     }
   };
 
@@ -443,80 +553,110 @@ export default function DocumentationEditor({ locale, availableLocales, categori
     setEditingNode({ node: null, type: null, originalValue: '' });
   };
 
+  const openSlugModal = (node: FileNode) => {
+    setSlugEditNode(node);
+    setNewSlugValue(node.slug || node.path.split('/').pop() || '');
+    setShowSlugModal(true);
+    setContextMenu({ node: null, x: 0, y: 0, visible: false });
+  };
+
+  const saveSlugEdit = async () => {
+    if (!slugEditNode || !newSlugValue) return;
+
+    setIsSavingSlug(true);
+    setContextMenu({ node: null, x: 0, y: 0, visible: false });
+
+    try {
+      const oldSlug = slugEditNode.slug || slugEditNode.path.split('/').pop();
+      const categoryPath = slugEditNode.path.split('/')[0];
+
+      // Get the current content
+      const response = await fetch(route('admin.plugins.documentation.file-content'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || ''
+        },
+        body: JSON.stringify({ locale, path: slugEditNode.path }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        let content = data.content || '';
+
+        // Update the slug in the frontmatter
+        const titleMatch = content.match(/^title:\s*"(.+?)"/m);
+        const slugMatch = content.match(/^slug:\s*"(.+?)"/m);
+
+        if (slugMatch) {
+          // Update existing slug
+          const slugLine = content.indexOf(slugMatch[0]);
+          const endOfLine = content.indexOf('\n', slugLine);
+          content = content.substring(0, slugLine) +
+                    `slug: "${newSlugValue}"` +
+                    content.substring(endOfLine);
+        } else if (titleMatch) {
+          // Add slug after title line
+          const titleLine = content.indexOf(titleMatch[0]);
+          const endOfTitleLine = content.indexOf('\n', titleLine);
+          content = content.substring(0, endOfTitleLine + 1) +
+                    `slug: "${newSlugValue}"\n` +
+                    content.substring(endOfTitleLine + 1);
+        }
+
+        // Save the updated content
+        await router.post(route('admin.plugins.documentation.save-content'), {
+          locale,
+          path: slugEditNode.path,
+          content,
+        });
+
+        await reloadCategories();
+
+        // Update selected file if it's the same
+        if (selectedFile?.path === slugEditNode.path) {
+          setSelectedFile({
+            ...selectedFile,
+            slug: newSlugValue,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to update slug:', error);
+    } finally {
+      setIsSavingSlug(false);
+      setShowSlugModal(false);
+      setSlugEditNode(null);
+      setNewSlugValue('');
+    }
+  };
+
   const deleteNode = async (node: FileNode) => {
     setContextMenu({ node: null, x: 0, y: 0, visible: false });
 
-    const confirmMessage = node.type === 'directory'
-      ? trans('admin.documentation.messages.folder_delete_confirm', { name: node.name })
-      : trans('admin.documentation.messages.delete_confirm', { name: node.name });
-
-    if (!confirm(confirmMessage)) {
-      return;
+    // Clear editor if deleted file was selected (before the request)
+    if (selectedFile?.path === node.path) {
+      setSelectedFile(null);
+      setFileContent('');
     }
 
     try {
-      if (node.type === 'file') {
-        await router.delete(route('admin.plugins.documentation.destroy', {
-          locale,
-          category: node.path.split('/')[0],
-          page: node.slug || node.path.split('/').slice(1).join('/'),
-        }));
-      } else {
-        // For folders, we need to delete all files recursively
-        const response = await fetch(route('admin.plugins.documentation.tree', { locale }), {
-          method: 'GET',
-        });
-        const data = await response.json();
-
-        const deleteFilesRecursively = async (folderPath: string) => {
-          const folder = data.tree.find((n: any) => n.path === folderPath);
-          if (!folder) return;
-
-          // Delete all files in folder
-          if (folder.children) {
-            for (const child of folder.children) {
-              if (child.type === 'file') {
-                await router.delete(route('admin.plugins.documentation.destroy', {
-                  locale,
-                  category: folderPath,
-                  page: child.slug,
-                }));
-              }
-            }
-          }
-
-          // Delete the index.md file
-          const indexPath = `${folderPath}/index`;
-          try {
-            await fetch(route('admin.plugins.documentation.save-content'), {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || ''
-              },
-              body: JSON.stringify({
-                locale,
-                path: indexPath,
-                content: '', // Empty content to delete
-              }),
-            });
-          } catch (e) {
-            // Ignore error if file doesn't exist
-          }
-        };
-
-        await deleteFilesRecursively(node.path);
-      }
-
-      await reloadCategories();
-
-      if (selectedFile?.path === node.path) {
-        setSelectedFile(null);
-        setFileContent('');
-      }
+      // Use the new delete-by-path endpoint
+      // The server returns redirect()->back() which Inertia will follow
+      // This will refresh the page with updated props including new categories
+      await router.post(route('admin.plugins.documentation.delete'), {
+        locale,
+        path: node.path,
+        type: node.type,
+      }, {
+        // Only preserve scroll to avoid jarring page jump
+        preserveScroll: true,
+      });
 
     } catch (error) {
       console.error('Failed to delete:', error);
+      // If there's an error, reload categories to sync state
+      await reloadCategories();
     }
   };
 
@@ -678,7 +818,11 @@ export default function DocumentationEditor({ locale, availableLocales, categori
 
       if (response.ok) {
         const data = await response.json();
-        setFileContent(data.content || '');
+        // Convert markdown to HTML for TipTap editor, preserving frontmatter
+        const markdown = data.content || '';
+        const { html, frontmatter: parsedFrontmatter } = markdownToHtml(markdown);
+        setFileContent(html);
+        setFrontmatter(parsedFrontmatter);
       }
     } catch (error) {
       console.error('Failed to load file:', error);
@@ -691,10 +835,13 @@ export default function DocumentationEditor({ locale, availableLocales, categori
     setIsSaving(true);
 
     try {
+      // Convert HTML back to markdown before saving, preserving frontmatter
+      const markdown = htmlToMarkdown(fileContent, frontmatter);
+
       await router.post(route('admin.plugins.documentation.save-content'), {
         locale,
         path: selectedFile.path,
-        content: fileContent,
+        content: markdown,
       }, {
         preserveState: true,
         preserveScroll: true,
@@ -733,12 +880,12 @@ export default function DocumentationEditor({ locale, availableLocales, categori
         <div className="h-14 border-b border-border bg-background px-4 flex items-center justify-between">
           {/* Left: Back + Title */}
           <div className="flex items-center gap-4">
-            <Link href={route('admin.plugins.documentation.index')}>
-              <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/admin/plugins">
                 <Home className="h-4 w-4 mr-2" />
                 {trans('admin.documentation.editor.back_to_admin')}
-              </Button>
-            </Link>
+              </Link>
+            </Button>
 
             <div className="h-6 w-px bg-border"></div>
 
@@ -768,7 +915,7 @@ export default function DocumentationEditor({ locale, availableLocales, categori
                   variant="outline"
                   size="sm"
                   as={Link}
-                  href={route('docs.page', {
+                  href={route('docs.locale.page', {
                     locale,
                     category: selectedFile.path.split('/')[0],
                     page: selectedFile.slug ?? selectedFile.path.split('/').slice(1).join('/'),
@@ -849,32 +996,175 @@ export default function DocumentationEditor({ locale, availableLocales, categori
             </div>
           </div>
 
-          {/* Right - Editor */}
-          <div className="flex-1 overflow-hidden flex flex-col">
+          {/* Right - Editor + Metadata Sidebar */}
+          <div className="flex-1 overflow-hidden flex">
             {selectedFile ? (
               <>
-                {/* Editor Header */}
-                <div className="h-10 border-b border-border px-4 flex items-center justify-between bg-muted/20">
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-sm font-medium">{selectedFile.name}</span>
-                    <span className="text-xs text-muted-foreground">/</span>
-                    <span className="text-xs text-muted-foreground">{selectedFile.path}</span>
+                {/* Editor Section */}
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  {/* Editor Header with cleaner breadcrumb */}
+                  <div className="h-10 border-b border-border px-4 flex items-center justify-between bg-muted/20">
+                    <div className="flex items-center gap-2 text-sm">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
+                      {selectedFile.type === 'directory' ? (
+                        <span className="font-medium">{selectedFile.name}</span>
+                      ) : (
+                        <>
+                          <span className="text-muted-foreground">{selectedFile.path.split('/')[0]}</span>
+                          <ChevronRight className="h-3 w-3 text-muted-foreground" />
+                          <span className="font-medium">{selectedFile.name}</span>
+                        </>
+                      )}
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowMetadataSidebar(!showMetadataSidebar)}
+                      title={showMetadataSidebar ? 'Hide metadata' : 'Show metadata'}
+                    >
+                      <FileEdit className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {/* WYSIWYG Editor */}
+                  <div className="flex-1 overflow-auto p-4 bg-background">
+                    <TiptapEditor
+                      content={fileContent}
+                      onChange={(content) => {
+                        setFileContent(content);
+                        setHasUnsavedChanges(true);
+                      }}
+                      placeholder={trans('admin.documentation.editor.wysiwyg_placeholder')}
+                      className="min-h-full"
+                    />
                   </div>
                 </div>
 
-                {/* Editor Content */}
-                <div className="flex-1 overflow-hidden">
-                  <Textarea
-                    value={fileContent}
-                    onChange={(e) => {
-                      setFileContent(e.target.value);
-                      setHasUnsavedChanges(true);
-                    }}
-                    placeholder={`# ${trans('admin.documentation.editor.markdown_placeholder')}`}
-                    className="w-full h-full font-mono text-sm p-4 border-0 rounded-none resize-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  />
-                </div>
+                {/* Metadata Sidebar */}
+                {showMetadataSidebar && selectedFile.type === 'file' && (
+                  <div className="w-80 border-l border-border bg-muted/20 overflow-y-auto">
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-semibold text-sm">File Metadata</h3>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowMetadataSidebar(false)}
+                        >
+                          ✕
+                        </Button>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Title</Label>
+                          <Input
+                            value={frontmatter.title || ''}
+                            onChange={(e) => {
+                              setFrontmatter({ ...frontmatter, title: e.target.value });
+                              setHasUnsavedChanges(true);
+                            }}
+                            placeholder="Page title"
+                          />
+                        </div>
+
+                        <div>
+                          <Label>Description</Label>
+                          <Input
+                            value={frontmatter.description || ''}
+                            onChange={(e) => {
+                              setFrontmatter({ ...frontmatter, description: e.target.value });
+                              setHasUnsavedChanges(true);
+                            }}
+                            placeholder="Page description"
+                          />
+                        </div>
+
+                        <div>
+                          <Label>Slug</Label>
+                          <Input
+                            value={selectedFile.slug || frontmatter.slug || ''}
+                            disabled
+                            className="bg-muted"
+                          />
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Use right-click menu to change slug
+                          </p>
+                        </div>
+
+                        <div>
+                          <Label>Order</Label>
+                          <Input
+                            type="number"
+                            value={frontmatter.order || 0}
+                            onChange={(e) => {
+                              setFrontmatter({ ...frontmatter, order: parseInt(e.target.value) || 0 });
+                              setHasUnsavedChanges(true);
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <Label>Icon</Label>
+                          <Input
+                            value={frontmatter.icon || ''}
+                            onChange={(e) => {
+                              setFrontmatter({ ...frontmatter, icon: e.target.value });
+                              setHasUnsavedChanges(true);
+                            }}
+                            placeholder="Folder, Book, etc."
+                          />
+                        </div>
+
+                        <div>
+                          <Label>Badge</Label>
+                          <Input
+                            value={frontmatter.badge || ''}
+                            onChange={(e) => {
+                              setFrontmatter({ ...frontmatter, badge: e.target.value });
+                              setHasUnsavedChanges(true);
+                            }}
+                            placeholder="New, Updated, etc."
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            id="draft"
+                            checked={frontmatter.draft || false}
+                            onChange={(e) => {
+                              setFrontmatter({ ...frontmatter, draft: e.target.checked });
+                              setHasUnsavedChanges(true);
+                            }}
+                            className="rounded"
+                          />
+                          <Label htmlFor="draft" className="text-sm">Draft</Label>
+                        </div>
+
+                        <div className="pt-4 border-t">
+                          <Button
+                            onClick={saveFile}
+                            disabled={isSaving}
+                            className="w-full"
+                          >
+                            {isSaving ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              <>
+                                <Save className="h-4 w-4 mr-2" />
+                                Save Changes
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <div className="h-full flex items-center justify-center text-muted-foreground">
@@ -933,6 +1223,13 @@ export default function DocumentationEditor({ locale, availableLocales, categori
               </button>
             </>
           )}
+          <button
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent rounded-md"
+            onClick={() => openSlugModal(contextMenu.node!)}
+          >
+            <FileEdit className="h-4 w-4" />
+            Edit Slug
+          </button>
           <button
             className="w-full flex items-center gap-2 px-3 py-2 text-sm hover:bg-accent rounded-md text-red-500"
             onClick={() => deleteNode(contextMenu.node!)}
@@ -1085,6 +1382,62 @@ export default function DocumentationEditor({ locale, availableLocales, categori
             <Button onClick={createNewLocale} disabled={isCreatingLocale || !newLocaleCode || newLocaleCode.length < 2}>
               {isCreatingLocale ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
               {trans('admin.documentation.editor.create')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Slug Modal */}
+      <Dialog open={showSlugModal} onOpenChange={setShowSlugModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Slug</DialogTitle>
+            <DialogDescription>
+              Change the URL slug for {slugEditNode?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="slug-input">New Slug</Label>
+              <Input
+                id="slug-input"
+                value={newSlugValue}
+                onChange={(e) => setNewSlugValue(e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '-'))}
+                placeholder="my-new-slug"
+              />
+              <p className="text-xs text-muted-foreground">
+                Only lowercase letters, numbers, and hyphens are allowed
+              </p>
+            </div>
+            {slugEditNode && (
+              <div className="space-y-2">
+                <Label>Preview URL</Label>
+                <p className="text-sm text-muted-foreground">
+                  {slugEditNode.type === 'directory'
+                    ? route('docs.locale.category', {
+                        locale,
+                        category: newSlugValue || slugEditNode.slug,
+                      })
+                    : route('docs.locale.page', {
+                        locale,
+                        category: slugEditNode.path.split('/')[0],
+                        page: newSlugValue || slugEditNode.slug,
+                      })}
+                </p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setShowSlugModal(false);
+              setSlugEditNode(null);
+              setNewSlugValue('');
+            }}>
+              Cancel
+            </Button>
+            <Button onClick={saveSlugEdit} disabled={isSavingSlug || !newSlugValue}>
+              {isSavingSlug ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
+              Save Slug
             </Button>
           </DialogFooter>
         </DialogContent>
