@@ -5,6 +5,17 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.5] - 2026-02-08
+
+### Added
+- **Auto-enable core plugins during installation**: Documentation, Shop, and Tickets plugins are now automatically enabled
+  - Plugin migrations are run automatically during installation
+  - Plugins are added to plugins.json and cache is cleared
+  - Eliminates manual plugin activation step after installation
+
+### Changed
+- Plugins are no longer required to be manually activated after web installation
+
 ## [1.4.4] - 2026-02-08
 
 ### Fixed

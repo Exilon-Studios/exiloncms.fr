@@ -914,6 +914,9 @@ class InstallController extends Controller
                 ]
             );
 
+            // Enable core plugins automatically
+            $this->enableCorePlugins();
+
             // Generate APP_KEY
             $this->updateEnvironmentFile([
                 'APP_KEY' => 'base64:'.base64_encode(Encrypter::generateKey(config('app.cipher'))),
@@ -1136,6 +1139,72 @@ class InstallController extends Controller
         if (is_writable($envPath)) {
             @file_put_contents($envPath, "\nAPP_INSTALLED=true\n", FILE_APPEND);
         }
+    }
+
+    /**
+     * Enable core plugins (documentation, shop, tickets) after installation.
+     * This ensures plugins are properly initialized with their migrations.
+     */
+    protected function enableCorePlugins(): void
+    {
+        // Core plugins to enable automatically
+        $corePlugins = ['documentation', 'shop', 'tickets'];
+        $pluginsPath = base_path('plugins');
+        $pluginsFile = base_path('plugins/plugins.json');
+
+        foreach ($corePlugins as $pluginId) {
+            $pluginPath = $pluginsPath.'/'.$pluginId;
+
+            // Check if plugin directory exists
+            if (! is_dir($pluginPath)) {
+                continue;
+            }
+
+            // Check if plugin has migrations
+            if (is_dir($pluginPath.'/database/migrations')) {
+                // Run migrations for this plugin
+                try {
+                    Artisan::call('migrate', ['--force' => true]);
+                } catch (\Exception $e) {
+                    // Log but continue - migration might have already run
+                    \Log::warning("Migration failed for plugin {$pluginId}: ".$e->getMessage());
+                }
+            }
+        }
+
+        // Load current enabled plugins or create empty array
+        $enabledPlugins = [];
+        if (file_exists($pluginsFile)) {
+            $content = file_get_contents($pluginsFile);
+            $plugins = json_decode($content, true);
+            if (is_array($plugins)) {
+                $enabledPlugins = $plugins;
+            }
+        }
+
+        // Add core plugins if not already enabled
+        foreach ($corePlugins as $pluginId) {
+            if (! in_array($pluginId, $enabledPlugins, true) && is_dir($pluginsPath.'/'.$pluginId)) {
+                $enabledPlugins[] = $pluginId;
+            }
+        }
+
+        // Save to plugins.json
+        $pluginsDir = dirname($pluginsFile);
+        if (! is_dir($pluginsDir)) {
+            mkdir($pluginsDir, 0755, true);
+        }
+
+        file_put_contents($pluginsFile, json_encode(array_values(array_unique($enabledPlugins)), JSON_PRETTY_PRINT));
+
+        // Clear plugin cache
+        $cacheFile = base_path('bootstrap/cache/plugins.php');
+        if (file_exists($cacheFile)) {
+            unlink($cacheFile);
+        }
+
+        \Illuminate\Support\Facades\Cache::forget('settings');
+        \Illuminate\Support\Facades\Cache::forget('plugins');
     }
 
     /**
