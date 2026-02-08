@@ -7,7 +7,6 @@ use ExilonCMS\Models\Role;
 use ExilonCMS\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class AdminUserSeeder extends Seeder
 {
@@ -15,6 +14,10 @@ class AdminUserSeeder extends Seeder
 
     /**
      * Run the database seeds.
+     *
+     * NOTE: The admin user is NOT created here anymore.
+     * It should be created during installation via the web installer
+     * or using `php artisan user:create --admin`.
      */
     public function run(): void
     {
@@ -27,36 +30,6 @@ class AdminUserSeeder extends Seeder
                 'power' => 100,
             ]
         );
-
-        // Create admin user with configurable email
-        $adminEmail = env('ADMIN_EMAIL', 'admin@example.com');
-
-        // Check if admin already exists with the same email to avoid duplicates
-        $existingAdmin = User::where('email', $adminEmail)->first();
-        if (! $existingAdmin) {
-            $admin = User::create([
-                'email' => $adminEmail,
-                'name' => 'Admin',
-                'password' => Hash::make('admin123'),
-                'role_id' => $adminRole->id,
-                'email_verified_at' => now(),
-                'password_changed_at' => now(),
-            ]);
-        }
-
-        // Fallback: create with admin@example.com if no env set
-        if (! $existingAdmin) {
-            $admin = User::firstOrCreate(
-                ['email' => 'admin@example.com'],
-                [
-                    'name' => 'Admin',
-                    'password' => Hash::make('password'),
-                    'role_id' => $adminRole->id,
-                    'email_verified_at' => now(),
-                    'password_changed_at' => now(),
-                ]
-            );
-        }
 
         // Create all permissions for admin role
         if ($adminRole->permissions()->count() === 0) {

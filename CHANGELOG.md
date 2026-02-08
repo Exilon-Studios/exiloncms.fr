@@ -5,6 +5,14 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.98] - 2026-02-08
+
+### Fixed
+- **Installer admin account creation**: Removed default admin user creation from AdminUserSeeder
+  - The web installer now creates the admin account exclusively
+  - Fixes login issues where the installer-created account couldn't be used
+  - Admin account should now be created via web installer or `php artisan user:create --admin`
+
 ## [1.3.91] - 2026-02-07
 
 ### Fixed
