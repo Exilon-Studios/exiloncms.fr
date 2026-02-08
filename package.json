@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "name": "exiloncms",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "ExilonCMS - Modern CMS for communities and businesses",
   "repository": {
     "type": "git",

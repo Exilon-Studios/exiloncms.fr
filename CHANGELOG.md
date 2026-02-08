@@ -5,6 +5,14 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3] - 2026-02-08
+
+### Fixed
+- **Pages plugin dependency error**: Made Pages plugin optional in AdminController
+  - Removed hard dependency on ExilonCMS\Plugins\Pages\Models\Page
+  - Dashboard now checks if Pages plugin exists before counting pages
+  - Fixes "Class not found" error when Pages plugin is disabled
+
 ## [1.4.2] - 2026-02-08
 
 ### Fixed

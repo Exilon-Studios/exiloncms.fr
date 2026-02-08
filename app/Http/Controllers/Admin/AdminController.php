@@ -6,7 +6,6 @@ use ExilonCMS\Extensions\UpdateManager;
 use ExilonCMS\Http\Controllers\Controller;
 use ExilonCMS\Models\Image;
 use ExilonCMS\Models\User;
-use ExilonCMS\Plugins\Pages\Models\Page;
 use ExilonCMS\Support\Charts;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
@@ -39,12 +38,18 @@ class AdminController extends Controller
             $totalPosts = \ExilonCMS\Plugins\Blog\Models\Post::count();
         }
 
+        // Count pages only if Pages plugin is available
+        $totalPages = 0;
+        if (class_exists('ExilonCMS\Plugins\Pages\Models\Page')) {
+            $totalPages = \ExilonCMS\Plugins\Pages\Models\Page::count();
+        }
+
         return inertia('Admin/Dashboard', [
             'secure' => $request->secure() || ! $this->app->isProduction(),
             'stats' => [
                 'totalUsers' => $userCount,
                 'totalPosts' => $totalPosts,
-                'totalPages' => Page::count(),
+                'totalPages' => $totalPages,
                 'totalImages' => Image::count(),
             ],
             'charts' => [
