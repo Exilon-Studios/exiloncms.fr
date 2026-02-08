@@ -835,7 +835,6 @@ class InstallController extends Controller
         try {
             Artisan::call('migrate:fresh', [
                 '--force' => true,
-                '--seed' => true,
             ]);
         } catch (Throwable $e) {
             \Log::error('Migration error during installation', [
@@ -883,8 +882,25 @@ class InstallController extends Controller
                 ]
             );
 
-            // Get admin role
-            $adminRole = Role::where('is_admin', true)->firstOrFail();
+            // Create admin role and permissions if they don't exist
+            $adminRole = Role::firstOrCreate(
+                ['name' => 'admin'],
+                [
+                    'color' => 'FF0000',
+                    'is_admin' => true,
+                    'power' => 100,
+                ]
+            );
+
+            // Create permissions for admin role if needed
+            if ($adminRole->permissions()->count() === 0) {
+                foreach (\ExilonCMS\Models\Permission::permissions() as $permission) {
+                    \ExilonCMS\Models\Permission::create([
+                        'permission' => $permission,
+                        'role_id' => $adminRole->id,
+                    ]);
+                }
+            }
 
             // Create or update admin user (update if exists from seeder)
             $user = User::updateOrCreate(
