@@ -12,14 +12,19 @@ class ShopController
 {
     public function index()
     {
+        // Check if Shop plugin tables exist before querying
+        $hasItemsTable = Schema::hasTable('shop_items');
+        $hasOrdersTable = Schema::hasTable('orders');
+        $hasCategoriesTable = Schema::hasTable('shop_categories');
+
         $stats = [
-            'total_items' => Schema::hasTable('shop_items') ? Item::count() : 0,
-            'total_orders' => Schema::hasTable('orders') ? \ExilonCMS\Plugins\Shop\Models\Order::count() : 0,
-            'total_revenue' => Schema::hasTable('orders') ? \ExilonCMS\Plugins\Shop\Models\Order::completed()->sum('total') ?? 0 : 0,
-            'pending_orders' => Schema::hasTable('orders') ? \ExilonCMS\Plugins\Shop\Models\Order::pending()->count() : 0,
+            'total_items' => $hasItemsTable ? Item::count() : 0,
+            'total_orders' => $hasOrdersTable ? \ExilonCMS\Plugins\Shop\Models\Order::count() : 0,
+            'total_revenue' => $hasOrdersTable ? (\ExilonCMS\Plugins\Shop\Models\Order::completed()->sum('total') ?? 0) : 0,
+            'pending_orders' => $hasOrdersTable ? \ExilonCMS\Plugins\Shop\Models\Order::pending()->count() : 0,
         ];
 
-        $categories = Schema::hasTable('shop_categories') ? Category::orderBy('position')->get() : collect();
+        $categories = $hasCategoriesTable ? Category::orderBy('position')->get() : collect();
 
         return Inertia::render('Admin/Shop/Index', [
             'stats' => $stats,

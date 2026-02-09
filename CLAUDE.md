@@ -38,6 +38,17 @@ php artisan install:interactive
 # Initial setup (first time)
 composer install
 php artisan key:generate
+
+# Configure database (SQLite by default, edit .env for PostgreSQL/MySQL)
+# DB_CONNECTION=sqlite
+# Or for PostgreSQL:
+# DB_CONNECTION=pgsql
+# DB_HOST=127.0.0.1
+# DB_PORT=5432
+# DB_DATABASE=mccms_v2
+# DB_USERNAME=mccms
+# DB_PASSWORD=mccms_secret
+
 php artisan migrate:fresh --seed
 php artisan user:create --admin --name="Admin" --email="admin@example.com" --password="password"
 npm install
@@ -64,6 +75,9 @@ npm run dev
 ```bash
 # Create a new game integration
 php artisan game:create MyGame
+
+# Check game server ping/status
+php artisan game:ping
 ```
 
 ### User Management Commands
@@ -194,7 +208,7 @@ The CLI wizard guides through:
 # Start PostgreSQL and pgAdmin
 docker-compose up -d
 
-# Container details:
+# Container details (note: project was formerly named MCCMS V2):
 # - PostgreSQL: localhost:5432
 #   - Database: mccms_v2
 #   - User: mccms
@@ -338,7 +352,7 @@ ExilonCMS supports multiple game servers through a unified game integration syst
 php artisan game:create MyGame
 ```
 
-This generates a basic game class that extends `Game` and implements required methods for server communication, user authentication, and attribute mapping.
+This generates a basic game class in `app/Games/MyGame/MyGame.php` that extends `Game` and implements required methods for server communication, user authentication, and attribute mapping.
 
 ### 5. Extension System (Plugins + Themes)
 
@@ -447,12 +461,13 @@ class Blog extends Plugin
 **Built-in Plugins:**
 - **Analytics** - Website analytics and statistics tracking
 - **Blog** - News/blog system with categories, tags, and comments
-- **Docs** - Documentation system with categories
+- **Documentation** (docs) - Documentation system with categories
 - **Legal** - Legal pages (privacy policy, terms of service)
 - **Notifications** - User notification system with channels and templates
 - **Pages** - Custom page management
 - **Releases** - Release notes and changelogs
 - **Shop** - E-commerce for game server items
+- **Tickets** - Support ticket system
 - **Translations** - Translation management interface
 - **Votes** - Voting system for game servers
 
@@ -470,7 +485,8 @@ ExilonCMS includes a Paymenter-style payment gateway system for processing payme
 **Architecture:**
 - `Gateway` abstract base class (`app/Classes/Extension/Gateway.php`) - Base for all payment gateways
 - `ExtensionHelper` (`app/Helpers/ExtensionHelper.php`) - Centralized gateway management
-- Gateways auto-discovered from `app/Extensions/Gateways/<Name>/` via composer autoload
+- Gateways are auto-discovered via composer autoload from `app/Extensions/Gateways/<Name>/<Name>.php`
+- Extension discovery uses PHP 8 `#[ExtensionMeta]` attributes for metadata
 
 **Gateway methods:**
 ```php
@@ -790,14 +806,13 @@ The project uses several key React libraries:
 7. **Flash messages** - Use session flash for success/error messages, accessed via `usePage().props.flash`
 8. **Helper functions** - Available globally via `app/helpers.php` and `app/color_helpers.php` (auto-loaded in composer.json)
 9. **Tailwind CSS v3.4** - Uses `@tailwind` directives in `resources/css/app.css`
-10. **Plugin system** - All modular features (Blog, Docs, Shop, etc.) are implemented as plugins in `plugins/` directory
+10. **Plugin system** - All modular features (Blog, Documentation, Shop, etc.) are implemented as plugins in `plugins/` directory
 11. **Marketplace integration** - Packages are installed from marketplace.exiloncms.fr via API
 12. **CRITICAL: Use ziggy-js for routes in JavaScript** - NEVER import from `vendor/tightenco/ziggy` as the vendor directory doesn't exist in CI builds. Always use `import { route } from 'ziggy-js'`
 13. **Extension lazy loading** - Extensions MUST use lazy loading in `boot()` phase, NOT `register()`. The cache service isn't available during `package:discover`, so instantiating services in `register()` will cause "Class cache does not exist" errors. Always check for package:discover and lazy load in `boot()`.
 14. **Run Pint before committing** - Code style is enforced in CI via `./vendor/bin/pint --test`. Run `./vendor/bin/pint` to auto-fix issues before pushing.
 15. **ALWAYS UPDATE CHANGELOG.md** - After ANY code change (fix, feature, refactor, chore), add an entry to `CHANGELOG.md` under today's date. Use format: `FIX:`, `FEATURE:`, `REFACTOR:`, or `CHORE:` followed by a concise description.
-
-## Common Patterns
+16. **Plugin namespace format** - When adding new plugins to composer.json autoload, use format: `"ExilonCMS\\Plugins\\<PluginName>\\": "plugins/<plugin-slug>/src/"` (e.g., `"ExilonCMS\\Plugins\\Analytics\\": "plugins/analytics/src/"`)
 
 ## Common Patterns
 
@@ -862,23 +877,32 @@ class MyPlugin extends Plugin
 composer dump-autoload
 ```
 
-5. **Enable plugin via settings:**
+5. **Enable plugin via settings or admin panel:**
 ```php
-// In database or via admin panel
-setting('enabled_plugins', ['blog', 'shop', 'my-plugin']);
+// In database
+setting(['enabled_plugins' => ['blog', 'shop', 'my-plugin']]);
+
+// Or via admin panel at /admin/plugins
 ```
 
 ### Creating a new payment gateway
 
-1. **Create gateway class** in `app/Extensions/Gateways/<Name>/<Name>.php`:
+1. **Create gateway directory and class** in `app/Extensions/Gateways/<Name>/<Name>.php`:
 ```php
 <?php
 
 namespace ExilonCMS\Extensions\Gateways\Stripe;
 
 use ExilonCMS\Classes\Extension\Gateway;
+use ExilonCMS\Attributes\ExtensionMeta;
 use ExilonCMS\Models\Invoice;
 
+#[ExtensionMeta(
+    id: 'stripe',
+    name: 'Stripe',
+    version: '1.0.0',
+    author: 'ExilonCMS'
+)]
 class Stripe extends Gateway
 {
     public function getConfig(): array
@@ -900,6 +924,13 @@ class Stripe extends Gateway
         return response()->json(['success' => true]);
     }
 }
+```
+
+2. **Ensure composer autoload** includes the path (usually via `app/Extensions/` autoloading)
+
+3. **Run composer dump-autoload**:
+```bash
+composer dump-autoload
 ```
 
 ### Creating a new admin page
@@ -1068,7 +1099,15 @@ ExilonCMS uses an `is_installed()` helper function (defined in `app/helpers.php`
 2. Fallback files: `public/installed.json`, `bootstrap/cache/installed`, `storage/installed.json`
 3. `.env` flag: `EXILONCMS_INSTALLED=true`
 
-The installation state can be reset during development by deleting the `installed_at` setting from the database or removing the fallback files.
+**Resetting installation state (for development/testing):**
+```bash
+# Via database
+php artisan tinker
+>>> \ExilonCMS\Models\Setting::where('name', 'installed_at')->delete();
+
+# Or remove fallback files
+rm public/installed.json bootstrap/cache/installed storage/installed.json
+```
 
 ## Translation Commands
 
@@ -1086,6 +1125,21 @@ php artisan translations:verify
 ```
 
 These are useful when adding new translation keys or updating existing ones.
+
+## Discord Notifications
+
+ExilonCMS supports Discord webhook notifications for CMS updates (plugins, themes, core).
+
+**Configuration:**
+Set the Discord webhook URL in `.env`:
+```env
+DISCORD_UPDATE_WEBHOOK_URL=https://discord.com/api/webhooks/...
+```
+
+When enabled, the CMS will send notifications to Discord when:
+- New CMS updates are available
+- Plugin updates are available
+- Theme updates are available
 
 ## CI/CD & Release
 

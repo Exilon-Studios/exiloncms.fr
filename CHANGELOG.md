@@ -5,6 +5,14 @@ All notable changes to ExilonCMS will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.6] - 2026-02-09
+
+### Fixed
+- **Shop plugin missing migrations**: Added missing migrations for shop_items and shop_categories tables
+  - Created migration for shop_categories table (id, name, description, position, timestamps)
+  - Created migration for shop_items table (id, name, description, price, stock, category_id, image, is_active, timestamps)
+  - Fixes "no such table: orders" and related errors when Shop plugin is enabled
+
 ## [1.4.5] - 2026-02-08
 
 ### Added
